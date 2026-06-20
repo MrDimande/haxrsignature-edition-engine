@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="0 0 600 300">
+  <defs>
+    <linearGradient id="topGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#8B6508" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(300,300)" fill="url(#topGold)" stroke="url(#topGold)" stroke-width="1.5">
+    <g id="tp">
+      <path d="M0,-260 C60,-160 75,-80 0,0 C-75,-80 -60,-160 0,-260 Z"/>
+    </g>
+    <use href="#tp" transform="rotate(45)"/>
+    <use href="#tp" transform="rotate(90)"/>
+    <use href="#tp" transform="rotate(135)"/>
+    <use href="#tp" transform="rotate(180)"/>
+    <use href="#tp" transform="rotate(225)"/>
+    <use href="#tp" transform="rotate(270)"/>
+    <use href="#tp" transform="rotate(315)"/>
+    <circle r="90" fill="none"/>
+    <circle r="45" fill="none"/>
+  </g>
+</svg>

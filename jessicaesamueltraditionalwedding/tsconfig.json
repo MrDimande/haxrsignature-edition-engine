@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./jessicaesamueltraditionalwedding/src/*"],
+      "@data/*": ["./data/*"],
+      "@lib/*": ["./lib/*"],
+      "@engines/*": ["./engines/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "next-env.d.ts"],
+  "exclude": ["node_modules"]
+}

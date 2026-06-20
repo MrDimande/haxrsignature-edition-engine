@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Versão só sombra  usar como camada separada se necessário -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <defs>
+    <filter id="layer1Shadow" x="-25%" y="-15%" width="150%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur"/>
+      <feOffset dx="0" dy="12" result="offsetBlur"/>
+      <feFlood flood-color="#2A1A08" flood-opacity="0.4"/>
+      <feComposite in2="offsetBlur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g id="layer-01-shadow" filter="url(#layer1Shadow)">
+    <ellipse cx="256" cy="268" rx="210" ry="205" fill="#1A1008" opacity="0.35"/>
+  </g>
+</svg>

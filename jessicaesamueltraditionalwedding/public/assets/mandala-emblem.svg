@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <defs>
+    <filter id="softShadow" x="-20%" y="-10%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#3D2810" flood-opacity="0.38"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+    <linearGradient id="darkGoldFoil" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A56E22"/>
+      <stop offset="35%" stop-color="#8C5A1A"/>
+      <stop offset="65%" stop-color="#704812"/>
+      <stop offset="100%" stop-color="#8C5A1A"/>
+    </linearGradient>
+    <linearGradient id="lightGoldFoil" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#F0D48A"/>
+      <stop offset="30%" stop-color="#D8B164"/>
+      <stop offset="55%" stop-color="#E8C878"/>
+      <stop offset="100%" stop-color="#C49A42"/>
+    </linearGradient>
+    <linearGradient id="mandalaGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8C878"/>
+      <stop offset="25%" stop-color="#D8B164"/>
+      <stop offset="50%" stop-color="#A56A1E"/>
+      <stop offset="75%" stop-color="#D8B164"/>
+      <stop offset="100%" stop-color="#8C5A1A"/>
+    </linearGradient>
+    <radialGradient id="mandalaRadial" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#F5E0A0"/>
+      <stop offset="45%" stop-color="#D8B164"/>
+      <stop offset="100%" stop-color="#8C5A1A"/>
+    </radialGradient>
+    <path id="petal" d="M0,-88 C22,-52 28,-18 0,0 C-28,-18 -22,-52 0,-88 Z" fill="url(#mandalaGold)"/>
+    <path id="dot" d="M0,-3 A3,3 0 1,1 0,3 A3,3 0 1,1 0,-3 Z" fill="#A56A1E"/>
+  </defs>
+  <g id="emblem-root" filter="url(#softShadow)">
+    <g id="layer-02-outer-ring">
+      <circle cx="256" cy="256" r="248" fill="url(#darkGoldFoil)"/>
+      <path d="M 256 24 A 232 232 0 0 1 464 256" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.18" stroke-linecap="round"/>
+    </g>
+    <g id="layer-03-inner-ring">
+      <circle cx="256" cy="256" r="228" fill="url(#lightGoldFoil)"/>
+      <circle cx="256" cy="256" r="228" fill="none" stroke="#FFFFFF" stroke-width="0.75" stroke-opacity="0.25"/>
+      <circle cx="256" cy="256" r="214" fill="none" stroke="#8C5A1A" stroke-width="0.5" stroke-opacity="0.35"/>
+    </g>
+    <g id="layer-04-white-center">
+      <circle cx="256" cy="256" r="198" fill="#FFFFFF"/>
+      <circle cx="256" cy="256" r="198" fill="none" stroke="#E8E0D4" stroke-width="0.5"/>
+    </g>
+    <g id="layer-05-mandala" transform="translate(256, 256)">
+      <g id="mandala-dot-ring" opacity="0.85">
+        <use href="#dot" transform="rotate(0) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(15) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(30) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(45) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(60) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(75) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(90) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(105) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(120) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(135) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(150) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(165) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(180) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(195) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(210) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(225) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(240) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(255) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(270) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(285) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(300) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(315) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(330) translate(0,-168)"/>
+        <use href="#dot" transform="rotate(345) translate(0,-168)"/>
+      </g>
+      <g id="mandala-petals-outer">
+        <use href="#petal" transform="rotate(0)"/>
+        <use href="#petal" transform="rotate(45)"/>
+        <use href="#petal" transform="rotate(90)"/>
+        <use href="#petal" transform="rotate(135)"/>
+        <use href="#petal" transform="rotate(180)"/>
+        <use href="#petal" transform="rotate(225)"/>
+        <use href="#petal" transform="rotate(270)"/>
+        <use href="#petal" transform="rotate(315)"/>
+      </g>
+      <g id="mandala-petals-inner" opacity="0.92">
+        <use href="#petal" transform="rotate(22.5) scale(0.62)"/>
+        <use href="#petal" transform="rotate(67.5) scale(0.62)"/>
+        <use href="#petal" transform="rotate(112.5) scale(0.62)"/>
+        <use href="#petal" transform="rotate(157.5) scale(0.62)"/>
+        <use href="#petal" transform="rotate(202.5) scale(0.62)"/>
+        <use href="#petal" transform="rotate(247.5) scale(0.62)"/>
+        <use href="#petal" transform="rotate(292.5) scale(0.62)"/>
+        <use href="#petal" transform="rotate(337.5) scale(0.62)"/>
+      </g>
+      <g id="mandala-diamonds" stroke="url(#mandalaGold)" stroke-width="1.8" fill="none">
+        <rect x="-42" y="-42" width="84" height="84" transform="rotate(45)" rx="1"/>
+        <rect x="-28" y="-28" width="56" height="56" transform="rotate(45)" rx="1"/>
+        <rect x="-14" y="-14" width="28" height="28" transform="rotate(45)" rx="1"/>
+      </g>
+      <g id="mandala-rings" fill="none" stroke="url(#mandalaGold)">
+        <circle r="72" stroke-width="1.5" opacity="0.7"/>
+        <circle r="48" stroke-width="1.2" opacity="0.55"/>
+        <circle r="24" stroke-width="1" opacity="0.45"/>
+      </g>
+      <g id="mandala-center">
+        <circle r="14" fill="url(#mandalaRadial)"/>
+        <circle r="6" fill="#FFFFFF" opacity="0.35"/>
+        <circle r="3" fill="#8C5A1A"/>
+      </g>
+      <g id="mandala-triangles" fill="url(#mandalaGold)" opacity="0.75">
+        <path d="M0,-58 L6,-46 L-6,-46 Z"/>
+        <path d="M0,58 L6,46 L-6,46 Z"/>
+        <path d="M58,0 L46,6 L46,-6 Z"/>
+        <path d="M-58,0 L-46,6 L-46,-6 Z"/>
+        <path d="M41,-41 L47,-35 L35,-35 Z"/>
+        <path d="M-41,-41 L-35,-35 L-47,-35 Z"/>
+        <path d="M41,41 L47,35 L35,35 Z"/>
+        <path d="M-41,41 L-35,35 L-47,35 Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37"/>
+      <stop offset="50%" stop-color="#B8860B"/>
+      <stop offset="100%" stop-color="#8B6508"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C9A227"/>
+      <stop offset="100%" stop-color="#7A5C10"/>
+    </linearGradient>
+  </defs>
+  <!-- Anel exterior -->
+  <circle cx="200" cy="200" r="198" fill="url(#ringGrad)"/>
+  <circle cx="200" cy="200" r="188" fill="#F5F0E6"/>
+  <!-- Mandala -->
+  <g transform="translate(200,200)" fill="url(#goldGrad)">
+    <g id="petal">
+      <path d="M0,-150 C35,-90 45,-40 0,0 C-45,-40 -35,-90 0,-150 Z" opacity="0.9"/>
+      <path d="M0,30 C35,90 45,140 0,150 C-45,140 -35,90 0,30 Z" opacity="0.7"/>
+    </g>
+    <use href="#petal" transform="rotate(45)"/>
+    <use href="#petal" transform="rotate(90)"/>
+    <use href="#petal" transform="rotate(135)"/>
+    <use href="#petal" transform="rotate(180)"/>
+    <use href="#petal" transform="rotate(225)"/>
+    <use href="#petal" transform="rotate(270)"/>
+    <use href="#petal" transform="rotate(315)"/>
+    <circle r="55" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+    <circle r="28" fill="url(#goldGrad)"/>
+    <g fill="#D4AF37">
+      <circle cx="0" cy="-95" r="8"/>
+      <circle cx="67" cy="-67" r="8"/>
+      <circle cx="95" cy="0" r="8"/>
+      <circle cx="67" cy="67" r="8"/>
+      <circle cx="0" cy="95" r="8"/>
+      <circle cx="-67" cy="67" r="8"/>
+      <circle cx="-95" cy="0" r="8"/>
+      <circle cx="-67" cy="-67" r="8"/>
+    </g>
+  </g>
+</svg>

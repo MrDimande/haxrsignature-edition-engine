@@ -1,0 +1,311 @@
+@import "tailwindcss";
+
+@theme {
+  /* HAXR Signature Color Tokens */
+  --color-terracotta-deep: #3D1B0B;
+  --color-terracotta-light: #4E2A18;
+  --color-wood-deep: #1E100A;
+  --color-wood-light: #2D1910;
+  --color-smooth-black: #120A07;
+  --color-gold-dark: #C5A059;
+  --color-gold-light: #D4AF37;
+  --color-beige-light: #FAF5F0;
+  --color-beige-dark: #EFE9E2;
+  --color-amber-accent: #D35400;
+  --color-orange-accent: #E67E22;
+
+  /* Custom Typography maps to layout.tsx Google Font variables */
+  --font-display: var(--font-playfair-display), serif;
+  --font-cinzel: var(--font-cinzel), serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-alt: var(--font-montserrat), sans-serif;
+}
+
+/* Base Body Styles */
+body {
+  background-color: #120A07;
+  color: #FAF5F0;
+  overflow-x: hidden;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* ─── GPU-Accelerated Background Blob Animations ─── */
+@keyframes blob-one {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.08); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes blob-two {
+  0% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(-50px, 40px) scale(1.12); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes blob-three {
+  0% { transform: translate(0px, 0px) scale(1); }
+  40% { transform: translate(40px, 30px) scale(0.92); }
+  80% { transform: translate(-30px, -45px) scale(1.06); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+/* ─── Audio Wave indicators animations ─── */
+@keyframes audio-bar-1 {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+@keyframes audio-bar-2 {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+@keyframes audio-bar-3 {
+  0%, 100% { transform: scaleY(0.2); }
+  50% { transform: scaleY(0.9); }
+}
+@keyframes audio-bar-4 {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1.15); }
+}
+
+@keyframes slow-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-blob-one {
+  animation: blob-one 20s infinite ease-in-out;
+}
+.animate-blob-two {
+  animation: blob-two 24s infinite ease-in-out;
+}
+.animate-blob-three {
+  animation: blob-three 22s infinite ease-in-out;
+}
+
+.animate-audio-bar-1 {
+  animation: audio-bar-1 1.2s infinite ease-in-out;
+}
+.animate-audio-bar-2 {
+  animation: audio-bar-2 0.85s infinite ease-in-out;
+}
+.animate-audio-bar-3 {
+  animation: audio-bar-3 1.35s infinite ease-in-out;
+}
+.animate-audio-bar-4 {
+  animation: audio-bar-4 1.05s infinite ease-in-out;
+}
+
+.animate-slow-spin {
+  animation: slow-spin 28s infinite linear;
+}
+
+/* ─── Custom Luxury Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #120A07;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(197, 160, 89, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(197, 160, 89, 0.5);
+}
+
+/* ─── Lenis Scroll Engine Overrides ─── */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* ─── Intro Overlay — CTA Button (engine-safe, não depende só de utilities) ─── */
+.ceremony-enter-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 0;
+  background-color: rgba(18, 10, 7, 0.4);
+  color: #faf5f0;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 300;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.5s ease;
+}
+
+.ceremony-enter-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: #d4af37;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ceremony-enter-btn:hover {
+  color: #120a07;
+}
+
+.ceremony-enter-btn:hover::before {
+  transform: scaleX(1);
+}
+
+.ceremony-enter-btn:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.6);
+  outline-offset: 3px;
+}
+
+/* ─── Intro Overlay — ritmo vertical editorial ─── */
+.intro-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-inline: 1.5rem;
+  max-width: 32rem;
+}
+
+.intro-overlay-brand {
+  margin-bottom: 2rem;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.45em;
+  color: #c5a059;
+}
+
+.intro-overlay-mandala {
+  width: 6rem;
+  height: 6rem;
+  margin-bottom: 2.75rem;
+  color: #d4af37;
+}
+
+.intro-overlay-subtitle {
+  margin-bottom: 1.125rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 10px;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  line-height: 1.6;
+  color: #faf5f0;
+}
+
+.intro-overlay-title {
+  margin-bottom: 1.5rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(2.25rem, 8vw, 3rem);
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  line-height: 1.2;
+  color: #d4af37;
+}
+
+.intro-overlay-divider {
+  width: 6rem;
+  height: 1px;
+  margin-bottom: 1.75rem;
+  background: linear-gradient(
+    to right,
+    transparent,
+    #c5a059,
+    transparent
+  );
+}
+
+.intro-overlay-name {
+  margin-bottom: 3rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  color: #faf5f0;
+}
+
+@media (min-width: 768px) {
+  .intro-overlay-mandala {
+    margin-bottom: 3rem;
+  }
+
+  .intro-overlay-subtitle {
+    margin-bottom: 1.25rem;
+  }
+
+  .intro-overlay-title {
+    margin-bottom: 1.75rem;
+  }
+
+  .intro-overlay-divider {
+    margin-bottom: 2rem;
+  }
+
+  .intro-overlay-name {
+    margin-bottom: 3.5rem;
+  }
+}
+
+/* ─── Impressão do passe RSVP (fallback se popup bloqueado) ─── */
+@media print {
+  html.kulaya-print-pass {
+    height: auto !important;
+  }
+
+  html.kulaya-print-pass body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 12mm !important;
+    overflow: visible !important;
+  }
+
+  html.kulaya-print-pass body * {
+    visibility: hidden !important;
+  }
+
+  html.kulaya-print-pass #luxury-ticket,
+  html.kulaya-print-pass #luxury-ticket * {
+    visibility: visible !important;
+  }
+
+  html.kulaya-print-pass #luxury-ticket {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+    width: 100% !important;
+    max-width: 420px !important;
+    height: fit-content !important;
+    box-shadow: none !important;
+    transform: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
