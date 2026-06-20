@@ -29,3 +29,5 @@ yarn-error.log*
 # Audio original pesado (usar bg-music-web.mp3)
 **/bg-music.mp3
 
+# IDE
+.cursor/
