@@ -13,6 +13,7 @@ export default function LenisProvider({ children }: { children: ReactNode }) {
         smoothWheel: true,
         wheelMultiplier: 1.0,
         touchMultiplier: 1.2,
+        overscroll: false,
       }}
     >
       {children}
