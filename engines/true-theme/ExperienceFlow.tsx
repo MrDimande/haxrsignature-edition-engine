@@ -287,18 +287,18 @@ export function AudioToggle() {
       }`}
       style={{
         borderColor: isRose
-          ? `${theme.colors.primary}66`
+          ? `${theme.colors.secondary}66`
           : `${theme.colors.accent}25`,
         backgroundColor: isRose
-          ? theme.colors.primary
+          ? theme.colors.secondary
           : "rgba(255, 255, 255, 0.42)",
         color: isRose
-          ? theme.colors.background
+          ? "#FFFFFF"
           : audioEnabled
             ? theme.colors.accent
             : theme.colors.primary,
         boxShadow: isRose
-          ? `0 4px 24px ${theme.colors.primary}45`
+          ? `0 4px 24px ${theme.colors.secondary}45`
           : undefined,
       }}
       aria-label={audioEnabled ? "Pausar música" : "Reproduzir música"}
@@ -308,7 +308,7 @@ export function AudioToggle() {
         className="absolute inset-0 rounded-full border pointer-events-none"
         style={{
           borderColor: isRose
-            ? `${theme.colors.background}35`
+            ? "rgba(255, 255, 255, 0.35)"
             : `${theme.colors.accent}15`,
         }}
         aria-hidden

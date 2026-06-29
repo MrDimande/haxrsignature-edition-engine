@@ -41,7 +41,7 @@ export const roseEleganceFarewellTheme: TrueTheme = {
   },
   palette: getRoseElegancePalette(),
   assets: {
-    heroImage: "/images/og/despedida-de-solteira-og.png",
+    heroImage: "/images/kulaya-cocktail-hero.webp",
     logoImage: "/images/haxr-logo-vertical.png",
     faviconImage: "/images/haxr-favicon.png",
     monogram: "JM",

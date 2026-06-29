@@ -12,6 +12,9 @@ export const roseType = {
     "font-script text-[4.5rem] sm:text-[5.5rem] md:text-[6.5rem] font-normal leading-[0.95] tracking-[0.02em]",
   heroSurname:
     "font-script text-[4.5rem] sm:text-[5.5rem] md:text-[6.5rem] font-normal leading-[0.95] tracking-[0.02em]",
+  /** Selo JM — serif editorial, sem cursiva ornamentada */
+  monogram:
+    "font-display text-xs sm:text-sm font-normal tracking-[0.36em] uppercase",
   bodyPoetic:
     "font-display italic text-base sm:text-lg md:text-xl font-light leading-relaxed tracking-[0.01em]",
 } as const;

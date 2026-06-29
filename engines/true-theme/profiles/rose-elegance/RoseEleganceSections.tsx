@@ -46,7 +46,7 @@ export function RoseHeroSection() {
       initial="hidden"
       animate="visible"
       variants={cinematicStagger}
-      className="relative min-h-[100dvh] min-h-screen w-full overflow-x-clip overflow-y-visible z-10"
+      className="relative w-full min-h-[100dvh] min-h-screen overflow-x-clip overflow-y-visible z-10"
       id="hero"
       style={{ backgroundColor: theme.colors.background }}
     >
@@ -105,19 +105,19 @@ export function RoseHeroSection() {
         aria-hidden
       />
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 min-h-[100dvh] min-h-screen flex flex-col md:grid md:grid-cols-12 md:gap-12 md:items-center md:py-20">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 min-h-[100dvh] min-h-screen flex flex-col items-center justify-center gap-2 pt-[max(2.75rem,env(safe-area-inset-top))] pb-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom)))] md:grid md:grid-cols-12 md:gap-12 md:items-center md:justify-start md:py-20 md:pb-20 md:min-h-screen">
         {/* Ilustração hero */}
         <motion.div
           variants={cinematicRevealVariants}
-          className="flex justify-center pt-[max(7.5rem,env(safe-area-inset-top))] pb-3 md:pt-0 md:py-0 md:col-span-5 md:col-start-8 md:row-start-1 order-1 md:order-2"
+          className="flex justify-center shrink-0 w-full translate-y-3 md:translate-y-0 md:pt-0 md:py-0 md:col-span-5 md:col-start-8 md:row-start-1 order-1 md:order-2"
         >
           <div className="relative group">
             <div
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(78vw,320px)] sm:w-[min(58vw,360px)] md:w-[min(40vw,380px)] aspect-square rounded-full pointer-events-none blur-3xl opacity-50"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(80vw,320px)] sm:w-[min(62vw,340px)] md:w-[min(40vw,380px)] aspect-square rounded-full pointer-events-none blur-3xl opacity-50"
               style={{ backgroundColor: `${theme.colors.secondary}35` }}
               aria-hidden
             />
-            <div className="relative w-[min(72vw,280px)] sm:w-[min(52vw,320px)] md:w-[min(36vw,360px)] translate-y-4 md:translate-y-0 transition-transform duration-[1.4s] ease-out group-hover:scale-[1.03]">
+            <div className="relative w-[min(76vw,300px)] sm:w-[min(58vw,320px)] md:w-[min(36vw,360px)] translate-y-2 md:translate-y-0 transition-transform duration-[1.4s] ease-out group-hover:scale-[1.03]">
               <Image
                 src={HERO_COCKTAIL}
                 alt=""
@@ -133,11 +133,11 @@ export function RoseHeroSection() {
         {/* Copy */}
         <motion.div
           variants={cinematicStagger}
-          className="flex flex-col items-center md:items-start text-center md:text-left mt-auto md:mt-0 pb-28 md:pb-0 md:col-span-6 md:col-start-1 order-2 md:order-1"
+          className="flex flex-col items-center md:items-start text-center md:text-left w-full max-w-sm md:max-w-none -mt-2 md:mt-0 md:col-span-6 md:col-start-1 order-2 md:order-1"
         >
           <motion.div
             variants={cinematicRevealVariants}
-            className="mb-5 md:mb-6 flex items-center gap-3"
+            className="mb-2 md:mb-6 flex items-center gap-3"
           >
             <span
               className="h-px w-10 md:w-14"
@@ -147,7 +147,7 @@ export function RoseHeroSection() {
               aria-hidden
             />
             <span
-              className={`${roseType.script} text-xl md:text-2xl ${theme.palette.textPrimary}`}
+              className={`${roseType.monogram} ${theme.palette.textPrimary}`}
             >
               {theme.assets.monogram}
             </span>
@@ -162,14 +162,14 @@ export function RoseHeroSection() {
 
           <motion.span
             variants={cinematicRevealVariants}
-            className={`${roseType.eyebrow} mb-4 md:mb-5 ${theme.palette.textPrimary} opacity-90`}
+            className={`${roseType.eyebrow} mb-2 md:mb-5 ${theme.palette.textPrimary} opacity-90`}
           >
             {theme.copy.heroEyebrow}
           </motion.span>
 
           <motion.h1
             variants={cinematicRevealVariants}
-            className={`text-center md:text-left mb-3 md:mb-4 ${theme.palette.textPrimary}`}
+            className={`text-center md:text-left mb-2 md:mb-4 ${theme.palette.textPrimary}`}
           >
             <span
               className={`${roseType.heroName} block`}
@@ -187,7 +187,7 @@ export function RoseHeroSection() {
 
           <motion.div
             variants={cinematicRevealVariants}
-            className="w-20 md:w-28 h-px mb-4 md:mb-5 mx-auto md:mx-0"
+            className="w-20 md:w-28 h-px mb-2 md:mb-5 mx-auto md:mx-0"
             style={{
               background: `linear-gradient(to right, transparent, ${theme.colors.accent}, transparent)`,
             }}
@@ -210,7 +210,7 @@ export function RoseHeroSection() {
 
           <motion.p
             variants={cinematicRevealVariants}
-            className="font-display italic text-sm sm:text-base font-light tracking-[0.06em] capitalize [text-shadow:0_1px_14px_rgba(255,229,240,0.85)]"
+            className="font-display italic text-sm sm:text-base font-light tracking-[0.06em] capitalize [text-shadow:0_1px_14px_rgba(255,229,240,0.85)] mb-1 md:mb-0"
             style={{ color: theme.colors.secondary }}
           >
             {eventDateLabel}
@@ -218,28 +218,29 @@ export function RoseHeroSection() {
         </motion.div>
       </div>
 
-      {/* Scroll */}
       <motion.button
         type="button"
         variants={variants.fadeIn}
-        className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 cursor-pointer bg-transparent border-0 p-0"
+        className="absolute bottom-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom)))] md:bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0"
         onClick={() => {
           document.getElementById("story")?.scrollIntoView({ behavior: "smooth" });
         }}
         aria-label="Deslizar para a história"
       >
-        <div
-          className="w-px h-10 opacity-30"
-          style={{
-            background: `linear-gradient(to bottom, ${theme.colors.secondary}, transparent)`,
-          }}
-          aria-hidden
-        />
         <span
           className={`${roseType.eyebrow} opacity-75 ${theme.palette.textPrimary}`}
         >
           Desliza
         </span>
+        <motion.div
+          className="w-px h-7 opacity-35"
+          style={{
+            background: `linear-gradient(to bottom, ${theme.colors.secondary}, transparent)`,
+          }}
+          animate={{ y: [0, 5, 0], opacity: [0.35, 0.65, 0.35] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          aria-hidden
+        />
       </motion.button>
     </motion.section>
   );
@@ -279,12 +280,12 @@ export function RoseIntroStorySection() {
       whileInView="visible"
       viewport={cinematicViewport}
       variants={cinematicStagger}
-      className="relative w-full min-h-screen py-24 px-6 flex flex-col items-center justify-center z-10"
+      className="relative w-full py-12 md:py-24 md:min-h-screen px-6 flex flex-col items-center justify-center z-10"
       id="story"
     >
       <motion.span
         variants={cinematicRevealVariants}
-        className={`${roseType.sectionLabel} mb-16 ${theme.palette.textSecondary}`}
+        className={`${roseType.sectionLabel} mb-10 md:mb-16 ${theme.palette.textSecondary}`}
       >
         A minha história
       </motion.span>

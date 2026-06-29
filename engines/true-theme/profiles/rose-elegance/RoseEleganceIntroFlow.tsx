@@ -95,6 +95,8 @@ function IntroEnterCta({
   const showFill = isEntering || isPressed;
   const accent = theme.colors.accent;
   const primary = theme.colors.primary;
+  const secondary = theme.colors.secondary;
+  const roseFill = `linear-gradient(135deg, ${secondary} 0%, #D9156A 100%)`;
 
   const handleClick = async () => {
     if (isEntering) return;
@@ -112,11 +114,7 @@ function IntroEnterCta({
   };
 
   const idleShadow = isCoarsePointer
-    ? [
-        `0 0 0 0 ${accent}00`,
-        `0 0 32px 6px ${accent}55`,
-        `0 0 0 0 ${accent}00`,
-      ]
+    ? `0 6px 28px ${accent}22, 0 1px 0 rgba(255, 255, 255, 0.45) inset`
     : [
         `0 0 0 0 ${accent}00`,
         `0 0 22px 3px ${accent}28`,
@@ -125,16 +123,6 @@ function IntroEnterCta({
 
   return (
     <div className="relative inline-flex">
-      {isCoarsePointer && !isEntering && (
-        <motion.span
-          aria-hidden
-          className="absolute -inset-2 rounded-full pointer-events-none"
-          style={{ border: `1px solid ${accent}` }}
-          animate={{ opacity: [0.15, 0.5, 0.15], scale: [1, 1.08, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        />
-      )}
-
       <motion.button
         type="button"
         onClick={handleClick}
@@ -147,87 +135,81 @@ function IntroEnterCta({
         animate={{
           opacity: 1,
           y: 0,
-          scale: isEntering ? 1 : isCoarsePointer ? [1, 1.035, 1] : 1,
+          scale: 1,
           boxShadow: isEntering
-            ? `0 0 36px 8px ${accent}55`
+            ? `0 10px 36px ${secondary}45`
             : idleShadow,
         }}
         transition={{
           opacity: { delay: 0.85, duration: 0.8 },
           y: { delay: 0.85, duration: 0.8 },
-          scale: isEntering
-            ? { duration: 0.2 }
-            : isCoarsePointer
-              ? { duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: 1 }
-              : { duration: 0.2 },
           boxShadow: isEntering
             ? { duration: 0.35 }
-            : {
-                duration: isCoarsePointer ? 2.2 : 2.6,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1.1,
-              },
+            : isCoarsePointer
+              ? { duration: 0.3 }
+              : {
+                  duration: 2.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1.1,
+                },
         }}
         whileHover={isEntering || isCoarsePointer ? undefined : { scale: 1.03 }}
-        whileTap={isEntering ? undefined : { scale: isCoarsePointer ? 0.92 : 0.97 }}
-        className="relative px-10 py-4 sm:py-3.5 min-h-[48px] font-body text-[10px] uppercase tracking-[0.28em] font-light border rounded-full transition-colors duration-300 group cursor-pointer overflow-hidden mb-4 disabled:cursor-wait touch-manipulation select-none"
+        whileTap={isEntering ? undefined : { scale: isCoarsePointer ? 0.98 : 0.97 }}
+        className="relative px-10 py-4 sm:py-3.5 min-h-[48px] font-body text-[10px] uppercase tracking-[0.28em] font-light border rounded-full transition-colors duration-300 group cursor-pointer overflow-hidden mb-4 disabled:cursor-wait touch-manipulation select-none backdrop-blur-md"
         style={{
-          borderColor: showFill ? accent : `${accent}66`,
+          borderColor: showFill ? `${accent}cc` : `${accent}66`,
           color: primary,
+          backgroundColor: isCoarsePointer
+            ? showFill
+              ? "transparent"
+              : "rgba(255, 255, 255, 0.42)"
+            : "rgba(255, 255, 255, 0.42)",
           WebkitTapHighlightColor: "transparent",
         }}
       >
-        {/* Shimmer — sempre visível em touch; subtil em desktop */}
+        {/* Shimmer dourado — subtil em mobile */}
         {!isEntering && (
           <motion.span
             aria-hidden
             className="absolute inset-0 z-[1] pointer-events-none rounded-full overflow-hidden"
           >
             <motion.span
-              className="absolute inset-y-0 w-[45%]"
+              className="absolute inset-y-0 w-[38%]"
               style={{
-                background: `linear-gradient(90deg, transparent, ${accent}${isCoarsePointer ? "70" : "35"}, transparent)`,
+                background: `linear-gradient(90deg, transparent, ${accent}${isCoarsePointer ? "45" : "35"}, transparent)`,
               }}
               animate={{ x: ["-120%", "280%"] }}
               transition={{
-                duration: isCoarsePointer ? 1.8 : 2.8,
+                duration: isCoarsePointer ? 3.2 : 2.8,
                 repeat: Infinity,
                 ease: "easeInOut",
-                repeatDelay: isCoarsePointer ? 0.4 : 1.2,
+                repeatDelay: isCoarsePointer ? 1.4 : 1.2,
               }}
             />
           </motion.span>
         )}
 
-        {isCoarsePointer && !isEntering && (
+        {isCoarsePointer ? (
           <motion.span
             aria-hidden
-            className="absolute inset-0 z-0 rounded-full origin-left pointer-events-none"
-            style={{ backgroundColor: `${primary}22` }}
-            animate={{ scaleX: [0.08, 0.32, 0.08] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0 z-0 rounded-full pointer-events-none"
+            style={{ background: roseFill }}
+            animate={{ opacity: showFill ? 1 : 0 }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+          />
+        ) : (
+          <span
+            className={`absolute inset-0 z-0 rounded-full transition-transform duration-300 origin-left ${
+              showFill ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+            }`}
+            style={{ backgroundColor: primary }}
           />
         )}
 
         <span
-          className={`absolute inset-0 z-0 rounded-full transition-transform duration-300 origin-left ${
-            showFill
-              ? "scale-x-100"
-              : isCoarsePointer
-                ? "scale-x-0"
-                : "scale-x-0 group-hover:scale-x-100"
-          }`}
-          style={{ backgroundColor: primary }}
-        />
-
-        <span
           className={`relative z-10 flex items-center justify-center gap-2.5 transition-colors duration-300 ${
-            showFill
-              ? "text-white"
-              : isCoarsePointer
-                ? ""
-                : "group-hover:text-white"
+            showFill ? "text-white" : isCoarsePointer ? "" : "group-hover:text-white"
           }`}
         >
           {isEntering ? (
@@ -443,7 +425,7 @@ function RoseEleganceOverlay({
               />
             </svg>
             <span
-              className={`${roseType.script} text-xl ${theme.palette.textPrimary}`}
+              className={`${roseType.monogram} ${theme.palette.textPrimary}`}
             >
               {theme.assets.monogram}
             </span>
