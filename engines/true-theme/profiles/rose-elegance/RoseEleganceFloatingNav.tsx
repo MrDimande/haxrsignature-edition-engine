@@ -86,9 +86,13 @@ export function RoseEleganceFloatingNav() {
 
     setActiveId(current);
 
-    const mobile = isMobileViewport();
-    setIsMobile(mobile);
-    setVisible(mobile || scrollY > vh * 0.45);
+    const hero = document.getElementById("hero");
+    const pastHero = hero
+      ? hero.getBoundingClientRect().bottom <= vh * 0.9
+      : scrollY > vh * 0.85;
+
+    setIsMobile(isMobileViewport());
+    setVisible(pastHero);
   }, []);
 
   useLenis(

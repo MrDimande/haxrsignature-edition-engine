@@ -105,7 +105,7 @@ export function RoseHeroSection() {
         aria-hidden
       />
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 min-h-[100dvh] min-h-screen flex flex-col items-center justify-center gap-2 pt-[max(2.75rem,env(safe-area-inset-top))] pb-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom)))] md:grid md:grid-cols-12 md:gap-12 md:items-center md:justify-start md:py-20 md:pb-20 md:min-h-screen">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 min-h-[100dvh] min-h-screen flex flex-col items-center justify-center gap-2 pt-[max(2.75rem,env(safe-area-inset-top))] pb-10 md:grid md:grid-cols-12 md:gap-12 md:items-center md:justify-start md:py-20 md:pb-20 md:min-h-screen">
         {/* Ilustração hero */}
         <motion.div
           variants={cinematicRevealVariants}
@@ -221,7 +221,7 @@ export function RoseHeroSection() {
       <motion.button
         type="button"
         variants={variants.fadeIn}
-        className="absolute bottom-[max(5.25rem,calc(4.5rem+env(safe-area-inset-bottom)))] md:bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0"
+        className="absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] md:bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1.5 cursor-pointer bg-transparent border-0 p-0"
         onClick={() => {
           document.getElementById("story")?.scrollIntoView({ behavior: "smooth" });
         }}
