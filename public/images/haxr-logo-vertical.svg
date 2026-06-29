@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" fill="none" role="img" aria-label="HAXR Signature">
+  <rect x="54" y="8" width="12" height="12" rx="1" fill="#C59E66" opacity="0.9"/>
+  <text x="60" y="72" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="300" letter-spacing="6" fill="#2D1D21">HAXR</text>
+  <line x1="24" y1="82" x2="96" y2="82" stroke="#C59E66" stroke-width="0.75" opacity="0.55"/>
+  <text x="60" y="104" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="9" font-weight="400" letter-spacing="4" fill="#2D1D21" opacity="0.65">SIGNATURE</text>
+  <text x="60" y="132" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="7" font-weight="400" letter-spacing="3" fill="#C59E66" opacity="0.8">EDITION</text>
+</svg>

@@ -17,8 +17,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# env files
+# env files (includes .env.local, .env.example is negated below if needed)
 .env*
+!.env.example
+# timestamped rebuild backups: .env.local.backup-YYYYMMDD-HHMMSS
 
 # vercel
 .vercel
@@ -26,8 +28,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# Audio original pesado (usar bg-music-web.mp3)
+# Audio original pesado (usar versão -web.mp3 no tema)
 **/bg-music.mp3
+public/audio/if-i-aint-got-you.mp3
 
 # IDE
 .cursor/

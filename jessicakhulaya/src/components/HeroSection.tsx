@@ -3,62 +3,50 @@
 import { useApp } from "@/lib/context";
 import { fadeIn, fadeUp, staggerContainer } from "@/lib/motion";
 import { COLORS } from "@/styles/tokens";
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
+import {
+  motion,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+
+const HERO_BG = "/images/jessica-kulaya-hero-bg.webp";
 
 export default function HeroSection() {
   const { introComplete } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // ─── 1. Scroll-Based Parallax ───
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
 
-  const scrollImageY = useTransform(scrollYProgress, [0, 1], [0, 60]);
-  const scrollTextY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const scrollBgY = useTransform(scrollYProgress, [0, 1], [0, 36]);
+  const scrollTextY = useTransform(scrollYProgress, [0, 1], [0, -20]);
 
-  // ─── 2. Mouse-Move 3D Interactive Parallax ───
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-
-  const springConfig = { stiffness: 50, damping: 20, mass: 0.6 };
+  const springConfig = { stiffness: 50, damping: 22, mass: 0.7 };
   const smoothX = useSpring(mouseX, springConfig);
   const smoothY = useSpring(mouseY, springConfig);
 
-  // Map mouse positions to distinct multi-plane translations
-  const textMouseX = useTransform(smoothX, [-0.5, 0.5], [-8, 8]);
-  const textMouseY = useTransform(smoothY, [-0.5, 0.5], [-8, 8]);
+  const bgMouseX = useTransform(smoothX, [-0.5, 0.5], [-8, 8]);
+  const bgMouseY = useTransform(smoothY, [-0.5, 0.5], [-6, 6]);
+  const textMouseX = useTransform(smoothX, [-0.5, 0.5], [-6, 6]);
 
-  // Combine scroll-drift and mouse-drift for the title container into a single motion value
   const combinedTextY = useTransform(
-    [scrollTextY, textMouseY],
-    ([latestScroll, latestMouse]) => Number(latestScroll) + Number(latestMouse)
+    [scrollTextY, smoothY],
+    ([scroll, mouse]) => Number(scroll) + Number(mouse) * 6
   );
-
-  // Outermost gold border shifts OPPOSITE to the image for maximum 3D distance
-  const frame1X = useTransform(smoothX, [-0.5, 0.5], [18, -18]);
-  const frame1Y = useTransform(smoothY, [-0.5, 0.5], [18, -18]);
-
-  // Inner gold border shifts slightly opposite
-  const frame2X = useTransform(smoothX, [-0.5, 0.5], [8, -8]);
-  const frame2Y = useTransform(smoothY, [-0.5, 0.5], [8, -8]);
-
-  // The actual photo shifts in the direction of the cursor (depth feel)
-  const imgMouseX = useTransform(smoothX, [-0.5, 0.5], [-12, 12]);
-  const imgMouseY = useTransform(smoothY, [-0.5, 0.5], [-12, 12]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      // Coordinates relative to center of the viewport (-0.5 to 0.5)
-      const x = (e.clientX / window.innerWidth) - 0.5;
-      const y = (e.clientY / window.innerHeight) - 0.5;
-      mouseX.set(x);
-      mouseY.set(y);
+      mouseX.set(e.clientX / window.innerWidth - 0.5);
+      mouseY.set(e.clientY / window.innerHeight - 0.5);
     };
-
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
@@ -71,182 +59,167 @@ export default function HeroSection() {
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="relative min-h-screen w-full flex flex-col items-center justify-center px-6 py-24 md:py-32 overflow-hidden z-10"
+      className="relative min-h-[100dvh] min-h-screen w-full flex flex-col overflow-x-hidden z-10"
       id="hero"
     >
-      {/* ─── SVG ClipPath Definition ─── */}
-      <svg className="absolute w-0 h-0" width="0" height="0">
-        <defs>
-          <clipPath id="african-shield" clipPathUnits="objectBoundingBox">
-            {/* Elegant organic shield shape */}
-            <path d="M 0.5,0 C 0.72,0.06 0.88,0.22 0.88,0.48 C 0.88,0.72 0.74,0.86 0.5,1 C 0.26,0.86 0.12,0.72 0.12,0.48 C 0.12,0.22 0.28,0.06 0.5,0 Z" />
-          </clipPath>
-        </defs>
-      </svg>
-
-      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        {/* ─── Left Side: Title and Subtitle ─── */}
-        <motion.div 
-          style={{ y: combinedTextY, x: textMouseX }}
-          className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left z-20 order-2 lg:order-1"
+      {/* ─── Fotografia de fundo ─── */}
+      <motion.div
+        className="absolute inset-0 z-0"
+        style={{ y: scrollBgY, x: bgMouseX }}
+        aria-hidden
+      >
+        <motion.div
+          className="absolute inset-0 origin-[center_38%] scale-[1.12] md:translate-y-0 md:origin-[52%_38%] md:scale-[1.05]"
+          style={{ y: bgMouseY }}
         >
-          {/* Tagline */}
-          <motion.span 
-            variants={fadeUp}
-            className="font-body text-[10px] font-light uppercase tracking-[0.4em] mb-4"
-            style={{ color: COLORS.burntGoldDark }}
-          >
-            All about the Traditional Ceremony
-          </motion.span>
-
-          {/* Headline */}
-          <motion.h1 
-            variants={fadeUp}
-            className="font-display text-xs font-light uppercase tracking-[0.5em] mb-3 text-white/80"
-          >
-            Cerimónia de Kulaya
-          </motion.h1>
-
-          <motion.h2 
-            variants={fadeUp}
-            className="font-display text-5xl sm:text-6xl md:text-7xl font-extralight tracking-[0.02em] leading-[1.05] text-[#FAF5F0] mb-6"
-          >
-            Jessica<br />
-            <span className="font-display italic font-normal text-[#D4AF37]">Muege</span>
-          </motion.h2>
-
-          <motion.p 
-            variants={fadeUp}
-            className="font-body text-xs sm:text-sm font-light leading-relaxed max-w-md mb-8 text-[#FAF5F0]/70"
-          >
-            Com profundo respeito às nossas raízes e à nossa cultura, convidamos a família e amigos para a cerimónia de Kulaya. Um momento de afirmação e dignidade onde tradição e continuidade se encontram.
-          </motion.p>
-
-          {/* Thin gold decorative divider line */}
-          <motion.div 
-            variants={fadeIn}
-            className="w-32 h-[1px] mb-8 hidden lg:block"
+          <Image
+            src={HERO_BG}
+            alt=""
+            fill
+            priority
+            quality={92}
+            sizes="100vw"
+            className="object-cover object-[center_38%] md:object-[52%_38%]"
             style={{
-              background: `linear-gradient(to right, ${COLORS.burntGoldLight}, transparent)`
+              filter: "contrast(1.03) brightness(0.96) saturate(1.02)",
             }}
           />
-
-          <motion.div 
-            variants={fadeUp}
-            className="flex items-center gap-4 text-left"
-          >
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COLORS.orangeAccent }} />
-            <div>
-              <span className="block font-body text-[9px] uppercase tracking-wider text-[#FAF5F0]/40">Presença Solicitada</span>
-              <span className="font-body text-xs text-[#D4AF37]/90 font-light">Sábado, 01 Agosto 2026</span>
-            </div>
-          </motion.div>
         </motion.div>
+      </motion.div>
 
-        {/* ─── Right/Center Side: Hero Portrait Asset (The Anchor) ─── */}
-        <div className="lg:col-span-7 flex justify-center items-center z-10 order-1 lg:order-2">
-          {/* Scroll Parallax Wrapper */}
-          <motion.div 
-            style={{ y: scrollImageY }}
-            variants={fadeIn}
-            className="relative w-[75vw] sm:w-[50vw] md:w-[42vw] lg:w-[32vw] aspect-[2/3] group"
+      {/* ─── Overlays — desktop editorial ─── */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none hidden md:block"
+        style={{
+          background: `linear-gradient(105deg, ${COLORS.smoothBlack}eb 0%, ${COLORS.woodBrownDeep}aa 30%, ${COLORS.terracottaDeep}35 52%, transparent 78%)`,
+        }}
+        aria-hidden
+      />
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none opacity-50 hidden md:block"
+        style={{
+          background: `radial-gradient(ellipse at 75% 35%, transparent 20%, ${COLORS.smoothBlack}88 100%)`,
+        }}
+        aria-hidden
+      />
+
+      {/* ─── Mobile — scrim localizado na faixa inferior (sem blur agressivo) ─── */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[52%] z-[1] pointer-events-none md:hidden"
+        style={{
+          background: `linear-gradient(to top, ${COLORS.woodBrownDeep} 0%, ${COLORS.woodBrownDeep}dd 32%, ${COLORS.smoothBlack}b3 58%, transparent 100%)`,
+        }}
+        aria-hidden
+      />
+
+      {/* Mobile: foto única + tipografia inferior. Sem ilustração neon — só fotografia editorial. */}
+      <div className="relative z-10 flex flex-col flex-1 w-full max-w-6xl mx-auto px-6 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(5rem,env(safe-area-inset-bottom))] md:py-32 justify-end md:justify-center min-h-[100dvh] md:min-h-0">
+        <div className="w-full">
+          <motion.div
+            style={{ y: combinedTextY, x: textMouseX }}
+            className="flex flex-col items-center md:items-start text-center md:text-left max-w-xl md:max-w-2xl mx-auto md:mx-0"
           >
-            {/* Outer Gold Border Shield Frame (shifts opposite to mouse) */}
-            <motion.div 
-              style={{
-                clipPath: "url(#african-shield)",
-                border: `1px solid ${COLORS.burntGoldDark}`,
-                opacity: 0.35,
-                x: frame1X,
-                y: frame1Y
-              }}
-              className="absolute inset-[-8px] transition-transform duration-300 ease-out -z-10"
-            />
-
-            {/* Inner Gold Border Accent Frame (shifts slightly opposite) */}
-            <motion.div 
-              style={{
-                clipPath: "url(#african-shield)",
-                border: `1.5px solid ${COLORS.burntGoldLight}`,
-                opacity: 0.8,
-                x: frame2X,
-                y: frame2Y
-              }}
-              className="absolute inset-[-3px] transition-transform duration-300 ease-out -z-10 group-hover:scale-[1.01]"
-            />
-
-            {/* Main Image Container (shifts with mouse) */}
-            <motion.div 
-              style={{
-                clipPath: "url(#african-shield)",
-                boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
-                x: imgMouseX,
-                y: imgMouseY
-              }}
-              className="relative w-full h-full overflow-hidden transition-all duration-300 ease-out"
+            <motion.span
+              variants={fadeUp}
+              className="font-body text-[10px] font-light uppercase tracking-[0.28em] mb-2 md:hidden"
+              style={{ color: COLORS.burntGoldLight }}
             >
-              <Image
-                src="/images/jessica.jpg"
-                alt="Retrato de Jessica Muege — Cerimónia de Kulaya"
-                fill
-                priority
-                sizes="(max-width: 640px) 75vw, (max-width: 1024px) 50vw, 32vw"
-                className="object-cover object-top scale-125 group-hover:scale-[1.32] transition-transform duration-1000 ease-[0.16,1,0.3,1]"
-                style={{
-                  filter: "contrast(1.02) brightness(0.98)"
-                }}
-              />
-              
-              {/* Soft warm vignette gradient overlay inside image to color grade and ground it */}
-              <div 
-                className="absolute inset-0 pointer-events-none mix-blend-color-burn opacity-40"
-                style={{
-                  background: `radial-gradient(circle at center, transparent 30%, ${COLORS.terracottaDeep} 100%)`
-                }}
-              />
-              <div 
-                className="absolute inset-0 pointer-events-none mix-blend-screen opacity-15"
-                style={{
-                  background: `linear-gradient(to top, ${COLORS.woodBrownDeep}, transparent)`
-                }}
-              />
-            </motion.div>
+              Uma celebração de raízes
+            </motion.span>
+
+            <motion.span
+              variants={fadeUp}
+              className="font-body text-[10px] font-light uppercase tracking-[0.4em] mb-4 hidden md:block"
+              style={{ color: COLORS.burntGoldLight }}
+            >
+              All about the Traditional Ceremony
+            </motion.span>
+
+            <motion.h1
+              variants={fadeUp}
+              className="font-display text-[9px] md:text-xs font-light uppercase tracking-[0.32em] md:tracking-[0.5em] mb-2 md:mb-3 text-white/55 md:text-white/85"
+            >
+              Cerimónia de Kulaya
+            </motion.h1>
+
+            <motion.h2
+              variants={fadeUp}
+              className="font-display text-[2.85rem] sm:text-5xl md:text-7xl font-extralight tracking-[0.01em] leading-[0.92] text-[#FAF5F0] mb-3 md:mb-5 [text-shadow:0_2px_24px_rgba(18,10,7,0.45)]"
+            >
+              Jessica
+              <br />
+              <span className="font-display italic font-normal text-[#D4AF37] text-[1.08em] md:text-[1em]">
+                Muege
+              </span>
+            </motion.h2>
+
+            <motion.div
+              variants={fadeIn}
+              className="w-16 h-px mb-3 mx-auto md:hidden"
+              style={{
+                background: `linear-gradient(to right, transparent, ${COLORS.burntGoldLight}, transparent)`,
+              }}
+            />
+
+            <motion.p
+              variants={fadeUp}
+              className="font-body text-sm font-light tracking-[0.14em] text-[#D4AF37] text-center mb-0 md:hidden [text-shadow:0_1px_12px_rgba(18,10,7,0.5)]"
+            >
+              Sábado, 01 Agosto 2026
+            </motion.p>
+
+            <motion.p
+              variants={fadeUp}
+              className="hidden md:block font-body text-xs sm:text-sm font-light leading-relaxed mb-8 text-[#FAF5F0]/88"
+            >
+              Com profundo respeito às nossas raízes e à nossa cultura, convidamos
+              a família e amigos para a cerimónia de Kulaya. Um momento de
+              afirmação e dignidade onde tradição e continuidade se encontram.
+            </motion.p>
+
+            <motion.div
+              variants={fadeIn}
+              className="w-32 h-px mb-4 hidden md:block"
+              style={{
+                background: `linear-gradient(to right, ${COLORS.burntGoldLight}, transparent)`,
+              }}
+            />
+
+            <motion.p
+              variants={fadeUp}
+              className="hidden md:block font-body text-xs font-light tracking-[0.08em] text-[#D4AF37] text-left"
+            >
+              Sábado, 01 Agosto 2026
+            </motion.p>
           </motion.div>
         </div>
       </div>
 
-      {/* ─── Big background letters: KULAYA ─── */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none -z-20 text-[18vw] font-display font-light uppercase tracking-[0.2em] opacity-[0.015]"
+      <div
+        className="absolute top-1/2 right-0 md:right-[8%] -translate-y-1/2 select-none pointer-events-none z-[2] text-[14vw] md:text-[11vw] font-display font-light uppercase tracking-[0.2em] opacity-[0.04] hidden md:block"
         style={{ color: COLORS.organicBeigeLight }}
+        aria-hidden
       >
         KULAYA
       </div>
 
-      {/* ─── Scroll Indicator ─── */}
       <motion.div
         variants={fadeIn}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 select-none cursor-pointer"
+        className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 select-none cursor-pointer"
         onClick={() => {
           document.getElementById("details")?.scrollIntoView({ behavior: "smooth" });
         }}
       >
-        <span 
-          className="font-body text-[8px] font-light uppercase tracking-[0.3em] opacity-40 hover:opacity-100 transition-opacity duration-300"
+        <span
+          className="font-body text-[8px] font-light uppercase tracking-[0.3em] opacity-50 hover:opacity-100 transition-opacity duration-300"
           style={{ color: COLORS.organicBeigeLight }}
         >
           Deslizar
         </span>
-        <div className="w-[1px] h-10 relative overflow-hidden bg-white/10">
-          <motion.div 
-            animate={{ 
-              y: ["-100%", "100%"] 
-            }}
-            transition={{
-              duration: 2.2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+        <div className="w-px h-10 relative overflow-hidden bg-white/15">
+          <motion.div
+            animate={{ y: ["-100%", "100%"] }}
+            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
             className="w-full h-1/2 absolute top-0 left-0"
             style={{ backgroundColor: COLORS.burntGoldLight }}
           />

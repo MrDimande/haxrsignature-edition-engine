@@ -1,6 +1,11 @@
 import { buildKulayaGuestRsvpEmail } from "@lib/email/templates/kulaya-guest-rsvp";
 import { buildKulayaRsvpTeamEmail } from "@lib/email/templates/kulaya-rsvp";
+import {
+  buildFarewellGuestRsvpEmail,
+  buildFarewellRsvpTeamEmail,
+} from "@lib/email/templates/farewell-rsvp";
 import { isResendConfigured, sendHaxrEmail } from "@lib/email/resend";
+import { FAREWELL_EVENT } from "@lib/farewell/event-details";
 import type { RsvpEventEmailConfig } from "./config";
 
 export interface RsvpSubmission {
@@ -10,6 +15,9 @@ export interface RsvpSubmission {
   slug?: string;
   email?: string;
   phone?: string;
+  messageForBride?: string;
+  size?: string;
+  dressCodeConfirmed?: boolean;
 }
 
 export type RsvpEmailResult = {
@@ -34,11 +42,12 @@ export async function sendRsvpNotificationEmail(
     return result;
   }
 
-  const { subject, html } = buildKulayaRsvpTeamEmail(
-    submission,
-    config.eventName,
-    config.slug
-  );
+  const slug = config.slug;
+  const isFarewell = slug === FAREWELL_EVENT.slug;
+
+  const { subject, html } = isFarewell
+    ? buildFarewellRsvpTeamEmail(submission, config.eventName, slug)
+    : buildKulayaRsvpTeamEmail(submission, config.eventName, slug);
 
   const teamResult = await sendHaxrEmail({
     channel: config.channel,
@@ -55,7 +64,9 @@ export async function sendRsvpNotificationEmail(
 
   result.teamSent = true;
 
-  const guestEmail = buildKulayaGuestRsvpEmail(submission, config.eventName);
+  const guestEmail = isFarewell
+    ? buildFarewellGuestRsvpEmail(submission, config.eventName, slug)
+    : buildKulayaGuestRsvpEmail(submission, config.eventName);
   if (!guestEmail) {
     result.guestSkipped = "no_email";
     return result;

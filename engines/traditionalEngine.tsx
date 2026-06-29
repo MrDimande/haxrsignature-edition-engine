@@ -26,14 +26,11 @@ const greatVibes = Great_Vibes({
   display: "swap",
 });
 
-export default function TraditionalEngine({
-  config,
-  slug,
-}: InvitationEngineProps) {
+export default function TraditionalEngine({ config }: InvitationEngineProps) {
   return (
     <div
       data-engine="traditional"
-      data-invitation={slug}
+      data-invitation={config.slug}
       data-source={config.sourcePath}
       className={`${playfair.variable} ${montserrat.variable} ${greatVibes.variable} min-h-screen antialiased`}
     >

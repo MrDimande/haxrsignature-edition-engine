@@ -4,6 +4,8 @@
 @source "../lobolojessicaesamuel/src/**/*.{js,ts,jsx,tsx}";
 @source "../jessicaesamueltraditionalwedding/src/**/*.{js,ts,jsx,tsx}";
 @source "../engines/**/*.{js,ts,jsx,tsx}";
+@source "../theme/**/*.{ts,tsx}";
+@source "../experience/**/*.{ts,tsx}";
 
 @theme inline {
   --color-gold: #d4af37;
@@ -40,4 +42,75 @@
 
 .pattern-overlay {
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.pattern-hearts {
+  background-image: url("data:image/svg+xml,%3Csvg width='36' height='36' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' fill='%23D0487B' fill-opacity='0.03'/%3E%3C/svg%3E");
+}
+
+@keyframes rose-drift {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.06;
+  }
+  25% {
+    transform: translateY(-18px) rotate(8deg);
+    opacity: 0.12;
+  }
+  50% {
+    transform: translateY(-8px) rotate(-5deg);
+    opacity: 0.08;
+  }
+  75% {
+    transform: translateY(-22px) rotate(6deg);
+    opacity: 0.14;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.06;
+  }
+}
+
+.animate-rose-drift {
+  animation: rose-drift 20s ease-in-out infinite;
+}
+
+/* Rose Elegance — tipografia feminina */
+[data-render-profile="rose-elegance"] .font-display {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+
+[data-render-profile="rose-elegance"] .font-script {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+}
+
+[data-render-profile="rose-elegance"] .font-body,
+[data-render-profile="rose-elegance"] .font-sans {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+}
+
+html:has([data-render-profile="rose-elegance"]) {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.scroll-container {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  min-height: 100vh;
+  width: 100%;
 }

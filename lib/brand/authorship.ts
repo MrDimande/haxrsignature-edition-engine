@@ -42,6 +42,11 @@ export const HAXR_AUTH = {
     year: 2026,
     rights: "Todos os direitos reservados.",
   },
+  assets: {
+    symbol: "/images/haxr-favicon.png",
+    logoVertical: "/images/haxr-logo-vertical.png",
+    logoHorizontal: "/images/haxr-logo-horizontal.png",
+  },
 } as const;
 
 export function formatCopyright(year = HAXR_AUTH.copyright.year): string {
@@ -75,6 +80,13 @@ export function buildRootMetadata(): Metadata {
     robots: {
       index: false,
       follow: false,
+    },
+    icons: {
+      icon: [
+        { url: HAXR_AUTH.assets.symbol, sizes: "32x32", type: "image/png" },
+      ],
+      apple: "/apple-icon.png",
+      shortcut: HAXR_AUTH.assets.symbol,
     },
     other: {
       "designer": HAXR_AUTH.brand,

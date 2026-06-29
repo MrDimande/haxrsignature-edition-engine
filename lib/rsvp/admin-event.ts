@@ -35,7 +35,7 @@ export function getEditionEventProvisionSpec(
     adminEventName: invitation.admin.adminEventName,
     clientName: invitation.admin.clientName,
     eventTypeLabel: invitation.admin.eventTypeLabel,
-    eventDate: invitation.metadata.eventDate || null,
+    eventDate: invitation.metadata.date || invitation.metadata.eventDate || null,
     envVar: invitation.admin.envVar,
     editionUrl: `${SITE_URL}/${invitation.slug}`,
     findSeatCode: slugToFindSeatCode(invitation.slug),

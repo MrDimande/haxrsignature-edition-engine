@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { HaxrAuthorshipMeta } from "@lib/brand/HaxrAuthorshipMeta";
 import { EngineRenderer } from "@engines/index";
-import { INVITATIONS, LEGACY_SLUG_REDIRECTS, getActiveInvitations } from "@data/invitations";
+import {
+  getInvitation,
+  LEGACY_SLUG_REDIRECTS,
+  getActiveInvitations,
+} from "@data/invitations";
+import { getTheme } from "@theme/resolver";
+import { getExperience } from "@experience/registry";
 import {
   buildInvitationMetadata,
   getEditionSiteUrl,
@@ -14,9 +20,16 @@ interface InvitationPageProps {
 }
 
 export function generateStaticParams() {
-  return getActiveInvitations().map((invitation) => ({
-    slug: invitation.slug,
-  }));
+  const params: Array<{ slug: string }> = [];
+  for (const invitation of getActiveInvitations()) {
+    params.push({ slug: invitation.slug });
+    if (invitation.aliases) {
+      for (const alias of invitation.aliases) {
+        params.push({ slug: alias });
+      }
+    }
+  }
+  return params;
 }
 
 export async function generateMetadata({
@@ -24,7 +37,7 @@ export async function generateMetadata({
 }: InvitationPageProps): Promise<Metadata> {
   const { slug } = await params;
   const canonicalSlug = resolveSlug(slug);
-  const invitation = canonicalSlug ? INVITATIONS[canonicalSlug] : null;
+  const invitation = canonicalSlug ? getInvitation(canonicalSlug) : null;
 
   if (!invitation || invitation.status !== "active") {
     return {
@@ -34,6 +47,7 @@ export async function generateMetadata({
   }
 
   const { metadata } = invitation;
+  const ogImage = metadata.ogImage ?? "/images/haxr-favicon.png";
   const base = buildInvitationMetadata(
     metadata.title,
     metadata.description,
@@ -46,7 +60,7 @@ export async function generateMetadata({
       ...base.openGraph,
       images: [
         {
-          url: "/images/jessica.jpg",
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: metadata.title,
@@ -57,7 +71,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: metadata.title,
       description: metadata.description,
-      images: ["/images/jessica.jpg"],
+      images: [ogImage],
     },
   };
 }
@@ -74,10 +88,13 @@ export default async function InvitationPage({ params }: InvitationPageProps) {
     notFound();
   }
 
-  const invitation = INVITATIONS[canonicalSlug];
+  const invitation = getInvitation(canonicalSlug);
   if (!invitation || invitation.status !== "active") {
     notFound();
   }
+
+  const theme = getTheme(invitation.theme);
+  const experience = getExperience(invitation.experienceType);
 
   return (
     <>
@@ -85,7 +102,11 @@ export default async function InvitationPage({ params }: InvitationPageProps) {
         pageName={invitation.metadata.title}
         pageUrl={`${getEditionSiteUrl()}/${canonicalSlug}`}
       />
-      <EngineRenderer config={invitation} slug={canonicalSlug} />
+      <EngineRenderer
+        config={invitation}
+        theme={theme}
+        experience={experience}
+      />
     </>
   );
 }

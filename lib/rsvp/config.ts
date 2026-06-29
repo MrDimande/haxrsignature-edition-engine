@@ -4,6 +4,8 @@ import {
   type EmailChannel,
 } from "@lib/email/addresses";
 import { getInvitationAdminBinding } from "@lib/rsvp/events";
+import { resolveSlug } from "@lib/engine";
+import { FAREWELL_EVENT } from "@lib/farewell/event-details";
 
 export interface RsvpEventEmailConfig {
   eventName: string;
@@ -29,9 +31,51 @@ export const KULAYA_RSVP_EMAIL: RsvpEventEmailConfig = {
   replyTo: PRIMARY_INBOX,
 };
 
+export const LINGERIE_RSVP_EMAIL: RsvpEventEmailConfig = {
+  eventName:
+    getInvitationAdminBinding("cha-de-lingerie")?.adminEventName ??
+    "Edition · Chá de Lingerie · Jessica Muege",
+  slug: "cha-de-lingerie",
+  channel: "rsvp",
+  notifyTo: [haxrMailboxes.rsvp],
+  cc: ["jessicamuege@gmail.com"],
+  replyTo: PRIMARY_INBOX,
+};
+
+export const PANELA_RSVP_EMAIL: RsvpEventEmailConfig = {
+  eventName: "Edition · Jessica Bride to Be Experience",
+  slug: "cha-de-panela",
+  channel: "rsvp",
+  notifyTo: [haxrMailboxes.rsvp],
+  cc: [],
+  replyTo: PRIMARY_INBOX,
+};
+
+export const FAREWELL_RSVP_EMAIL: RsvpEventEmailConfig = {
+  eventName:
+    getInvitationAdminBinding(FAREWELL_EVENT.slug)?.adminEventName ??
+    "Edition · Despedida de Solteira · Jessica Muege",
+  slug: FAREWELL_EVENT.slug,
+  channel: "rsvp",
+  notifyTo: [haxrMailboxes.rsvp],
+  cc: ["jessicamuege@gmail.com"],
+  replyTo: PRIMARY_INBOX,
+};
+
 export function getRsvpEmailConfig(slug?: string): RsvpEventEmailConfig | null {
-  if (!slug || slug === "jessicakulaya" || slug === "jessicakhulaya") {
+  if (!slug) return null;
+  const canonicalSlug = resolveSlug(slug) ?? slug;
+  if (canonicalSlug === "jessicakulaya") {
     return KULAYA_RSVP_EMAIL;
+  }
+  if (canonicalSlug === "cha-de-lingerie") {
+    return LINGERIE_RSVP_EMAIL;
+  }
+  if (canonicalSlug === "cha-de-panela") {
+    return PANELA_RSVP_EMAIL;
+  }
+  if (canonicalSlug === FAREWELL_EVENT.slug) {
+    return FAREWELL_RSVP_EMAIL;
   }
   return null;
 }

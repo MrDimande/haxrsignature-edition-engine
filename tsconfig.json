@@ -34,6 +34,12 @@
       ],
       "@engines/*": [
         "./engines/*"
+      ],
+      "@theme/*": [
+        "./theme/*"
+      ],
+      "@experience/*": [
+        "./experience/*"
       ]
     }
   },
@@ -49,6 +55,9 @@
     "lib/**/*.tsx",
     "engines/**/*.ts",
     "engines/**/*.tsx",
+    "theme/**/*.ts",
+    "experience/**/*.ts",
+    "data/registry.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

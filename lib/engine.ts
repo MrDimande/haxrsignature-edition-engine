@@ -1,5 +1,7 @@
 import {
   INVITATIONS,
+  ALIAS_INDEX,
+  getInvitation as getInvitationFromData,
   invitationSlugs,
   LEGACY_SLUG_REDIRECTS,
   type InvitationConfig,
@@ -7,13 +9,13 @@ import {
 } from "@data/invitations";
 
 export function getInvitation(slug: string): InvitationConfig | null {
-  const canonicalSlug = LEGACY_SLUG_REDIRECTS[slug] ?? slug;
-  return INVITATIONS[canonicalSlug] ?? null;
+  return getInvitationFromData(slug);
 }
 
 export function resolveSlug(slug: string): string | null {
   if (INVITATIONS[slug]) return slug;
   if (LEGACY_SLUG_REDIRECTS[slug]) return LEGACY_SLUG_REDIRECTS[slug];
+  if (ALIAS_INDEX[slug]) return ALIAS_INDEX[slug];
   return null;
 }
 
@@ -50,3 +52,5 @@ export function getLegacyFolderForSlug(slug: string): string | null {
   if (!resolved) return null;
   return INVITATIONS[resolved]?.legacyFolder ?? null;
 }
+
+export { INVITATIONS as InvitationRegistry };
