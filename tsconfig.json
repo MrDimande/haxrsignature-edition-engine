@@ -40,6 +40,9 @@
       ],
       "@experience/*": [
         "./experience/*"
+      ],
+      "@core/*": [
+        "./core/*"
       ]
     }
   },
@@ -57,6 +60,7 @@
     "engines/**/*.tsx",
     "theme/**/*.ts",
     "experience/**/*.ts",
+    "core/**/*.ts",
     "data/registry.ts",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"

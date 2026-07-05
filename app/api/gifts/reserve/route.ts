@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { FAREWELL_EVENT } from "@lib/farewell/event-details";
 import { reserveGift } from "@lib/gifts";
 import { sendGiftReserveNotificationEmail } from "@lib/gifts/send-notification";
 import { reserveJessicaSamuelGift } from "@lib/jessica-samuel-wedding/gifts/inventory";
