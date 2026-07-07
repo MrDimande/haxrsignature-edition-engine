@@ -21,6 +21,12 @@ const buckets = new Map<string, Bucket>();
 export const RATE_LIMITS = {
   /** RSVP Edition — por IP (protege Resend + Supabase) */
   editionRsvp: { max: 8, windowMs: 15 * 60 * 1000 },
+  /** Gift reservation mutations — por slug + fingerprint */
+  giftReserve: { max: 6, windowMs: 15 * 60 * 1000 },
+  /** Jessica & Samuel photo wall — signed upload intent */
+  jessicaSamuelPhotoIntent: { max: 5, windowMs: 15 * 60 * 1000 },
+  /** Jessica & Samuel photo wall — upload completion */
+  jessicaSamuelPhotoComplete: { max: 8, windowMs: 15 * 60 * 1000 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 function pruneExpiredBuckets(now: number): void {

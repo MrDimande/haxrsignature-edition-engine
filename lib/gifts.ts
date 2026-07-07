@@ -171,7 +171,8 @@ export async function getMergedGifts(): Promise<GiftItem[]> {
 
 export async function reserveGift(
   giftId: string,
-  reservedBy: string
+  reservedBy: string,
+  _registryKey = REGISTRY_KEY
 ): Promise<{
   success: boolean;
   error?: string;

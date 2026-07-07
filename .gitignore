@@ -22,6 +22,11 @@ yarn-error.log*
 !.env.example
 # timestamped rebuild backups: .env.local.backup-YYYYMMDD-HHMMSS
 
+# Runtime reservation fallback files may contain guest PII.
+# Keep sanitised fixtures in explicit fixture directories trackable.
+data/gifts/*reservations*.json
+!data/gifts/**/fixtures/*.json
+
 # vercel
 .vercel
 
