@@ -24,16 +24,29 @@ export function validateGiftReservationPayload(
   }
 
   const record = body as Record<string, unknown>;
-  const itemId = typeof record.itemId === "string" ? record.itemId.trim() : "";
+  const itemId =
+    typeof record.itemId === "string"
+      ? record.itemId.trim()
+      : typeof record.giftId === "string"
+        ? record.giftId.trim()
+        : "";
   const guestName =
-    typeof record.guestName === "string" ? record.guestName.trim() : "";
+    typeof record.guestName === "string"
+      ? record.guestName.trim()
+      : typeof record.reservedBy === "string"
+        ? record.reservedBy.trim()
+        : "";
   const guestPhone =
     typeof record.guestPhone === "string" ? record.guestPhone.trim() : "";
   const message =
     typeof record.message === "string" ? record.message.trim() : undefined;
   const quantityRaw = record.quantity;
   const quantity =
-    typeof quantityRaw === "number" ? quantityRaw : Number(quantityRaw);
+    quantityRaw === undefined || quantityRaw === null
+      ? 1
+      : typeof quantityRaw === "number"
+        ? quantityRaw
+        : Number(quantityRaw);
 
   if (!itemId) {
     return { ok: false, error: "Seleccione um presente.", status: 400 };
