@@ -1,0 +1,207 @@
+name: Supabase Preview Migrations Control Plane
+
+# Preview-only, linkless migration control plane.
+# Secrets: SUPABASE_DB_URL (Environment secret) — no SUPABASE_ACCESS_TOKEN.
+# Variables: SUPABASE_TARGET_TIER (Environment variable) — must equal "preview".
+# Transport: supabase migration list / db push --db-url "$SUPABASE_DB_URL" only.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Execution mode (validate or apply)'
+        type: choice
+        required: true
+        default: 'validate'
+        options:
+          - 'validate'
+          - 'apply'
+      change_ticket:
+        description: 'Change Ticket Identifier (e.g., Ticket-123)'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: Preflight Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Inputs
+        run: |
+          if [ -z "${{ github.event.inputs.change_ticket }}" ]; then
+            echo "::error::Change ticket identifier must not be empty."
+            exit 1
+          fi
+          if [ "${{ github.event.inputs.mode }}" != "validate" ] && [ "${{ github.event.inputs.mode }}" != "apply" ]; then
+            echo "::error::Invalid execution mode selected."
+            exit 1
+          fi
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify Migration Provenance
+        run: |
+          MIGRATION_FILE="supabase/migrations/20260702231600_photo_upload_intents.sql"
+          EXPECTED_HASH="4a71a7e8029ff87ee3987f444d6927d534a6b34125650f423b8abd55e4f2ad36"
+          
+          if [ ! -f "$MIGRATION_FILE" ]; then
+            echo "::error::Migration file $MIGRATION_FILE is missing from the workspace."
+            exit 1
+          fi
+          
+          ACTUAL_HASH=$(sha256sum "$MIGRATION_FILE" | awk '{print $1}')
+          
+          echo "Expected Hash: ${EXPECTED_HASH,,}"
+          echo "Actual Hash:   ${ACTUAL_HASH,,}"
+          
+          if [ "${ACTUAL_HASH,,}" != "${EXPECTED_HASH,,}" ]; then
+            echo "::error::Migration provenance check failed. Checksum mismatch."
+            exit 1
+          fi
+          echo "Migration provenance check passed. Checksum matches commit 52679bd."
+
+      - name: Check Git Diff Checksums
+        run: |
+          git diff --check
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Run TypeScript Compiler Check
+        run: |
+          npx tsc --noEmit
+
+      - name: Run Tests
+        run: |
+          npm test
+
+      - name: Build Application
+        run: |
+          npm run build
+
+  apply-preview-migrations:
+    name: Apply Preview Migrations
+    needs: preflight
+    if: github.event.inputs.mode == 'apply'
+    runs-on: ubuntu-latest
+    environment: supabase-preview-migrations
+    concurrency:
+      group: supabase-preview-migrations
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify Environment Safety
+        env:
+          TARGET_TIER: ${{ vars.SUPABASE_TARGET_TIER }}
+        run: |
+          set +x
+          if [ -z "${TARGET_TIER}" ] || [ "$TARGET_TIER" != "preview" ]; then
+            echo "::error::Invalid target tier. Apply is restricted to the preview environment."
+            exit 1
+          fi
+          echo "Environment target tier verified. Proceeding."
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
+        with:
+          version: '1.192.5'
+
+      - name: Verify Migration Files Presence
+        run: |
+          MIGRATION_FILE="supabase/migrations/20260702231600_photo_upload_intents.sql"
+          if [ ! -f "$MIGRATION_FILE" ]; then
+            echo "::error::Migration file $MIGRATION_FILE is missing."
+            exit 1
+          fi
+
+      - name: Inspect Pre-Apply Migration History
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set +x
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error::SUPABASE_DB_URL is not configured in the preview environment."
+            exit 1
+          fi
+          echo "=== Pre-Apply Migration History ==="
+          # migration list --db-url compares local and remote migration-history
+          # timestamps and detects migration-history divergence. It does NOT prove
+          # the remote schema has no manual or out-of-band changes.
+          supabase migration list --db-url "$SUPABASE_DB_URL"
+
+          if supabase migration list --db-url "$SUPABASE_DB_URL" | grep -q "Remote Only"; then
+            echo "::error::Remote and local migration history are divergent. Aborting."
+            exit 1
+          fi
+
+      - name: Execute Migration Push
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set +x
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error::SUPABASE_DB_URL is not configured in the preview environment."
+            exit 1
+          fi
+          supabase db push --db-url "$SUPABASE_DB_URL"
+
+      - name: Inspect Post-Apply Migration History & Verify
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set +x
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then
+            echo "::error::SUPABASE_DB_URL is not configured in the preview environment."
+            exit 1
+          fi
+          echo "=== Post-Apply Migration History ==="
+          # migration list --db-url compares local and remote migration-history
+          # timestamps and detects migration-history divergence. It does NOT prove
+          # the remote schema has no manual or out-of-band changes.
+          supabase migration list --db-url "$SUPABASE_DB_URL"
+
+          MIGRATION_STATUS=$(supabase migration list --db-url "$SUPABASE_DB_URL" | grep "20260702231600" || true)
+          echo "Target migration status: $MIGRATION_STATUS"
+
+          if [ -z "$MIGRATION_STATUS" ]; then
+            echo "::error::Target migration 20260702231600 not found in database migration list."
+            exit 1
+          fi
+
+          if echo "$MIGRATION_STATUS" | grep -q "Local Only"; then
+            echo "::error::Verification failed. Target migration is not applied on the remote database."
+            exit 1
+          fi
+
+          echo "Verification passed. Migration 20260702231600 is recorded in remote migration history."
+
+      - name: Audit Output
+        run: |
+          echo "=== Migration Audit Metadata ==="
+          echo "Git SHA: ${{ github.sha }}"
+          echo "Workflow Run ID: ${{ github.run_id }}"
+          echo "Selected Mode: ${{ github.event.inputs.mode }}"
+          echo "Change Ticket Identifier: ${{ github.event.inputs.change_ticket }}"
+          echo "Migration Filename: 20260702231600_photo_upload_intents.sql"
+          echo "Migration Checksum: 4a71a7e8029ff87ee3987f444d6927d534a6b34125650f423b8abd55e4f2ad36"
+          echo "Preflight Status: PASS"
+          echo "Migration History Status: ALIGNED (history timestamps only — not a schema-drift audit)"
+          echo "Apply Status: APPLIED"
+          echo "Post-Apply Verification Status: PASS"
