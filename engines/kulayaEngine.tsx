@@ -41,11 +41,11 @@ const montserrat = Montserrat({
 
 const fontClasses = `${playfair.variable} ${cinzel.variable} ${inter.variable} ${montserrat.variable}`;
 
-export default function KulayaEngine({ config, slug }: InvitationEngineProps) {
+export default function KulayaEngine({ config }: InvitationEngineProps) {
   return (
     <div
       data-engine="kulaya"
-      data-invitation={slug}
+      data-invitation={config.slug}
       data-source={config.sourcePath}
       className={`${fontClasses} min-h-full flex flex-col antialiased`}
     >

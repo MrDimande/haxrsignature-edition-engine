@@ -1,3 +1,15 @@
 export type { InvitationEngineProps } from "./types";
-export { EngineRenderer } from "./EngineRenderer";
-export type { EngineRenderProps } from "./EngineRenderer";
+export {
+  EngineRenderer,
+  EngineRegistry,
+  getEngine,
+  ENGINE_META,
+  getEngineMeta,
+  resolveCanonicalEngineKey,
+} from "./registry";
+export type {
+  EngineRenderProps,
+  EngineRegistryKey,
+  RegistryEngineMetaKey,
+  EngineMeta,
+} from "./registry";

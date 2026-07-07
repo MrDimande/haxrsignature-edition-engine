@@ -29,6 +29,7 @@ function readEventId(envVar: string): string | undefined {
     EDITION_EVENT_JESSICA_KULAYA_ID: "KULAYA_EVENT_ID",
     EDITION_EVENT_JESSICA_LOBOLO_ID: "LOBOLO_EVENT_ID",
     EDITION_EVENT_JESSICA_TRADITIONAL_ID: "TRADITIONAL_WEDDING_EVENT_ID",
+    EDITION_EVENT_JESSICA_FAREWELL_ID: "FAREWELL_EVENT_ID",
   };
   const legacyKey = legacyMap[envVar];
   if (legacyKey) {

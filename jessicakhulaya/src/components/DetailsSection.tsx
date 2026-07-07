@@ -24,7 +24,7 @@ export default function DetailsSection() {
       whileInView="visible"
       viewport={defaultViewport}
       variants={staggerContainer}
-      className="relative w-full py-28 md:py-36 px-6 overflow-hidden z-10 flex flex-col items-center justify-center border-t border-b border-[#FAF5F0]/5"
+      className="relative w-full py-28 md:py-36 px-6 overflow-hidden z-10 flex flex-col items-center justify-center border-t-0 border-b border-[#FAF5F0]/5 md:border-t"
       id="details"
       style={{ backgroundColor: COLORS.woodBrownDeep }}
     >

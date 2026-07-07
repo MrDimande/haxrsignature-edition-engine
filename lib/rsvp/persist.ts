@@ -47,6 +47,9 @@ export async function persistEditionRsvp(
     p_edition_slug: binding.slug,
     p_email: submission.email?.trim() ?? "",
     p_phone: submission.phone?.trim() ?? "",
+    p_message_for_bride: submission.messageForBride?.trim() ?? "",
+    p_size: submission.size?.trim() ?? "",
+    p_dress_code_confirmed: submission.dressCodeConfirmed ?? null,
   });
 
   if (error) {

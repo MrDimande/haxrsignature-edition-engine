@@ -35,8 +35,9 @@ export default function RootLayout({
     <html
       lang="pt"
       className={`${cormorant.variable} ${inter.variable} h-full scroll-smooth antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full bg-[#0A0705] text-[#F5F0E8]">
+      <body className="min-h-full bg-[#0A0705] text-[#F5F0E8]" suppressHydrationWarning>
         <HaxrAuthorshipMeta />
         {children}
       </body>
