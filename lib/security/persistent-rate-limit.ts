@@ -11,6 +11,11 @@ type RpcRateLimitRow = {
   retry_after_seconds: number;
 };
 
+export type PersistentRateLimitFn = (
+  key: string,
+  config: RateLimitConfig
+) => Promise<RateLimitResult>;
+
 function parseRpcResult(data: unknown): RateLimitResult | null {
   if (!data || typeof data !== "object") return null;
   const row = data as RpcRateLimitRow;

@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
       ...config.resolve.alias,
       "@data": path.resolve(__dirname, "data"),
       "@lib": path.resolve(__dirname, "lib"),
+      "@core": path.resolve(__dirname, "core"),
       "@engines": path.resolve(__dirname, "engines"),
       "@legacy/jessicakhulaya/page": path.resolve(
         __dirname,
