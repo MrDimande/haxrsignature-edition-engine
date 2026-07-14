@@ -76,7 +76,8 @@ export const TRADITIONAL_RSVP_EMAIL: RsvpEventEmailConfig = {
 
 export function getRsvpEmailConfig(slug?: string): RsvpEventEmailConfig | null {
   if (!slug) return null;
-  const canonicalSlug = resolveSlug(slug) ?? slug;
+  const canonicalSlug = resolveSlug(slug);
+  if (!canonicalSlug) return null;
   if (canonicalSlug === "jessicakulaya") {
     return KULAYA_RSVP_EMAIL;
   }
