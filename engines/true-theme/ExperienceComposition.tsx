@@ -10,6 +10,7 @@ import {
 } from "./ExperienceSections";
 import { IllustrationCeremonyExperience } from "./profiles/illustration-ceremony/IllustrationCeremonySections";
 import { RoseEleganceExperience } from "./profiles/rose-elegance/RoseEleganceExperience";
+import { PrimaveraLoboloExperience } from "./profiles/primavera-lobolo/PrimaveraLoboloExperience";
 
 function StandardEditorialExperience() {
   return (
@@ -34,6 +35,8 @@ export function ExperienceComposition() {
       return <IllustrationCeremonyExperience />;
     case "rose-elegance":
       return <RoseEleganceExperience />;
+    case "primavera-lobolo":
+      return <PrimaveraLoboloExperience />;
     case "standard":
       return <StandardEditorialExperience />;
     default: {

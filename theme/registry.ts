@@ -1,3 +1,4 @@
+import { primaveraLoboloTheme } from "./definitions/primavera-lobolo";
 import { brideToBeIllustrationTheme } from "./definitions/bride-to-be-illustration";
 import { corporateMinimalTrueTheme } from "./definitions/corporate-minimal";
 import { kulayaTrueTheme } from "./definitions/kulaya-traditional";
@@ -15,6 +16,7 @@ export const ThemeRegistry: Record<RegistryThemeKey, TrueTheme> = {
   "corporate-minimal": corporateMinimalTrueTheme,
   "bride-to-be-illustration": brideToBeIllustrationTheme,
   "rose-elegance-farewell": roseEleganceFarewellTheme,
+  "primavera-lobolo": primaveraLoboloTheme,
 };
 
 export type { RegistryThemeKey };

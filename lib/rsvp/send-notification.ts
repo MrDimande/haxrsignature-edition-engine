@@ -66,7 +66,7 @@ export async function sendRsvpNotificationEmail(
 
   const guestEmail = isFarewell
     ? buildFarewellGuestRsvpEmail(submission, config.eventName, slug)
-    : buildKulayaGuestRsvpEmail(submission, config.eventName);
+    : buildKulayaGuestRsvpEmail(submission, config.eventName, slug);
   if (!guestEmail) {
     result.guestSkipped = "no_email";
     return result;

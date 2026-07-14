@@ -38,8 +38,8 @@ export function buildKulayaRsvpTeamEmail(
   });
 
   const subject = submission.attending
-    ? `${HAXR_AUTH.brand} · RSVP ✓ · ${submission.name} · Kulaya`
-    : `${HAXR_AUTH.brand} · RSVP · ${submission.name} · Kulaya`;
+    ? `${HAXR_AUTH.brand} · RSVP ✓ · ${submission.name} · ${eventName}`
+    : `${HAXR_AUTH.brand} · RSVP · ${submission.name} · ${eventName}`;
 
   const binding = getEditionEventBinding(slug);
   const adminUrl = binding?.eventId
@@ -58,6 +58,9 @@ export function buildKulayaRsvpTeamEmail(
     ...(submission.phone?.trim()
       ? [["Telefone", submission.phone.trim()] as const]
       : []),
+    ...(submission.messageForBride?.trim()
+      ? [["Observação", submission.messageForBride.trim()] as const]
+      : []),
     ["Evento", eventName],
     ["Recebido em", timestamp],
     [
@@ -68,7 +71,7 @@ export function buildKulayaRsvpTeamEmail(
 
   const html = buildBrandEmailHtml({
     title: "Nova confirmação RSVP",
-    subtitle: "Cerimónia de Kulaya · Jessica Muege",
+    subtitle: eventName,
     editionTag: "Edition · Convite digital",
     preheader: `${submission.name} — ${statusLabel}`,
     body: `<p style="margin:0;color:#8a8478;font-size:15px;line-height:1.7;">Recebemos uma nova resposta no convite digital. Os detalhes seguem abaixo.</p>

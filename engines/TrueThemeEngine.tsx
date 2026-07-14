@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ReactLenis } from "lenis/react";
 import { Playfair_Display, Inter, Montserrat, Cormorant_Garamond, Great_Vibes, Jost } from "next/font/google";
 import { resolveThemeTokens } from "../theme/resolver";
@@ -70,13 +70,22 @@ export default function TrueThemeEngine({
   const [rsvpStatus, setRsvpStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
-  const audioPlayerRef = useRef<ExperienceAudioPlayer | null>(null);
+  const [audioPlayer, setAudioPlayer] = useState<ExperienceAudioPlayer | null>(
+    null,
+  );
 
   useEffect(() => {
     const player = new ExperienceAudioPlayer(theme, setAudioEnabled);
-    audioPlayerRef.current = player;
+    setAudioPlayer(player);
     return () => player.stop();
   }, [theme]);
+
+  useEffect(() => {
+    if (!introComplete || !audioPlayer || theme.audio.type === "silent") return;
+    if (!audioPlayer.isPlaying()) {
+      void audioPlayer.start();
+    }
+  }, [introComplete, audioPlayer, theme.audio.type]);
 
   return (
     <ExperienceProvider
@@ -85,7 +94,7 @@ export default function TrueThemeEngine({
         tokens,
         experience,
         config,
-        audioPlayer: audioPlayerRef.current,
+        audioPlayer,
         audioEnabled,
         setAudioEnabled,
         introComplete,
