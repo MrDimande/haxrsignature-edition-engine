@@ -56,6 +56,18 @@ export function validateGiftReservationPayload(
     return { ok: false, error: "Indique o seu nome.", status: 400 };
   }
 
+  if (guestName.length > 120) {
+    return { ok: false, error: "Nome demasiado longo.", status: 400 };
+  }
+
+  if (guestPhone.length > 30) {
+    return { ok: false, error: "Telefone inválido.", status: 400 };
+  }
+
+  if (message && message.length > 280) {
+    return { ok: false, error: "Mensagem demasiado longa.", status: 400 };
+  }
+
   if (options.requiresPhone && !guestPhone) {
     return {
       ok: false,
@@ -64,18 +76,18 @@ export function validateGiftReservationPayload(
     };
   }
 
-  if (!Number.isInteger(quantity) || quantity < 1) {
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20) {
     return { ok: false, error: "Quantidade inválida.", status: 400 };
   }
 
   return {
     ok: true,
     sanitized: {
-      itemId,
-      guestName,
-      guestPhone,
+      itemId: itemId.slice(0, 80),
+      guestName: guestName.slice(0, 120),
+      guestPhone: guestPhone.slice(0, 30),
       quantity,
-      message: message || undefined,
+      message: message ? message.slice(0, 280) : undefined,
     },
   };
 }

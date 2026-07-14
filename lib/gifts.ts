@@ -18,6 +18,33 @@ type Reservation = {
   timestamp: string;
 };
 
+/** Public gift payload — never includes reservation PII */
+export type PublicGiftItem = {
+  id: string;
+  name: string;
+  category: GiftItem["category"];
+  status: "available" | "reserved";
+  popularityScore?: number;
+  emotionalTag?: string;
+};
+
+export function toPublicGift(gift: GiftItem): PublicGiftItem {
+  return {
+    id: gift.id,
+    name: gift.name,
+    category: gift.category,
+    status: gift.status === "reserved" ? "reserved" : "available",
+    ...(gift.popularityScore !== undefined
+      ? { popularityScore: gift.popularityScore }
+      : {}),
+    ...(gift.emotionalTag ? { emotionalTag: gift.emotionalTag } : {}),
+  };
+}
+
+export function toPublicGifts(gifts: GiftItem[]): PublicGiftItem[] {
+  return gifts.map(toPublicGift);
+}
+
 let reservationPromiseChain = Promise.resolve();
 
 function mergeCatalogWithReservations(
@@ -28,7 +55,7 @@ function mergeCatalogWithReservations(
     if (reservation) {
       return {
         ...gift,
-        status: "reserved",
+        status: "reserved" as const,
         reservedBy: reservation.reservedBy,
         timestamp: reservation.timestamp,
         reservedAt: reservation.timestamp,
@@ -100,7 +127,7 @@ async function reserveGiftInSupabase(
   giftId: string,
   reservedBy: string,
   giftName: string
-): Promise<{ success: boolean; error?: string; conflictName?: string }> {
+): Promise<{ success: boolean; error?: string }> {
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("reserve_edition_gift", {
     p_registry_key: REGISTRY_KEY,
@@ -127,8 +154,7 @@ async function reserveGiftInSupabase(
   if (payload?.error === "already_reserved") {
     return {
       success: false,
-      error: `Este presente já foi oferecido por ${payload.reservedBy || "outra convidada"}.`,
-      conflictName: payload.reservedBy,
+      error: "Este presente já foi reservado por outra convidada.",
     };
   }
 
@@ -145,12 +171,9 @@ async function reserveGiftInFile(
   const reservations = await getReservationsFromFile();
   const alreadyReserved = reservations.some((r) => r.giftId === giftId);
   if (alreadyReserved) {
-    const reservedItem = mergeCatalogWithReservations(reservations).find(
-      (g) => g.id === giftId
-    );
     return {
       success: false,
-      error: `Este presente já foi oferecido por ${reservedItem?.reservedBy || "outra convidada"}.`,
+      error: "Este presente já foi reservado por outra convidada.",
     };
   }
 
@@ -164,9 +187,16 @@ async function reserveGiftInFile(
   return { success: true };
 }
 
+/** Internal merge — may include reservedBy for email notifications only */
 export async function getMergedGifts(): Promise<GiftItem[]> {
   const reservations = await getReservations();
   return mergeCatalogWithReservations(reservations);
+}
+
+/** Public catalog — strips all reservation PII */
+export async function getPublicGifts(): Promise<PublicGiftItem[]> {
+  const merged = await getMergedGifts();
+  return toPublicGifts(merged);
 }
 
 export async function reserveGift(
@@ -176,7 +206,7 @@ export async function reserveGift(
 ): Promise<{
   success: boolean;
   error?: string;
-  gifts?: GiftItem[];
+  gifts?: PublicGiftItem[];
   giftName?: string;
 }> {
   return new Promise((resolve) => {
@@ -201,12 +231,12 @@ export async function reserveGift(
           : await reserveGiftInFile(giftId, reservedBy);
 
         if (!result.success) {
-          const merged = await getMergedGifts();
+          const merged = await getPublicGifts();
           resolve({ success: false, error: result.error, gifts: merged });
           return;
         }
 
-        const updatedGifts = await getMergedGifts();
+        const updatedGifts = await getPublicGifts();
         resolve({ success: true, gifts: updatedGifts, giftName: staticGift.name });
       })
       .catch((err) => {

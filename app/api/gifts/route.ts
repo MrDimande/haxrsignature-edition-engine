@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getMergedGifts } from "@lib/gifts";
+import { getPublicGifts } from "@lib/gifts";
 
 export async function GET() {
   try {
-    const gifts = await getMergedGifts();
+    const gifts = await getPublicGifts();
     return NextResponse.json({ success: true, gifts }, { status: 200 });
   } catch (error) {
     console.error("GET /api/gifts error:", error);
