@@ -11,6 +11,7 @@ import {
   getEditionSiteUrl,
   getProxyTimeoutMs,
   isProxyFallbackEnabled,
+  MAX_PROXY_RSVP_BODY_BYTES,
   validateProxyConfig,
 } from "@lib/control-plane/config";
 import { logProxyRsvp, type ProxyLogFields } from "@lib/control-plane/logging";
@@ -79,6 +80,21 @@ export async function proxyRsvpToCore(
   const coreBase = getCoreApiBaseUrl();
   const clientIp = getRequestIp(request);
   const rawBody = await request.text();
+
+  if (Buffer.byteLength(rawBody, "utf8") > MAX_PROXY_RSVP_BODY_BYTES) {
+    logProxyRsvp({
+      requestId,
+      backend: "proxy",
+      outcome: "config_error",
+    });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Pedido demasiado grande.",
+      },
+      { status: 413 }
+    );
+  }
 
   let parsedBody: unknown = null;
   try {

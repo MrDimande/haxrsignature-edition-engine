@@ -1,17 +1,38 @@
 import { isFarewellRsvpDeadlinePassed, FAREWELL_EVENT } from "@lib/farewell/event-details";
-import { resolveInvitationSlug } from "@lib/rsvp/events";
+import { resolveActiveRsvpSlug } from "@lib/rsvp/events";
+import { parseAttending } from "@lib/rsvp/parse-attending";
 import type { RsvpSubmission } from "@lib/rsvp/send-notification";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export const RSVP_FIELD_LIMITS = {
+  name: 120,
+  email: 160,
+  phone: 30,
+  message: 280,
+  size: 12,
+} as const;
+
 function normalizePhone(value: unknown): string {
   if (typeof value !== "string") return "";
-  return value.trim().slice(0, 30);
+  return value.trim().slice(0, RSVP_FIELD_LIMITS.phone);
 }
 
 function normalizeEmail(value: unknown): string {
   if (typeof value !== "string") return "";
-  return value.trim().toLowerCase().slice(0, 160);
+  return value.trim().toLowerCase().slice(0, RSVP_FIELD_LIMITS.email);
+}
+
+function validationError(error: string): LocalRsvpValidationError {
+  return {
+    ok: false,
+    status: 400,
+    outcome: "validation_error",
+    body: {
+      success: false,
+      error,
+    },
+  };
 }
 
 export type LocalRsvpValidationError = {
@@ -47,16 +68,8 @@ export type LocalRsvpValidationResult =
   | LocalRsvpValidationSuccess;
 
 export function validateLocalRsvpPayload(body: unknown): LocalRsvpValidationResult {
-  if (!body || typeof body !== "object") {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "Por favor, introduza o seu nome.",
-      },
-    };
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return validationError("Por favor, introduza o seu nome.");
   }
 
   const record = body as Record<string, unknown>;
@@ -73,10 +86,6 @@ export function validateLocalRsvpPayload(body: unknown): LocalRsvpValidationResu
     dressCodeConfirmed,
   } = record;
 
-  const canonicalSlug = resolveInvitationSlug(
-    typeof slug === "string" ? slug : undefined
-  );
-
   if (typeof honeypot === "string" && honeypot.trim() !== "") {
     return {
       ok: false,
@@ -84,122 +93,81 @@ export function validateLocalRsvpPayload(body: unknown): LocalRsvpValidationResu
       outcome: "honeypot",
       body: {
         success: true,
-        message: "RSVP process completed (honeypot trigger).",
+        message: "RSVP process completed.",
       },
     };
+  }
+
+  const resolvedSlug = resolveActiveRsvpSlug(
+    typeof slug === "string" ? slug : undefined
+  );
+  if (!resolvedSlug) {
+    return validationError("Convite inválido ou indisponível.");
   }
 
   if (typeof name !== "string" || name.trim() === "") {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "Por favor, introduza o seu nome.",
-      },
-    };
+    return validationError("Por favor, introduza o seu nome.");
   }
 
-  if (attending === undefined) {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "Por favor, indique se irá comparecer.",
-      },
-    };
+  const trimmedName = name.trim().slice(0, RSVP_FIELD_LIMITS.name);
+  if (trimmedName.length === 0) {
+    return validationError("Por favor, introduza o seu nome.");
   }
+
+  const attendingResult = parseAttending(attending);
+  if (!attendingResult.ok) {
+    return validationError(attendingResult.error);
+  }
+  const isAttending = attendingResult.attending;
 
   const parsedGuests = parseInt(String(guests), 10);
   if (
-    attending &&
+    isAttending &&
     (Number.isNaN(parsedGuests) || parsedGuests < 1 || parsedGuests > 10)
   ) {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "O número de pessoas deve ser entre 1 e 10.",
-      },
-    };
+    return validationError("O número de pessoas deve ser entre 1 e 10.");
   }
 
   const normalizedEmail = normalizeEmail(email);
   const normalizedPhone = normalizePhone(phone);
 
   if (normalizedEmail && !EMAIL_PATTERN.test(normalizedEmail)) {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "Por favor, introduza um email válido.",
-      },
-    };
+    return validationError("Por favor, introduza um email válido.");
   }
 
-  const isFarewell = canonicalSlug === FAREWELL_EVENT.slug;
+  const isFarewell = resolvedSlug === FAREWELL_EVENT.slug;
 
   if (isFarewell && !normalizedPhone) {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "Indique o telefone para contacto (WhatsApp).",
-      },
-    };
+    return validationError("Indique o telefone para contacto (WhatsApp).");
   }
 
-  if (attending && !normalizedEmail && !normalizedPhone) {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "Indique email ou telefone para contacto.",
-      },
-    };
+  if (isAttending && !normalizedEmail && !normalizedPhone) {
+    return validationError("Indique email ou telefone para contacto.");
   }
 
   if (isFarewell && isFarewellRsvpDeadlinePassed()) {
-    return {
-      ok: false,
-      status: 400,
-      outcome: "validation_error",
-      body: {
-        success: false,
-        error: "O prazo para confirmação terminou. Contacte a organizadora.",
-      },
-    };
+    return validationError(
+      "O prazo para confirmação terminou. Contacte a organizadora."
+    );
   }
 
   const normalizedMessage =
     typeof messageForBride === "string"
-      ? messageForBride.trim().slice(0, 280)
+      ? messageForBride.trim().slice(0, RSVP_FIELD_LIMITS.message)
       : undefined;
   const normalizedSize =
-    typeof size === "string" ? size.trim().slice(0, 12) : undefined;
-
-  const resolvedSlug =
-    canonicalSlug ?? (typeof slug === "string" ? slug : "jessicakulaya");
+    typeof size === "string"
+      ? size.trim().slice(0, RSVP_FIELD_LIMITS.size)
+      : undefined;
 
   return {
     ok: true,
     slug: resolvedSlug,
     isFarewell,
     submission: {
-      name: name.trim(),
-      attending: Boolean(attending),
-      guests: attending ? parsedGuests : 0,
+      name: trimmedName,
+      attending: isAttending,
+      guests: isAttending ? parsedGuests : 0,
       slug: resolvedSlug,
       email: normalizedEmail || undefined,
       phone: normalizedPhone || undefined,
