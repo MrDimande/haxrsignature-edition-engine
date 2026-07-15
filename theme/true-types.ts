@@ -21,7 +21,11 @@ export type MoodEmotion =
   | "soft-intimate"
   | "celebratory";
 
-export type RenderProfile = "standard" | "illustration-ceremony" | "rose-elegance";
+export type RenderProfile =
+  | "standard"
+  | "illustration-ceremony"
+  | "rose-elegance"
+  | "primavera-lobolo";
 
 export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
 

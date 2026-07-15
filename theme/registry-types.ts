@@ -5,4 +5,5 @@ export type RegistryThemeKey =
   | "kulaya-traditional"
   | "corporate-minimal"
   | "bride-to-be-illustration"
-  | "rose-elegance-farewell";
+  | "rose-elegance-farewell"
+  | "primavera-lobolo";
