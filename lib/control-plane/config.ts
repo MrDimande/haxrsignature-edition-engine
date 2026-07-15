@@ -1,20 +1,33 @@
-export type ApiBackendMode = "local" | "proxy";
+import {
+  canUseLocalProxyFallback,
+  decideRsvpBackend,
+  isLocalRsvpExplicitlyAllowed,
+  isVercelProduction,
+} from "@lib/control-plane/rsvp-backend";
+
+export type ApiBackendMode = "local" | "proxy" | "unconfigured";
 
 const DEFAULT_CORE_BASE = "https://www.haxrsignature.com";
 const DEFAULT_PROXY_TIMEOUT_MS = 28_000;
 
+/**
+ * Resolves the active RSVP backend.
+ * Production never silently defaults to local — use decideRsvpBackend() for guards.
+ */
 export function resolveApiBackend(): ApiBackendMode {
-  const raw = process.env.HAXR_API_BACKEND?.trim().toLowerCase();
-  if (raw === "proxy") return "proxy";
-  return "local";
+  const decision = decideRsvpBackend();
+  if (decision.mode === "proxy") return "proxy";
+  if (decision.mode === "local") return "local";
+  return "unconfigured";
 }
 
 export function isProxyRsvpBackend(): boolean {
   return resolveApiBackend() === "proxy";
 }
 
+/** @deprecated Prefer canUseLocalProxyFallback — Production always false. */
 export function isProxyFallbackEnabled(): boolean {
-  return process.env.HAXR_PROXY_FALLBACK?.trim().toLowerCase() === "true";
+  return canUseLocalProxyFallback();
 }
 
 export function getCoreApiBaseUrl(): string {
@@ -76,3 +89,10 @@ export function assertProxyReadyOrThrow(): void {
 }
 
 export const MAX_PROXY_RSVP_BODY_BYTES = 16_384;
+
+export {
+  canUseLocalProxyFallback,
+  decideRsvpBackend,
+  isLocalRsvpExplicitlyAllowed,
+  isVercelProduction,
+};
