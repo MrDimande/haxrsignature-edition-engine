@@ -4,6 +4,7 @@ import { useExperience } from "./context";
 import { ExperienceFlow as StandardExperienceFlow } from "./ExperienceFlow";
 import { IllustrationIntroFlow } from "./profiles/illustration-ceremony/IllustrationIntroFlow";
 import { RoseEleganceIntroFlow } from "./profiles/rose-elegance/RoseEleganceIntroFlow";
+import { PrimaveraLoboloIntroFlow } from "./profiles/primavera-lobolo/PrimaveraLoboloIntroFlow";
 
 /** Routes intro flow by theme render profile — not by slug */
 export function ExperienceFlowRouter() {
@@ -15,6 +16,10 @@ export function ExperienceFlowRouter() {
 
   if (theme.renderProfile === "rose-elegance") {
     return <RoseEleganceIntroFlow />;
+  }
+
+  if (theme.renderProfile === "primavera-lobolo") {
+    return <PrimaveraLoboloIntroFlow />;
   }
 
   return <StandardExperienceFlow />;

@@ -75,6 +75,732 @@
   animation: rose-drift 20s ease-in-out infinite;
 }
 
+@keyframes primavera-petal-drift {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.12;
+  }
+  33% {
+    transform: translate(12px, -24px) rotate(12deg) scale(1.05);
+    opacity: 0.22;
+  }
+  66% {
+    transform: translate(-8px, -14px) rotate(-8deg) scale(0.96);
+    opacity: 0.16;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 0.12;
+  }
+}
+
+.animate-primavera-petal-drift {
+  animation: primavera-petal-drift 18s ease-in-out infinite;
+}
+
+/* Primavera Lobolo — hero editorial (referência convitevf-2026) */
+[data-render-profile="primavera-lobolo"] .font-script {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+}
+
+.primavera-hero-intro {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: 100svh;
+  padding: env(safe-area-inset-top, 0) 0 0;
+  background-color: #141416;
+}
+
+.primavera-hero-intro__film {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.038;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+
+.primavera-hero-intro__gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 10, 0) 0%,
+    rgba(8, 8, 10, 0) 48%,
+    rgba(8, 8, 10, 0.12) 68%,
+    rgba(8, 8, 10, 0.28) 100%
+  );
+}
+
+.primavera-hero-intro__bottom-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  height: clamp(200px, 42vh, 360px);
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.35) 38%,
+    rgba(0, 0, 0, 0.92) 72%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.35) 38%,
+    rgba(0, 0, 0, 0.92) 72%,
+    #000 100%
+  );
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 10, 0) 0%,
+    rgba(8, 8, 10, 0.22) 42%,
+    rgba(8, 8, 10, 0.55) 78%,
+    rgba(8, 8, 10, 0.72) 100%
+  );
+}
+
+.primavera-hero-intro__content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: clamp(28px, 5vh, 48px);
+  width: 100%;
+  max-width: 1180px;
+  min-height: min(100vh, 100dvh);
+  margin: 0 auto;
+  padding: clamp(88px, 12vh, 120px) clamp(20px, 5vw, 40px)
+    clamp(160px, 24vw, 200px);
+  box-sizing: border-box;
+}
+
+.primavera-hero-intro__copy {
+  max-width: min(32rem, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 3vh, 26px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .primavera-hero-intro__copy {
+    animation: primaveraHeroCopyIn 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+}
+
+@keyframes primaveraHeroCopyIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.primavera-hero-intro__eyebrow {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.65rem, 1.45vw, 0.76rem);
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+}
+
+.primavera-hero-intro__names {
+  margin: 0;
+  padding: 0 0.5rem;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  max-width: min(96vw, 36rem);
+}
+
+.primavera-hero-intro__names-inner {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: clamp(0.1em, 2.2vw, 0.24em);
+  row-gap: 0.1em;
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.75rem, 11vw, 6rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #e8cf6a;
+  -webkit-text-fill-color: #e8cf6a;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 0 40px rgba(212, 175, 55, 0.28),
+    0 1px 0 rgba(255, 252, 232, 0.2);
+}
+
+.primavera-hero-intro__names-part {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.primavera-hero-intro__names-amp {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: 0.4em;
+  line-height: 1;
+  display: inline-block;
+  padding: 0 0.02em;
+  opacity: 0.94;
+  flex-shrink: 0;
+  transform: translateY(0.26em);
+  text-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.35),
+    0 0 1px rgba(255, 244, 200, 0.3);
+}
+
+.primavera-hero-intro__names::after {
+  content: "";
+  display: block;
+  width: min(88px, 26vw);
+  height: 1px;
+  margin: clamp(8px, 1.8vw, 14px) auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(242, 227, 142, 0.4),
+    transparent
+  );
+  box-shadow: 0 0 10px rgba(242, 227, 142, 0.12);
+}
+
+.primavera-hero-intro__date {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.78rem, 1.75vw, 0.92rem);
+  font-weight: 300;
+  letter-spacing: 0.42em;
+  margin: 0;
+  padding-left: 0.42em;
+  color: rgba(255, 255, 255, 0.94);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
+}
+
+.primavera-hero-intro__scroll {
+  position: relative;
+  z-index: 12;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #d4af37;
+  text-decoration: none;
+  transition: color 0.25s ease, filter 0.25s ease;
+  padding: 10px 16px 8px;
+  margin-top: -4px;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.25));
+}
+
+.primavera-hero-intro__scroll:hover {
+  color: #f0dc82;
+}
+
+.primavera-hero-intro__scroll:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, 0.75);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.primavera-hero-intro__chevrons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  overflow: visible;
+  will-change: transform;
+}
+
+.primavera-hero-intro__chev {
+  display: block;
+  will-change: transform, opacity;
+}
+
+.primavera-hero-intro__chev--2 {
+  opacity: 0.72;
+}
+
+@media (max-width: 767px) {
+  .primavera-hero-intro__content {
+    gap: clamp(32px, 7vh, 52px);
+    padding-top: clamp(108px, 15vh, 136px);
+    padding-bottom: clamp(176px, 30vw, 220px);
+    justify-content: flex-start;
+  }
+
+  .primavera-hero-intro__copy {
+    gap: clamp(26px, 5.5vh, 38px);
+    max-width: 100%;
+    width: 100%;
+    flex: 1;
+    justify-content: flex-start;
+    padding-top: clamp(2.75rem, 9vh, 4.5rem);
+  }
+
+  .primavera-hero-intro__names {
+    max-width: 100%;
+    padding: 0 clamp(10px, 4vw, 18px);
+    margin-top: clamp(0.5rem, 1.8vh, 1rem);
+  }
+
+  .primavera-hero-intro__names-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: clamp(0.55rem, 3.2vh, 1.15rem);
+    column-gap: 0;
+    font-size: clamp(3.1rem, 14vw, 4.35rem);
+    line-height: 1.06;
+    width: 100%;
+  }
+
+  .primavera-hero-intro__names-part {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.02;
+    max-width: 92vw;
+  }
+
+  .primavera-hero-intro__names-amp {
+    transform: none;
+    font-size: 0.5em;
+    line-height: 1;
+    padding: clamp(0.2rem, 1.4vh, 0.55rem) 0;
+    opacity: 0.92;
+  }
+
+  .primavera-hero-intro__names::after {
+    margin-top: clamp(14px, 2.8vh, 20px);
+    width: min(104px, 34vw);
+  }
+
+  .primavera-hero-intro__date {
+    margin-top: clamp(6px, 1.2vh, 10px);
+    letter-spacing: 0.34em;
+    font-size: clamp(0.8rem, 3.4vw, 0.9rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .primavera-hero-intro__content {
+    justify-content: flex-start;
+    padding-top: clamp(20vh, 24vh, 28vh);
+    padding-bottom: clamp(170px, 22vw, 220px);
+  }
+}
+
+.primavera-hero-intro__transition {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  pointer-events: none;
+  line-height: 0;
+}
+
+.primavera-hero-intro__feather {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(120px, 22vw, 200px);
+  background: linear-gradient(
+    180deg,
+    rgba(8, 8, 10, 0) 0%,
+    rgba(8, 8, 10, 0.12) 35%,
+    rgba(251, 246, 240, 0.2) 72%,
+    rgba(251, 246, 240, 0.72) 100%
+  );
+}
+
+.primavera-hero-intro__curve {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: clamp(84px, 12vw, 128px);
+  transform: translateY(1px);
+}
+
+/* Secção citação — estilo Letícia & Jaime */
+.primavera-quote-section {
+  background-color: #fbf6f0;
+}
+
+.primavera-quote-section__inner {
+  max-width: min(40rem, 92vw);
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.25rem, 3vh, 1.75rem);
+}
+
+.primavera-quote-section__title {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.75rem, 9vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #9e4218;
+  margin: 0;
+}
+
+.primavera-quote-section__body {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.95rem, 2vw, 1.125rem);
+  font-weight: 300;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: #4a3020;
+  margin: 0;
+  max-width: 34rem;
+}
+
+.primavera-quote-section__attribution {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.68rem, 1.4vw, 0.78rem);
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #b89b5e;
+  margin: clamp(0.5rem, 1.5vh, 0.75rem) 0 0;
+}
+
+.primavera-quote-section__divider {
+  width: min(72px, 18vw);
+  height: 1px;
+  margin-top: clamp(0.25rem, 1vh, 0.5rem);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 39, 0.45),
+    transparent
+  );
+}
+
+/* Secção União das Famílias — card editorial (referência Letícia & Jaime) */
+.primavera-families-section {
+  background-color: #fbf6f0;
+}
+
+.primavera-families-card {
+  position: relative;
+  margin-top: clamp(2.5rem, 8vw, 4rem);
+  padding: clamp(3.5rem, 10vw, 5rem) clamp(1.25rem, 4vw, 2.5rem)
+    clamp(2rem, 5vw, 3rem);
+  border-radius: clamp(28px, 5vw, 44px);
+  background: linear-gradient(
+    165deg,
+    #ffffff 0%,
+    #fbf6f0 48%,
+    #f5ede4 100%
+  );
+  border: 1px solid rgba(201, 162, 39, 0.38);
+  box-shadow:
+    0 24px 60px rgba(158, 66, 24, 0.08),
+    0 4px 18px rgba(42, 24, 16, 0.04);
+  overflow: visible;
+}
+
+.primavera-families-card::before {
+  content: "";
+  position: absolute;
+  inset: clamp(10px, 2vw, 16px);
+  border-radius: clamp(20px, 4vw, 34px);
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  pointer-events: none;
+}
+
+.primavera-families-card__arch {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: min(88%, 420px);
+  height: clamp(28px, 6vw, 40px);
+  color: #fbf6f0;
+  transform: translate(-50%, -99%);
+  filter: drop-shadow(0 -2px 8px rgba(158, 66, 24, 0.06));
+  pointer-events: none;
+}
+
+.primavera-families-card__arch svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.primavera-families-card__photo-wrap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primavera-families-card__photo-ring {
+  width: clamp(108px, 24vw, 148px);
+  height: clamp(108px, 24vw, 148px);
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(
+    145deg,
+    rgba(201, 162, 39, 0.85),
+    rgba(196, 92, 38, 0.55)
+  );
+  box-shadow:
+    0 12px 32px rgba(158, 66, 24, 0.18),
+    0 0 0 6px rgba(251, 246, 240, 0.95);
+}
+
+.primavera-families-card__photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 18%;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+}
+
+.primavera-families-card__crest {
+  position: absolute;
+  width: clamp(148px, 32vw, 196px);
+  height: clamp(148px, 32vw, 196px);
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.primavera-families-card__body {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.primavera-families-card__eyebrow {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.62rem, 1.3vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #b89b5e;
+  margin: 0 0 clamp(0.5rem, 1.5vh, 0.75rem);
+}
+
+.primavera-families-card__title {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.5rem, 8vw, 3.75rem);
+  font-weight: 400;
+  line-height: 1.05;
+  color: #9e4218;
+  margin: 0 0 clamp(1.5rem, 4vh, 2.25rem);
+}
+
+.primavera-families-card__couple {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+  max-width: 36rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .primavera-families-card__couple {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: start;
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .primavera-couple-profile--groom {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .primavera-families-card__couple-divider {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .primavera-couple-profile--bride {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+.primavera-families-card__couple-divider {
+  display: none;
+  width: 1px;
+  min-height: 100%;
+  align-self: stretch;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(201, 162, 39, 0.45),
+    transparent
+  );
+}
+
+@media (min-width: 768px) {
+  .primavera-families-card__couple-divider {
+    display: block;
+  }
+}
+
+.primavera-couple-profile__name {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2rem, 5.5vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: #9e4218;
+  margin: 0 0 0.65rem;
+}
+
+.primavera-couple-profile__lineage {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.62rem, 1.3vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #b89b5e;
+  margin: 0 0 0.85rem;
+}
+
+.primavera-couple-profile__parents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.primavera-couple-profile__parent {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.82rem, 1.8vw, 0.95rem);
+  font-weight: 300;
+  line-height: 1.55;
+  color: #4a3020;
+  margin: 0;
+}
+
+.primavera-families-card__invitation {
+  max-width: 32rem;
+  margin: 0 auto;
+}
+
+.primavera-families-card__invitation-lead {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(1.75rem, 5vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: #9e4218;
+  margin: 0 0 0.85rem;
+}
+
+.primavera-families-card__invitation-body {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.88rem, 1.9vw, 1rem);
+  font-weight: 300;
+  line-height: 1.8;
+  color: #4a3020;
+  margin: 0;
+}
+
+/* Cabeçalhos editoriais Primavera — Great Vibes + eyebrow dourado (secções) */
+.primavera-editorial-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.primavera-editorial-heading--center {
+  text-align: center;
+  align-items: center;
+}
+
+.primavera-editorial-heading--left {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.primavera-editorial-heading__eyebrow {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.62rem, 1.3vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #b89b5e;
+  margin: 0 0 clamp(0.5rem, 1.5vh, 0.75rem);
+}
+
+.primavera-editorial-heading__title {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.35rem, 7.5vw, 3.65rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: #9e4218;
+  margin: 0;
+}
+
+.primavera-editorial-heading__title--light {
+  color: #fbf6f0;
+}
+
+.primavera-editorial-heading__title--compact {
+  font-size: clamp(2rem, 6.5vw, 3rem);
+}
+
+.primavera-editorial-heading__divider {
+  width: min(72px, 18vw);
+  height: 1px;
+  margin-top: clamp(0.65rem, 1.5vh, 0.85rem);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 39, 0.45),
+    transparent
+  );
+}
+
+.primavera-editorial-heading--left .primavera-editorial-heading__divider {
+  margin-left: 0;
+  margin-right: auto;
+  background: linear-gradient(
+    90deg,
+    rgba(201, 162, 39, 0.45),
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primavera-hero-intro__copy {
+    animation: none;
+  }
+}
+
 /* Rose Elegance — tipografia feminina */
 [data-render-profile="rose-elegance"] .font-display {
   font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;

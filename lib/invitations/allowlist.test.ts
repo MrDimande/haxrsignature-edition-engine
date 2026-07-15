@@ -9,9 +9,10 @@ import {
 import { INVITATIONS } from "@data/invitations";
 
 describe("invitation allowlist / slug resolution", () => {
-  it("inclui convites activos existentes", () => {
+  it("inclui todos os convites activos", () => {
     for (const slug of [
       "jessicakulaya",
+      "jessicaesamueltraditionalwedding",
       "cha-de-lingerie",
       "cha-de-panela",
       "jessicachadelingerie",
@@ -22,10 +23,11 @@ describe("invitation allowlist / slug resolution", () => {
     }
   });
 
-  it("draft traditional-wedding não é activo", () => {
-    assert.equal(INVITATIONS["traditional-wedding"].status, "draft");
-    assert.equal(isActiveInvitationSlug("traditional-wedding"), false);
-    assert.equal(resolveActiveInvitationSlug("traditional-wedding"), null);
+  it("resolve jessicaesamueltraditionalwedding para primavera-lobolo", () => {
+    const invitation = INVITATIONS.jessicaesamueltraditionalwedding;
+    assert.equal(invitation.theme, "primavera-lobolo");
+    assert.equal(invitation.engine, "theme");
+    assert.equal(invitation.status, "active");
   });
 
   it("slug desconhecido não faz fallback para jessicakulaya", () => {
@@ -49,6 +51,10 @@ describe("invitation allowlist / slug resolution", () => {
     assert.equal(
       resolveActiveInvitationSlug("jessicakhulaya"),
       "jessicakulaya"
+    );
+    assert.equal(
+      resolveActiveInvitationSlug("traditional-wedding"),
+      "jessicaesamueltraditionalwedding"
     );
     assert.equal(
       resolveActiveInvitationSlug("despedida-de-solteira"),

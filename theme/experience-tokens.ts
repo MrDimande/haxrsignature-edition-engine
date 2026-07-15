@@ -159,7 +159,14 @@ export function resolveExperienceTokens(theme: TrueTheme): ExperienceTokens {
           body: 'var(--font-jost), "Jost", system-ui, sans-serif',
           script: 'var(--font-great-vibes), "Great Vibes", cursive',
         }
-      : baseTypography;
+      : theme.renderProfile === "primavera-lobolo"
+        ? {
+            display:
+              'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+            body: 'var(--font-jost), "Jost", system-ui, sans-serif',
+            script: 'var(--font-great-vibes), "Great Vibes", cursive',
+          }
+        : baseTypography;
 
   return {
     motion,
@@ -257,6 +264,22 @@ export function getRoseElegancePalette(): TrueTheme["palette"] {
     blob2: "rgba(255, 229, 240, 0.85)",
     blob3: "rgba(255, 45, 138, 0.18)",
     divider: "rgba(201, 168, 108, 0.32)",
+  };
+}
+
+export function getPrimaveraLoboloPalette(): TrueTheme["palette"] {
+  return {
+    bgBase: "#F5EDE4",
+    textPrimary: "text-[#2A1810]",
+    textSecondary: "text-[#5C3A28]",
+    accent: "#C9A227",
+    accentLight: "rgba(201, 162, 39, 0.18)",
+    cardBg:
+      "bg-[#FFFAF5]/90 backdrop-blur-sm border border-[#C9A227]/30 shadow-[0_8px_32px_rgba(196,92,38,0.08)]",
+    blob1: "rgba(196, 92, 38, 0.14)",
+    blob2: "rgba(243, 223, 208, 0.9)",
+    blob3: "rgba(201, 162, 39, 0.16)",
+    divider: "rgba(201, 162, 39, 0.55)",
   };
 }
 

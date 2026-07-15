@@ -84,9 +84,9 @@ describe("validateLocalRsvpPayload", () => {
     }
   });
 
-  it("aceita RSVP com acompanhantes para convite activo", () => {
+  it("aceita RSVP com acompanhantes para casamento tradicional", () => {
     const result = validateLocalRsvpPayload({
-      slug: "jessicakulaya",
+      slug: "jessicaesamueltraditionalwedding",
       name: "Convidado Teste",
       attending: true,
       guests: 3,
@@ -96,7 +96,7 @@ describe("validateLocalRsvpPayload", () => {
 
     assert.equal(result.ok, true);
     if (result.ok) {
-      assert.equal(result.slug, "jessicakulaya");
+      assert.equal(result.slug, "jessicaesamueltraditionalwedding");
       assert.equal(result.submission.attending, true);
       assert.equal(result.submission.guests, 3);
     }
@@ -105,7 +105,7 @@ describe("validateLocalRsvpPayload", () => {
   it('mantém attending false quando body envia "false" ou "0"', () => {
     for (const attending of ["false", "0", false, 0] as const) {
       const result = validateLocalRsvpPayload({
-        slug: "jessicakulaya",
+        slug: "jessicaesamueltraditionalwedding",
         name: "Convidado Ausente",
         attending,
         guests: 1,
@@ -121,7 +121,7 @@ describe("validateLocalRsvpPayload", () => {
 
   it("rejeita attending inválido", () => {
     const result = validateLocalRsvpPayload({
-      slug: "jessicakulaya",
+      slug: "jessicaesamueltraditionalwedding",
       name: "Convidado",
       attending: "maybe",
       guests: 1,
