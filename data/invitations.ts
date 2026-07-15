@@ -225,7 +225,8 @@ export const activeInvitationSlugs = getActiveInvitations().map(
 );
 
 export function getInvitation(slug: string): InvitationConfig | null {
-  const canonical = LEGACY_SLUG_REDIRECTS[slug] ?? slug;
+  const canonical =
+    LEGACY_SLUG_REDIRECTS[slug] ?? ALIAS_INDEX[slug] ?? slug;
   return INVITATIONS[canonical] ?? null;
 }
 

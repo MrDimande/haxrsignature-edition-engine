@@ -884,7 +884,7 @@ function GiftCard({
           <p
             className={`font-display italic text-[10px] leading-relaxed ${theme.palette.textSecondary}`}
           >
-            Reservado por {gift.reservedBy}
+            Reservado
           </p>
         ) : (
           <button

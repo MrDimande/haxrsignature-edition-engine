@@ -5,6 +5,7 @@ import {
   formatCopyrightShort,
   formatEmailSignature,
 } from "@lib/brand/authorship";
+import { escapeHtml } from "@lib/email/escape-html";
 
 const BRAND = HAXR_AUTH.brand;
 const GOLD = "#c9a962";
@@ -64,15 +65,15 @@ export function buildBrandEmailHtml({
   signature = true,
 }: BrandEmailOptions): string {
   const preheaderBlock = preheader
-    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${preheader}</div>`
+    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(preheader)}</div>`
     : "";
 
   const editionBlock = editionTag
-    ? `<p style="margin:0 0 12px;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:${GOLD_SOFT};">${editionTag}</p>`
+    ? `<p style="margin:0 0 12px;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:${GOLD_SOFT};">${escapeHtml(editionTag)}</p>`
     : "";
 
   const subtitleBlock = subtitle
-    ? `<p style="margin:12px 0 0;font-size:14px;line-height:1.5;color:${MUTED};font-weight:400;">${subtitle}</p>`
+    ? `<p style="margin:12px 0 0;font-size:14px;line-height:1.5;color:${MUTED};font-weight:400;">${escapeHtml(subtitle)}</p>`
     : "";
 
   const ctaBlock =
@@ -98,7 +99,7 @@ ${secondaryCta ? `<tr><td align="center">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title}</title>
+<title>${escapeHtml(title)}</title>
 </head>
 <body style="margin:0;padding:0;background-color:${BG};font-family:Georgia,'Times New Roman',serif;">
 ${preheaderBlock}
@@ -111,7 +112,7 @@ ${editionBlock}
 <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="margin:20px auto 0;">
 <tr><td style="width:48px;height:1px;background:linear-gradient(to right,transparent,${GOLD},transparent);font-size:0;line-height:0;">&nbsp;</td></tr>
 </table>
-<h1 style="margin:20px 0 0;font-size:26px;font-weight:400;line-height:1.35;color:${HEADING};">${title}</h1>
+<h1 style="margin:20px 0 0;font-size:26px;font-weight:400;line-height:1.35;color:${HEADING};">${escapeHtml(title)}</h1>
 ${subtitleBlock}
 </td></tr>
 <tr><td style="padding:36px 44px 28px;font-size:16px;line-height:1.7;color:${TEXT};">
@@ -129,16 +130,35 @@ ${footerExtra}
 </html>`;
 }
 
+export type EmailDetailRow = {
+  label: string;
+  /** Plain text — escaped. Prefer this for all user content. */
+  value?: string;
+  /** Trusted static markup only (never pass user input). */
+  html?: string;
+};
+
 /** Cartão interior reutilizável — detalhes RSVP / convite */
-export function buildEmailDetailCard(rows: ReadonlyArray<readonly [string, string]>): string {
-  const innerRows = rows
-    .map(
-      ([label, value], index) =>
-        `<tr>
+export function buildEmailDetailCard(
+  rows: ReadonlyArray<readonly [string, string] | EmailDetailRow>
+): string {
+  const normalized: EmailDetailRow[] = rows.map((row): EmailDetailRow => {
+    if (Array.isArray(row)) {
+      return { label: row[0], value: row[1] };
+    }
+    return row as EmailDetailRow;
+  });
+
+  const innerRows = normalized
+    .map((row, index) => {
+      const label = escapeHtml(row.label);
+      const valueHtml =
+        row.html !== undefined ? row.html : escapeHtml(row.value ?? "");
+      return `<tr>
 <td style="padding:${index === 0 ? "0" : "14px"} 0 14px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:${MUTED};vertical-align:top;width:36%;border-bottom:1px solid ${BORDER_SOFT};">${label}</td>
-<td style="padding:${index === 0 ? "0" : "14px"} 0 14px 16px;color:${HEADING};vertical-align:top;border-bottom:1px solid ${BORDER_SOFT};">${value}</td>
-</tr>`
-    )
+<td style="padding:${index === 0 ? "0" : "14px"} 0 14px 16px;color:${HEADING};vertical-align:top;border-bottom:1px solid ${BORDER_SOFT};">${valueHtml}</td>
+</tr>`;
+    })
     .join("");
 
   return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;background-color:${PANEL_INNER};border:1px solid ${BORDER};">
@@ -146,6 +166,21 @@ export function buildEmailDetailCard(rows: ReadonlyArray<readonly [string, strin
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0">${innerRows}</table>
 </td></tr>
 </table>`;
+}
+
+/** Safe mailto cell for detail cards — href and label are escaped */
+export function buildSafeMailtoHtml(email: string): string {
+  const safe = escapeHtml(email.trim());
+  return `<a href="mailto:${safe}" style="color:${GOLD};text-decoration:none;">${safe}</a>`;
+}
+
+/** Safe invitation URL cell — only allow same-origin edition paths */
+export function buildSafeInviteLinkHtml(siteUrl: string, slug: string): string {
+  const base = siteUrl.replace(/\/$/, "");
+  const safeSlug = slug.replace(/[^a-z0-9-]/gi, "");
+  const href = escapeHtml(`${base}/${safeSlug}`);
+  const label = escapeHtml(`edition.haxrsignature.com/${safeSlug}`);
+  return `<a href="${href}" style="color:${GOLD};text-decoration:none;">${label}</a>`;
 }
 
 /** Destaque de estado — confirmado / declinado */
@@ -157,12 +192,14 @@ export function buildEmailStatusHero(
   const accent = attending ? GOLD : "#6b6560";
   const label = attending ? "Presença confirmada" : "Impossibilidade registada";
   const icon = attending ? "✦" : "—";
+  const safeName = escapeHtml(guestName);
+  const safeSummary = escapeHtml(summary);
 
   return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0;">
 <tr><td style="padding:28px 24px;background-color:${PANEL_INNER};border:1px solid ${BORDER};border-left:3px solid ${accent};">
 <p style="margin:0;font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:${accent};">${icon}&nbsp; ${label}</p>
-<p style="margin:14px 0 0;font-size:22px;font-weight:400;line-height:1.35;color:${HEADING};">${guestName}</p>
-<p style="margin:10px 0 0;font-size:14px;line-height:1.6;color:${MUTED};">${summary}</p>
+<p style="margin:14px 0 0;font-size:22px;font-weight:400;line-height:1.35;color:${HEADING};">${safeName}</p>
+<p style="margin:10px 0 0;font-size:14px;line-height:1.6;color:${MUTED};">${safeSummary}</p>
 </td></tr>
 </table>`;
 }

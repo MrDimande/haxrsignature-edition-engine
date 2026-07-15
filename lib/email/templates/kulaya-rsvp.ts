@@ -2,7 +2,11 @@ import {
   buildBrandEmailHtml,
   buildEmailDetailCard,
   buildEmailStatusHero,
+  buildSafeInviteLinkHtml,
+  buildSafeMailtoHtml,
+  type EmailDetailRow,
 } from "@lib/email/brand-shell";
+import { sanitizeEmailText } from "@lib/email/escape-html";
 import { HAXR_AUTH } from "@lib/brand/authorship";
 import { getEditionEventBinding } from "@lib/rsvp/events";
 import type { RsvpSubmission } from "@lib/rsvp/send-notification";
@@ -31,6 +35,7 @@ export function buildKulayaRsvpTeamEmail(
     ? "Presença confirmada"
     : "Impossibilidade registada";
   const guestSummary = buildGuestSummary(submission);
+  const safeName = sanitizeEmailText(submission.name);
   const timestamp = new Date().toLocaleString("pt-MZ", {
     dateStyle: "long",
     timeStyle: "short",
@@ -38,39 +43,34 @@ export function buildKulayaRsvpTeamEmail(
   });
 
   const subject = submission.attending
-    ? `${HAXR_AUTH.brand} · RSVP ✓ · ${submission.name} · Kulaya`
-    : `${HAXR_AUTH.brand} · RSVP · ${submission.name} · Kulaya`;
+    ? `${HAXR_AUTH.brand} · RSVP ✓ · ${safeName} · ${eventName}`
+    : `${HAXR_AUTH.brand} · RSVP · ${safeName} · ${eventName}`;
 
   const binding = getEditionEventBinding(slug);
   const adminUrl = binding?.eventId
     ? `${ADMIN_BASE}/${binding.eventId}`
     : `${ADMIN_BASE}`;
 
-  const detailRows: Array<readonly [string, string]> = [
+  const detailRows: EmailDetailRow[] = [
     ...(submission.email?.trim()
-      ? [
-          [
-            "Email",
-            `<a href="mailto:${submission.email.trim()}" style="color:${"#c9a962"};text-decoration:none;">${submission.email.trim()}</a>`,
-          ] as const,
-        ]
+      ? [{ label: "Email", html: buildSafeMailtoHtml(submission.email) }]
       : []),
     ...(submission.phone?.trim()
-      ? [["Telefone", submission.phone.trim()] as const]
+      ? [{ label: "Telefone", value: submission.phone.trim() }]
       : []),
-    ["Evento", eventName],
-    ["Recebido em", timestamp],
-    [
-      "Convite digital",
-      `<a href="${SITE_URL}/${slug}" style="color:#c9a962;text-decoration:none;">edition.haxrsignature.com/${slug}</a>`,
-    ],
+    ...(submission.messageForBride?.trim()
+      ? [{ label: "Observação", value: submission.messageForBride.trim() }]
+      : []),
+    { label: "Evento", value: eventName },
+    { label: "Recebido em", value: timestamp },
+    { label: "Convite digital", html: buildSafeInviteLinkHtml(SITE_URL, slug) },
   ];
 
   const html = buildBrandEmailHtml({
     title: "Nova confirmação RSVP",
-    subtitle: "Cerimónia de Kulaya · Jessica Muege",
+    subtitle: eventName,
     editionTag: "Edition · Convite digital",
-    preheader: `${submission.name} — ${statusLabel}`,
+    preheader: `${safeName} — ${statusLabel}`,
     body: `<p style="margin:0;color:#8a8478;font-size:15px;line-height:1.7;">Recebemos uma nova resposta no convite digital. Os detalhes seguem abaixo.</p>
 ${buildEmailStatusHero(submission.attending, submission.name, guestSummary)}
 ${buildEmailDetailCard(detailRows)}`,
