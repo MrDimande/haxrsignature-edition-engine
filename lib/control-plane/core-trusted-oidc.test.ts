@@ -115,16 +115,18 @@ describe("resolveEditionCoreOidcToken", () => {
 });
 
 describe("rsvp-proxy trusted OIDC contract", () => {
-  it("proxy usa applyTrustedOidcHeader sem protection-bypass", () => {
+  it("proxy mantém Bearer HAXR + OIDC e aplica bypass Preview só via helper", () => {
     const source = fs.readFileSync(
       path.join(path.dirname(fileURLToPath(import.meta.url)), "rsvp-proxy.ts"),
       "utf8"
     );
     assert.match(source, /applyTrustedOidcHeader\(coreHeaders, trustedOidcToken\)/);
     assert.match(source, /Authorization: `Bearer \$\{secret\}`/);
+    assert.match(source, /applyCoreProtectionBypassHeader\(coreHeaders, coreBase\)/);
     assert.match(source, /readUpstreamDiagnostics\(response, trustedOidcPresent\)/);
     assert.match(source, /isTrustedOidcPresent\(trustedOidcToken\)/);
-    assert.doesNotMatch(source, /protection-bypass/i);
-    assert.doesNotMatch(source, /PROTECTION_BYPASS/);
+    assert.match(source, /redactProtectionBypassSecret/);
+    assert.doesNotMatch(source, /x-vercel-protection-bypass:\s/);
+    assert.doesNotMatch(source, /VERCEL_AUTOMATION_BYPASS_SECRET/);
   });
 });
