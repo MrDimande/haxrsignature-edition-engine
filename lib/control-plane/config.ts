@@ -63,3 +63,16 @@ export function validateProxyConfig(): ProxyConfigValidation {
 
   return { ok: true };
 }
+
+/** Fail-closed when proxy mode is enabled without required secrets */
+export function assertProxyReadyOrThrow(): void {
+  if (!isProxyRsvpBackend()) return;
+  const config = validateProxyConfig();
+  if (!config.ok) {
+    throw new Error(
+      `[edition/proxy] fail-closed: missing ${config.missing.join(",")}`
+    );
+  }
+}
+
+export const MAX_PROXY_RSVP_BODY_BYTES = 16_384;
