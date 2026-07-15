@@ -1,5 +1,8 @@
 import { randomUUID } from "crypto";
-import { isProxyRsvpBackend } from "@lib/control-plane/config";
+import {
+  decideRsvpBackend,
+  rsvpBackendNotConfiguredResponse,
+} from "@lib/control-plane/rsvp-backend";
 import { proxyRsvpToCore } from "@lib/control-plane/rsvp-proxy";
 import { handleLocalRsvpPost } from "@lib/rsvp/handle-local";
 
@@ -36,7 +39,13 @@ export async function POST(request: Request) {
     );
   }
 
-  if (isProxyRsvpBackend()) {
+  // Fail closed BEFORE persist / email / webhook / analytics.
+  const decision = decideRsvpBackend();
+  if (decision.mode === "blocked") {
+    return rsvpBackendNotConfiguredResponse(randomUUID());
+  }
+
+  if (decision.mode === "proxy") {
     return proxyRsvpToCore(request);
   }
 

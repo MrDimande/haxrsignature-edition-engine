@@ -10,10 +10,10 @@ import {
   getEditionProxySecret,
   getEditionSiteUrl,
   getProxyTimeoutMs,
-  isProxyFallbackEnabled,
   MAX_PROXY_RSVP_BODY_BYTES,
   validateProxyConfig,
 } from "@lib/control-plane/config";
+import { canUseLocalProxyFallback } from "@lib/control-plane/rsvp-backend";
 import { logProxyRsvp, type ProxyLogFields } from "@lib/control-plane/logging";
 import { handleLocalRsvpPost } from "@lib/rsvp/handle-local";
 import { getRequestIp } from "@lib/security/rate-limit";
@@ -154,7 +154,8 @@ export async function proxyRsvpToCore(
     try {
       json = responseText ? JSON.parse(responseText) : null;
     } catch {
-      if (isProxyFallbackEnabled()) {
+      // Production: never fall back to local (persist/email side effects).
+      if (canUseLocalProxyFallback()) {
         return handleLocalRsvpPost(request, { rawBody, requestId });
       }
 
@@ -212,7 +213,7 @@ export async function proxyRsvpToCore(
       outcome,
     });
 
-    if (isProxyFallbackEnabled()) {
+    if (canUseLocalProxyFallback()) {
       console.warn(
         `[edition/rsvp/proxy] fallback local activo requestId=${requestId} outcome=${outcome} err=${safeError}`
       );
