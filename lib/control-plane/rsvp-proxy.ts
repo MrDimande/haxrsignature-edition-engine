@@ -11,12 +11,17 @@ import {
   getEditionSiteUrl,
   getProxyTimeoutMs,
   isProxyFallbackEnabled,
+  MAX_PROXY_RSVP_BODY_BYTES,
   validateProxyConfig,
 } from "@lib/control-plane/config";
 import { logProxyRsvp, type ProxyLogFields } from "@lib/control-plane/logging";
 import { handleLocalRsvpPost } from "@lib/rsvp/handle-local";
 import { getRequestIp } from "@lib/security/rate-limit";
 import { readUpstreamDiagnostics } from "@lib/control-plane/upstream-diagnostics";
+import {
+  applyCoreProtectionBypassHeader,
+  redactProtectionBypassSecret,
+} from "@lib/control-plane/vercel-protection-bypass";
 
 const CORE_RSVP_PATH = "/api/v1/edition/rsvp";
 
@@ -80,6 +85,21 @@ export async function proxyRsvpToCore(
   const clientIp = getRequestIp(request);
   const rawBody = await request.text();
 
+  if (Buffer.byteLength(rawBody, "utf8") > MAX_PROXY_RSVP_BODY_BYTES) {
+    logProxyRsvp({
+      requestId,
+      backend: "proxy",
+      outcome: "config_error",
+    });
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Pedido demasiado grande.",
+      },
+      { status: 413 }
+    );
+  }
+
   let parsedBody: unknown = null;
   try {
     parsedBody = rawBody ? JSON.parse(rawBody) : null;
@@ -107,6 +127,8 @@ export async function proxyRsvpToCore(
     const trustedOidcToken = await resolveEditionCoreOidcToken();
     const trustedOidcPresent = isTrustedOidcPresent(trustedOidcToken);
     applyTrustedOidcHeader(coreHeaders, trustedOidcToken);
+    // Preview-only: Vercel Deployment Protection bypass (never replaces HAXR Bearer).
+    applyCoreProtectionBypassHeader(coreHeaders, coreBase);
 
     const response = await fetch(`${coreBase}${CORE_RSVP_PATH}`, {
       method: "POST",
@@ -176,6 +198,10 @@ export async function proxyRsvpToCore(
       error instanceof Error && error.name === "AbortError";
     const outcome = isTimeout ? "timeout" : "network_error";
     const proxyLatencyMs = Date.now() - started;
+    const safeError =
+      error instanceof Error
+        ? redactProtectionBypassSecret(error.message)
+        : "unknown";
 
     logProxyRsvp({
       requestId,
@@ -188,11 +214,10 @@ export async function proxyRsvpToCore(
 
     if (isProxyFallbackEnabled()) {
       console.warn(
-        `[edition/rsvp/proxy] fallback local activo requestId=${requestId} outcome=${outcome}`
+        `[edition/rsvp/proxy] fallback local activo requestId=${requestId} outcome=${outcome} err=${safeError}`
       );
       return handleLocalRsvpPost(request, { rawBody, requestId });
     }
-
     logProxyRsvp({
       requestId,
       slug,
