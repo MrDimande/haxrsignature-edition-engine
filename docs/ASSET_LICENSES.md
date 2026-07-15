@@ -13,7 +13,7 @@ Assets shipped in Edition PR #7 (`feature/edition-primavera-lobolo-theme`).
 - Do not remove or replace without a new owner decision.
 - Single copy in `public/audio/`; no duplicate assets for this track.
 
-## Checks (Fase 1D — confirmed)
+## Checks (Fase 1D/1E — confirmed)
 
 | Check | Result |
 |-------|--------|
