@@ -1,8 +1,11 @@
 import {
   INVITATIONS,
-  LEGACY_SLUG_REDIRECTS,
   type InvitationAdminBinding,
 } from "@data/invitations";
+import {
+  resolveActiveInvitationSlug,
+  resolveCanonicalInvitationSlug,
+} from "@lib/invitations/allowlist";
 
 export interface EditionEventBinding {
   slug: string;
@@ -12,12 +15,17 @@ export interface EditionEventBinding {
   envVar: string;
 }
 
-/** Slug canónico (ex.: jessicakhulaya → jessicakulaya) */
+/**
+ * Canonical slug resolution for RSVP / admin bindings.
+ * Includes aliases and legacy redirects. No silent fallback to another event.
+ */
 export function resolveInvitationSlug(slug?: string): string | null {
-  if (!slug) return null;
-  const normalized = slug.trim().toLowerCase();
-  if (INVITATIONS[normalized]) return normalized;
-  return LEGACY_SLUG_REDIRECTS[normalized] ?? null;
+  return resolveCanonicalInvitationSlug(slug);
+}
+
+/** Active invitations only — drafts must not receive RSVP persistence */
+export function resolveActiveRsvpSlug(slug?: string): string | null {
+  return resolveActiveInvitationSlug(slug);
 }
 
 function readEventId(envVar: string): string | undefined {

@@ -2,6 +2,7 @@ import {
   buildBrandEmailHtml,
   buildEmailDetailCard,
 } from "@lib/email/brand-shell";
+import { escapeHtml, sanitizeEmailText } from "@lib/email/escape-html";
 import { HAXR_AUTH } from "@lib/brand/authorship";
 import { FAREWELL_EVENT } from "@lib/farewell/event-details";
 import { getEditionEventBinding } from "@lib/rsvp/events";
@@ -28,18 +29,20 @@ export function buildFarewellGiftReserveTeamEmail(input: {
     timeZone: "Africa/Maputo",
   });
 
-  const subject = `${HAXR_AUTH.brand} · Presente reservado · ${input.reservedBy}`;
+  const safeReserver = sanitizeEmailText(input.reservedBy);
+  const safeGift = sanitizeEmailText(input.giftName);
+  const subject = `${HAXR_AUTH.brand} · Presente reservado · ${safeReserver}`;
 
   const html = buildBrandEmailHtml({
     title: "Novo gesto de carinho",
     subtitle: input.eventName ?? "Despedida de Solteira · Jessica Muege",
     editionTag: "Edition · Lista de presentes",
-    preheader: `${input.reservedBy} reservou: ${input.giftName}`,
-    body: `<p style="margin:0;color:#8a8478;font-size:15px;line-height:1.7;"><strong style="color:#f5f0e8;font-weight:400;">${input.reservedBy}</strong> reservou um presente na lista da despedida.</p>
+    preheader: `${safeReserver} reservou: ${safeGift}`,
+    body: `<p style="margin:0;color:#8a8478;font-size:15px;line-height:1.7;"><strong style="color:#f5f0e8;font-weight:400;">${escapeHtml(input.reservedBy)}</strong> reservou um presente na lista da despedida.</p>
 ${buildEmailDetailCard([
-  ["Presente", input.giftName],
-  ["Oferecido por", input.reservedBy],
-  ["Registado em", timestamp],
+  { label: "Presente", value: input.giftName },
+  { label: "Oferecido por", value: input.reservedBy },
+  { label: "Registado em", value: timestamp },
 ])}`,
     cta: { label: "Ver no admin", href: adminUrl },
     secondaryCta: { label: "Ver convite", href: `${SITE_URL}/${slug}` },

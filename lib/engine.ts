@@ -7,16 +7,17 @@ import {
   type InvitationConfig,
   type InvitationStatus,
 } from "@data/invitations";
+import {
+  resolveActiveInvitationSlug,
+  resolveCanonicalInvitationSlug,
+} from "@lib/invitations/allowlist";
 
 export function getInvitation(slug: string): InvitationConfig | null {
   return getInvitationFromData(slug);
 }
 
 export function resolveSlug(slug: string): string | null {
-  if (INVITATIONS[slug]) return slug;
-  if (LEGACY_SLUG_REDIRECTS[slug]) return LEGACY_SLUG_REDIRECTS[slug];
-  if (ALIAS_INDEX[slug]) return ALIAS_INDEX[slug];
-  return null;
+  return resolveCanonicalInvitationSlug(slug);
 }
 
 /** @internal Server-side only — never use on public-facing pages */
@@ -32,10 +33,7 @@ export function getActiveInvitations(): Array<InvitationConfig> {
 }
 
 export function isValidInvitationSlug(slug: string): boolean {
-  const resolved = resolveSlug(slug);
-  if (!resolved) return false;
-  const invitation = INVITATIONS[resolved];
-  return invitation !== null && invitation.status === "active";
+  return resolveActiveInvitationSlug(slug) !== null;
 }
 
 /** @internal Server-side only */
@@ -54,3 +52,15 @@ export function getLegacyFolderForSlug(slug: string): string | null {
 }
 
 export { INVITATIONS as InvitationRegistry };
+export {
+  resolveActiveInvitationSlug,
+  resolveCanonicalInvitationSlug,
+  ACTIVE_INVITATION_ALLOWLIST,
+} from "@lib/invitations/allowlist";
+
+/** @deprecated Prefer resolveCanonicalInvitationSlug — kept for alias index consumers */
+export function resolveAliasSlug(slug: string): string | null {
+  if (ALIAS_INDEX[slug]) return ALIAS_INDEX[slug];
+  if (LEGACY_SLUG_REDIRECTS[slug]) return LEGACY_SLUG_REDIRECTS[slug];
+  return null;
+}

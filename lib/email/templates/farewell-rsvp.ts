@@ -3,7 +3,11 @@ import {
   buildBrandEmailHtml,
   buildEmailDetailCard,
   buildEmailStatusHero,
+  buildSafeInviteLinkHtml,
+  buildSafeMailtoHtml,
+  type EmailDetailRow,
 } from "@lib/email/brand-shell";
+import { escapeHtml, sanitizeEmailText } from "@lib/email/escape-html";
 import {
   FAREWELL_EVENT,
   FAREWELL_VENUE,
@@ -32,6 +36,7 @@ export function buildFarewellRsvpTeamEmail(
   const statusLabel = submission.attending
     ? "Presença confirmada"
     : "Impossibilidade registada";
+  const safeName = sanitizeEmailText(submission.name);
   const timestamp = new Date().toLocaleString("pt-MZ", {
     dateStyle: "long",
     timeStyle: "short",
@@ -39,38 +44,35 @@ export function buildFarewellRsvpTeamEmail(
   });
 
   const subject = submission.attending
-    ? `${HAXR_AUTH.brand} · RSVP ✓ · ${submission.name} · Despedida`
-    : `${HAXR_AUTH.brand} · RSVP · ${submission.name} · Despedida`;
+    ? `${HAXR_AUTH.brand} · RSVP ✓ · ${safeName} · Despedida`
+    : `${HAXR_AUTH.brand} · RSVP · ${safeName} · Despedida`;
 
   const binding = getEditionEventBinding(slug);
   const adminUrl = binding?.eventId
     ? `${ADMIN_BASE}/${binding.eventId}`
     : ADMIN_BASE;
 
-  const detailRows: Array<readonly [string, string]> = [
+  const detailRows: EmailDetailRow[] = [
     ...(submission.email?.trim()
-      ? [
-          [
-            "Email",
-            `<a href="mailto:${submission.email.trim()}" style="color:#c9a962;text-decoration:none;">${submission.email.trim()}</a>`,
-          ] as const,
-        ]
+      ? [{ label: "Email", html: buildSafeMailtoHtml(submission.email) }]
       : []),
     ...(submission.phone?.trim()
-      ? [["Telefone", submission.phone.trim()] as const]
+      ? [{ label: "Telefone", value: submission.phone.trim() }]
       : []),
     ...(submission.size?.trim()
-      ? [["Tamanho (opcional)", submission.size.trim()] as const]
+      ? [{ label: "Tamanho (opcional)", value: submission.size.trim() }]
       : []),
     ...(submission.messageForBride?.trim()
-      ? [["Mensagem para a Jessica", submission.messageForBride.trim()] as const]
+      ? [
+          {
+            label: "Mensagem para a Jessica",
+            value: submission.messageForBride.trim(),
+          },
+        ]
       : []),
-    ["Evento", eventName],
-    ["Recebido em", timestamp],
-    [
-      "Convite digital",
-      `<a href="${SITE_URL}/${slug}" style="color:#c9a962;text-decoration:none;">edition.haxrsignature.com/${slug}</a>`,
-    ],
+    { label: "Evento", value: eventName },
+    { label: "Recebido em", value: timestamp },
+    { label: "Convite digital", html: buildSafeInviteLinkHtml(SITE_URL, slug) },
   ];
 
   const guestSummary = submission.attending
@@ -81,7 +83,7 @@ export function buildFarewellRsvpTeamEmail(
     title: "Nova confirmação · Despedida de Solteira",
     subtitle: "Rose Elegance Farewell · Jessica Muege",
     editionTag: "Edition · Convite digital",
-    preheader: `${submission.name} — ${statusLabel}`,
+    preheader: `${safeName} — ${statusLabel}`,
     body: `<p style="margin:0;color:#8a8478;font-size:15px;line-height:1.7;">Recebemos uma nova resposta no convite da despedida. Os detalhes seguem abaixo.</p>
 ${buildEmailStatusHero(submission.attending, submission.name, guestSummary)}
 ${formatDressCodeAlert(submission.dressCodeConfirmed)}
@@ -103,7 +105,7 @@ export function buildFarewellGuestRsvpEmail(
   if (!submission.email?.trim()) return null;
 
   const inviteUrl = `${SITE_URL}/${slug}`;
-  const guestName = submission.name.trim();
+  const guestName = escapeHtml(submission.name.trim());
 
   if (submission.attending) {
     const subject = `${HAXR_AUTH.brand} · Presença confirmada · Despedida de Solteira`;
@@ -115,9 +117,15 @@ export function buildFarewellGuestRsvpEmail(
       body: `<p style="margin:0 0 16px;">Olá <strong style="color:#f5f0e8;font-weight:400;">${guestName}</strong>,</p>
 <p style="margin:0 0 8px;">A sua confirmação completa este ritual de passagem. Seguem os detalhes do encontro.</p>
 ${buildEmailDetailCard([
-  ["Data", `${FAREWELL_EVENT.dateIso.split("-").reverse().join("/")} · ${FAREWELL_EVENT.timeLabel}`],
-  ["Local", FAREWELL_VENUE.full],
-  ["Dress code", "Uma peça rosa (obrigatório) · branco reservado à noiva"],
+  {
+    label: "Data",
+    value: `${FAREWELL_EVENT.dateIso.split("-").reverse().join("/")} · ${FAREWELL_EVENT.timeLabel}`,
+  },
+  { label: "Local", value: FAREWELL_VENUE.full },
+  {
+    label: "Dress code",
+    value: "Uma peça rosa (obrigatório) · branco reservado à noiva",
+  },
 ])}
 <p style="margin:24px 0 0;font-size:14px;line-height:1.7;color:#8a8478;">Guarde este email e volte ao convite digital para rever o dress code, localização e sugestões de presente.</p>`,
       cta: { label: "Ver convite", href: inviteUrl },
