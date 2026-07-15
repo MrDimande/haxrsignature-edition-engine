@@ -1,10 +1,24 @@
 ﻿# Asset licenses — Edition Primavera Lobolo (PR theme)
 
-Assets retained in this theme PR. **Audio commercial rights are pending owner confirmation** (not removed in Fase 1D per owner instruction).
+Assets shipped in Edition PR #7 (`feature/edition-primavera-lobolo-theme`).
 
-| Asset | Used by | Origin / notes |
-|-------|---------|----------------|
-| `public/audio/famba-kwatsi.mp3` | `theme/definitions/primavera-lobolo.ts` | Credit UI: Nordino Chambal. Project credit/disclaimer present; **commercial licence proof not verified in-repo**. Keep until owner decides. |
-| `public/images/traditional-wedding/jessica-samuel-hero.png` | Primavera Lobolo experience / event details | Client wedding visual for Jessica & Samuel traditional invite. |
+| Asset | Used by | Notes |
+|-------|---------|-------|
+| `public/audio/famba-kwatsi.mp3` | Exclusively `theme/definitions/primavera-lobolo.ts` (Primavera Lobolo) | **Owner-confirmed authorisation** for use in the invitation. Credits are presented in the experience UI (title/artist/rights holder + disclaimer). **Not redistributed as a standalone download** — only embedded as ambient audio inside this theme. |
+| `public/images/traditional-wedding/jessica-samuel-hero.png` | Primavera Lobolo experience / traditional wedding details | Client wedding visual for Jessica & Samuel traditional invite. |
 
-No unused duplicate of `famba-kwatsi.mp3` ship in this PR.
+## Audio policy
+
+- Keep `famba-kwatsi.mp3` in this PR.
+- Do not remove or replace without a new owner decision.
+- Single copy in `public/audio/`; no duplicate assets for this track.
+
+## Checks (Fase 1D — confirmed)
+
+| Check | Result |
+|-------|--------|
+| lint | pass |
+| `tsc --noEmit` | pass |
+| `npm test` | pass |
+| `npm run build` | pass |
+| secret scan (diff) | clean |
