@@ -10,6 +10,7 @@ import {
   WEDDING_COPY,
   WEDDING_COUPLE,
   WEDDING_EVENT,
+  WEDDING_ITINERARY_SCHEDULE_CONFIRMED,
   WEDDING_VENUE,
   buildWeddingGoogleCalendarUrl,
   downloadWeddingIcsFile,
@@ -1143,7 +1144,7 @@ export function JessicaSamuelRSVPSection() {
                   {formatDaysUntilLabel(daysLeft)}
                 </p>
                 <div className="js-rsvp-ritual__actions mt-8">
-                  {calendarUrl ? (
+                  {WEDDING_ITINERARY_SCHEDULE_CONFIRMED && calendarUrl ? (
                     <a
                       href={calendarUrl}
                       target="_blank"
@@ -1152,19 +1153,22 @@ export function JessicaSamuelRSVPSection() {
                     >
                       Adicionar ao calendário
                     </a>
-                  ) : (
-                    <PrimaryButton
-                      onClick={() => downloadWeddingIcsFile()}
-                      fullWidth
-                    >
-                      Adicionar ao calendário
-                    </PrimaryButton>
-                  )}
-                  {calendarUrl ? (
+                  ) : null}
+                  {WEDDING_ITINERARY_SCHEDULE_CONFIRMED ? (
                     <GhostButton onClick={() => downloadWeddingIcsFile()}>
                       Descarregar .ics
                     </GhostButton>
-                  ) : null}
+                  ) : (
+                    <p
+                      className="js-rsvp-ritual__lead"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      O horário da cerimónia religiosa ainda está por confirmar.
+                      Google Calendar e o ficheiro .ics ficam disponíveis assim
+                      que a hora for confirmada.
+                    </p>
+                  )}
                   <GhostButton onClick={scrollToInvite}>
                     Voltar ao convite
                   </GhostButton>

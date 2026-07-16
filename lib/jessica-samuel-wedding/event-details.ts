@@ -306,9 +306,12 @@ function formatIcsLocal(date: Date): string {
 export function buildWeddingGoogleCalendarUrl(
   dateIso: string = WEDDING_EVENT.dateIso,
   timeLabel: string = WEDDING_EVENT.timeLabel,
+  options?: { scheduleConfirmed?: boolean },
 ): string | null {
+  const scheduleConfirmed =
+    options?.scheduleConfirmed ?? WEDDING_ITINERARY_SCHEDULE_CONFIRMED;
   // Não embutir horário provisório como facto em calendários externos.
-  if (!WEDDING_ITINERARY_SCHEDULE_CONFIRMED) return null;
+  if (!scheduleConfirmed) return null;
   if (!timeLabel.match(/\d{1,2}h/i)) return null;
 
   const { start, end } = parseWeddingEventDateTime(dateIso, timeLabel);
@@ -329,9 +332,12 @@ export function buildWeddingGoogleCalendarUrl(
 export function buildWeddingIcsContent(
   dateIso: string = WEDDING_EVENT.dateIso,
   timeLabel: string = WEDDING_EVENT.timeLabel,
+  options?: { scheduleConfirmed?: boolean },
 ): string | null {
+  const scheduleConfirmed =
+    options?.scheduleConfirmed ?? WEDDING_ITINERARY_SCHEDULE_CONFIRMED;
   // Não gerar .ics enquanto o horário religioso não estiver confirmado.
-  if (!WEDDING_ITINERARY_SCHEDULE_CONFIRMED) return null;
+  if (!scheduleConfirmed) return null;
   if (!timeLabel.match(/\d{1,2}h/i)) return null;
 
   const { start, end } = parseWeddingEventDateTime(dateIso, timeLabel);

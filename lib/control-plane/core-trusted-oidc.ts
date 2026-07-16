@@ -2,14 +2,19 @@ import { getVercelOidcToken } from "@vercel/oidc";
 
 export const CORE_TRUSTED_OIDC_HEADER = "x-vercel-trusted-oidc-idp-token";
 
+type OidcTokenReader = () => Promise<string | undefined | null>;
+
 /**
  * Token OIDC oficial da Edition para Trusted Sources (Vercel → Vercel).
  * Fonte única: getVercelOidcToken() — resolve contexto de Function ou dev refresh.
  * Localhost sem token: undefined (sem falhar).
+ * `readToken` é injectável apenas para testes determinísticos.
  */
-export async function resolveEditionCoreOidcToken(): Promise<string | undefined> {
+export async function resolveEditionCoreOidcToken(
+  readToken: OidcTokenReader = getVercelOidcToken
+): Promise<string | undefined> {
   try {
-    const token = await getVercelOidcToken();
+    const token = await readToken();
     const trimmed = token?.trim();
     return trimmed ? trimmed : undefined;
   } catch {
