@@ -9,20 +9,10 @@ describe("parseAttending", () => {
     assert.deepEqual(parseAttending(false), { ok: true, attending: false });
   });
 
-  it('aceita "true" / "false" / "1" / "0"', () => {
-    assert.deepEqual(parseAttending("true"), { ok: true, attending: true });
-    assert.deepEqual(parseAttending("false"), { ok: true, attending: false });
-    assert.deepEqual(parseAttending("1"), { ok: true, attending: true });
-    assert.deepEqual(parseAttending("0"), { ok: true, attending: false });
-    assert.deepEqual(parseAttending(1), { ok: true, attending: true });
-    assert.deepEqual(parseAttending(0), { ok: true, attending: false });
-  });
-
-  it('rejeita "false" que Boolean() interpretaria como true', () => {
-    const result = parseAttending("false");
-    assert.equal(result.ok, true);
-    if (result.ok) assert.equal(result.attending, false);
-    assert.equal(Boolean("false"), true);
+  it("rejeita strings e números mesmo quando parecem booleanos", () => {
+    for (const value of ["true", "false", "1", "0", 1, 0]) {
+      assert.equal(parseAttending(value).ok, false);
+    }
   });
 
   it("rejeita objectos, arrays e valores desconhecidos", () => {
@@ -102,20 +92,18 @@ describe("validateLocalRsvpPayload", () => {
     }
   });
 
-  it('mantém attending false quando body envia "false" ou "0"', () => {
-    for (const attending of ["false", "0", false, 0] as const) {
-      const result = validateLocalRsvpPayload({
-        slug: "jessicaesamueltraditionalwedding",
-        name: "Convidado Ausente",
-        attending,
-        guests: 1,
-        phone: "840000000",
-      });
-      assert.equal(result.ok, true, `failed for ${String(attending)}`);
-      if (result.ok) {
-        assert.equal(result.submission.attending, false);
-        assert.equal(result.submission.guests, 0);
-      }
+  it("mantém attending=false booleano e força guests=0", () => {
+    const result = validateLocalRsvpPayload({
+      slug: "jessicaesamueltraditionalwedding",
+      name: "Convidado Ausente",
+      attending: false,
+      guests: 1,
+      phone: "840000000",
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.submission.attending, false);
+      assert.equal(result.submission.guests, 0);
     }
   });
 
@@ -169,7 +157,7 @@ describe("validateLocalRsvpPayload", () => {
     }
   });
 
-  it("honeypot devolve sucesso silencioso", () => {
+  it("honeypot devolve 200 sem sucesso nem persistência", () => {
     const result = validateLocalRsvpPayload({
       slug: "jessicakulaya",
       name: "Bot",
@@ -182,6 +170,8 @@ describe("validateLocalRsvpPayload", () => {
     if (!result.ok) {
       assert.equal(result.outcome, "honeypot");
       assert.equal(result.status, 200);
+      assert.equal(result.body.success, false);
+      assert.equal(result.body.persisted, false);
       assert.doesNotMatch(result.body.message, /honeypot/i);
     }
   });

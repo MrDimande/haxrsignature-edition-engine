@@ -49,7 +49,9 @@ export type LocalRsvpHoneypot = {
   ok: false;
   status: 200;
   body: {
-    success: true;
+    success: false;
+    persisted: false;
+    honeypot: true;
     message: string;
   };
   outcome: "honeypot";
@@ -92,7 +94,9 @@ export function validateLocalRsvpPayload(body: unknown): LocalRsvpValidationResu
       status: 200,
       outcome: "honeypot",
       body: {
-        success: true,
+        success: false,
+        persisted: false,
+        honeypot: true,
         message: "RSVP process completed.",
       },
     };

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 export const RSVP_BACKEND_NOT_CONFIGURED = "rsvp_backend_not_configured" as const;
+export const RSVP_SLUG_NOT_ALLOWED = "rsvp_slug_not_allowed" as const;
+export const RSVP_BINDING_MISSING = "rsvp_binding_missing" as const;
 
 export type RsvpBackendDecision =
   | { mode: "proxy" }
@@ -13,17 +15,19 @@ export function isVercelProduction(): boolean {
 }
 
 /**
- * Local RSVP handler is opt-in only outside Production.
- * Requires HAXR_API_BACKEND=local plus an explicit allow signal.
+ * Local RSVP handler is opt-in only.
+ * Requires HAXR_API_BACKEND=local plus HAXR_ALLOW_LOCAL_RSVP=true
+ * (including Production — never a silent default).
  */
 export function isLocalRsvpExplicitlyAllowed(): boolean {
-  if (isVercelProduction()) return false;
-
   const backend = process.env.HAXR_API_BACKEND?.trim().toLowerCase();
   if (backend !== "local") return false;
 
   const allow = process.env.HAXR_ALLOW_LOCAL_RSVP?.trim().toLowerCase();
   if (allow === "true" || allow === "1") return true;
+
+  // Production never silently allows local without the explicit flag.
+  if (isVercelProduction()) return false;
 
   if (process.env.NODE_ENV === "test") return true;
   if (process.env.VERCEL_ENV === "development") return true;
@@ -56,12 +60,12 @@ export function decideRsvpBackend(): RsvpBackendDecision {
       mode: "blocked",
       code: RSVP_BACKEND_NOT_CONFIGURED,
       reason: isVercelProduction()
-        ? "local_forbidden_in_production"
+        ? "local_not_explicitly_allowed"
         : "local_not_explicitly_allowed",
     };
   }
 
-  // Absent or invalid — never default to local in Production (fail closed).
+  // Absent or invalid — never default to local (fail closed).
   return {
     mode: "blocked",
     code: RSVP_BACKEND_NOT_CONFIGURED,
@@ -74,6 +78,53 @@ export function canUseLocalProxyFallback(): boolean {
   if (isVercelProduction()) return false;
   if (!isLocalRsvpExplicitlyAllowed()) return false;
   return process.env.HAXR_PROXY_FALLBACK?.trim().toLowerCase() === "true";
+}
+
+/**
+ * Parse HAXR_LOCAL_RSVP_ALLOWED_SLUGS (comma-separated).
+ * Empty in Production ⇒ no slug may use local RSVP.
+ */
+export function parseLocalRsvpAllowedSlugs(
+  raw: string | undefined = process.env.HAXR_LOCAL_RSVP_ALLOWED_SLUGS
+): Set<string> {
+  if (!raw?.trim()) return new Set();
+  return new Set(
+    raw
+      .split(",")
+      .map((part) => part.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+/**
+ * Production: allowlist required and must contain the slug.
+ * Non-production: if allowlist is set, enforce it; if empty, allow (dev/test).
+ */
+export function isLocalRsvpSlugAllowed(slug: string): boolean {
+  const normalized = slug.trim().toLowerCase();
+  if (!normalized) return false;
+
+  const allowed = parseLocalRsvpAllowedSlugs();
+
+  if (isVercelProduction()) {
+    return allowed.has(normalized);
+  }
+
+  if (allowed.size === 0) return true;
+  return allowed.has(normalized);
+}
+
+export type RsvpNotificationMode = "disabled" | "enabled";
+
+/** Default seguro: disabled. */
+export function resolveRsvpNotificationMode(
+  raw: string | undefined = process.env.HAXR_RSVP_NOTIFICATION_MODE
+): RsvpNotificationMode {
+  return raw?.trim().toLowerCase() === "enabled" ? "enabled" : "disabled";
+}
+
+export function areRsvpNotificationsEnabled(): boolean {
+  return resolveRsvpNotificationMode() === "enabled";
 }
 
 export function rsvpBackendNotConfiguredResponse(
@@ -96,6 +147,59 @@ export function rsvpBackendNotConfiguredResponse(
       success: false,
       error: "Ocorreu um erro ao processar o seu RSVP.",
       code: RSVP_BACKEND_NOT_CONFIGURED,
+      persisted: false,
+    },
+    { status: 503 }
+  );
+}
+
+export function rsvpSlugNotAllowedResponse(
+  requestId: string,
+  slug?: string
+): NextResponse {
+  console.info(
+    JSON.stringify({
+      scope: "edition/rsvp/guard",
+      requestId,
+      slug,
+      stage: "slug_allowlist",
+      outcome: RSVP_SLUG_NOT_ALLOWED,
+      httpStatus: 403,
+    })
+  );
+
+  return NextResponse.json(
+    {
+      success: false,
+      error: "Ocorreu um erro ao processar o seu RSVP.",
+      code: RSVP_SLUG_NOT_ALLOWED,
+      persisted: false,
+    },
+    { status: 403 }
+  );
+}
+
+export function rsvpBindingMissingResponse(
+  requestId: string,
+  slug?: string
+): NextResponse {
+  console.info(
+    JSON.stringify({
+      scope: "edition/rsvp/guard",
+      requestId,
+      slug,
+      stage: "binding_guard",
+      outcome: RSVP_BINDING_MISSING,
+      httpStatus: 503,
+    })
+  );
+
+  return NextResponse.json(
+    {
+      success: false,
+      error: "Ocorreu um erro ao processar o seu RSVP.",
+      code: RSVP_BINDING_MISSING,
+      persisted: false,
     },
     { status: 503 }
   );

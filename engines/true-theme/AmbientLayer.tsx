@@ -5,6 +5,7 @@ import { AmbientBackground } from "./AmbientBackground";
 import { IllustrationAmbient } from "./profiles/illustration-ceremony/IllustrationAmbient";
 import { RoseEleganceAmbient } from "./profiles/rose-elegance/RoseEleganceAmbient";
 import { PrimaveraLoboloAmbient } from "./profiles/primavera-lobolo/PrimaveraLoboloAmbient";
+import { JessicaSamuelAmbient } from "./profiles/jessica-samuel-wedding/JessicaSamuelAmbient";
 
 export function AmbientLayer() {
   const { theme } = useExperience();
@@ -19,6 +20,10 @@ export function AmbientLayer() {
 
   if (theme.renderProfile === "primavera-lobolo") {
     return <PrimaveraLoboloAmbient />;
+  }
+
+  if (theme.renderProfile === "jessica-samuel-wedding") {
+    return <JessicaSamuelAmbient />;
   }
 
   return <AmbientBackground />;

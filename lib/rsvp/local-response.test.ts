@@ -6,18 +6,14 @@ import {
 } from "./local-response";
 
 describe("buildLocalRsvpSuccessBody", () => {
-  it("devolve apenas o envelope público mínimo", () => {
-    const body = buildLocalRsvpSuccessBody();
+  it("devolve envelope com success + persisted obrigatórios", () => {
+    const body = buildLocalRsvpSuccessBody({ notificationSkipped: true });
 
-    assert.deepEqual(body, {
-      success: true,
-      message: LOCAL_RSVP_SUCCESS_MESSAGE,
-    });
-    assert.equal(Object.keys(body).length, 2);
+    assert.equal(body.success, true);
+    assert.equal(body.persisted, true);
+    assert.equal(body.message, LOCAL_RSVP_SUCCESS_MESSAGE);
+    assert.equal(body.notificationSkipped, true);
     assert.equal("data" in body, false);
-    assert.equal("persisted" in body, false);
     assert.equal("emailSent" in body, false);
-    assert.equal("guestEmailSent" in body, false);
-    assert.equal("notificationPending" in body, false);
   });
 });

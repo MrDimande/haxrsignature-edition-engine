@@ -11,6 +11,7 @@ import {
 import { IllustrationCeremonyExperience } from "./profiles/illustration-ceremony/IllustrationCeremonySections";
 import { RoseEleganceExperience } from "./profiles/rose-elegance/RoseEleganceExperience";
 import { PrimaveraLoboloExperience } from "./profiles/primavera-lobolo/PrimaveraLoboloExperience";
+import { JessicaSamuelExperience } from "./profiles/jessica-samuel-wedding/JessicaSamuelExperience";
 
 function StandardEditorialExperience() {
   return (
@@ -37,6 +38,8 @@ export function ExperienceComposition() {
       return <RoseEleganceExperience />;
     case "primavera-lobolo":
       return <PrimaveraLoboloExperience />;
+    case "jessica-samuel-wedding":
+      return <JessicaSamuelExperience />;
     case "standard":
       return <StandardEditorialExperience />;
     default: {

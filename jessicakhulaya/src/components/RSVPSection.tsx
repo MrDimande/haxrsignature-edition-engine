@@ -5,6 +5,7 @@ import { defaultViewport, fadeUp, staggerContainer } from "@/lib/motion";
 import { COLORS } from "@/styles/tokens";
 import { formatStudioCredit } from "@lib/brand/authorship";
 import { KULAYA_VENUE } from "@lib/kulaya/event-details";
+import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
 import { Download, Printer, Send } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
@@ -46,26 +47,22 @@ export default function RSVPSection() {
     setErrorMsg("");
 
     try {
-      const response = await fetch("/api/rsvp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          attending: formData.attending === "yes",
-          guests: formData.attending === "yes" ? parseInt(formData.guests, 10) : 0,
-          honeypot: formData.honeypot,
-          slug: "jessicakulaya",
-        }),
+      const { data, outcome } = await submitUniversalRsvp({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        attending: formData.attending === "yes",
+        guests:
+          formData.attending === "yes" ? parseInt(formData.guests, 10) : 0,
+        honeypot: formData.honeypot,
+        slug: "jessicakulaya",
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Ocorreu um erro ao processar o seu RSVP.");
+      if (
+        outcome.kind !== "success" &&
+        outcome.kind !== "persisted_partial"
+      ) {
+        throw new Error(outcome.message);
       }
 
       setSubmittedData({

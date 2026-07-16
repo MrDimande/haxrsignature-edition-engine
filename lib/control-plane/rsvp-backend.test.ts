@@ -79,11 +79,21 @@ describe("decideRsvpBackend fail-closed", () => {
     }
   });
 
-  it("Production com HAXR_API_BACKEND=local → blocked", () => {
+  it("Production com HAXR_API_BACKEND=local + allow → local", () => {
     clearBackendEnv();
     setEnv("VERCEL_ENV", "production");
     setEnv("HAXR_API_BACKEND", "local");
     setEnv("HAXR_ALLOW_LOCAL_RSVP", "true");
+    const decision = decideRsvpBackend();
+    assert.equal(decision.mode, "local");
+    assert.equal(isLocalRsvpExplicitlyAllowed(), true);
+  });
+
+  it("Production com HAXR_API_BACKEND=local sem allow → blocked", () => {
+    clearBackendEnv();
+    setEnv("VERCEL_ENV", "production");
+    setEnv("HAXR_API_BACKEND", "local");
+    setEnv("HAXR_ALLOW_LOCAL_RSVP", undefined);
     const decision = decideRsvpBackend();
     assert.equal(decision.mode, "blocked");
     assert.equal(isLocalRsvpExplicitlyAllowed(), false);

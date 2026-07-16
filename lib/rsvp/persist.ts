@@ -1,6 +1,10 @@
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { getEditionEventBinding } from "@lib/rsvp/events";
-import { normalizeGuestName } from "@lib/rsvp/normalize";
+import {
+  normalizeGuestName,
+  normalizeRsvpEmail,
+  normalizeRsvpPhone,
+} from "@lib/rsvp/normalize";
 import type { RsvpSubmission } from "@lib/rsvp/send-notification";
 
 export type EditionRsvpPersistResult =
@@ -34,19 +38,22 @@ export async function persistEditionRsvp(
     };
   }
 
-  const partySize = submission.attending ? submission.guests : 0;
+  const attending = submission.attending === true;
+  const partySize = attending ? submission.guests : 0;
   const nameNormalized = normalizeGuestName(submission.name);
+  const emailNormalized = normalizeRsvpEmail(submission.email);
+  const phoneNormalized = normalizeRsvpPhone(submission.phone);
 
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("submit_edition_rsvp", {
     p_event_id: binding.eventId,
     p_name: submission.name.trim(),
     p_name_normalized: nameNormalized,
-    p_attending: submission.attending,
+    p_attending: attending,
     p_party_size: partySize,
     p_edition_slug: binding.slug,
-    p_email: submission.email?.trim() ?? "",
-    p_phone: submission.phone?.trim() ?? "",
+    p_email: emailNormalized,
+    p_phone: phoneNormalized,
     p_message_for_bride: submission.messageForBride?.trim() ?? "",
     p_size: submission.size?.trim() ?? "",
     p_dress_code_confirmed: submission.dressCodeConfirmed ?? null,

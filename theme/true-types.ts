@@ -25,7 +25,8 @@ export type RenderProfile =
   | "standard"
   | "illustration-ceremony"
   | "rose-elegance"
-  | "primavera-lobolo";
+  | "primavera-lobolo"
+  | "jessica-samuel-wedding";
 
 export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
 
