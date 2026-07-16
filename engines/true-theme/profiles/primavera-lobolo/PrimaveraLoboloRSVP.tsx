@@ -4,10 +4,9 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Heart, Send, UserCheck } from "lucide-react";
 import {
-  resolveRsvpClientOutcome,
   resolveRsvpSubmitUiStateInFinally,
-  type RsvpApiPayload,
 } from "@lib/rsvp/client-outcome";
+import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
 import { TRADITIONAL_COPY } from "@lib/jessica-samuel-traditional/event-details";
 import { useExperience } from "../../context";
 import { primaveraType } from "./primavera-typography";
@@ -103,11 +102,8 @@ export function PrimaveraLoboloRSVPSection() {
     const timeout = setTimeout(() => controller.abort(), RSVP_FETCH_TIMEOUT_MS);
 
     try {
-      const response = await fetch("/api/rsvp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
+      const { outcome } = await submitUniversalRsvp(
+        {
           name: form.name.trim(),
           email: form.email.trim() || undefined,
           phone: form.phone.trim() || undefined,
@@ -116,18 +112,14 @@ export function PrimaveraLoboloRSVPSection() {
           messageForBride: companionNote,
           honeypot: form.honeypot,
           slug: config.slug,
-        }),
-      });
+        },
+        controller.signal
+      );
 
-      let data: RsvpApiPayload = {};
-      try {
-        data = (await response.json()) as RsvpApiPayload;
-      } catch {
-        throw new Error("Resposta inválida do servidor.");
-      }
-
-      const outcome = resolveRsvpClientOutcome(response.ok, data);
-      if (outcome.kind === "success") {
+      if (
+        outcome.kind === "success" ||
+        outcome.kind === "persisted_partial"
+      ) {
         setStatus("success");
         return;
       }

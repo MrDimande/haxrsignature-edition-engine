@@ -208,6 +208,34 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       envVar: "EDITION_EVENT_JESSICA_FAREWELL_ID",
     },
   },
+  jessicasamuelwedding: {
+    slug: "jessicasamuelwedding",
+    aliases: ["jessica-samuel"],
+    engine: "theme",
+    theme: "jessica-samuel-wedding",
+    experienceType: "editorial",
+    sourcePath: "/jessicasamuelwedding",
+    legacyFolder: "jessica-samuel",
+    status: "active",
+    metadata: {
+      title: "Casamento — Jessica Muege & Samuel Govene",
+      date: "2026-08-15",
+      time: "A confirmar",
+      location: "Salão de Eventos Vila Verde, Matola",
+      dressCode: "Black-tie · formal",
+      subtitle: "Black-tie · Editorial · Celebração",
+      description:
+        "Convite digital de casamento editorial — uma experiência cinematográfica de amor, fé e união sob a assinatura HAXR.",
+      eventDate: "2026-08-15",
+      eventType: "Casamento",
+    },
+    admin: {
+      clientName: "Jessica & Samuel",
+      eventTypeLabel: "Casamento",
+      adminEventName: "Edition · Casamento · Jessica & Samuel",
+      envVar: "EDITION_EVENT_JESSICA_WEDDING_ID",
+    },
+  },
 };
 
 /** @deprecated Use INVITATIONS */
@@ -242,6 +270,7 @@ export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
   chadepanela: "cha-de-panela",
   "despedida-de-solteira": "jessicachadelingerie",
   "jessica-farewell": "jessicachadelingerie",
+  "jessica-samuel": "jessicasamuelwedding",
 };
 
 export const ALIAS_INDEX: Record<string, string> = {};

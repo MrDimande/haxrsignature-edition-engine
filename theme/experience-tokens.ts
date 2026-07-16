@@ -166,7 +166,13 @@ export function resolveExperienceTokens(theme: TrueTheme): ExperienceTokens {
             body: 'var(--font-jost), "Jost", system-ui, sans-serif',
             script: 'var(--font-great-vibes), "Great Vibes", cursive',
           }
-        : baseTypography;
+        : theme.renderProfile === "jessica-samuel-wedding"
+          ? {
+              display:
+                'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+              body: 'var(--font-inter), "Inter", system-ui, sans-serif',
+            }
+          : baseTypography;
 
   return {
     motion,
@@ -280,6 +286,22 @@ export function getPrimaveraLoboloPalette(): TrueTheme["palette"] {
     blob2: "rgba(243, 223, 208, 0.9)",
     blob3: "rgba(201, 162, 39, 0.16)",
     divider: "rgba(201, 162, 39, 0.55)",
+  };
+}
+
+export function getJessicaSamuelWeddingPalette(): TrueTheme["palette"] {
+  return {
+    bgBase: "#F1E3CF",
+    textPrimary: "text-[#171312]",
+    textSecondary: "text-[rgba(23,19,18,0.72)]",
+    accent: "#7A2332",
+    accentLight: "rgba(122, 35, 50, 0.14)",
+    cardBg:
+      "bg-[#FFF9F2]/92 backdrop-blur-md border border-[rgba(214,191,162,0.7)] shadow-[0_18px_40px_rgba(23,19,18,0.06)]",
+    blob1: "rgba(201, 147, 155, 0.16)",
+    blob2: "rgba(255, 249, 242, 0.9)",
+    blob3: "rgba(214, 191, 162, 0.28)",
+    divider: "rgba(214, 191, 162, 0.75)",
   };
 }
 

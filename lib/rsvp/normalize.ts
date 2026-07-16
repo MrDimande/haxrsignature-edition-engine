@@ -49,3 +49,45 @@ export function normalizeGuestName(value: string): string {
     .toLowerCase()
     .replace(/\s+/g, " ");
 }
+
+/** Email canónico para matching idempotente (case-insensitive). */
+export function normalizeRsvpEmail(value: string | undefined | null): string {
+  if (!value) return "";
+  return value.trim().toLowerCase().slice(0, 160);
+}
+
+/**
+ * Telefone canónico: remove espaços/separadores; preserva +258 / dígitos.
+ * Matching idempotente dentro do mesmo event_id (RPC + payload).
+ */
+export function normalizeRsvpPhone(value: string | undefined | null): string {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  const hasPlus = trimmed.startsWith("+");
+  const digits = trimmed.replace(/\D/g, "");
+  if (!digits) return "";
+
+  const normalized = hasPlus || digits.startsWith("258") ? `+${digits.replace(/^\+/, "")}` : digits;
+  return normalized.slice(0, 30);
+}
+
+/**
+ * Stable per-event identity stored in name_normalized for Edition-created rows.
+ * Contact beats name so equal names with different contacts remain distinct.
+ * event_id remains a separate mandatory database predicate.
+ */
+export function buildRsvpIdentityKey(options: {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+}): string {
+  const email = normalizeRsvpEmail(options.email);
+  if (email) return `email:${email}`;
+
+  const phone = normalizeRsvpPhone(options.phone);
+  if (phone) return `phone:${phone}`;
+
+  return `name:${normalizeGuestName(options.name)}`;
+}

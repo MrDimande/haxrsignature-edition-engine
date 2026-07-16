@@ -23,10 +23,9 @@ import {
   isFarewellRsvpDeadlinePassed,
 } from "@lib/farewell/event-details";
 import {
-  resolveRsvpClientOutcome,
   resolveRsvpSubmitUiStateInFinally,
-  type RsvpApiPayload,
 } from "@lib/rsvp/client-outcome";
+import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
 
 const RSVP_STORAGE_PREFIX = "haxr_rsvp_";
 const SIZE_OPTIONS = ["", "XS", "S", "M", "L", "XL", "XXL"] as const;
@@ -229,11 +228,8 @@ export function RoseRSVPSection() {
     let settled = false;
 
     try {
-      const response = await fetch("/api/rsvp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
+      const { outcome } = await submitUniversalRsvp(
+        {
           name: formData.name,
           phone: formData.phone,
           email: formData.email || undefined,
@@ -246,23 +242,18 @@ export function RoseRSVPSection() {
             : undefined,
           honeypot: formData.honeypot,
           slug: config.slug,
-        }),
-      });
-
-      let data: RsvpApiPayload = {};
-      try {
-        data = (await response.json()) as RsvpApiPayload;
-      } catch {
-        throw new Error("Resposta inválida do servidor.");
-      }
-
-      const outcome = resolveRsvpClientOutcome(response.ok, data);
+        },
+        controller.signal
+      );
       const result: StoredRsvp = {
         name: formData.name,
         attending: isAttending,
       };
 
-      if (outcome.kind === "success") {
+      if (
+        outcome.kind === "success" ||
+        outcome.kind === "persisted_partial"
+      ) {
         persistLocalSuccess(result);
         settled = true;
         return;

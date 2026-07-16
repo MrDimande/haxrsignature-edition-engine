@@ -1,10 +1,13 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
-import { getRsvpEmailConfig } from "@lib/rsvp/config";
 import {
-  isEditionPersistenceConfigured,
-  resolveInvitationSlug,
-} from "@lib/rsvp/events";
+  areRsvpNotificationsEnabled,
+  isLocalRsvpSlugAllowed,
+  rsvpBindingMissingResponse,
+  rsvpSlugNotAllowedResponse,
+} from "@lib/control-plane/rsvp-backend";
+import { getRsvpEmailConfig } from "@lib/rsvp/config";
+import { isEditionPersistenceConfigured } from "@lib/rsvp/events";
 import { logLocalRsvp } from "@lib/rsvp/logging";
 import { buildLocalRsvpSuccessBody } from "@lib/rsvp/local-response";
 import { persistEditionRsvp } from "@lib/rsvp/persist";
@@ -104,7 +107,18 @@ export async function handleLocalRsvpPost(
       return NextResponse.json(validation.body, { status: validation.status });
     }
 
-    const { submission } = validation;
+    const { submission, slug } = validation;
+
+    if (!isLocalRsvpSlugAllowed(slug)) {
+      return rsvpSlugNotAllowedResponse(requestId, slug);
+    }
+
+    if (
+      !isSupabaseConfigured() ||
+      !isEditionPersistenceConfigured(slug)
+    ) {
+      return rsvpBindingMissingResponse(requestId, slug);
+    }
 
     const ip = getRequestIp(request);
     const rateKey = `edition:rsvp:${ip}`;
@@ -120,92 +134,59 @@ export async function handleLocalRsvpPost(
       return rateLimitResponse(rateResult);
     }
 
-    const persistenceRequired =
-      isSupabaseConfigured() && isEditionPersistenceConfigured(submission.slug);
+    const persistResult = await persistEditionRsvp(submission);
 
-    let persistResult: Awaited<ReturnType<typeof persistEditionRsvp>> | null =
-      null;
-
-    if (persistenceRequired) {
-      persistResult = await persistEditionRsvp(submission);
-
-      if (!persistResult.ok) {
-        console.error("[RSVP] Persist failed:", persistResult.error);
-        logStage(requestId, "persist", startedAt, 502, "persist_failed", {
-          slug: submission.slug,
-        });
-        return NextResponse.json(
-          {
-            success: false,
-            error:
-              "Não foi possível registar a confirmação. Tente novamente em instantes.",
-          },
-          { status: 502 }
-        );
-      }
-    } else if (isSupabaseConfigured()) {
-      console.warn(
-        `[RSVP] Event ID não configurado para slug "${submission.slug}" — apenas email.`
+    if (!persistResult.ok) {
+      console.error("[RSVP] Persist failed:", persistResult.error);
+      logStage(requestId, "persist", startedAt, 502, "persist_failed", {
+        slug: submission.slug,
+        persisted: false,
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          persisted: false,
+          error:
+            "Não foi possível registar a confirmação. Tente novamente em instantes.",
+        },
+        { status: 502 }
       );
     }
 
-    const emailConfig = getRsvpEmailConfig(submission.slug);
-    const persisted = Boolean(persistResult?.ok);
+    const notificationsEnabled = areRsvpNotificationsEnabled();
+    const emailConfig = notificationsEnabled
+      ? getRsvpEmailConfig(submission.slug)
+      : null;
 
     if (emailConfig) {
-      if (persisted) {
-        queueRsvpNotificationEmail(requestId, submission, emailConfig);
-      } else {
-        try {
-          const emailResult = await sendRsvpNotificationEmail(
-            submission,
-            emailConfig
-          );
-
-          logStage(requestId, "email", startedAt, 200, "success", {
-            slug: submission.slug,
-            persisted: false,
-            emailSent: Boolean(emailResult.teamSent),
-            guestEmailSent: Boolean(emailResult.guestSent),
-          });
-
-          return NextResponse.json(buildLocalRsvpSuccessBody(), {
-            status: 200,
-          });
-        } catch (emailError) {
-          console.error("[RSVP] Email delivery failed:", emailError);
-
-          if (process.env.RESEND_API_KEY) {
-            logStage(requestId, "email", startedAt, 502, "email_failed", {
-              slug: submission.slug,
-              persisted: false,
-            });
-            return NextResponse.json(
-              {
-                success: false,
-                error:
-                  "Não foi possível enviar a confirmação. Tente novamente em instantes.",
-              },
-              { status: 502 }
-            );
-          }
-        }
-      }
+      queueRsvpNotificationEmail(requestId, submission, emailConfig);
     }
+
+    const notificationSkipped = !notificationsEnabled || !emailConfig;
 
     logStage(requestId, "complete", startedAt, 200, "success", {
       slug: submission.slug,
-      persisted,
+      persisted: true,
       emailSent: false,
       guestEmailSent: false,
     });
 
-    return NextResponse.json(buildLocalRsvpSuccessBody(), { status: 200 });
+    return NextResponse.json(
+      buildLocalRsvpSuccessBody({
+        notificationSkipped,
+        guestId: persistResult.guestId,
+      }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error("RSVP Server Error:", error);
     logStage(requestId, "complete", startedAt, 500, "server_error");
     return NextResponse.json(
-      { success: false, error: "Ocorreu um erro ao processar o seu RSVP." },
+      {
+        success: false,
+        persisted: false,
+        error: "Ocorreu um erro ao processar o seu RSVP.",
+      },
       { status: 500 }
     );
   }

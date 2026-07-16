@@ -8,10 +8,27 @@ import {
 import { buildLocalRsvpSuccessBody } from "./local-response";
 
 describe("resolveRsvpClientOutcome", () => {
-  it("trata envelope mínimo 200 como sucesso", () => {
-    const payload = buildLocalRsvpSuccessBody();
+  it("exige success=true e persisted=true para sucesso visual", () => {
+    const payload = buildLocalRsvpSuccessBody({ notificationSkipped: true });
     const outcome = resolveRsvpClientOutcome(true, payload);
     assert.equal(outcome.kind, "success");
+  });
+
+  it("rejeita 200 sem persisted", () => {
+    const outcome = resolveRsvpClientOutcome(true, {
+      success: true,
+      message: "ok",
+    });
+    assert.equal(outcome.kind, "error");
+  });
+
+  it("rejeita honeypot mesmo com HTTP 200", () => {
+    const outcome = resolveRsvpClientOutcome(true, {
+      success: false,
+      persisted: false,
+      honeypot: true,
+    });
+    assert.equal(outcome.kind, "error");
   });
 
   it("trata 400 de validação como erro", () => {
@@ -33,13 +50,13 @@ describe("resolveRsvpClientOutcome", () => {
     assert.equal(outcome.kind, "error");
   });
 
-  it("trata 502 legado com persisted como sucesso", () => {
+  it("erro + persisted=true → persisted_partial (explícito)", () => {
     const outcome = resolveRsvpClientOutcome(false, {
       success: false,
       persisted: true,
       error: "Email falhou",
     });
-    assert.equal(outcome.kind, "success");
+    assert.equal(outcome.kind, "persisted_partial");
   });
 
   it("trata 200 com success false como erro", () => {
@@ -55,6 +72,16 @@ describe("resolveRsvpSubmitUiStateAfterFetch", () => {
   it("passa para success após resposta válida", () => {
     assert.equal(
       resolveRsvpSubmitUiStateAfterFetch("sending", { kind: "success" }),
+      "success"
+    );
+  });
+
+  it("persisted_partial também mostra sucesso UI", () => {
+    assert.equal(
+      resolveRsvpSubmitUiStateAfterFetch("sending", {
+        kind: "persisted_partial",
+        message: "Email falhou",
+      }),
       "success"
     );
   });

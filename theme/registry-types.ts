@@ -6,4 +6,5 @@ export type RegistryThemeKey =
   | "corporate-minimal"
   | "bride-to-be-illustration"
   | "rose-elegance-farewell"
-  | "primavera-lobolo";
+  | "primavera-lobolo"
+  | "jessica-samuel-wedding";
