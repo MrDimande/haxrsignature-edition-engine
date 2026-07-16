@@ -74,14 +74,24 @@ describe("applyTrustedOidcHeader", () => {
 });
 
 describe("resolveEditionCoreOidcToken", () => {
-  it("devolve undefined em local quando getVercelOidcToken falha", async () => {
-    const token = await resolveEditionCoreOidcToken();
+  it("devolve undefined quando o reader falha (fail-closed sem throw)", async () => {
+    const token = await resolveEditionCoreOidcToken(async () => {
+      throw new Error("oidc unavailable");
+    });
     assert.equal(token, undefined);
+  });
+
+  it("trim e rejeita token vazio do reader", async () => {
+    assert.equal(await resolveEditionCoreOidcToken(async () => "   "), undefined);
+    assert.equal(
+      await resolveEditionCoreOidcToken(async () => "  preview-token  "),
+      "preview-token"
+    );
   });
 
   it("usa getVercelOidcToken como única fonte — sem fallbacks manuais", () => {
     const source = fs.readFileSync(SOURCE_PATH, "utf8");
-    assert.match(source, /getVercelOidcToken\(\)/);
+    assert.match(source, /getVercelOidcToken/);
     assert.doesNotMatch(source, /x-vercel-oidc-token/);
     assert.doesNotMatch(source, /VERCEL_OIDC_TOKEN/);
     assert.doesNotMatch(source, /readOidcFromRuntime/);
@@ -104,8 +114,11 @@ describe("resolveEditionCoreOidcToken", () => {
     };
 
     try {
-      await resolveEditionCoreOidcToken();
-      assert.equal(logs.length, 0);
+      await resolveEditionCoreOidcToken(async () => "secret-oidc-value");
+      assert.equal(
+        logs.some((line) => line.includes("secret-oidc-value")),
+        false
+      );
     } finally {
       console.info = originalInfo;
       console.warn = originalWarn;
