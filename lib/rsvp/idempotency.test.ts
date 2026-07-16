@@ -6,9 +6,11 @@ import {
   resolveRsvpNotificationMode,
 } from "@lib/control-plane/rsvp-backend";
 import {
+  buildRsvpIdentityKey,
   normalizeRsvpEmail,
   normalizeRsvpPhone,
 } from "@lib/rsvp/normalize";
+import { resolveExistingRsvpIdentityKey } from "@lib/rsvp/persist";
 
 const ENV_KEYS = ["VERCEL_ENV", "HAXR_LOCAL_RSVP_ALLOWED_SLUGS", "HAXR_RSVP_NOTIFICATION_MODE"] as const;
 
@@ -84,23 +86,66 @@ describe("notification mode", () => {
   });
 });
 
-describe("idempotency contract (documentação + normalização)", () => {
-  it("mesmo contacto normaliza igual (exact duplicate)", () => {
-    const a = {
-      email: normalizeRsvpEmail("Guest@Example.com"),
-      phone: normalizeRsvpPhone("+258 84 000 0001"),
-    };
-    const b = {
-      email: normalizeRsvpEmail("guest@example.com"),
-      phone: normalizeRsvpPhone("+258840000001"),
-    };
-    assert.deepEqual(a, b);
+describe("idempotency contract", () => {
+  it("exact duplicate e email case-insensitive reutilizam a mesma chave", () => {
+    const first = buildRsvpIdentityKey({
+      name: "HAXR RSVP Production Canary",
+      email: "Guest@Example.com",
+    });
+    const second = buildRsvpIdentityKey({
+      name: "HAXR RSVP Production Canary",
+      email: "guest@example.com",
+    });
+    assert.equal(first, second);
+    assert.equal(first, "email:guest@example.com");
+  });
+
+  it("telefone com espaços e +258 reutiliza a mesma chave", () => {
+    assert.equal(
+      buildRsvpIdentityKey({
+        name: "Canary",
+        phone: "+258 84 000 0001",
+      }),
+      buildRsvpIdentityKey({
+        name: "Canary",
+        phone: "258840000001",
+      })
+    );
   });
 
   it("attending=false força party size zero no contrato de persist", () => {
     const attending = false;
     const guests = attending ? 3 : 0;
     assert.equal(guests, 0);
+  });
+
+  it("Sim seguido de Não reutiliza a identidade existente pelo contacto", () => {
+    const key = resolveExistingRsvpIdentityKey(
+      [
+        {
+          name_normalized: "email:guest@example.invalid",
+          email: "guest@example.invalid",
+          phone: null,
+        },
+      ],
+      {
+        name: "Outro Nome",
+        email: "Guest@Example.invalid",
+      }
+    );
+    assert.equal(key, "email:guest@example.invalid");
+  });
+
+  it("nomes iguais com contactos diferentes permanecem separados", () => {
+    const a = buildRsvpIdentityKey({
+      name: "Maria Silva",
+      email: "maria.a@example.invalid",
+    });
+    const b = buildRsvpIdentityKey({
+      name: "Maria Silva",
+      email: "maria.b@example.invalid",
+    });
+    assert.notEqual(a, b);
   });
 
   it("eventos diferentes mantêm contactos separados (chave inclui event_id)", () => {

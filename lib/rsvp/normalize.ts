@@ -72,3 +72,22 @@ export function normalizeRsvpPhone(value: string | undefined | null): string {
   const normalized = hasPlus || digits.startsWith("258") ? `+${digits.replace(/^\+/, "")}` : digits;
   return normalized.slice(0, 30);
 }
+
+/**
+ * Stable per-event identity stored in name_normalized for Edition-created rows.
+ * Contact beats name so equal names with different contacts remain distinct.
+ * event_id remains a separate mandatory database predicate.
+ */
+export function buildRsvpIdentityKey(options: {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+}): string {
+  const email = normalizeRsvpEmail(options.email);
+  if (email) return `email:${email}`;
+
+  const phone = normalizeRsvpPhone(options.phone);
+  if (phone) return `phone:${phone}`;
+
+  return `name:${normalizeGuestName(options.name)}`;
+}

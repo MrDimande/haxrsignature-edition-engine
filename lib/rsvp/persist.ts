@@ -1,6 +1,7 @@
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { getEditionEventBinding } from "@lib/rsvp/events";
 import {
+  buildRsvpIdentityKey,
   normalizeGuestName,
   normalizeRsvpEmail,
   normalizeRsvpPhone,
@@ -22,6 +23,43 @@ export type EditionRsvpPersistResult =
       skipped?: string;
     };
 
+type ExistingEditionGuestIdentity = {
+  name_normalized: string | null;
+  email: string | null;
+  phone: string | null;
+};
+
+export function resolveExistingRsvpIdentityKey(
+  candidates: ExistingEditionGuestIdentity[],
+  submission: Pick<RsvpSubmission, "name" | "email" | "phone">
+): string {
+  const email = normalizeRsvpEmail(submission.email);
+  const phone = normalizeRsvpPhone(submission.phone);
+
+  const contactMatch = candidates.find((candidate) => {
+    if (email && normalizeRsvpEmail(candidate.email) === email) return true;
+    if (phone && normalizeRsvpPhone(candidate.phone) === phone) return true;
+    return false;
+  });
+
+  if (contactMatch?.name_normalized) {
+    return contactMatch.name_normalized;
+  }
+
+  // Name fallback is safe only when no contact was supplied.
+  if (!email && !phone) {
+    const normalizedName = normalizeGuestName(submission.name);
+    const nameMatch = candidates.find(
+      (candidate) =>
+        candidate.name_normalized === normalizedName ||
+        candidate.name_normalized === `name:${normalizedName}`
+    );
+    if (nameMatch?.name_normalized) return nameMatch.name_normalized;
+  }
+
+  return buildRsvpIdentityKey(submission);
+}
+
 export async function persistEditionRsvp(
   submission: RsvpSubmission
 ): Promise<EditionRsvpPersistResult> {
@@ -40,15 +78,30 @@ export async function persistEditionRsvp(
 
   const attending = submission.attending === true;
   const partySize = attending ? submission.guests : 0;
-  const nameNormalized = normalizeGuestName(submission.name);
   const emailNormalized = normalizeRsvpEmail(submission.email);
   const phoneNormalized = normalizeRsvpPhone(submission.phone);
 
   const supabase = createAdminClient();
+  const { data: existingGuests, error: lookupError } = await supabase
+    .from("guests")
+    .select("name_normalized,email,phone")
+    .eq("event_id", binding.eventId)
+    .eq("guest_source", "edition_rsvp");
+
+  if (lookupError) {
+    console.error("[RSVP] Identity lookup failed:", lookupError.message);
+    return { ok: false, error: lookupError.message };
+  }
+
+  const identityKey = resolveExistingRsvpIdentityKey(
+    (existingGuests ?? []) as ExistingEditionGuestIdentity[],
+    submission
+  );
+
   const { data, error } = await supabase.rpc("submit_edition_rsvp", {
     p_event_id: binding.eventId,
     p_name: submission.name.trim(),
-    p_name_normalized: nameNormalized,
+    p_name_normalized: identityKey,
     p_attending: attending,
     p_party_size: partySize,
     p_edition_slug: binding.slug,
