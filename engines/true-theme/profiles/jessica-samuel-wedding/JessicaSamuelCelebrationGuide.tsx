@@ -413,12 +413,11 @@ export function JessicaSamuelCelebrationGuideSection() {
           </p>
         </header>
 
-        {!WEDDING_ITINERARY_SCHEDULE_CONFIRMED &&
-        process.env.NODE_ENV !== "production" ? (
+        {!WEDDING_ITINERARY_SCHEDULE_CONFIRMED ? (
           <p className="js-celeb-guide__dev-note" role="note">
-            Dev: horário da cerimónia religiosa ainda provisório (
-            {WEDDING_ITINERARY[0].timeLabel}) — aguarda confirmação 08h00 vs
-            10h30.
+            Horário da cerimónia religiosa ainda provisório (
+            {WEDDING_ITINERARY[0].timeLabel}). Confirmaremos em breve se
+            será 08h00 ou 10h30 — o calendário só será activado depois.
           </p>
         ) : null}
 

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  buildWeddingGoogleCalendarUrl,
+  buildWeddingIcsContent,
   WEDDING_EVENT,
   WEDDING_ITINERARY,
   WEDDING_ITINERARY_SCHEDULE_CONFIRMED,
@@ -23,6 +25,12 @@ describe("jessica-samuel celebration guide config", () => {
 
   it("marca o horário como não confirmado até resolver 08h00 vs 10h30", () => {
     assert.equal(WEDDING_ITINERARY_SCHEDULE_CONFIRMED, false);
+  });
+
+  it("bloqueia Google Calendar e .ics enquanto o horário for provisório", () => {
+    assert.equal(WEDDING_ITINERARY_SCHEDULE_CONFIRMED, false);
+    assert.equal(buildWeddingGoogleCalendarUrl(), null);
+    assert.equal(buildWeddingIcsContent(), null);
   });
 
   it("lista de presentes é orientação presencial — sem catálogo de produtos", () => {
