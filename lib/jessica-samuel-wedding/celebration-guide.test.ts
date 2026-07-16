@@ -31,6 +31,54 @@ describe("jessica-samuel celebration guide config", () => {
     assert.equal(WEDDING_ITINERARY_SCHEDULE_CONFIRMED, false);
     assert.equal(buildWeddingGoogleCalendarUrl(), null);
     assert.equal(buildWeddingIcsContent(), null);
+    assert.equal(
+      buildWeddingGoogleCalendarUrl(undefined, undefined, {
+        scheduleConfirmed: false,
+      }),
+      null
+    );
+    assert.equal(
+      buildWeddingIcsContent(undefined, undefined, {
+        scheduleConfirmed: false,
+      }),
+      null
+    );
+  });
+
+  it("quando confirmado, Calendar e .ics usam a mesma fonte central de horário", () => {
+    const url = buildWeddingGoogleCalendarUrl(undefined, undefined, {
+      scheduleConfirmed: true,
+    });
+    const ics = buildWeddingIcsContent(undefined, undefined, {
+      scheduleConfirmed: true,
+    });
+    assert.ok(url?.includes("calendar.google.com/calendar/render"));
+    assert.ok(url?.includes(encodeURIComponent(WEDDING_EVENT.calendarTitle)));
+    assert.ok(ics?.includes("BEGIN:VEVENT"));
+    assert.ok(ics?.includes(WEDDING_EVENT.calendarTitle));
+    assert.ok(ics?.includes(WEDDING_RELIGIOUS_CEREMONY_TIME) || ics?.includes("DTSTART:"));
+  });
+
+  it("a UI de sucesso do RSVP não oferece Calendar/.ics com horário provisório", async () => {
+    const fs = await import("node:fs/promises");
+    const path = await import("node:path");
+    const source = await fs.readFile(
+      path.join(
+        process.cwd(),
+        "engines/true-theme/profiles/jessica-samuel-wedding/JessicaSamuelRSVP.tsx"
+      ),
+      "utf8"
+    );
+    assert.match(source, /WEDDING_ITINERARY_SCHEDULE_CONFIRMED && calendarUrl/);
+    assert.match(
+      source,
+      /O horário da cerimónia religiosa ainda está por confirmar/
+    );
+    assert.equal(
+      source.includes("onClick={() => downloadWeddingIcsFile()}") &&
+        !source.includes("WEDDING_ITINERARY_SCHEDULE_CONFIRMED ?"),
+      false
+    );
   });
 
   it("lista de presentes é orientação presencial — sem catálogo de produtos", () => {
