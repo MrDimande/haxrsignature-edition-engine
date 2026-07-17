@@ -26,8 +26,11 @@ import {
   resolveRsvpSubmitUiStateInFinally,
 } from "@lib/rsvp/client-outcome";
 import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
+import {
+  buildEditionRsvpStorageKey,
+  buildLegacyRsvpStorageKey,
+} from "@lib/rsvp/storage-keys";
 
-const RSVP_STORAGE_PREFIX = "haxr_rsvp_";
 const SIZE_OPTIONS = ["", "XS", "S", "M", "L", "XL", "XXL"] as const;
 
 const EASE_APPLE = [0.16, 1, 0.3, 1] as const;
@@ -69,7 +72,9 @@ type StoredRsvp = {
 function readStoredRsvp(slug: string): StoredRsvp | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(`${RSVP_STORAGE_PREFIX}${slug}`);
+    const raw =
+      localStorage.getItem(buildEditionRsvpStorageKey(slug)) ??
+      localStorage.getItem(buildLegacyRsvpStorageKey(slug));
     if (!raw) return null;
     return JSON.parse(raw) as StoredRsvp;
   } catch {
@@ -79,12 +84,13 @@ function readStoredRsvp(slug: string): StoredRsvp | null {
 
 function storeRsvp(slug: string, data: StoredRsvp): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(`${RSVP_STORAGE_PREFIX}${slug}`, JSON.stringify(data));
+  localStorage.setItem(buildEditionRsvpStorageKey(slug), JSON.stringify(data));
 }
 
 function clearStoredRsvp(slug: string): void {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(`${RSVP_STORAGE_PREFIX}${slug}`);
+  localStorage.removeItem(buildEditionRsvpStorageKey(slug));
+  localStorage.removeItem(buildLegacyRsvpStorageKey(slug));
 }
 
 const inputClass = (theme: ReturnType<typeof useExperience>["theme"]) =>
@@ -378,18 +384,19 @@ export function RoseRSVPSection() {
               <motion.form
                 variants={variants.fadeUp}
                 onSubmit={handleSubmit}
-                className="space-y-6 flex-1 flex flex-col"
+                className="relative space-y-6 flex-1 flex flex-col"
               >
             <input
               type="text"
-              name="honeypot"
+              name="company_website"
               value={formData.honeypot}
               onChange={(e) => {
                 setFormData((p) => ({ ...p, honeypot: e.target.value }));
                 clearRsvpError();
               }}
-              title="Honeypot"
-              className="hidden"
+              title="Leave blank"
+              aria-hidden="true"
+              className="absolute -left-[9999px] h-0 w-0 opacity-0 pointer-events-none"
               tabIndex={-1}
               autoComplete="off"
             />

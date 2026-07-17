@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Search, Lock, Gift, Check, X, ChevronDown, Sparkles } from "lucide-react";
 import { useExperience } from "../../context";
 import type { GiftItem } from "@data/gifts/rose-elegance";
 import { ROSE_ELEGANCE_GIFTS } from "@data/gifts/rose-elegance";
+import {
+  buildEditionGiftStorageKey,
+  LEGACY_GLOBAL_GIFT_STORAGE_KEY,
+} from "@lib/rsvp/storage-keys";
 import { roseType } from "./rose-typography";
 import { BrideSizesGuide } from "./BrideSizesGuide";
 
@@ -78,6 +82,7 @@ export function GiftRegistryPanel({ embedded = false }: { embedded?: boolean }) 
   const [totalReserved, setTotalReserved] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const closeModal = useCallback(() => setShowModal(false), []);
 
   useEffect(() => {
     setMounted(true);
@@ -237,7 +242,7 @@ export function GiftRegistryPanel({ embedded = false }: { embedded?: boolean }) 
             {showModal ? (
               <GiftSelectionModal
                 key="gift-selection-modal"
-                onClose={() => setShowModal(false)}
+                onClose={closeModal}
               />
             ) : null}
           </AnimatePresence>,
@@ -316,7 +321,7 @@ function RoseGiftCardShell({
 }
 
 function GiftSelectionModal({ onClose }: { onClose: () => void }) {
-  const { theme } = useExperience();
+  const { theme, config } = useExperience();
   const [gifts, setGifts] = useState<GiftItem[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -330,8 +335,18 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("haxr_reserved_gift_id");
-      if (stored) setSessionReservedId(stored);
+      const scopedKey = buildEditionGiftStorageKey(config.slug);
+      const scoped = localStorage.getItem(scopedKey);
+      const legacyGlobal = localStorage.getItem(LEGACY_GLOBAL_GIFT_STORAGE_KEY);
+      if (scoped) {
+        setSessionReservedId(scoped);
+      } else if (legacyGlobal) {
+        // Migrate one-time global lock into this invite only, then clear the
+        // shared key so other browsers/sessions are not permanently blocked.
+        localStorage.setItem(scopedKey, legacyGlobal);
+        localStorage.removeItem(LEGACY_GLOBAL_GIFT_STORAGE_KEY);
+        setSessionReservedId(legacyGlobal);
+      }
     }
     fetchGifts();
 
@@ -349,7 +364,7 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
       document.documentElement.classList.remove("lenis-stopped");
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [onClose]);
+  }, [config.slug, onClose]);
 
   const fetchGifts = async () => {
     try {
@@ -459,7 +474,8 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           giftId: selectedGift.id,
-          reservedBy: confirmName.trim()
+          reservedBy: confirmName.trim(),
+          slug: config.slug,
         })
       });
       const data = await response.json();
@@ -478,7 +494,11 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
         setSessionReservedId(selectedGift.id);
 
         if (typeof window !== "undefined") {
-          localStorage.setItem("haxr_reserved_gift_id", selectedGift.id);
+          localStorage.setItem(
+            buildEditionGiftStorageKey(config.slug),
+            selectedGift.id
+          );
+          localStorage.removeItem(LEGACY_GLOBAL_GIFT_STORAGE_KEY);
         }
 
         setTimeout(() => {

@@ -9,18 +9,37 @@ import {
 import { INVITATIONS } from "@data/invitations";
 
 describe("invitation allowlist / slug resolution", () => {
-  it("inclui todos os convites activos", () => {
+  it("inclui todos os convites activos publicados", () => {
     for (const slug of [
       "jessicakulaya",
       "jessicaesamueltraditionalwedding",
-      "cha-de-lingerie",
       "cha-de-panela",
       "jessicachadelingerie",
+      "jessicasamuelwedding",
     ]) {
       assert.ok(ACTIVE_INVITATION_ALLOWLIST.includes(slug));
       assert.equal(isActiveInvitationSlug(slug), true);
       assert.equal(resolveActiveInvitationSlug(slug), slug);
     }
+  });
+
+  it("draft cha-de-lingerie (Residência Muege) não unifica com jessicachadelingerie (Govene)", () => {
+    assert.equal(INVITATIONS["cha-de-lingerie"].status, "draft");
+    assert.equal(isActiveInvitationSlug("cha-de-lingerie"), false);
+    assert.equal(resolveActiveInvitationSlug("cha-de-lingerie"), null);
+    assert.equal(resolveCanonicalInvitationSlug("cha-de-lingerie"), "cha-de-lingerie");
+    assert.notEqual(
+      resolveCanonicalInvitationSlug("cha-de-lingerie"),
+      "jessicachadelingerie"
+    );
+    assert.equal(
+      INVITATIONS["cha-de-lingerie"].metadata.location.includes("Muege"),
+      true
+    );
+    assert.equal(
+      INVITATIONS.jessicachadelingerie.metadata.location.includes("Govene"),
+      true
+    );
   });
 
   it("resolve jessicaesamueltraditionalwedding para primavera-lobolo", () => {
@@ -64,5 +83,8 @@ describe("invitation allowlist / slug resolution", () => {
       resolveActiveInvitationSlug("jessicabridetobe"),
       "cha-de-panela"
     );
+    // Aliases do stub Muege deixam de ser activos (draft cha-de-lingerie)
+    assert.equal(resolveActiveInvitationSlug("chadelingerie"), null);
+    assert.equal(resolveActiveInvitationSlug("jessica-cha-de-lingerie"), null);
   });
 });
