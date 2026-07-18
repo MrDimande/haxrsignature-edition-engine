@@ -128,6 +128,11 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       envVar: "EDITION_EVENT_JESSICA_TRADITIONAL_ID",
     },
   },
+  /**
+   * Stub Residência Muege / pink-lingerie — venues distintos de
+   * jessicachadelingerie (Govene). Draft: sem binding Production nem gifts.
+   * Canónico publicado: /jessicachadelingerie. NÃO unificar por redirect.
+   */
   "cha-de-lingerie": {
     slug: "cha-de-lingerie",
     engine: "theme",
@@ -135,7 +140,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     experienceType: "intimate",
     sourcePath: "/chadelingerie",
     legacyFolder: "chadelingerie",
-    status: "active",
+    status: "draft",
     metadata: {
       title: "Chá de Lingerie — Jessica Muege",
       date: "2026-07-25",

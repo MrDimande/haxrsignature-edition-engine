@@ -23,7 +23,7 @@ export function RoseEleganceExperience() {
 
   return (
     <div
-      className="w-full select-none pb-24"
+      className="w-full pb-28 md:pb-24 [&_input]:select-text [&_textarea]:select-text [&_select]:select-text"
       style={{ backgroundColor: theme.colors.background }}
       data-lenis-prevent
     >
