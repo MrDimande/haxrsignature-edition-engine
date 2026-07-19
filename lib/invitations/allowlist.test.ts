@@ -65,4 +65,19 @@ describe("invitation allowlist / slug resolution", () => {
       "cha-de-panela"
     );
   });
+
+  it("mantém chaves de registry esperadas para convites Edition críticos", () => {
+    assert.equal(
+      INVITATIONS.jessicachadelingerie.admin?.expectedRegistryKey,
+      "rose-elegance"
+    );
+    assert.equal(
+      INVITATIONS.jessicaesamueltraditionalwedding.admin?.expectedRegistryKey,
+      "traditional-wedding"
+    );
+    assert.equal(
+      INVITATIONS.jessicasamuelwedding.admin?.expectedRegistryKey,
+      "jessica-samuel-wedding"
+    );
+  });
 });

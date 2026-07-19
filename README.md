@@ -73,7 +73,7 @@ One system renders all invitations dynamically:
 
 - `/jessicakulaya`
 - `/lobolo-jessica-samuel`
-- `/traditional-wedding`
+- `/jessicaesamueltraditionalwedding`
 
 ---
 

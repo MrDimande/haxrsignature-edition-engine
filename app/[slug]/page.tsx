@@ -47,7 +47,7 @@ export async function generateMetadata({
   }
 
   const { metadata } = invitation;
-  const ogImage = metadata.ogImage ?? "/images/haxr-favicon.png";
+  const ogImage = metadata.ogImage;
   const base = buildInvitationMetadata(
     metadata.title,
     metadata.description,
@@ -58,6 +58,7 @@ export async function generateMetadata({
     ...base,
     openGraph: {
       ...base.openGraph,
+      type: "website",
       images: [
         {
           url: ogImage,

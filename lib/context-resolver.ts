@@ -8,11 +8,11 @@ export type InvitationContext = {
 };
 
 const SLUG_ALIASES: Record<string, string> = {
-  jessicasamuelwedding: "jessica-samuel",
+  "jessica-samuel": "jessicasamuelwedding",
 };
 
 const INVITATION_FEATURES: Record<string, Omit<InvitationContext, "slug">> = {
-  "jessica-samuel": {
+  jessicasamuelwedding: {
     giftsRegistryKey: "jessica-samuel",
     photoWallEnabled: true,
     photoWallBucket: "wedding-photos",

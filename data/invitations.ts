@@ -23,8 +23,11 @@ export interface InvitationMetadata {
   eventType: string;
   /** @deprecated Use metadata.date */
   eventDate: string;
-  /** Imagem Open Graph / WhatsApp (1200×630 recomendado) */
-  ogImage?: string;
+  /**
+   * Imagem Open Graph / WhatsApp / email preview.
+   * Obrigatória por convite — 1200×630, visual do evento (não logo HAXR).
+   */
+  ogImage: string;
 }
 
 export interface InvitationAdminBinding {
@@ -32,6 +35,7 @@ export interface InvitationAdminBinding {
   eventTypeLabel: string;
   adminEventName: string;
   envVar: string;
+  expectedRegistryKey?: string;
 }
 
 export interface InvitationConfig {
@@ -67,6 +71,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Convite digital imersivo para a Cerimónia de Kulaya. Uma celebração de raízes, dignidade e continuidade cultural.",
       eventDate: "2026-08-01",
       eventType: "Kulaya",
+      ogImage: "/images/og/kulaya-jessica-og.png",
     },
     admin: {
       clientName: "Jessica Muege",
@@ -93,6 +98,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Convite digital de casamento tradicional (Lobolo). Uma experiência HAXR Signature — cada celebração merece uma assinatura.",
       eventDate: "2026-08-29",
       eventType: "Lobolo",
+      ogImage: "/images/og/lobolo-jessica-samuel-og.png",
     },
     admin: {
       clientName: "Jessica & Samuel",
@@ -120,12 +126,14 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Convite digital cerimonial para o Lobolo de Jessica & Samuel. Uma celebração da união das famílias com honra, tradição e elegância.",
       eventDate: "2026-08-08",
       eventType: "Casamento Tradicional · Lobolo",
+      ogImage: "/images/og/casamento-tradicional-jessica-samuel-og.png",
     },
     admin: {
       clientName: "Jessica & Samuel",
       eventTypeLabel: "Casamento Tradicional",
       adminEventName: "Edition · Casamento Tradicional · Jessica & Samuel",
       envVar: "EDITION_EVENT_JESSICA_TRADITIONAL_ID",
+      expectedRegistryKey: "traditional-wedding",
     },
   },
   "cha-de-lingerie": {
@@ -148,6 +156,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Um encontro exclusivo de cumplicidade e carinho, celebrando a transição da Jessica para uma nova fase da sua vida. Uma tarde repleta de risos, partilhas e elegância.",
       eventDate: "2026-07-25",
       eventType: "Chá de Lingerie",
+      ogImage: "/images/og/cha-de-lingerie-og.png",
     },
     admin: {
       clientName: "Jessica Muege",
@@ -177,6 +186,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Uma jornada emocional ilustrada antes do grande dia — celebração, feminilidade, elegância e alegria partilhada entre amigas.",
       eventDate: "2026-09-12",
       eventType: "Chá de Panela",
+      ogImage: "/images/og/cha-de-panela-og.png",
     },
   },
   jessicachadelingerie: {
@@ -206,6 +216,37 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       eventTypeLabel: "Despedida de Solteira",
       adminEventName: "Edition · Despedida de Solteira · Jessica Muege",
       envVar: "EDITION_EVENT_JESSICA_FAREWELL_ID",
+      expectedRegistryKey: "rose-elegance",
+    },
+  },
+  jessicasamuelwedding: {
+    slug: "jessicasamuelwedding",
+    aliases: ["jessica-samuel"],
+    engine: "theme",
+    theme: "jessica-samuel-wedding",
+    experienceType: "editorial",
+    sourcePath: "/jessicasamuelwedding",
+    legacyFolder: "jessica-samuel",
+    status: "active",
+    metadata: {
+      title: "Casamento — Jessica Muege & Samuel Govene",
+      date: "2026-08-15",
+      time: "A confirmar",
+      location: "Salão de Eventos Vila Verde, Matola",
+      dressCode: "Traje de gala · a rigor",
+      subtitle: "Black-tie · Editorial · Celebração",
+      description:
+        "Convite digital de casamento editorial — uma experiência cinematográfica de amor, fé e união sob a assinatura HAXR.",
+      eventDate: "2026-08-15",
+      eventType: "Casamento",
+      ogImage: "/images/og/jessica-samuel-wedding-og.png",
+    },
+    admin: {
+      clientName: "Jessica & Samuel",
+      eventTypeLabel: "Casamento",
+      adminEventName: "Edition · Casamento · Jessica & Samuel",
+      envVar: "EDITION_EVENT_JESSICA_WEDDING_ID",
+      expectedRegistryKey: "jessica-samuel-wedding",
     },
   },
 };
@@ -242,6 +283,7 @@ export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
   chadepanela: "cha-de-panela",
   "despedida-de-solteira": "jessicachadelingerie",
   "jessica-farewell": "jessicachadelingerie",
+  "jessica-samuel": "jessicasamuelwedding",
 };
 
 export const ALIAS_INDEX: Record<string, string> = {};

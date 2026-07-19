@@ -1,0 +1,1524 @@
+﻿diff --git a/.gitignore b/.gitignore
+index 22bfd14..e4775fb 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -20,7 +20,9 @@ yarn-error.log*
+ # env files (includes .env.local, .env.example is negated below if needed)
+ .env*
+ !.env.example
+-# timestamped rebuild backups: .env.local.backup-YYYYMMDD-HHMMSS
++
++# backup files ÔÇö scripts may generate timestamped backups with secrets
++*.backup
+ 
+ # Runtime reservation fallback files may contain guest PII.
+ # Keep sanitised fixtures in explicit fixture directories trackable.
+diff --git a/app/[slug]/page.tsx b/app/[slug]/page.tsx
+index 6962ec9..db8a72d 100644
+--- a/app/[slug]/page.tsx
++++ b/app/[slug]/page.tsx
+@@ -1,9 +1,10 @@
+ import type { Metadata } from "next";
+-import { notFound, redirect } from "next/navigation";
++import { notFound, permanentRedirect } from "next/navigation";
+ import { HaxrAuthorshipMeta } from "@lib/brand/HaxrAuthorshipMeta";
+ import { EngineRenderer } from "@engines/index";
+ import {
+   getInvitation,
++  getInvitationPublicSlug,
+   LEGACY_SLUG_REDIRECTS,
+   getActiveInvitations,
+ } from "@data/invitations";
+@@ -22,7 +23,7 @@ interface InvitationPageProps {
+ export function generateStaticParams() {
+   const params: Array<{ slug: string }> = [];
+   for (const invitation of getActiveInvitations()) {
+-    params.push({ slug: invitation.slug });
++    params.push({ slug: getInvitationPublicSlug(invitation) });
+     if (invitation.aliases) {
+       for (const alias of invitation.aliases) {
+         params.push({ slug: alias });
+@@ -48,10 +49,11 @@ export async function generateMetadata({
+ 
+   const { metadata } = invitation;
+   const ogImage = metadata.ogImage ?? "/images/haxr-favicon.png";
++  const publicSlug = getInvitationPublicSlug(invitation);
+   const base = buildInvitationMetadata(
+     metadata.title,
+     metadata.description,
+-    invitation.slug
++    publicSlug
+   );
+ 
+   return {
+@@ -80,19 +82,20 @@ export default async function InvitationPage({ params }: InvitationPageProps) {
+   const { slug } = await params;
+ 
+   if (LEGACY_SLUG_REDIRECTS[slug]) {
+-    redirect(`/${LEGACY_SLUG_REDIRECTS[slug]}`);
++    permanentRedirect(`/${LEGACY_SLUG_REDIRECTS[slug]}`);
+   }
+ 
+-  const canonicalSlug = resolveSlug(slug);
+-  if (!canonicalSlug) {
++  const registryKey = resolveSlug(slug);
++  if (!registryKey) {
+     notFound();
+   }
+ 
+-  const invitation = getInvitation(canonicalSlug);
++  const invitation = getInvitation(registryKey);
+   if (!invitation || invitation.status !== "active") {
+     notFound();
+   }
+ 
++  const publicSlug = getInvitationPublicSlug(invitation);
+   const theme = getTheme(invitation.theme);
+   const experience = getExperience(invitation.experienceType);
+ 
+@@ -100,7 +103,7 @@ export default async function InvitationPage({ params }: InvitationPageProps) {
+     <>
+       <HaxrAuthorshipMeta
+         pageName={invitation.metadata.title}
+-        pageUrl={`${getEditionSiteUrl()}/${canonicalSlug}`}
++        pageUrl={`${getEditionSiteUrl()}/${publicSlug}`}
+       />
+       <EngineRenderer
+         config={invitation}
+diff --git a/data/invitations.ts b/data/invitations.ts
+index 2afc9f1..8546bfb 100644
+--- a/data/invitations.ts
++++ b/data/invitations.ts
+@@ -1,3 +1,4 @@
++import { resolveInvitationAssetPath } from "@lib/invitations/assets";
+ import type { ExperienceType } from "@experience/types";
+ import type { RegistryEngineMetaKey } from "../engines/registry-meta";
+ import type { RegistryThemeKey } from "../theme/registry-types";
+@@ -21,8 +22,6 @@ export interface InvitationMetadata {
+   subtitle: string;
+   description: string;
+   eventType: string;
+-  /** @deprecated Use metadata.date */
+-  eventDate: string;
+   /** Imagem Open Graph / WhatsApp (1200├ù630 recomendado) */
+   ogImage?: string;
+ }
+@@ -35,7 +34,10 @@ export interface InvitationAdminBinding {
+ }
+ 
+ export interface InvitationConfig {
++  /** Stable internal identifier ÔÇö APIs, Supabase, asset folders, RSVP payloads */
+   slug: string;
++  /** Public URL segment when different from `slug` (presentation only) */
++  publicSlug?: string;
+   aliases?: string[];
+   engine: RegistryEngineMetaKey;
+   theme: RegistryThemeKey;
+@@ -45,6 +47,11 @@ export interface InvitationConfig {
+   status: InvitationStatus;
+   metadata: InvitationMetadata;
+   admin?: InvitationAdminBinding;
++  giftsRegistryKey?: string;
++  photoWall?: {
++    enabled: boolean;
++    bucket: string;
++  };
+ }
+ 
+ export const INVITATIONS: Record<string, InvitationConfig> = {
+@@ -65,7 +72,6 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
+       subtitle: "KULAYA ┬À INVERNO 2026",
+       description:
+         "Convite digital imersivo para a Cerim├│nia de Kulaya. Uma celebra├º├úo de ra├¡zes, dignidade e continuidade cultural.",
+-      eventDate: "2026-08-01",
+       eventType: "Kulaya",
+     },
+     admin: {
+@@ -91,7 +97,6 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
+       subtitle: "Primavera Africana de Luxo",
+       description:
+         "Convite digital de casamento tradicional (Lobolo). Uma experi├¬ncia HAXR Signature ÔÇö cada celebra├º├úo merece uma assinatura.",
+-      eventDate: "2026-08-29",
+       eventType: "Lobolo",
+     },
+     admin: {
+@@ -117,7 +122,6 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
+       subtitle: "Casamento Tradicional ┬À Tema Primavera",
+       description:
+         "Convite digital para o Casamento Tradicional. Tema Primavera ÔÇö laranja, dourado e branco.",
+-      eventDate: "2026-07-25",
+       eventType: "DOT / Lobolo",
+     },
+     admin: {
+@@ -145,7 +149,6 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
+       subtitle: "BRIDE TO BE EXPERIENCE",
+       description:
+         "Um encontro exclusivo de cumplicidade e carinho, celebrando a transi├º├úo da Jessica para uma nova fase da sua vida. Uma tarde repleta de risos, partilhas e eleg├óncia.",
+-      eventDate: "2026-07-25",
+       eventType: "Ch├í de Lingerie",
+     },
+     admin: {
+@@ -174,9 +177,14 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
+       subtitle: "BRIDE-TO-BE ┬À ILLUSTRATED JOURNEY",
+       description:
+         "Uma jornada emocional ilustrada antes do grande dia ÔÇö celebra├º├úo, feminilidade, eleg├óncia e alegria partilhada entre amigas.",
+-      eventDate: "2026-09-12",
+       eventType: "Ch├í de Panela",
+     },
++    admin: {
++      clientName: "Jessica Muege",
++      eventTypeLabel: "Ch├í de Panela",
++      adminEventName: "Edition ┬À Jessica Bride to Be Experience",
++      envVar: "EDITION_EVENT_JESSICA_PANELA_ID",
++    },
+   },
+   jessicachadelingerie: {
+     slug: "jessicachadelingerie",
+@@ -196,7 +204,6 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
+       subtitle: "Ch├í de lingerie ┬À despedida mimosa",
+       description:
+         "Uma despedida de solteira feminina e ├¡ntima, cursiva, rosa e cheia de charme para celebrar a noiva antes do grande dia.",
+-      eventDate: "2026-07-25",
+       eventType: "Despedida de Solteira",
+       ogImage: "/images/og/despedida-de-solteira-og.png",
+     },
+@@ -206,6 +213,40 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
+       adminEventName: "Edition ┬À Despedida de Solteira ┬À Jessica Muege",
+       envVar: "EDITION_EVENT_JESSICA_FAREWELL_ID",
+     },
++    giftsRegistryKey: "rose-elegance",
++  },
++  "jessica-samuel": {
++    slug: "jessica-samuel",
++    publicSlug: "jessicasamuelwedding",
++    engine: "theme",
++    theme: "jessica-samuel-wedding",
++    experienceType: "editorial",
++    sourcePath: "/jessicasamuelwedding",
++    legacyFolder: "jessica-samuel",
++    status: "active",
++    metadata: {
++      title: "Casamento ÔÇö Jessica Muege & Samuel Govene",
++      date: "2026-08-15",
++      time: "A confirmar",
++      location: "Sal├úo de Eventos Vila Verde, Matola",
++      dressCode: "Black-tie ┬À formal",
++      subtitle: "Black-tie ┬À Editorial ┬À Celebra├º├úo",
++      description:
++        "Convite digital de casamento editorial ÔÇö uma experi├¬ncia cinematogr├ífica de amor, f├® e uni├úo sob a assinatura HAXR.",
++      eventType: "Casamento",
++      ogImage: resolveInvitationAssetPath("jessica-samuel", "og"),
++    },
++    admin: {
++      clientName: "Jessica & Samuel",
++      eventTypeLabel: "Casamento",
++      adminEventName: "Edition ┬À Casamento ┬À Jessica & Samuel",
++      envVar: "EDITION_EVENT_JESSICA_WEDDING_ID",
++    },
++    giftsRegistryKey: "jessica-samuel",
++    photoWall: {
++      enabled: true,
++      bucket: "wedding-photos",
++    },
+   },
+ };
+ 
+@@ -221,17 +262,41 @@ export function getActiveInvitations(): InvitationConfig[] {
+ }
+ 
+ export const activeInvitationSlugs = getActiveInvitations().map(
+-  (invitation) => invitation.slug
++  (invitation) => getInvitationPublicSlug(invitation)
+ );
+ 
++export function getInvitationPublicSlug(invitation: InvitationConfig): string {
++  return invitation.publicSlug ?? invitation.slug;
++}
++
+ export function getInvitation(slug: string): InvitationConfig | null {
+-  const canonical = LEGACY_SLUG_REDIRECTS[slug] ?? slug;
+-  return INVITATIONS[canonical] ?? null;
++  const key = resolveInvitationRegistryKey(slug);
++  return key ? (INVITATIONS[key] ?? null) : null;
++}
++
++/** Registry key (internal id) from public slug, alias, or legacy route */
++export function resolveInvitationRegistryKey(slug: string): string | null {
++  const normalized = slug.trim().toLowerCase();
++  if (INVITATIONS[normalized]) return normalized;
++
++  const legacyTarget = LEGACY_SLUG_REDIRECTS[normalized];
++  if (legacyTarget) {
++    return resolveInvitationRegistryKey(legacyTarget);
++  }
++
++  if (ALIAS_INDEX[normalized]) return ALIAS_INDEX[normalized];
++
++  for (const [key, invitation] of Object.entries(INVITATIONS)) {
++    if (getInvitationPublicSlug(invitation) === normalized) return key;
++  }
++
++  return null;
+ }
+ 
+-/** Legacy slug redirects ÔÇö never exposed on public routes */
++/** Legacy slug redirects ÔÇö permanent public route migrations */
+ export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
+   jessicakhulaya: "jessicakulaya",
++  "jessica-samuel": "jessicasamuelwedding",
+   "jessica-samuel-traditional": "traditional-wedding",
+   "jessica-traditional-wedding": "traditional-wedding",
+   chadelingerie: "cha-de-lingerie",
+diff --git a/data/registry.ts b/data/registry.ts
+index 33dc5fe..f589f7a 100644
+--- a/data/registry.ts
++++ b/data/registry.ts
+@@ -12,6 +12,8 @@ export {
+   activeInvitationSlugs,
+   LEGACY_SLUG_REDIRECTS,
+   getInvitation,
++  getInvitationPublicSlug,
++  resolveInvitationRegistryKey,
+   getActiveInvitations,
+   type InvitationConfig,
+   type InvitationMetadata,
+diff --git a/engines/true-theme/AmbientBackground.tsx b/engines/true-theme/AmbientBackground.tsx
+index e726440..7c1c7af 100644
+--- a/engines/true-theme/AmbientBackground.tsx
++++ b/engines/true-theme/AmbientBackground.tsx
+@@ -3,9 +3,11 @@
+ import { useEffect } from "react";
+ import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+ import { useExperience } from "./context";
++import { useClientMounted } from "./hooks/useClientMounted";
+ 
+ export function AmbientBackground() {
+   const { theme } = useExperience();
++  const mounted = useClientMounted();
+   const mouseX = useMotionValue(0);
+   const mouseY = useMotionValue(0);
+   const springConfig = { stiffness: 40, damping: 22, mass: 0.8 };
+@@ -19,15 +21,23 @@ export function AmbientBackground() {
+ 
+   const isGrid = theme.visuals.shapes === "grid";
+   const isGlass = theme.visuals.shapes === "glass";
++  const blobShape = isGlass ? "rounded-2xl" : "rounded-full";
++  const blobShape2 = isGlass ? "rounded-3xl" : "rounded-full";
++  const blobShape3 = isGlass ? "rounded-xl" : "rounded-full";
+ 
+   useEffect(() => {
++    if (!mounted) return;
+     const handleMouseMove = (e: MouseEvent) => {
+       mouseX.set(e.clientX / window.innerWidth - 0.5);
+       mouseY.set(e.clientY / window.innerHeight - 0.5);
+     };
+     window.addEventListener("mousemove", handleMouseMove);
+     return () => window.removeEventListener("mousemove", handleMouseMove);
+-  }, [mouseX, mouseY]);
++  }, [mouseX, mouseY, mounted]);
++
++  const blobOneClass = `absolute w-[60vw] h-[60vw] ${blobShape} filter blur-[120px] opacity-35 animate-blob-one`;
++  const blobTwoClass = `absolute w-[50vw] h-[50vw] ${blobShape2} filter blur-[100px] opacity-30 animate-blob-two`;
++  const blobThreeClass = `absolute w-[40vw] h-[40vw] ${blobShape3} filter blur-[140px] opacity-25 animate-blob-three`;
+ 
+   return (
+     <div className="fixed inset-0 w-full h-full -z-50 overflow-hidden pointer-events-none">
+@@ -43,34 +53,65 @@ export function AmbientBackground() {
+ 
+       {!isGrid && (
+         <div className="absolute inset-0 overflow-hidden">
+-          <motion.div
+-            style={{
+-              x: blob1X,
+-              y: blob1Y,
+-              backgroundColor: theme.palette.blob1,
+-              left: "-10%",
+-              top: "10%",
+-            }}
+-            className={`absolute w-[60vw] h-[60vw] ${isGlass ? "rounded-2xl" : "rounded-full"} filter blur-[120px] opacity-35 animate-blob-one`}
+-          />
+-          <motion.div
+-            style={{
+-              x: blob2X,
+-              y: blob2Y,
+-              backgroundColor: theme.palette.blob2,
+-              right: "-5%",
+-              bottom: "15%",
+-            }}
+-            className={`absolute w-[50vw] h-[50vw] ${isGlass ? "rounded-3xl" : "rounded-full"} filter blur-[100px] opacity-30 animate-blob-two`}
+-          />
+-          <motion.div
+-            style={{
+-              backgroundColor: theme.palette.blob3,
+-              left: "30%",
+-              top: "40%",
+-            }}
+-            className={`absolute w-[40vw] h-[40vw] ${isGlass ? "rounded-xl" : "rounded-full"} filter blur-[140px] opacity-25 animate-blob-three`}
+-          />
++          {mounted ? (
++            <>
++              <motion.div
++                style={{
++                  x: blob1X,
++                  y: blob1Y,
++                  backgroundColor: theme.palette.blob1,
++                  left: "-10%",
++                  top: "10%",
++                }}
++                className={blobOneClass}
++              />
++              <motion.div
++                style={{
++                  x: blob2X,
++                  y: blob2Y,
++                  backgroundColor: theme.palette.blob2,
++                  right: "-5%",
++                  bottom: "15%",
++                }}
++                className={blobTwoClass}
++              />
++              <motion.div
++                style={{
++                  backgroundColor: theme.palette.blob3,
++                  left: "30%",
++                  top: "40%",
++                }}
++                className={blobThreeClass}
++              />
++            </>
++          ) : (
++            <>
++              <div
++                style={{
++                  backgroundColor: theme.palette.blob1,
++                  left: "-10%",
++                  top: "10%",
++                }}
++                className={blobOneClass}
++              />
++              <div
++                style={{
++                  backgroundColor: theme.palette.blob2,
++                  right: "-5%",
++                  bottom: "15%",
++                }}
++                className={blobTwoClass}
++              />
++              <div
++                style={{
++                  backgroundColor: theme.palette.blob3,
++                  left: "30%",
++                  top: "40%",
++                }}
++                className={blobThreeClass}
++              />
++            </>
++          )}
+         </div>
+       )}
+ 
+diff --git a/engines/true-theme/ExperienceComposition.tsx b/engines/true-theme/ExperienceComposition.tsx
+index ba52eaa..92a94bb 100644
+--- a/engines/true-theme/ExperienceComposition.tsx
++++ b/engines/true-theme/ExperienceComposition.tsx
+@@ -1,45 +1,11 @@
+ "use client";
+ 
+ import { useExperience } from "./context";
+-import {
+-  HeroSection,
+-  DetailsSection,
+-  LocationSection,
+-  RSVPSection,
+-  FooterSection,
+-} from "./ExperienceSections";
+-import { IllustrationCeremonyExperience } from "./profiles/illustration-ceremony/IllustrationCeremonySections";
+-import { RoseEleganceExperience } from "./profiles/rose-elegance/RoseEleganceExperience";
++import { getTrueThemeProfile } from "./profile-registry";
+ 
+-function StandardEditorialExperience() {
+-  return (
+-    <>
+-      <HeroSection />
+-      <DetailsSection />
+-      <LocationSection />
+-      <RSVPSection />
+-      <FooterSection />
+-    </>
+-  );
+-}
+-
+-/**
+- * Profile-based section composition ÔÇö driven by theme.renderProfile, never by slug.
+- */
++/** Composition entry ÔÇö delegates to profile registry only. */
+ export function ExperienceComposition() {
+   const { theme } = useExperience();
+-
+-  switch (theme.renderProfile) {
+-    case "illustration-ceremony":
+-      return <IllustrationCeremonyExperience />;
+-    case "rose-elegance":
+-      return <RoseEleganceExperience />;
+-    case "standard":
+-      return <StandardEditorialExperience />;
+-    default: {
+-      const _exhaustive: never = theme.renderProfile;
+-      return _exhaustive;
+-    }
+-  }
++  const { Experience } = getTrueThemeProfile(theme.renderProfile);
++  return <Experience />;
+ }
+-
+diff --git a/engines/true-theme/ExperienceFlowRouter.tsx b/engines/true-theme/ExperienceFlowRouter.tsx
+index 04d8dd1..a832918 100644
+--- a/engines/true-theme/ExperienceFlowRouter.tsx
++++ b/engines/true-theme/ExperienceFlowRouter.tsx
+@@ -1,21 +1,11 @@
+ "use client";
+ 
+ import { useExperience } from "./context";
+-import { ExperienceFlow as StandardExperienceFlow } from "./ExperienceFlow";
+-import { IllustrationIntroFlow } from "./profiles/illustration-ceremony/IllustrationIntroFlow";
+-import { RoseEleganceIntroFlow } from "./profiles/rose-elegance/RoseEleganceIntroFlow";
++import { getTrueThemeProfile } from "./profile-registry";
+ 
+-/** Routes intro flow by theme render profile ÔÇö not by slug */
++/** Intro flow entry ÔÇö delegates to profile registry only. */
+ export function ExperienceFlowRouter() {
+   const { theme } = useExperience();
+-
+-  if (theme.renderProfile === "illustration-ceremony") {
+-    return <IllustrationIntroFlow />;
+-  }
+-
+-  if (theme.renderProfile === "rose-elegance") {
+-    return <RoseEleganceIntroFlow />;
+-  }
+-
+-  return <StandardExperienceFlow />;
++  const { IntroFlow } = getTrueThemeProfile(theme.renderProfile);
++  return <IntroFlow />;
+ }
+diff --git a/engines/true-theme/ExperienceSections.tsx b/engines/true-theme/ExperienceSections.tsx
+index a897446..0d99ad8 100644
+--- a/engines/true-theme/ExperienceSections.tsx
++++ b/engines/true-theme/ExperienceSections.tsx
+@@ -437,11 +437,20 @@ export function RSVPSection() {
+           </motion.div>
+         ) : (
+           <motion.form variants={variants.fadeUp} onSubmit={handleSubmit} className={`text-left space-y-8 p-8 shadow-sm ${theme.palette.cardBg}`}>
+-            <input type="text" name="honeypot" value={formData.honeypot} onChange={(e) => setFormData((p) => ({ ...p, honeypot: e.target.value }))} className="hidden" tabIndex={-1} autoComplete="off" />
+-            <input required name="name" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} placeholder="Nome completo" className={`w-full bg-transparent border-b py-3 text-sm ${theme.palette.textPrimary} focus:outline-none`} style={{ borderColor: `${theme.colors.primary}15` }} />
++            <input type="text" name="honeypot" value={formData.honeypot} onChange={(e) => setFormData((p) => ({ ...p, honeypot: e.target.value }))} className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
++            <label className="block">
++              <span className="sr-only">Nome completo</span>
++              <input id="rsvp-name" required name="name" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} placeholder="Nome completo" maxLength={200} className={`w-full bg-transparent border-b py-3 text-sm ${theme.palette.textPrimary} focus:outline-none`} style={{ borderColor: `${theme.colors.primary}15` }} />
++            </label>
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+-              <input type="email" name="email" value={formData.email} onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))} placeholder="Email" className={`w-full bg-transparent border-b py-3 text-sm ${theme.palette.textPrimary} focus:outline-none`} style={{ borderColor: `${theme.colors.primary}15` }} />
+-              <input type="tel" name="phone" value={formData.phone} onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))} placeholder="Telefone" className={`w-full bg-transparent border-b py-3 text-sm ${theme.palette.textPrimary} focus:outline-none`} style={{ borderColor: `${theme.colors.primary}15` }} />
++              <label className="block">
++                <span className="sr-only">Email</span>
++                <input id="rsvp-email" type="email" name="email" value={formData.email} onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))} placeholder="Email" className={`w-full bg-transparent border-b py-3 text-sm ${theme.palette.textPrimary} focus:outline-none`} style={{ borderColor: `${theme.colors.primary}15` }} />
++              </label>
++              <label className="block">
++                <span className="sr-only">Telefone</span>
++                <input id="rsvp-phone" type="tel" name="phone" value={formData.phone} onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))} placeholder="Telefone" className={`w-full bg-transparent border-b py-3 text-sm ${theme.palette.textPrimary} focus:outline-none`} style={{ borderColor: `${theme.colors.primary}15` }} />
++              </label>
+             </div>
+             <div className="grid grid-cols-2 gap-4">
+               {(["yes", "no"] as const).map((val) => (
+@@ -459,8 +468,8 @@ export function RSVPSection() {
+                 </button>
+               ))}
+             </div>
+-            {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
+-            <button type="submit" disabled={rsvpStatus === "sending"} className="w-full py-4 border font-body text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 transition-all" style={{ borderColor: theme.colors.primary, color: theme.colors.primary }}>
++            {errorMsg && <p className="text-xs text-red-500" role="alert">{errorMsg}</p>}
++            <button id="rsvp-submit" type="submit" disabled={rsvpStatus === "sending"} className="w-full py-4 border font-body text-[10px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 transition-all" style={{ borderColor: theme.colors.primary, color: theme.colors.primary }}>
+               <Send size={12} />
+               {rsvpStatus === "sending" ? "A enviar..." : "Enviar Confirma├º├úo"}
+             </button>
+diff --git a/engines/true-theme/profiles/rose-elegance/RoseRSVPExperience.tsx b/engines/true-theme/profiles/rose-elegance/RoseRSVPExperience.tsx
+index d41c803..7546890 100644
+--- a/engines/true-theme/profiles/rose-elegance/RoseRSVPExperience.tsx
++++ b/engines/true-theme/profiles/rose-elegance/RoseRSVPExperience.tsx
+@@ -23,7 +23,10 @@ import {
+   isFarewellRsvpDeadlinePassed,
+ } from "@lib/farewell/event-details";
+ import {
+-  resolveRsvpClientOutcome,
++  resolveRsvpClientContract,
++  type RsvpLocalSubmission,
++} from "@lib/rsvp/client-contract";
++import {
+   resolveRsvpSubmitUiStateInFinally,
+   type RsvpApiPayload,
+ } from "@lib/rsvp/client-outcome";
+@@ -256,19 +259,28 @@ export function RoseRSVPSection() {
+         throw new Error("Resposta inv├ílida do servidor.");
+       }
+ 
+-      const outcome = resolveRsvpClientOutcome(response.ok, data);
+-      const result: StoredRsvp = {
++      const localSubmission: RsvpLocalSubmission = {
+         name: formData.name,
+         attending: isAttending,
+       };
+ 
+-      if (outcome.kind === "success") {
++      const contract = resolveRsvpClientContract(
++        response.ok,
++        data,
++        localSubmission
++      );
++      const result: StoredRsvp = {
++        name: localSubmission.name,
++        attending: localSubmission.attending,
++      };
++
++      if (contract.outcome.kind === "success") {
+         persistLocalSuccess(result);
+         settled = true;
+         return;
+       }
+ 
+-      setErrorMsg(outcome.message);
++      setErrorMsg(contract.outcome.message);
+       setRsvpStatus("error");
+       settled = true;
+     } catch (err) {
+diff --git a/lib/control-plane/core-trusted-oidc.test.ts b/lib/control-plane/core-trusted-oidc.test.ts
+index 1db729a..62e8e65 100644
+--- a/lib/control-plane/core-trusted-oidc.test.ts
++++ b/lib/control-plane/core-trusted-oidc.test.ts
+@@ -113,18 +113,3 @@ describe("resolveEditionCoreOidcToken", () => {
+     }
+   });
+ });
+-
+-describe("rsvp-proxy trusted OIDC contract", () => {
+-  it("proxy usa applyTrustedOidcHeader sem protection-bypass", () => {
+-    const source = fs.readFileSync(
+-      path.join(path.dirname(fileURLToPath(import.meta.url)), "rsvp-proxy.ts"),
+-      "utf8"
+-    );
+-    assert.match(source, /applyTrustedOidcHeader\(coreHeaders, trustedOidcToken\)/);
+-    assert.match(source, /Authorization: `Bearer \$\{secret\}`/);
+-    assert.match(source, /readUpstreamDiagnostics\(response, trustedOidcPresent\)/);
+-    assert.match(source, /isTrustedOidcPresent\(trustedOidcToken\)/);
+-    assert.doesNotMatch(source, /protection-bypass/i);
+-    assert.doesNotMatch(source, /PROTECTION_BYPASS/);
+-  });
+-});
+diff --git a/lib/control-plane/logging.ts b/lib/control-plane/logging.ts
+index b1712e0..a645822 100644
+--- a/lib/control-plane/logging.ts
++++ b/lib/control-plane/logging.ts
+@@ -9,7 +9,8 @@ type ProxyLogFields = {
+     | "timeout"
+     | "network_error"
+     | "invalid_core_response"
+-    | "fallback_disabled";
++    | "fallback_disabled"
++    | "validation_error";
+   attending?: boolean;
+   trustedOidcPresent?: boolean;
+   upstreamStatus?: number;
+diff --git a/lib/control-plane/rsvp-proxy.ts b/lib/control-plane/rsvp-proxy.ts
+index dccb37c..59bd305 100644
+--- a/lib/control-plane/rsvp-proxy.ts
++++ b/lib/control-plane/rsvp-proxy.ts
+@@ -1,15 +1,9 @@
+ import { randomUUID } from "node:crypto";
+ import { NextResponse } from "next/server";
+-import {
+-  applyTrustedOidcHeader,
+-  isTrustedOidcPresent,
+-  resolveEditionCoreOidcToken,
+-} from "@lib/control-plane/core-trusted-oidc";
+ import {
+   getCoreApiBaseUrl,
+   getEditionProxySecret,
+   getEditionSiteUrl,
+-  getProxyTimeoutMs,
+   isProxyFallbackEnabled,
+   validateProxyConfig,
+ } from "@lib/control-plane/config";
+@@ -17,8 +11,17 @@ import { logProxyRsvp, type ProxyLogFields } from "@lib/control-plane/logging";
+ import { handleLocalRsvpPost } from "@lib/rsvp/handle-local";
+ import { getRequestIp } from "@lib/security/rate-limit";
+ import { readUpstreamDiagnostics } from "@lib/control-plane/upstream-diagnostics";
++import { validateRsvpPayload } from "@core/contracts/rsvp.contract";
++import { resolveInvitationContext } from "@lib/context-resolver";
++import { isFarewellRsvpDeadlinePassed } from "@lib/farewell/event-details";
++import {
++  resolveEditionCoreOidcToken,
++  applyTrustedOidcHeader,
++  isTrustedOidcPresent,
++} from "@lib/control-plane/core-trusted-oidc";
+ 
+ const CORE_RSVP_PATH = "/api/v1/edition/rsvp";
++const PROXY_TIMEOUT_MS = 10000; // 10 seconds target timeout
+ 
+ function proxyConfigErrorResponse(requestId: string, missing: string[]) {
+   logProxyRsvp({
+@@ -68,7 +71,8 @@ function readAttending(body: unknown): boolean | undefined {
+ export async function proxyRsvpToCore(
+   request: Request
+ ): Promise<NextResponse> {
+-  const requestId = randomUUID();
++  const incomingRequestId = request.headers.get("x-request-id")?.trim();
++  const requestId = incomingRequestId || randomUUID();
+   const config = validateProxyConfig();
+ 
+   if (!config.ok) {
+@@ -91,10 +95,68 @@ export async function proxyRsvpToCore(
+   const attending = readAttending(parsedBody);
+   const started = Date.now();
+ 
++  const context = resolveInvitationContext(slug ?? "");
++  if (!context) {
++    logProxyRsvp({
++      requestId,
++      backend: "proxy",
++      outcome: "validation_error",
++    });
++    return NextResponse.json(
++      {
++        success: false,
++        error: "Convite inv├ílido.",
++      },
++      { status: 400 }
++    );
++  }
++
++  const isFarewell = context.slug === "jessicachadelingerie";
++  const isDeadlinePassed = isFarewell && isFarewellRsvpDeadlinePassed();
++
++  // Validate the payload against the core contract before proxying
++  const validation = validateRsvpPayload(parsedBody, { isFarewell, isDeadlinePassed });
++
++  if (!validation.ok) {
++    if ("isHoneypot" in validation) {
++      return NextResponse.json(
++        {
++          success: true,
++          message: "RSVP process completed (honeypot trigger).",
++        },
++        { status: 200 }
++      );
++    }
++
++    return NextResponse.json(
++      {
++        success: false,
++        error: validation.error,
++      },
++      { status: 400 }
++    );
++  }
++
++  const sanitizedPayload = {
++    slug: context.slug,
++    name: validation.sanitized.name,
++    attending: validation.sanitized.attending,
++    guests: validation.sanitized.guests,
++    email: validation.sanitized.email || "",
++    phone: validation.sanitized.phone || "",
++    messageForBride: validation.sanitized.messageForBride || "",
++    size: validation.sanitized.size || "",
++    dressCodeConfirmed: validation.sanitized.dressCodeConfirmed ?? null,
++    honeypot: "", // Whitelist requires honeypot to be sent explicitly as empty string
++  };
++
++  const payloadString = JSON.stringify(sanitizedPayload);
++
+   try {
+     const controller = new AbortController();
+-    const timeout = setTimeout(() => controller.abort(), getProxyTimeoutMs());
++    const timeout = setTimeout(() => controller.abort(), PROXY_TIMEOUT_MS);
+ 
++    const oidcToken = await resolveEditionCoreOidcToken();
+     const coreHeaders: Record<string, string> = {
+       "Content-Type": "application/json",
+       Authorization: `Bearer ${secret}`,
+@@ -103,22 +165,19 @@ export async function proxyRsvpToCore(
+       "X-HAXR-Proxy-Origin": "edition",
+       "X-HAXR-Edition-Site": getEditionSiteUrl(),
+     };
+-
+-    const trustedOidcToken = await resolveEditionCoreOidcToken();
+-    const trustedOidcPresent = isTrustedOidcPresent(trustedOidcToken);
+-    applyTrustedOidcHeader(coreHeaders, trustedOidcToken);
++    applyTrustedOidcHeader(coreHeaders, oidcToken);
+ 
+     const response = await fetch(`${coreBase}${CORE_RSVP_PATH}`, {
+       method: "POST",
+       headers: coreHeaders,
+-      body: rawBody,
++      body: payloadString,
+       signal: controller.signal,
+     });
+ 
+     clearTimeout(timeout);
+ 
+     const proxyLatencyMs = Date.now() - started;
+-    const upstream = readUpstreamDiagnostics(response, trustedOidcPresent);
++    const upstream = readUpstreamDiagnostics(response, isTrustedOidcPresent(oidcToken));
+     const diagnosticLog: Partial<ProxyLogFields> = {
+       slug,
+       attending,
+@@ -126,14 +185,52 @@ export async function proxyRsvpToCore(
+       ...upstream,
+     };
+ 
++    const status = response.status;
++    const fallbackStatuses = [500, 502, 503, 504];
++
++    if (fallbackStatuses.includes(status)) {
++      if (isProxyFallbackEnabled()) {
++        console.warn(
++          `[edition/rsvp/proxy] core returned ${status}, falling back to local mode. requestId=${requestId}`
++        );
++        return handleLocalRsvpPost(request, { rawBody: payloadString, requestId });
++      }
++
++      logProxyRsvp({
++        requestId,
++        slug,
++        attending,
++        backend: "proxy",
++        proxyLatencyMs,
++        outcome: "fallback_disabled",
++      });
++
++      return proxyFailureResponse(requestId, "invalid_core_response", {
++        ...diagnosticLog,
++      });
++    }
++
++    if (status === 401 || status === 403) {
++      console.error(
++        `[edition/rsvp/proxy] core rejected authentication proxy requestId=${requestId} status=${status}`
++      );
++      return NextResponse.json(
++        {
++          success: false,
++          error: "Ocorreu um erro de autentica├º├úo no servidor.",
++        },
++        { status: 500 }
++      );
++    }
++
+     const responseText = await response.text();
+-    let json: unknown;
++    let json: any;
+ 
+     try {
+       json = responseText ? JSON.parse(responseText) : null;
+     } catch {
+       if (isProxyFallbackEnabled()) {
+-        return handleLocalRsvpPost(request, { rawBody, requestId });
++        return handleLocalRsvpPost(request, { rawBody: payloadString, requestId });
+       }
+ 
+       return proxyFailureResponse(requestId, "invalid_core_response", {
+@@ -148,29 +245,19 @@ export async function proxyRsvpToCore(
+       ...diagnosticLog,
+     });
+ 
+-    if (response.status === 401) {
+-      console.error(
+-        `[edition/rsvp/proxy] core rejeitou autentica├º├úo proxy requestId=${requestId}`
+-      );
++    if (status === 200) {
++      // Normalise Core 200 response to remove internal/PII details
+       return NextResponse.json(
+         {
+-          success: false,
+-          error: "Ocorreu um erro ao processar o seu RSVP.",
++          success: true,
++          message: json.message || "O seu RSVP foi registado com sucesso!",
+         },
+-        { status: 500 }
++        { status: 200 }
+       );
+     }
+ 
+-    const headers: HeadersInit = {};
+-    const retryAfter = response.headers.get("retry-after");
+-    if (retryAfter) {
+-      headers["Retry-After"] = retryAfter;
+-    }
+-
+-    return NextResponse.json(json, {
+-      status: response.status,
+-      headers,
+-    });
++    // Authoritative 400, 409, 429 errors from Core are returned as-is
++    return NextResponse.json(json, { status });
+   } catch (error) {
+     const isTimeout =
+       error instanceof Error && error.name === "AbortError";
+@@ -188,9 +275,9 @@ export async function proxyRsvpToCore(
+ 
+     if (isProxyFallbackEnabled()) {
+       console.warn(
+-        `[edition/rsvp/proxy] fallback local activo requestId=${requestId} outcome=${outcome}`
++        `[edition/rsvp/proxy] fallback local activo devido a erro de rede/timeout requestId=${requestId} outcome=${outcome}`
+       );
+-      return handleLocalRsvpPost(request, { rawBody, requestId });
++      return handleLocalRsvpPost(request, { rawBody: payloadString, requestId });
+     }
+ 
+     logProxyRsvp({
+diff --git a/lib/engine.ts b/lib/engine.ts
+index 379bd27..44b1357 100644
+--- a/lib/engine.ts
++++ b/lib/engine.ts
+@@ -4,6 +4,7 @@ import {
+   getInvitation as getInvitationFromData,
+   invitationSlugs,
+   LEGACY_SLUG_REDIRECTS,
++  resolveInvitationRegistryKey,
+   type InvitationConfig,
+   type InvitationStatus,
+ } from "@data/invitations";
+@@ -13,10 +14,7 @@ export function getInvitation(slug: string): InvitationConfig | null {
+ }
+ 
+ export function resolveSlug(slug: string): string | null {
+-  if (INVITATIONS[slug]) return slug;
+-  if (LEGACY_SLUG_REDIRECTS[slug]) return LEGACY_SLUG_REDIRECTS[slug];
+-  if (ALIAS_INDEX[slug]) return ALIAS_INDEX[slug];
+-  return null;
++  return resolveInvitationRegistryKey(slug);
+ }
+ 
+ /** @internal Server-side only ÔÇö never use on public-facing pages */
+diff --git a/lib/gifts.ts b/lib/gifts.ts
+index 652fad4..06d6295 100644
+--- a/lib/gifts.ts
++++ b/lib/gifts.ts
+@@ -3,14 +3,17 @@ import path from "path";
+ import { ROSE_ELEGANCE_GIFTS, type GiftItem } from "@data/gifts/rose-elegance";
+ import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+ 
+-const REGISTRY_KEY = "rose-elegance";
+-
+-const RESERVATIONS_FILE = path.join(
+-  process.cwd(),
+-  "data",
+-  "gifts",
+-  "reservations.json"
+-);
++function getReservationsFile(registryKey: string): string {
++  if (registryKey === "rose-elegance") {
++    return path.join(process.cwd(), "data", "gifts", "reservations.json");
++  }
++  return path.join(
++    process.cwd(),
++    "data",
++    "gifts",
++    `reservations-${registryKey}.json`
++  );
++}
+ 
+ type Reservation = {
+   giftId: string;
+@@ -38,12 +41,13 @@ function mergeCatalogWithReservations(
+   });
+ }
+ 
+-async function getReservationsFromFile(): Promise<Reservation[]> {
++async function getReservationsFromFile(registryKey: string): Promise<Reservation[]> {
+   try {
+-    if (!fs.existsSync(RESERVATIONS_FILE)) {
++    const file = getReservationsFile(registryKey);
++    if (!fs.existsSync(file)) {
+       return [];
+     }
+-    const content = await fs.promises.readFile(RESERVATIONS_FILE, "utf-8");
++    const content = await fs.promises.readFile(file, "utf-8");
+     return JSON.parse(content) as Reservation[];
+   } catch (error) {
+     console.error("Error reading gift reservations file:", error);
+@@ -52,15 +56,17 @@ async function getReservationsFromFile(): Promise<Reservation[]> {
+ }
+ 
+ async function saveReservationsToFile(
+-  reservations: Reservation[]
++  reservations: Reservation[],
++  registryKey: string
+ ): Promise<void> {
+   try {
+-    const dir = path.dirname(RESERVATIONS_FILE);
++    const file = getReservationsFile(registryKey);
++    const dir = path.dirname(file);
+     if (!fs.existsSync(dir)) {
+       await fs.promises.mkdir(dir, { recursive: true });
+     }
+     await fs.promises.writeFile(
+-      RESERVATIONS_FILE,
++      file,
+       JSON.stringify(reservations, null, 2),
+       "utf-8"
+     );
+@@ -69,12 +75,12 @@ async function saveReservationsToFile(
+   }
+ }
+ 
+-async function getReservationsFromSupabase(): Promise<Reservation[]> {
++async function getReservationsFromSupabase(registryKey: string): Promise<Reservation[]> {
+   const supabase = createAdminClient();
+   const { data, error } = await supabase
+     .from("edition_gift_reservations")
+     .select("gift_id, reserved_by, created_at")
+-    .eq("registry_key", REGISTRY_KEY)
++    .eq("registry_key", registryKey)
+     .order("created_at", { ascending: true });
+ 
+   if (error) {
+@@ -89,21 +95,22 @@ async function getReservationsFromSupabase(): Promise<Reservation[]> {
+   }));
+ }
+ 
+-async function getReservations(): Promise<Reservation[]> {
++async function getReservations(registryKey: string): Promise<Reservation[]> {
+   if (isSupabaseConfigured()) {
+-    return getReservationsFromSupabase();
++    return getReservationsFromSupabase(registryKey);
+   }
+-  return getReservationsFromFile();
++  return getReservationsFromFile(registryKey);
+ }
+ 
+ async function reserveGiftInSupabase(
+   giftId: string,
+   reservedBy: string,
+-  giftName: string
++  giftName: string,
++  registryKey: string
+ ): Promise<{ success: boolean; error?: string; conflictName?: string }> {
+   const supabase = createAdminClient();
+   const { data, error } = await supabase.rpc("reserve_edition_gift", {
+-    p_registry_key: REGISTRY_KEY,
++    p_registry_key: registryKey,
+     p_gift_id: giftId,
+     p_reserved_by: reservedBy.trim(),
+     p_gift_name: giftName,
+@@ -140,9 +147,10 @@ async function reserveGiftInSupabase(
+ 
+ async function reserveGiftInFile(
+   giftId: string,
+-  reservedBy: string
++  reservedBy: string,
++  registryKey: string
+ ): Promise<{ success: boolean; error?: string }> {
+-  const reservations = await getReservationsFromFile();
++  const reservations = await getReservationsFromFile(registryKey);
+   const alreadyReserved = reservations.some((r) => r.giftId === giftId);
+   if (alreadyReserved) {
+     const reservedItem = mergeCatalogWithReservations(reservations).find(
+@@ -160,18 +168,19 @@ async function reserveGiftInFile(
+     timestamp: new Date().toISOString(),
+   };
+ 
+-  await saveReservationsToFile([...reservations, newReservation]);
++  await saveReservationsToFile([...reservations, newReservation], registryKey);
+   return { success: true };
+ }
+ 
+-export async function getMergedGifts(): Promise<GiftItem[]> {
+-  const reservations = await getReservations();
++export async function getMergedGifts(registryKey = "rose-elegance"): Promise<GiftItem[]> {
++  const reservations = await getReservations(registryKey);
+   return mergeCatalogWithReservations(reservations);
+ }
+ 
+ export async function reserveGift(
+   giftId: string,
+-  reservedBy: string
++  reservedBy: string,
++  registryKey = "rose-elegance"
+ ): Promise<{
+   success: boolean;
+   error?: string;
+@@ -196,16 +205,16 @@ export async function reserveGift(
+         }
+ 
+         const result = isSupabaseConfigured()
+-          ? await reserveGiftInSupabase(giftId, reservedBy, staticGift.name)
+-          : await reserveGiftInFile(giftId, reservedBy);
++          ? await reserveGiftInSupabase(giftId, reservedBy, staticGift.name, registryKey)
++          : await reserveGiftInFile(giftId, reservedBy, registryKey);
+ 
+         if (!result.success) {
+-          const merged = await getMergedGifts();
++          const merged = await getMergedGifts(registryKey);
+           resolve({ success: false, error: result.error, gifts: merged });
+           return;
+         }
+ 
+-        const updatedGifts = await getMergedGifts();
++        const updatedGifts = await getMergedGifts(registryKey);
+         resolve({ success: true, gifts: updatedGifts, giftName: staticGift.name });
+       })
+       .catch((err) => {
+diff --git a/lib/rsvp/admin-event.ts b/lib/rsvp/admin-event.ts
+index 9da4061..554f77c 100644
+--- a/lib/rsvp/admin-event.ts
++++ b/lib/rsvp/admin-event.ts
+@@ -35,7 +35,7 @@ export function getEditionEventProvisionSpec(
+     adminEventName: invitation.admin.adminEventName,
+     clientName: invitation.admin.clientName,
+     eventTypeLabel: invitation.admin.eventTypeLabel,
+-    eventDate: invitation.metadata.date || invitation.metadata.eventDate || null,
++    eventDate: invitation.metadata.date || null,
+     envVar: invitation.admin.envVar,
+     editionUrl: `${SITE_URL}/${invitation.slug}`,
+     findSeatCode: slugToFindSeatCode(invitation.slug),
+diff --git a/lib/rsvp/config.ts b/lib/rsvp/config.ts
+index 61a0723..f804ee7 100644
+--- a/lib/rsvp/config.ts
++++ b/lib/rsvp/config.ts
+@@ -62,6 +62,17 @@ export const FAREWELL_RSVP_EMAIL: RsvpEventEmailConfig = {
+   replyTo: PRIMARY_INBOX,
+ };
+ 
++export const WEDDING_RSVP_EMAIL: RsvpEventEmailConfig = {
++  eventName:
++    getInvitationAdminBinding("jessica-samuel")?.adminEventName ??
++    "Edition ┬À Casamento ┬À Jessica & Samuel",
++  slug: "jessica-samuel",
++  channel: "rsvp",
++  notifyTo: [haxrMailboxes.rsvp],
++  cc: ["jessicamuege@gmail.com"],
++  replyTo: PRIMARY_INBOX,
++};
++
+ export function getRsvpEmailConfig(slug?: string): RsvpEventEmailConfig | null {
+   if (!slug) return null;
+   const canonicalSlug = resolveSlug(slug) ?? slug;
+@@ -77,5 +88,8 @@ export function getRsvpEmailConfig(slug?: string): RsvpEventEmailConfig | null {
+   if (canonicalSlug === FAREWELL_EVENT.slug) {
+     return FAREWELL_RSVP_EMAIL;
+   }
++  if (canonicalSlug === "jessica-samuel") {
++    return WEDDING_RSVP_EMAIL;
++  }
+   return null;
+ }
+diff --git a/lib/rsvp/events.ts b/lib/rsvp/events.ts
+index 9b2f371..b57e2b7 100644
+--- a/lib/rsvp/events.ts
++++ b/lib/rsvp/events.ts
+@@ -1,6 +1,7 @@
+ import {
+   INVITATIONS,
+-  LEGACY_SLUG_REDIRECTS,
++  getInvitation,
++  resolveInvitationRegistryKey,
+   type InvitationAdminBinding,
+ } from "@data/invitations";
+ 
+@@ -12,12 +13,10 @@ export interface EditionEventBinding {
+   envVar: string;
+ }
+ 
+-/** Slug can├│nico (ex.: jessicakhulaya ÔåÆ jessicakulaya) */
++/** Slug can├│nico interno (ex.: jessicakhulaya ÔåÆ jessicakulaya; jessicasamuelwedding ÔåÆ jessica-samuel) */
+ export function resolveInvitationSlug(slug?: string): string | null {
+   if (!slug) return null;
+-  const normalized = slug.trim().toLowerCase();
+-  if (INVITATIONS[normalized]) return normalized;
+-  return LEGACY_SLUG_REDIRECTS[normalized] ?? null;
++  return resolveInvitationRegistryKey(slug.trim().toLowerCase());
+ }
+ 
+ function readEventId(envVar: string): string | undefined {
+@@ -29,6 +28,7 @@ function readEventId(envVar: string): string | undefined {
+     EDITION_EVENT_JESSICA_KULAYA_ID: "KULAYA_EVENT_ID",
+     EDITION_EVENT_JESSICA_LOBOLO_ID: "LOBOLO_EVENT_ID",
+     EDITION_EVENT_JESSICA_TRADITIONAL_ID: "TRADITIONAL_WEDDING_EVENT_ID",
++    EDITION_EVENT_JESSICA_WEDDING_ID: "WEDDING_EVENT_ID",
+     EDITION_EVENT_JESSICA_FAREWELL_ID: "FAREWELL_EVENT_ID",
+   };
+   const legacyKey = legacyMap[envVar];
+diff --git a/lib/rsvp/validate-local.test.ts b/lib/rsvp/validate-local.test.ts
+index 2b1b8f3..a48142c 100644
+--- a/lib/rsvp/validate-local.test.ts
++++ b/lib/rsvp/validate-local.test.ts
+@@ -52,4 +52,32 @@ describe("validateLocalRsvpPayload", () => {
+       assert.equal(result.submission.guests, 1);
+     }
+   });
++
++  it("rejeita attending string e aceita attending=false booleano", () => {
++    const stringResult = validateLocalRsvpPayload({
++      slug: "jessicakulaya",
++      name: "Convidada Teste",
++      attending: "false",
++      guests: 1,
++      email: "guest@example.com",
++    });
++
++    assert.equal(stringResult.ok, false);
++    if (!stringResult.ok) {
++      assert.equal(stringResult.status, 400);
++      assert.match(stringResult.body.error, /comparecer/i);
++    }
++
++    const falseResult = validateLocalRsvpPayload({
++      slug: "jessicakulaya",
++      name: "Convidada Teste",
++      attending: false,
++    });
++
++    assert.equal(falseResult.ok, true);
++    if (falseResult.ok) {
++      assert.equal(falseResult.submission.attending, false);
++      assert.equal(falseResult.submission.guests, 0);
++    }
++  });
+ });
+diff --git a/lib/rsvp/validate-local.ts b/lib/rsvp/validate-local.ts
+index 4ec5a23..2c631a4 100644
+--- a/lib/rsvp/validate-local.ts
++++ b/lib/rsvp/validate-local.ts
+@@ -1,18 +1,7 @@
+ import { isFarewellRsvpDeadlinePassed, FAREWELL_EVENT } from "@lib/farewell/event-details";
+ import { resolveInvitationSlug } from "@lib/rsvp/events";
+ import type { RsvpSubmission } from "@lib/rsvp/send-notification";
+-
+-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+-
+-function normalizePhone(value: unknown): string {
+-  if (typeof value !== "string") return "";
+-  return value.trim().slice(0, 30);
+-}
+-
+-function normalizeEmail(value: unknown): string {
+-  if (typeof value !== "string") return "";
+-  return value.trim().toLowerCase().slice(0, 160);
+-}
++import { validateRsvpPayload } from "@core/contracts/rsvp.contract";
+ 
+ export type LocalRsvpValidationError = {
+   ok: false;
+@@ -47,168 +36,65 @@ export type LocalRsvpValidationResult =
+   | LocalRsvpValidationSuccess;
+ 
+ export function validateLocalRsvpPayload(body: unknown): LocalRsvpValidationResult {
+-  if (!body || typeof body !== "object") {
+-    return {
+-      ok: false,
+-      status: 400,
+-      outcome: "validation_error",
+-      body: {
+-        success: false,
+-        error: "Por favor, introduza o seu nome.",
+-      },
+-    };
+-  }
+-
+-  const record = body as Record<string, unknown>;
+-  const {
+-    name,
+-    attending,
+-    guests,
+-    honeypot,
+-    slug,
+-    email,
+-    phone,
+-    messageForBride,
+-    size,
+-    dressCodeConfirmed,
+-  } = record;
+-
+   const canonicalSlug = resolveInvitationSlug(
+-    typeof slug === "string" ? slug : undefined
++    body && typeof body === "object" && typeof (body as any).slug === "string"
++      ? (body as any).slug
++      : undefined
+   );
+ 
+-  if (typeof honeypot === "string" && honeypot.trim() !== "") {
+-    return {
+-      ok: false,
+-      status: 200,
+-      outcome: "honeypot",
+-      body: {
+-        success: true,
+-        message: "RSVP process completed (honeypot trigger).",
+-      },
+-    };
+-  }
+-
+-  if (typeof name !== "string" || name.trim() === "") {
++  if (!canonicalSlug) {
+     return {
+       ok: false,
+       status: 400,
+       outcome: "validation_error",
+       body: {
+         success: false,
+-        error: "Por favor, introduza o seu nome.",
+-      },
+-    };
+-  }
+-
+-  if (attending === undefined) {
+-    return {
+-      ok: false,
+-      status: 400,
+-      outcome: "validation_error",
+-      body: {
+-        success: false,
+-        error: "Por favor, indique se ir├í comparecer.",
+-      },
+-    };
+-  }
+-
+-  const parsedGuests = parseInt(String(guests), 10);
+-  if (
+-    attending &&
+-    (Number.isNaN(parsedGuests) || parsedGuests < 1 || parsedGuests > 10)
+-  ) {
+-    return {
+-      ok: false,
+-      status: 400,
+-      outcome: "validation_error",
+-      body: {
+-        success: false,
+-        error: "O n├║mero de pessoas deve ser entre 1 e 10.",
+-      },
+-    };
+-  }
+-
+-  const normalizedEmail = normalizeEmail(email);
+-  const normalizedPhone = normalizePhone(phone);
+-
+-  if (normalizedEmail && !EMAIL_PATTERN.test(normalizedEmail)) {
+-    return {
+-      ok: false,
+-      status: 400,
+-      outcome: "validation_error",
+-      body: {
+-        success: false,
+-        error: "Por favor, introduza um email v├ílido.",
++        error: "Convite inv├ílido.",
+       },
+     };
+   }
+ 
+   const isFarewell = canonicalSlug === FAREWELL_EVENT.slug;
++  const deadlinePassed = isFarewell && isFarewellRsvpDeadlinePassed();
+ 
+-  if (isFarewell && !normalizedPhone) {
+-    return {
+-      ok: false,
+-      status: 400,
+-      outcome: "validation_error",
+-      body: {
+-        success: false,
+-        error: "Indique o telefone para contacto (WhatsApp).",
+-      },
+-    };
+-  }
+-
+-  if (attending && !normalizedEmail && !normalizedPhone) {
+-    return {
+-      ok: false,
+-      status: 400,
+-      outcome: "validation_error",
+-      body: {
+-        success: false,
+-        error: "Indique email ou telefone para contacto.",
+-      },
+-    };
+-  }
++  const contractResult = validateRsvpPayload(body, {
++    isFarewell,
++    isDeadlinePassed: deadlinePassed,
++  });
++
++  if (!contractResult.ok) {
++    if ("isHoneypot" in contractResult) {
++      return {
++        ok: false,
++        status: 200,
++        outcome: "honeypot",
++        body: {
++          success: true,
++          message: "RSVP process completed (honeypot trigger).",
++        },
++      };
++    }
+ 
+-  if (isFarewell && isFarewellRsvpDeadlinePassed()) {
+     return {
+       ok: false,
+       status: 400,
+       outcome: "validation_error",
+       body: {
+         success: false,
+-        error: "O prazo para confirma├º├úo terminou. Contacte a organizadora.",
++        error: contractResult.error,
+       },
+     };
+   }
+ 
+-  const normalizedMessage =
+-    typeof messageForBride === "string"
+-      ? messageForBride.trim().slice(0, 280)
+-      : undefined;
+-  const normalizedSize =
+-    typeof size === "string" ? size.trim().slice(0, 12) : undefined;
+-
+-  const resolvedSlug =
+-    canonicalSlug ?? (typeof slug === "string" ? slug : "jessicakulaya");
++  const { sanitized } = contractResult;
+ 
+   return {
+     ok: true,
+-    slug: resolvedSlug,
++    slug: canonicalSlug,
+     isFarewell,
+     submission: {
+-      name: name.trim(),
+-      attending: Boolean(attending),
+-      guests: attending ? parsedGuests : 0,
+-      slug: resolvedSlug,
+-      email: normalizedEmail || undefined,
+-      phone: normalizedPhone || undefined,
+-      messageForBride: normalizedMessage || undefined,
+-      size: normalizedSize || undefined,
+-      dressCodeConfirmed:
+-        typeof dressCodeConfirmed === "boolean"
+-          ? dressCodeConfirmed
+-          : undefined,
+-    },
++      ...sanitized,
++      slug: canonicalSlug,
++    } as RsvpSubmission,
+   };
+ }
+diff --git a/package.json b/package.json
+index b26519e..b7e9da9 100644
+--- a/package.json
++++ b/package.json
+@@ -11,7 +11,7 @@
+     "build": "next build",
+     "start": "next start",
+     "lint": "eslint",
+-    "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts",
++    "test": "node --import tsx --test core/contracts/*.test.ts lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/invitations/*.test.ts lib/jessica-samuel-wedding/gifts/*.test.ts lib/jessica-samuel-wedding/countdown/*.test.ts lib/jessica-samuel-wedding/photo-wall/*.test.ts lib/jessica-samuel-wedding/audio/*.test.ts",
+     "smoke:rsvp-reminders": "node scripts/smoke-rsvp-reminders.mjs",
+     "smoke:farewell-ops": "node scripts/smoke-farewell-ops.mjs",
+     "smoke:export": "node scripts/smoke-export.mjs"
+diff --git a/theme/experience-tokens.ts b/theme/experience-tokens.ts
+index bbde4d3..c3694df 100644
+--- a/theme/experience-tokens.ts
++++ b/theme/experience-tokens.ts
+@@ -159,7 +159,12 @@ export function resolveExperienceTokens(theme: TrueTheme): ExperienceTokens {
+           body: 'var(--font-jost), "Jost", system-ui, sans-serif',
+           script: 'var(--font-great-vibes), "Great Vibes", cursive',
+         }
+-      : baseTypography;
++      : theme.renderProfile === "jessica-samuel-wedding"
++        ? {
++            display: 'var(--font-display), "Cormorant Garamond", Georgia, serif',
++            body: 'var(--font-body), "Inter", system-ui, sans-serif',
++          }
++        : baseTypography;
+ 
+   return {
+     motion,
+@@ -245,6 +250,21 @@ export function getBrideIllustrationPalette(): TrueTheme["palette"] {
+   };
+ }
+ 
++export function getJessicaSamuelWeddingPalette(): TrueTheme["palette"] {
++  return {
++    bgBase: "#0A0A0A",
++    textPrimary: "text-[#F5F0E8]",
++    textSecondary: "text-[#D4A5AD]",
++    accent: "#722F37",
++    accentLight: "rgba(114, 47, 55, 0.18)",
++    cardBg: "bg-[#141010]/80 backdrop-blur-md border border-[#F5F0E8]/08",
++    blob1: "rgba(114, 47, 55, 0.22)",
++    blob2: "rgba(10, 10, 10, 0.95)",
++    blob3: "rgba(212, 165, 173, 0.12)",
++    divider: "rgba(114, 47, 55, 0.45)",
++  };
++}
++
+ export function getRoseElegancePalette(): TrueTheme["palette"] {
+   return {
+     bgBase: "#FFE5F0",
+diff --git a/theme/registry-types.ts b/theme/registry-types.ts
+index e415ff4..c02572c 100644
+--- a/theme/registry-types.ts
++++ b/theme/registry-types.ts
+@@ -5,4 +5,5 @@ export type RegistryThemeKey =
+   | "kulaya-traditional"
+   | "corporate-minimal"
+   | "bride-to-be-illustration"
+-  | "rose-elegance-farewell";
++  | "rose-elegance-farewell"
++  | "jessica-samuel-wedding";
+diff --git a/theme/registry.ts b/theme/registry.ts
+index 8bd4172..d81c533 100644
+--- a/theme/registry.ts
++++ b/theme/registry.ts
+@@ -2,6 +2,7 @@ import { brideToBeIllustrationTheme } from "./definitions/bride-to-be-illustrati
+ import { corporateMinimalTrueTheme } from "./definitions/corporate-minimal";
+ import { kulayaTrueTheme } from "./definitions/kulaya-traditional";
+ import { pinkLingerieTrueTheme } from "./definitions/pink-lingerie";
++import { jessicaSamuelWeddingTheme } from "./definitions/jessica-samuel-wedding";
+ import { roseEleganceFarewellTheme } from "./definitions/rose-elegance-farewell";
+ import type { TrueTheme } from "./true-types";
+ import type { RegistryThemeKey } from "./registry-types";
+@@ -15,6 +16,7 @@ export const ThemeRegistry: Record<RegistryThemeKey, TrueTheme> = {
+   "corporate-minimal": corporateMinimalTrueTheme,
+   "bride-to-be-illustration": brideToBeIllustrationTheme,
+   "rose-elegance-farewell": roseEleganceFarewellTheme,
++  "jessica-samuel-wedding": jessicaSamuelWeddingTheme,
+ };
+ 
+ export type { RegistryThemeKey };
+diff --git a/theme/true-types.ts b/theme/true-types.ts
+index b1a27f1..778c3c5 100644
+--- a/theme/true-types.ts
++++ b/theme/true-types.ts
+@@ -21,7 +21,11 @@ export type MoodEmotion =
+   | "soft-intimate"
+   | "celebratory";
+ 
+-export type RenderProfile = "standard" | "illustration-ceremony" | "rose-elegance";
++export type RenderProfile =
++  | "standard"
++  | "illustration-ceremony"
++  | "rose-elegance"
++  | "jessica-samuel-wedding";
+ 
+ export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
+ 
+diff --git a/tsconfig.json b/tsconfig.json
+index 707705c..25c1731 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -40,6 +40,9 @@
+       ],
+       "@experience/*": [
+         "./experience/*"
++      ],
++      "@core/*": [
++        "./core/*"
+       ]
+     }
+   },

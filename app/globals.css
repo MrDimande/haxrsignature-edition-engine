@@ -98,7 +98,7 @@
   animation: primavera-petal-drift 18s ease-in-out infinite;
 }
 
-/* Primavera Lobolo — hero editorial (referência convitevf-2026) */
+/* Primavera Lobolo ? hero editorial (refer?ncia convitevf-2026) */
 [data-render-profile="primavera-lobolo"] .font-script {
   font-family: var(--font-great-vibes), "Great Vibes", cursive;
 }
@@ -444,7 +444,7 @@
   transform: translateY(1px);
 }
 
-/* Secção citação — estilo Letícia & Jaime */
+/* Sec??o cita??o ? estilo Let?cia & Jaime */
 .primavera-quote-section {
   background-color: #fbf6f0;
 }
@@ -502,7 +502,7 @@
   );
 }
 
-/* Secção União das Famílias — card editorial (referência Letícia & Jaime) */
+/* Sec??o Uni?o das Fam?lias ? card editorial (refer?ncia Let?cia & Jaime) */
 .primavera-families-section {
   background-color: #fbf6f0;
 }
@@ -728,7 +728,7 @@
   margin: 0;
 }
 
-/* Cabeçalhos editoriais Primavera — Great Vibes + eyebrow dourado (secções) */
+/* Cabe?alhos editoriais Primavera ? Great Vibes + eyebrow dourado (sec??es) */
 .primavera-editorial-heading {
   display: flex;
   flex-direction: column;
@@ -801,7 +801,4306 @@
   }
 }
 
-/* Rose Elegance — tipografia feminina */
+/* Jessica & Samuel Wedding ? tipografia + tokens de cor */
+[data-render-profile="jessica-samuel-wedding"] {
+  --js-champagne: #f1e3cf;
+  --js-ivory: #fff9f2;
+  --js-ink: #171312;
+  --js-ink-soft: rgba(23, 19, 18, 0.72);
+  --js-rose: #c9939b;
+  --js-wine: #7a2332;
+  --js-champagne-deep: #d6bfa2;
+}
+
+html:has([data-render-profile="jessica-samuel-wedding"]) {
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html:has([data-render-profile="jessica-samuel-wedding"])::-webkit-scrollbar {
+  display: none;
+}
+
+/* A Jornada ? rota de bordo em ?8? + avi?o de papel */
+.js-wedding-journey-flight {
+  position: relative;
+  margin: 2.75rem auto 0;
+  width: 100%;
+  max-width: 44rem;
+  padding: 0.65rem 0.1rem 0.25rem;
+  border-top: 1px solid rgba(122, 35, 50, 0.09);
+  border-bottom: 1px solid rgba(122, 35, 50, 0.09);
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(201, 147, 155, 0.07),
+      transparent 62%
+    );
+}
+
+.js-wedding-journey-flight__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.js-wedding-journey-flight__path--live {
+  animation: js-journey-dash 18s linear infinite;
+}
+
+.js-wedding-journey-flight__plane {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.js-wedding-journey-flight__atmosphere {
+  opacity: 0.74;
+}
+
+.js-wedding-journey-flight__atmosphere > g:nth-child(1) {
+  animation: js-journey-cloud 7s ease-in-out infinite;
+}
+
+.js-wedding-journey-flight__atmosphere > g:nth-child(2) {
+  animation: js-journey-cloud 8s ease-in-out -2s infinite;
+}
+
+.js-wedding-journey-flight__atmosphere > g:nth-child(3) {
+  animation: js-journey-cloud 6.5s ease-in-out -4s infinite;
+}
+
+.js-wedding-journey-flight__compass {
+  opacity: 0.46;
+}
+
+.js-wedding-journey-flight__markers {
+  pointer-events: none;
+}
+
+.js-wedding-journey-flight__label {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 7px;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  opacity: 0.58;
+}
+
+@keyframes js-journey-dash {
+  to {
+    stroke-dashoffset: -360;
+  }
+}
+
+@keyframes js-journey-cloud {
+  0%,
+  100% {
+    opacity: 0.58;
+  }
+
+  50% {
+    opacity: 0.88;
+  }
+}
+
+@media (max-width: 520px) {
+  .js-wedding-journey-flight {
+    width: calc(100% + 1rem);
+    margin-left: -0.5rem;
+  }
+
+  .js-wedding-journey-flight__label {
+    font-size: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-journey-flight__path--live {
+    animation: none;
+  }
+
+  .js-wedding-journey-flight__atmosphere > g {
+    animation: none !important;
+  }
+}
+
+/* Navega??o editorial ? surge apenas depois do hero */
+.js-wedding-nav {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 1rem;
+  right: 1rem;
+  z-index: 70;
+  width: auto;
+  max-width: 65rem;
+  margin-inline: auto;
+  pointer-events: none;
+}
+
+.js-wedding-nav__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.42rem 0.55rem 0.42rem 0.8rem;
+  overflow: hidden;
+  border: 1px solid rgba(214, 191, 162, 0.62);
+  border-radius: 999px;
+  background: rgba(255, 249, 242, 0.9);
+  box-shadow:
+    0 18px 48px rgba(23, 19, 18, 0.13),
+    0 4px 16px rgba(122, 35, 50, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px) saturate(1.16);
+  pointer-events: auto;
+}
+
+.js-wedding-nav__inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(122, 35, 50, 0.42),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.js-wedding-nav__monogram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.25rem;
+  padding-right: 0.65rem;
+  border-right: 1px solid rgba(122, 35, 50, 0.15);
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-wedding-nav__monogram span {
+  margin-inline: 0.16rem;
+  color: var(--js-rose, #c9939b);
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: 1.1em;
+}
+
+.js-wedding-nav__items {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.18rem;
+  width: 100%;
+}
+
+.js-wedding-nav__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  min-height: 2.65rem;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(23, 19, 18, 0.62);
+  cursor: pointer;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.js-wedding-nav__item:hover {
+  color: var(--js-wine, #7a2332);
+  background: rgba(122, 35, 50, 0.06);
+}
+
+.js-wedding-nav__item:active {
+  transform: scale(0.97);
+}
+
+.js-wedding-nav__item.is-active {
+  color: var(--js-ivory, #fff9f2);
+  background: linear-gradient(145deg, #8f2e3f, #681b29);
+  box-shadow:
+    0 7px 18px rgba(122, 35, 50, 0.24),
+    inset 0 1px 0 rgba(255, 249, 242, 0.2);
+}
+
+.js-wedding-nav__item:focus-visible {
+  outline: 2px solid var(--js-wine, #7a2332);
+  outline-offset: 2px;
+}
+
+.js-wedding-nav__label,
+.js-wedding-nav__short-label {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.js-wedding-nav__short-label {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .js-wedding-nav {
+    top: auto;
+    bottom: max(0.7rem, env(safe-area-inset-bottom));
+    left: 0.5rem;
+    right: 0.5rem;
+    width: auto;
+  }
+
+  .js-wedding-nav__inner {
+    gap: 0;
+    padding: 0.35rem;
+    border-color: rgba(214, 191, 162, 0.68);
+    background: rgba(255, 249, 242, 0.94);
+    box-shadow:
+      0 16px 42px rgba(23, 19, 18, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  }
+
+  .js-wedding-nav__monogram {
+    display: none;
+  }
+
+  .js-wedding-nav__items {
+    gap: 0.1rem;
+  }
+
+  .js-wedding-nav__item {
+    min-width: 0;
+    min-height: 3.15rem;
+    flex-direction: column;
+    gap: 0.22rem;
+    padding: 0.38rem 0.12rem;
+  }
+
+  .js-wedding-nav__item svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .js-wedding-nav__label {
+    display: none;
+  }
+
+  .js-wedding-nav__short-label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: clamp(0.43rem, 2vw, 0.5rem);
+    letter-spacing: 0.08em;
+    text-overflow: ellipsis;
+  }
+}
+
+[data-render-profile="jessica-samuel-wedding"] .font-script {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+}
+
+[data-render-profile="jessica-samuel-wedding"] .font-body,
+[data-render-profile="jessica-samuel-wedding"] .font-sans {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+}
+
+.js-wedding-hero__transition {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  pointer-events: none;
+  line-height: 0;
+  /* cobre o hairline mobile entre hero e a sec??o champagne */
+  margin-bottom: -3px;
+}
+
+.js-wedding-hero__transition::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 6px;
+  background-color: var(--js-champagne, #f1e3cf);
+  z-index: 0;
+}
+
+.js-wedding-hero__feather {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* termina acima da base s?lida da curva ? evita linha preta no mobile */
+  bottom: clamp(36px, 5.5vw, 56px);
+  height: clamp(100px, 18vw, 168px);
+  background: linear-gradient(
+    180deg,
+    rgba(23, 19, 18, 0) 0%,
+    rgba(23, 19, 18, 0.22) 42%,
+    rgba(23, 19, 18, 0.5) 78%,
+    rgba(23, 19, 18, 0.72) 100%
+  );
+  z-index: 1;
+}
+
+.js-wedding-hero__curve {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: clamp(84px, 12vw, 128px);
+  transform: translateY(2px);
+}
+
+/* Hero nomes ? marfim + rosa antigo + linha vinho */
+.js-wedding-hero-intro__copy {
+  max-width: min(32rem, 92vw);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 3vh, 26px);
+}
+
+.js-wedding-hero-intro__eyebrow {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.65rem, 1.45vw, 0.76rem);
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--js-ivory, #fff9f2);
+  text-shadow: 0 1px 12px rgba(23, 19, 18, 0.45);
+}
+
+.js-wedding-hero-intro__names {
+  margin: 0;
+  padding: 0 0.5rem;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  max-width: min(96vw, 36rem);
+}
+
+.js-wedding-hero-intro__names-inner {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: clamp(0.1em, 2.2vw, 0.24em);
+  row-gap: 0.1em;
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.75rem, 11vw, 6rem);
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: var(--js-ivory, #fff9f2);
+  -webkit-text-fill-color: var(--js-ivory, #fff9f2);
+  text-shadow:
+    0 2px 6px rgba(23, 19, 18, 0.4),
+    0 1px 0 rgba(255, 249, 242, 0.12);
+}
+
+.js-wedding-hero-intro__names-part {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.js-wedding-hero-intro__names-amp {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: 0.4em;
+  line-height: 1;
+  display: inline-block;
+  padding: 0 0.02em;
+  opacity: 1;
+  flex-shrink: 0;
+  transform: translateY(0.26em);
+  color: var(--js-rose, #c9939b);
+  -webkit-text-fill-color: var(--js-rose, #c9939b);
+  text-shadow: 0 2px 10px rgba(23, 19, 18, 0.35);
+}
+
+.js-wedding-hero-intro__names::after {
+  content: "";
+  display: block;
+  width: min(88px, 26vw);
+  height: 1px;
+  margin: clamp(8px, 1.8vw, 14px) auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--js-wine, #7a2332),
+    transparent
+  );
+}
+
+.js-wedding-hero-intro__date {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.78rem, 1.75vw, 0.92rem);
+  font-weight: 300;
+  letter-spacing: 0.42em;
+  margin: 0;
+  padding-left: 0.42em;
+  color: var(--js-ivory, #fff9f2);
+  text-shadow: 0 1px 12px rgba(23, 19, 18, 0.4);
+}
+
+@media (max-width: 767px) {
+  .js-wedding-hero-intro__names {
+    max-width: 100%;
+    padding: 0 clamp(10px, 4vw, 18px);
+  }
+
+  .js-wedding-hero-intro__names-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: clamp(0.55rem, 3.2vh, 1.15rem);
+    column-gap: 0;
+    font-size: clamp(3.1rem, 14vw, 4.35rem);
+    line-height: 1.06;
+    width: 100%;
+  }
+
+  .js-wedding-hero-intro__names-part {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.02;
+    max-width: 92vw;
+  }
+
+  .js-wedding-hero-intro__names-amp {
+    transform: none;
+    font-size: 0.5em;
+    line-height: 1;
+    padding: clamp(0.2rem, 1.4vh, 0.55rem) 0;
+  }
+
+  .js-wedding-hero-intro__names::after {
+    margin-top: clamp(14px, 2.8vh, 20px);
+    width: min(104px, 34vw);
+  }
+
+  .js-wedding-hero-intro__date {
+    margin-top: clamp(6px, 1.2vh, 10px);
+    letter-spacing: 0.34em;
+    font-size: clamp(0.8rem, 3.4vw, 0.9rem);
+  }
+}
+
+/* Capa editorial ? v?u que se ergue */
+.js-wedding-cover {
+  background-color: var(--js-ink, #171312);
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-wedding-cover__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.js-wedding-cover__img {
+  object-fit: cover;
+  object-position: center 22%;
+  filter: contrast(1.06) saturate(0.88) brightness(0.92);
+  transform: scale(1.02);
+}
+
+.js-wedding-cover__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(23, 19, 18, 0.55) 0%,
+      rgba(23, 19, 18, 0.18) 28%,
+      rgba(23, 19, 18, 0.12) 48%,
+      rgba(23, 19, 18, 0.55) 72%,
+      rgba(23, 19, 18, 0.88) 100%
+    ),
+    radial-gradient(
+      ellipse 70% 50% at 50% 42%,
+      transparent 0%,
+      rgba(23, 19, 18, 0.28) 100%
+    );
+}
+
+.js-wedding-cover__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+.js-wedding-cover__stage {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  min-height: 100dvh;
+  align-items: flex-end;
+  justify-content: center;
+  padding:
+    max(1.5rem, env(safe-area-inset-top))
+    clamp(1.35rem, 5vw, 2rem)
+    max(1.75rem, env(safe-area-inset-bottom))
+    clamp(1.35rem, 5vw, 2rem);
+}
+
+.js-wedding-cover__content {
+  width: min(100%, 26rem);
+  text-align: center;
+  padding-bottom: clamp(0.5rem, 2vh, 1.25rem);
+}
+
+.js-wedding-cover__monogram {
+  margin: 0 0 1.1rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.62rem, 2vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.72);
+}
+
+.js-wedding-cover__title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.2rem, 1.2vh, 0.45rem);
+}
+
+.js-wedding-cover__name {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.65rem, 10vw, 3.85rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: var(--js-ivory, #fff9f2);
+  -webkit-text-fill-color: var(--js-ivory, #fff9f2);
+  text-shadow:
+    0 2px 6px rgba(23, 19, 18, 0.4),
+    0 1px 0 rgba(255, 249, 242, 0.12);
+}
+
+.js-wedding-cover__amp {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(1.35rem, 5vw, 1.85rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--js-rose, #c9939b);
+  -webkit-text-fill-color: var(--js-rose, #c9939b);
+  text-shadow: 0 2px 10px rgba(23, 19, 18, 0.35);
+}
+
+.js-wedding-cover__rule {
+  width: 4.5rem;
+  height: 1px;
+  margin: 1.35rem auto 1.15rem;
+  transform-origin: center;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 249, 242, 0.55),
+    transparent
+  );
+}
+
+.js-wedding-cover__whisper {
+  margin: 0 0 1rem;
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(1.65rem, 5.5vw, 2.15rem);
+  line-height: 1.25;
+  color: rgba(255, 249, 242, 0.92);
+  text-shadow: 0 2px 18px rgba(23, 19, 18, 0.35);
+}
+
+.js-wedding-cover__meta {
+  margin: 0 0 1.75rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.62rem, 2vw, 0.7rem);
+  font-weight: 500;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.62);
+}
+
+.js-wedding-cover__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.15rem;
+  padding: 0.95rem 1.85rem;
+  border: 1px solid rgba(255, 249, 242, 0.28);
+  border-radius: 14px;
+  background:
+    linear-gradient(168deg, #8f2e3f 0%, var(--js-wine, #7a2332) 55%, #5c1a26 100%);
+  color: var(--js-ivory, #fff9f2);
+  cursor: pointer;
+  box-shadow:
+    0 14px 36px rgba(23, 19, 18, 0.35),
+    0 0 0 1px rgba(201, 147, 155, 0.18),
+    inset 0 1px 0 rgba(255, 249, 242, 0.22);
+  transition:
+    opacity 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.js-wedding-cover__cta:disabled {
+  opacity: 0.78;
+  cursor: wait;
+}
+
+.js-wedding-cover__cta:focus-visible {
+  outline: 2px solid var(--js-rose, #c9939b);
+  outline-offset: 4px;
+}
+
+.js-wedding-cover__cta-label {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.js-wedding-cover__brand {
+  margin: 1.65rem 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.38);
+}
+
+@media (min-width: 768px) {
+  .js-wedding-cover__stage {
+    align-items: center;
+    padding-block: clamp(2rem, 6vh, 4rem);
+  }
+
+  .js-wedding-cover__content {
+    width: min(100%, 30rem);
+    padding:
+      clamp(2rem, 4vh, 3rem)
+      clamp(1.75rem, 3vw, 2.5rem);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 249, 242, 0.16);
+    background: linear-gradient(
+      165deg,
+      rgba(23, 19, 18, 0.42) 0%,
+      rgba(23, 19, 18, 0.22) 100%
+    );
+    box-shadow:
+      0 28px 64px rgba(23, 19, 18, 0.28),
+      inset 0 1px 0 rgba(255, 249, 242, 0.14);
+    backdrop-filter: blur(6px);
+  }
+
+  .js-wedding-cover__img {
+    object-position: center 28%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-wedding-cover__content {
+    border-radius: 36px;
+    width: min(100%, 32rem);
+  }
+
+  .js-wedding-cover__name {
+    font-size: clamp(3.1rem, 4.6vw, 4.1rem);
+  }
+
+  .js-wedding-cover__amp {
+    font-size: clamp(1.55rem, 2.2vw, 1.95rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-cover__cta,
+  .js-wedding-cover__img {
+    transition: none !important;
+  }
+}
+
+/* Dress code editorial ? traje de gala */
+.js-dress-code__lead {
+  margin: 0.85rem auto 0;
+  max-width: 34rem;
+  text-align: center;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.92rem, 2.2vw, 1.02rem);
+  font-weight: 300;
+  line-height: 1.65;
+  color: rgba(23, 19, 18, 0.68);
+}
+
+.js-dress-code__inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.js-dress-code__prologue {
+  margin: 0 auto;
+  max-width: 36rem;
+  text-align: center;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.1rem, 2.8vw, 1.3rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(255, 249, 242, 0.88);
+}
+
+.js-dress-code__columns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 2.75rem);
+}
+
+.js-dress-code__column-head {
+  text-align: center;
+  margin-bottom: 1.15rem;
+}
+
+.js-dress-code__column-eyebrow {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--js-rose, #c9939b);
+}
+
+.js-dress-code__column-line {
+  margin: 0 auto;
+  max-width: 22rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.05rem, 2.6vw, 1.2rem);
+  font-style: italic;
+  line-height: 1.45;
+  color: rgba(255, 249, 242, 0.86);
+}
+
+.js-dress-code__her-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+}
+
+.js-dress-code__her-grid > :first-child {
+  grid-row: 1 / 3;
+}
+
+.js-dress-code__her-grid > :first-child .js-dress-code__frame {
+  height: 100%;
+}
+
+.js-dress-code__her-grid > :first-child .js-dress-code__media {
+  height: 100%;
+  min-height: 0;
+}
+
+.js-dress-code__him-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.js-dress-code__frame {
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.js-dress-code__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 249, 242, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(201, 147, 155, 0.18),
+    0 16px 36px rgba(23, 19, 18, 0.22);
+}
+
+.js-dress-code__frame--featured .js-dress-code__media {
+  aspect-ratio: 3 / 4.2;
+  height: 100%;
+  min-height: 100%;
+}
+
+.js-dress-code__img {
+  object-fit: cover;
+  object-position: center 12%;
+  transform: scale(1.02);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: contrast(1.04) saturate(0.94) brightness(1.01);
+}
+
+.js-dress-code__frame:hover .js-dress-code__img {
+  transform: scale(1.06);
+}
+
+.js-dress-code__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 55%,
+    rgba(23, 19, 18, 0.22) 100%
+  );
+}
+
+.js-dress-code__caption {
+  text-align: center;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.58);
+}
+
+@media (min-width: 768px) {
+  .js-dress-code__columns {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+
+  .js-dress-code__column-head {
+    text-align: left;
+    margin-bottom: 1.35rem;
+  }
+
+  .js-dress-code__column-line {
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .js-dress-code__her-grid {
+    gap: 0.9rem;
+  }
+
+  .js-dress-code__him-grid {
+    gap: 0.9rem;
+  }
+
+  .js-dress-code__media {
+    border-radius: 22px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-dress-code__prologue {
+    max-width: 40rem;
+  }
+
+  .js-dress-code__columns {
+    gap: 2.75rem;
+  }
+
+  .js-dress-code__media {
+    border-radius: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-dress-code__img,
+  .js-dress-code__frame:hover .js-dress-code__img {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+.js-wedding-quote-section__inner {
+  max-width: min(40rem, 92vw);
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.25rem, 3vh, 1.75rem);
+}
+
+.js-wedding-quote-section__title {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.75rem, 9vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: var(--js-wine, #7a2332);
+  margin: 0;
+}
+
+.js-wedding-quote-section__body {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.95rem, 2vw, 1.125rem);
+  font-weight: 300;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  color: var(--js-ink-soft, rgba(23, 19, 18, 0.72));
+  margin: 0;
+  max-width: 34rem;
+}
+
+.js-wedding-quote-section__attribution {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.68rem, 1.4vw, 0.78rem);
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--js-rose, #c9939b);
+  margin: clamp(0.25rem, 1vh, 0.5rem) 0 0;
+}
+
+.js-wedding-quote-section__divider {
+  width: min(72px, 18vw);
+  height: 1px;
+  margin-top: clamp(0.25rem, 1vh, 0.5rem);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--js-champagne-deep, #d6bfa2),
+    transparent
+  );
+}
+
+.js-wedding-editorial-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.js-wedding-editorial-heading--center {
+  text-align: center;
+  align-items: center;
+}
+
+.js-wedding-editorial-heading--left {
+  text-align: left;
+  align-items: flex-start;
+}
+
+.js-wedding-editorial-heading__eyebrow {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.62rem, 1.3vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+  margin: 0 0 clamp(0.5rem, 1.5vh, 0.75rem);
+}
+
+.js-wedding-editorial-heading__title {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.35rem, 7.5vw, 3.65rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  color: var(--js-ink, #171312);
+  margin: 0;
+}
+
+.js-wedding-editorial-heading__title--light {
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-wedding-editorial-heading__title--compact {
+  font-size: clamp(2rem, 6.5vw, 3rem);
+}
+
+.js-wedding-editorial-heading__divider {
+  width: min(72px, 18vw);
+  height: 1px;
+  margin-top: clamp(0.65rem, 1.5vh, 0.85rem);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--js-champagne-deep, #d6bfa2),
+    transparent
+  );
+}
+
+.js-wedding-editorial-heading--left .js-wedding-editorial-heading__divider {
+  margin-left: 0;
+  margin-right: auto;
+  background: linear-gradient(
+    90deg,
+    var(--js-champagne-deep, #d6bfa2),
+    transparent
+  );
+}
+
+.js-wedding-editorial-heading--on-wine .js-wedding-editorial-heading__eyebrow {
+  color: var(--js-rose, #c9939b);
+}
+
+.js-wedding-editorial-heading--on-wine .js-wedding-editorial-heading__title {
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-wedding-editorial-heading--on-wine .js-wedding-editorial-heading__divider {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 249, 242, 0.45),
+    transparent
+  );
+}
+
+/* Uni?o das Fam?lias ? card + foto central (layout convitevf-2026)
+   Desktop: mesmo ritmo do Jaime & Let?cia ? container min(92%, 1180px), card 100% nele */
+.js-wedding-couple-section {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--js-champagne, #f1e3cf);
+  padding-inline: 0;
+}
+
+.js-wedding-couple-section__shell {
+  /* mobile-first: quase full-bleed; desktop = container Jaime & Let?cia */
+  width: min(92%, 1180px);
+  max-width: none;
+  margin-inline: auto;
+  padding-inline: 16px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .js-wedding-couple-section__shell {
+    padding-inline: 20px;
+  }
+}
+
+.js-wedding-couple-section::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  transform: translateX(-50%);
+  width: min(90%, 720px);
+  height: 320px;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(122, 35, 50, 0.1),
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+.js-wedding-couple-section__title {
+  position: relative;
+  z-index: 1;
+  margin-bottom: clamp(28px, 4vw, 40px);
+}
+
+.js-wedding-couple-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.14) 0%, transparent 42%),
+    linear-gradient(
+      168deg,
+      #8f2e3f 0%,
+      #7a2332 22%,
+      #6b1e2c 48%,
+      #7a2332 78%,
+      #5c1a26 100%
+    );
+  color: rgba(255, 249, 242, 0.98);
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.04),
+    0 28px 64px rgba(23, 19, 18, 0.12),
+    0 12px 32px rgba(122, 35, 50, 0.35),
+    inset 0 1px 0 rgba(255, 249, 242, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 249, 242, 0.22);
+}
+
+@media (min-width: 768px) {
+  .js-wedding-couple-wrap {
+    border-radius: 44px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-wedding-couple-wrap {
+    border-radius: 52px;
+  }
+}
+
+.js-wedding-couple-wrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 249, 242, 0.28) 25%,
+    rgba(255, 249, 242, 0.5) 50%,
+    rgba(255, 249, 242, 0.28) 75%,
+    transparent 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.js-wedding-couple-wrap::after {
+  content: "";
+  position: absolute;
+  top: -35%;
+  right: -25%;
+  width: 58%;
+  height: 85%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 249, 242, 0.1) 0%,
+    transparent 68%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.js-wedding-couple-wrap__inner {
+  position: relative;
+  z-index: 1;
+  padding: clamp(36px, 5vw, 64px) clamp(18px, 4vw, 48px);
+}
+
+@media (min-width: 1024px) {
+  .js-wedding-couple-wrap__inner {
+    padding: clamp(48px, 5.5vw, 72px) clamp(36px, 5vw, 72px);
+  }
+}
+
+.js-wedding-couple-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+  align-items: center;
+  text-align: center;
+}
+
+@media (min-width: 981px) {
+  .js-wedding-couple-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(148px, 240px) minmax(0, 1fr);
+    gap: clamp(28px, 4.5vw, 56px);
+  }
+}
+
+.js-wedding-couple-card {
+  position: relative;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.js-wedding-couple-card__name {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.1rem, 4.6vw, 3.1rem);
+  margin: 0 0 4px;
+  font-weight: 400;
+  line-height: 1.15;
+  white-space: nowrap;
+  color: var(--js-ivory, #fff9f2);
+  text-shadow:
+    0 1px 0 rgba(255, 249, 242, 0.2),
+    0 4px 24px rgba(23, 19, 18, 0.18);
+}
+
+.js-wedding-couple-card__name::after {
+  content: "";
+  display: block;
+  width: min(72px, 40%);
+  height: 1px;
+  margin: 18px auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 249, 242, 0.55),
+    transparent
+  );
+}
+
+.js-wedding-couple-card__lineage {
+  margin: 20px 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.84rem, 1.55vw, 0.98rem);
+  font-weight: 300;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  color: rgba(255, 249, 242, 0.94);
+  max-width: 20rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.js-wedding-couple-card__amp {
+  display: inline-block;
+  padding: 0 0.1em;
+  font-weight: 500;
+  font-size: 0.95em;
+  opacity: 0.98;
+  color: var(--js-rose, #c9939b);
+}
+
+.js-wedding-couple-photo-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.js-wedding-couple-photo {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  max-width: 208px;
+  aspect-ratio: 2 / 5;
+  max-height: min(540px, 58vh);
+  border-radius: 22px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 249, 242, 0.95);
+  box-shadow:
+    0 0 0 1px rgba(201, 147, 155, 0.35),
+    0 20px 48px rgba(23, 19, 18, 0.22),
+    0 8px 20px rgba(23, 19, 18, 0.12),
+    inset 0 0 0 1px rgba(255, 249, 242, 0.12);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.55s ease;
+}
+
+.js-wedding-couple-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 249, 242, 0.14);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.js-wedding-couple-wrap:hover .js-wedding-couple-photo {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow:
+    0 0 0 1px rgba(255, 249, 242, 0.2),
+    0 28px 56px rgba(23, 19, 18, 0.24),
+    0 12px 28px rgba(23, 19, 18, 0.14),
+    inset 0 0 0 1px rgba(255, 249, 242, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-couple-wrap:hover .js-wedding-couple-photo {
+    transform: none;
+  }
+}
+
+.js-wedding-couple-photo__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 12%;
+  display: block;
+}
+
+@media (max-width: 980px) {
+  .js-wedding-couple-wrap {
+    border-radius: 28px;
+  }
+
+  .js-wedding-couple-wrap__inner {
+    padding: 32px 18px;
+  }
+
+  .js-wedding-couple-photo-column {
+    order: -1;
+    min-height: 0;
+  }
+
+  .js-wedding-couple-photo {
+    max-width: min(220px, 68vw);
+    max-height: 380px;
+    margin: 0 auto;
+  }
+
+  .js-wedding-couple-card__name {
+    font-size: clamp(1.85rem, 8.5vw, 2.6rem);
+  }
+}
+
+@media (max-width: 380px) {
+  .js-wedding-couple-card__name {
+    white-space: normal;
+  }
+}
+
+/* Galeria editorial ? cart?o-joia (jornada em cap?tulos) */
+.js-gallery-card-section .js-gallery-card__lead {
+  margin: 0.85rem auto 0;
+  max-width: 28rem;
+  text-align: center;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.9rem, 2.2vw, 1rem);
+  font-weight: 300;
+  line-height: 1.65;
+  color: rgba(23, 19, 18, 0.68);
+}
+
+.js-gallery-card__inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 5vw, 3rem);
+}
+
+.js-gallery-card__prologue {
+  text-align: center;
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.js-gallery-card__prologue-eyebrow {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.62);
+}
+
+.js-gallery-card__prologue-text {
+  margin: 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.05rem, 2.8vw, 1.25rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgba(255, 249, 242, 0.88);
+}
+
+.js-gallery-card__journey {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 2.75rem);
+}
+
+.js-gallery-card__chapter {
+  margin: 0;
+  display: grid;
+  gap: 0.95rem;
+}
+
+.js-gallery-card__media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  aspect-ratio: 4 / 5;
+  border: 1px solid rgba(255, 249, 242, 0.28);
+  box-shadow:
+    0 0 0 1px rgba(201, 147, 155, 0.18),
+    0 18px 40px rgba(23, 19, 18, 0.22);
+}
+
+.js-gallery-card__chapter--feature .js-gallery-card__media {
+  aspect-ratio: 3 / 4;
+}
+
+.js-gallery-card__img {
+  object-fit: cover;
+  object-position: center 16%;
+  transform: scale(1.02);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: contrast(1.04) saturate(0.92) brightness(1.02);
+}
+
+.js-gallery-card__chapter:hover .js-gallery-card__img {
+  transform: scale(1.05);
+}
+
+.js-gallery-card__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 48%,
+    rgba(23, 19, 18, 0.28) 100%
+  );
+}
+
+.js-gallery-card__caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  text-align: center;
+  padding-inline: 0.5rem;
+}
+
+.js-gallery-card__roman {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--js-rose, #c9939b);
+}
+
+.js-gallery-card__title {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(1.85rem, 5vw, 2.35rem);
+  line-height: 1.15;
+  color: var(--js-ivory, #fff9f2);
+  text-shadow: 0 2px 18px rgba(23, 19, 18, 0.2);
+}
+
+.js-gallery-card__line {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.95rem, 2.4vw, 1.08rem);
+  font-style: italic;
+  color: rgba(255, 249, 242, 0.72);
+}
+
+.js-gallery-card__epilogue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding-top: 0.35rem;
+}
+
+.js-gallery-card__epilogue-rule {
+  display: block;
+  width: min(88px, 40%);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 249, 242, 0.5),
+    transparent
+  );
+}
+
+.js-gallery-card__epilogue-text {
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.62);
+}
+
+@media (min-width: 768px) {
+  .js-gallery-card__journey {
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 3vw, 2rem) clamp(1.25rem, 2.5vw, 1.75rem);
+    align-items: start;
+  }
+
+  .js-gallery-card__chapter--feature {
+    grid-column: 1 / -1;
+    max-width: 28rem;
+    margin-inline: auto;
+  }
+
+  .js-gallery-card__chapter--closing {
+    grid-column: 1 / -1;
+    max-width: 24rem;
+    margin-inline: auto;
+  }
+
+  .js-gallery-card__chapter--pair-b {
+    margin-top: 2.5rem;
+  }
+
+  .js-gallery-card__media {
+    border-radius: 22px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-gallery-card__journey {
+    grid-template-columns: 1.1fr 0.9fr;
+    column-gap: clamp(1.75rem, 3vw, 2.75rem);
+  }
+
+  .js-gallery-card__chapter--feature {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .js-gallery-card__chapter--feature .js-gallery-card__media {
+    aspect-ratio: 2 / 3;
+    min-height: 28rem;
+  }
+
+  .js-gallery-card__chapter--pair {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .js-gallery-card__chapter--pair-b {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 0;
+  }
+
+  .js-gallery-card__chapter--closing {
+    grid-column: 1 / -1;
+    max-width: 22rem;
+    justify-self: center;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-gallery-card__img,
+  .js-gallery-card__chapter:hover .js-gallery-card__img {
+    transition: none;
+    transform: scale(1.02);
+  }
+}
+
+/* Itiner?rio ? ?O nosso dia? (mobile-first, coluna ?nica) */
+.js-wedding-itinerary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.js-wedding-itinerary__item {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  column-gap: 1.15rem;
+  align-items: stretch;
+}
+
+.js-wedding-itinerary__rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.35rem;
+}
+
+.js-wedding-itinerary__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background-color: var(--js-wine, #7a2332);
+  box-shadow: 0 0 0 3px rgba(122, 35, 50, 0.12);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.js-wedding-itinerary__line {
+  flex: 1;
+  width: 1px;
+  min-height: 2.5rem;
+  margin-top: 0.45rem;
+  background-color: var(--js-champagne-deep, #d6bfa2);
+}
+
+.js-wedding-itinerary__content {
+  padding-bottom: clamp(1.75rem, 4.5vw, 2.35rem);
+}
+
+.js-wedding-itinerary__item--last .js-wedding-itinerary__content {
+  padding-bottom: 0;
+}
+
+.js-wedding-itinerary__time {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.78rem, 2.4vw, 0.88rem);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-wedding-itinerary__title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.35rem, 4.2vw, 1.65rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  color: var(--js-ink, #171312);
+}
+
+.js-wedding-itinerary__location {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.88rem, 2.6vw, 0.98rem);
+  font-weight: 300;
+  line-height: 1.55;
+  color: rgba(23, 19, 18, 0.62);
+}
+
+.js-wedding-itinerary__note {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.95rem, 2.8vw, 1.05rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--js-rose, #c9939b);
+}
+
+.js-wedding-itinerary__maps {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid var(--js-champagne-deep, #d6bfa2);
+  background-color: var(--js-ivory, #fff9f2);
+  color: var(--js-ink, #171312);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease;
+}
+
+.js-wedding-itinerary__maps:hover {
+  background-color: var(--js-wine, #7a2332);
+  border-color: var(--js-wine, #7a2332);
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-wedding-itinerary__maps:focus-visible {
+  outline: 2px solid var(--js-wine, #7a2332);
+  outline-offset: 3px;
+}
+
+/* Guia da Celebra??o ? cart?es + pain?is editoriais */
+.js-celeb-guide__dev-note {
+  margin: 0 auto 1.5rem;
+  max-width: 36rem;
+  text-align: center;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: rgba(122, 35, 50, 0.72);
+}
+
+.js-celeb-guide__section-eyebrow {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__section-title {
+  margin: 0 auto;
+  max-width: 18ch;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.85rem, 5.5vw, 2.85rem);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: 0.01em;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__section-rule {
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  margin: 1.1rem auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--js-champagne-deep, #d6bfa2),
+    transparent
+  );
+}
+
+.js-celeb-guide__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+}
+
+.js-celeb-guide__grid--single {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.js-celeb-guide__gallery {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.js-celeb-guide__gallery-frame {
+  margin: 0;
+}
+
+.js-celeb-guide__gallery-media {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(23, 19, 18, 0.06);
+}
+
+.js-celeb-guide__gallery-img {
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.js-celeb-guide__gallery-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.85rem;
+  padding-inline: 0.15rem;
+}
+
+.js-celeb-guide__gallery-chapter {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__gallery-name {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__gallery-line {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 0.98rem;
+  font-style: italic;
+  color: rgba(23, 19, 18, 0.58);
+}
+
+.js-celeb-guide__card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  width: 100%;
+  min-height: 22rem;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 249, 242, 0.22);
+  color: rgba(255, 249, 242, 0.98);
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.04),
+    0 28px 64px rgba(23, 19, 18, 0.12),
+    0 12px 32px rgba(122, 35, 50, 0.28),
+    inset 0 1px 0 rgba(255, 249, 242, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
+}
+
+.js-celeb-guide__card--static {
+  cursor: default;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+.js-celeb-guide__card--static:hover,
+.js-celeb-guide__card--static:focus-visible {
+  transform: none;
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.04),
+    0 28px 64px rgba(23, 19, 18, 0.12),
+    0 12px 32px rgba(122, 35, 50, 0.28),
+    inset 0 1px 0 rgba(255, 249, 242, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.js-celeb-guide__card--static:hover .js-celeb-guide__card-img,
+.js-celeb-guide__card--static:focus-visible .js-celeb-guide__card-img {
+  transform: scale(1.03);
+}
+
+.js-celeb-guide__card--static:hover .js-celeb-guide__card-rule,
+.js-celeb-guide__card--static:focus-visible .js-celeb-guide__card-rule {
+  width: min(72px, 40%);
+}
+
+.js-celeb-guide__card--wine {
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.14) 0%, transparent 42%),
+    linear-gradient(
+      168deg,
+      #8f2e3f 0%,
+      #7a2332 22%,
+      #6b1e2c 48%,
+      #7a2332 78%,
+      #5c1a26 100%
+    );
+}
+
+.js-celeb-guide__card--ivory {
+  border-color: rgba(214, 191, 162, 0.55);
+  color: var(--js-ink, #171312);
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.55) 0%, transparent 48%),
+    linear-gradient(
+      168deg,
+      #fff9f2 0%,
+      #f1e3cf 42%,
+      #e8d5bb 100%
+    );
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.03),
+    0 24px 56px rgba(23, 19, 18, 0.1),
+    0 10px 28px rgba(122, 35, 50, 0.12),
+    inset 0 1px 0 rgba(255, 249, 242, 0.85);
+}
+
+.js-celeb-guide__card-shine {
+  position: absolute;
+  top: -35%;
+  right: -25%;
+  width: 58%;
+  height: 85%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 249, 242, 0.12) 0%,
+    transparent 68%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.js-celeb-guide__card--ivory .js-celeb-guide__card-shine {
+  background: radial-gradient(
+    circle,
+    rgba(122, 35, 50, 0.08) 0%,
+    transparent 68%
+  );
+}
+
+.js-celeb-guide__card-hairline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 249, 242, 0.28) 25%,
+    rgba(255, 249, 242, 0.5) 50%,
+    rgba(255, 249, 242, 0.28) 75%,
+    transparent 100%
+  );
+  z-index: 3;
+  pointer-events: none;
+}
+
+.js-celeb-guide__card--ivory .js-celeb-guide__card-hairline {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(122, 35, 50, 0.18) 25%,
+    rgba(122, 35, 50, 0.42) 50%,
+    rgba(122, 35, 50, 0.18) 75%,
+    transparent 100%
+  );
+}
+
+.js-celeb-guide__card-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.js-celeb-guide__card-parallax {
+  position: absolute;
+  inset: -10% 0;
+  display: block;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-celeb-guide__card-parallax {
+    will-change: auto;
+    inset: 0;
+  }
+}
+
+.js-celeb-guide__card-img {
+  object-fit: cover;
+  object-position: center 22%;
+  transform: scale(1.03);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0.42;
+}
+
+.js-celeb-guide__card-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(241, 227, 207, 0.35) 0%,
+    rgba(241, 227, 207, 0.72) 42%,
+    rgba(255, 249, 242, 0.94) 100%
+  );
+}
+
+.js-celeb-guide__card-img--wine {
+  object-position: center 28%;
+  opacity: 0.32;
+}
+
+.js-celeb-guide__card-veil--wine {
+  background: linear-gradient(
+    165deg,
+    rgba(58, 14, 22, 0.78) 0%,
+    rgba(92, 26, 38, 0.86) 28%,
+    rgba(74, 18, 28, 0.93) 62%,
+    rgba(48, 10, 16, 0.97) 100%
+  );
+}
+
+.js-celeb-guide__card--has-media.js-celeb-guide__card--wine {
+  background: #3a0e16;
+}
+
+.js-celeb-guide__card--has-media.js-celeb-guide__card--wine .js-celeb-guide__card-eyebrow {
+  color: rgba(255, 249, 242, 0.9);
+  text-shadow: 0 1px 10px rgba(23, 19, 18, 0.45);
+}
+
+.js-celeb-guide__card--has-media.js-celeb-guide__card--wine .js-celeb-guide__card-title {
+  color: #fff9f2;
+  text-shadow:
+    0 1px 0 rgba(255, 249, 242, 0.2),
+    0 2px 18px rgba(23, 19, 18, 0.55);
+}
+
+.js-celeb-guide__card--has-media.js-celeb-guide__card--wine .js-celeb-guide__card-desc {
+  color: rgba(255, 249, 242, 0.92);
+  text-shadow: 0 1px 12px rgba(23, 19, 18, 0.4);
+}
+
+.js-celeb-guide__card--has-media.js-celeb-guide__card--wine .js-celeb-guide__card-rule {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 249, 242, 0.75),
+    transparent
+  );
+}
+
+.js-celeb-guide__card-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: clamp(1.75rem, 4vw, 2.35rem);
+  max-width: 26rem;
+}
+
+.js-celeb-guide__card-body--full {
+  max-width: none;
+  width: 100%;
+  gap: 0.75rem;
+}
+
+.js-celeb-guide__card-body--full .js-celeb-guide__timeline {
+  width: 100%;
+  margin-top: 0.85rem;
+}
+
+.js-celeb-guide__card-body--full .js-celeb-guide__gift-editorial {
+  width: 100%;
+  margin-top: 0.95rem;
+}
+
+.js-celeb-guide__card-eyebrow {
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.72);
+}
+
+.js-celeb-guide__card--ivory .js-celeb-guide__card-eyebrow {
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__card-title {
+  margin: 0;
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.15rem, 5.5vw, 2.85rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--js-ivory, #fff9f2);
+  text-shadow:
+    0 1px 0 rgba(255, 249, 242, 0.16),
+    0 4px 24px rgba(23, 19, 18, 0.18);
+}
+
+.js-celeb-guide__card--ivory .js-celeb-guide__card-title {
+  color: var(--js-ink, #171312);
+  text-shadow: none;
+}
+
+.js-celeb-guide__card-rule {
+  display: block;
+  width: min(72px, 40%);
+  height: 1px;
+  margin: 0.15rem 0 0.2rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 249, 242, 0.55),
+    transparent
+  );
+}
+
+.js-celeb-guide__card--ivory .js-celeb-guide__card-rule {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(122, 35, 50, 0.45),
+    transparent
+  );
+}
+
+.js-celeb-guide__card:hover .js-celeb-guide__card-rule,
+.js-celeb-guide__card:focus-visible .js-celeb-guide__card-rule {
+  width: min(110px, 55%);
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-celeb-guide__card:hover,
+.js-celeb-guide__card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.04),
+    0 32px 72px rgba(23, 19, 18, 0.16),
+    0 16px 36px rgba(122, 35, 50, 0.32),
+    inset 0 1px 0 rgba(255, 249, 242, 0.28);
+}
+
+.js-celeb-guide__card:hover .js-celeb-guide__card-img,
+.js-celeb-guide__card:focus-visible .js-celeb-guide__card-img {
+  transform: scale(1.08);
+}
+
+.js-celeb-guide__card-desc {
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.88rem, 2.2vw, 0.98rem);
+  font-weight: 300;
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+  color: rgba(255, 249, 242, 0.88);
+}
+
+.js-celeb-guide__card--ivory .js-celeb-guide__card-desc {
+  color: rgba(23, 19, 18, 0.72);
+}
+
+.js-celeb-guide__card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 2.75rem;
+  margin-top: 0.35rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: inherit;
+}
+
+.js-celeb-guide__card--wine .js-celeb-guide__card-cta {
+  color: var(--js-rose, #c9939b);
+}
+
+.js-celeb-guide__card--ivory .js-celeb-guide__card-cta {
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__card:focus-visible {
+  outline: 2px solid var(--js-rose, #c9939b);
+  outline-offset: 4px;
+}
+
+.js-celeb-guide__card-arrow {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-celeb-guide__card:hover .js-celeb-guide__card-arrow,
+.js-celeb-guide__card:focus-visible .js-celeb-guide__card-arrow {
+  transform: translateX(5px);
+}
+
+.js-celeb-guide__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.js-celeb-guide__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(23, 19, 18, 0.48);
+  cursor: pointer;
+}
+
+.js-celeb-guide__dialog {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: min(94svh, 100%);
+  margin: 0;
+  background: var(--js-ivory, #fff9f2);
+  color: var(--js-ink, #171312);
+  border: 1px solid var(--js-champagne-deep, #d6bfa2);
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.js-celeb-guide__dialog-chrome {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.85rem 1rem 0.35rem;
+  padding-top: max(0.85rem, env(safe-area-inset-top, 0px));
+  background: var(--js-ivory, #fff9f2);
+}
+
+.js-celeb-guide__close {
+  min-height: 2.5rem;
+  padding: 0.35rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: rgba(23, 19, 18, 0.65);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.js-celeb-guide__close:focus-visible {
+  outline: 2px solid var(--js-wine, #7a2332);
+  outline-offset: 3px;
+}
+
+.js-celeb-guide__dialog-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.js-celeb-guide__dialog-inner {
+  padding: 0.5rem 1.35rem 2.5rem;
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.js-celeb-guide__panel-eyebrow {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(23, 19, 18, 0.5);
+}
+
+.js-celeb-guide__panel-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2rem, 7vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__panel-lead {
+  margin: 0 0 2rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(23, 19, 18, 0.68);
+}
+
+.js-celeb-guide__timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.js-celeb-guide__timeline-item {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr);
+  column-gap: 1.15rem;
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-item {
+  grid-template-columns: 2.35rem minmax(0, 1fr);
+  column-gap: 1.05rem;
+  padding-block: 0.15rem;
+}
+
+.js-celeb-guide__timeline-rail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.4rem;
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-rail {
+  padding-top: 0.15rem;
+}
+
+.js-celeb-guide__timeline-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--js-rose, #c9939b);
+  box-shadow: 0 0 0 3px rgba(201, 147, 155, 0.18);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.js-celeb-guide__timeline-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex-shrink: 0;
+  z-index: 1;
+  border-radius: 999px;
+  color: #fff9f2;
+  background:
+    linear-gradient(145deg, rgba(255, 249, 242, 0.18) 0%, rgba(255, 249, 242, 0.06) 100%);
+  border: 1px solid rgba(255, 249, 242, 0.42);
+  box-shadow:
+    0 0 0 4px rgba(255, 249, 242, 0.06),
+    inset 0 1px 0 rgba(255, 249, 242, 0.22);
+  backdrop-filter: blur(6px);
+}
+
+.js-celeb-guide__timeline-line {
+  flex: 1;
+  width: 1px;
+  min-height: 2.75rem;
+  margin-top: 0.45rem;
+  background: var(--js-champagne-deep, #d6bfa2);
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-line {
+  min-height: 2.4rem;
+  margin-top: 0.55rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 249, 242, 0.45) 0%,
+    rgba(255, 249, 242, 0.12) 100%
+  );
+}
+
+.js-celeb-guide__timeline-body {
+  padding-bottom: 1.85rem;
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-body {
+  padding-bottom: 1.55rem;
+  padding-top: 0.12rem;
+}
+
+.js-celeb-guide__timeline-item.is-last .js-celeb-guide__timeline-body {
+  padding-bottom: 0.35rem;
+}
+
+.js-celeb-guide__timeline-time {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-time {
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+  opacity: 0.95;
+}
+
+.js-celeb-guide__timeline-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.35rem, 4vw, 1.6rem);
+  font-weight: 400;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-title {
+  font-size: clamp(1.28rem, 3.4vw, 1.52rem);
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  margin-bottom: 0.45rem;
+}
+
+.js-celeb-guide__timeline-place-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.1rem;
+}
+
+.js-celeb-guide__timeline-pin {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  color: rgba(255, 249, 242, 0.72);
+}
+
+.js-celeb-guide__timeline-place {
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(23, 19, 18, 0.58);
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-place {
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+}
+
+.js-celeb-guide__timeline-note {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--js-rose, #c9939b);
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-note {
+  margin-top: 0.55rem;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+  color: #f0d0d6;
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-dot {
+  background: #fff9f2;
+  box-shadow: 0 0 0 3px rgba(255, 249, 242, 0.22);
+}
+
+.js-celeb-guide__timeline--on-wine:not(.js-celeb-guide__timeline--editorial)
+  .js-celeb-guide__timeline-line {
+  background: rgba(255, 249, 242, 0.42);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-time {
+  color: rgba(255, 249, 242, 0.9);
+  text-shadow: 0 1px 8px rgba(23, 19, 18, 0.35);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-title {
+  color: #fff9f2;
+  text-shadow: 0 1px 12px rgba(23, 19, 18, 0.4);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-place {
+  color: rgba(255, 249, 242, 0.84);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-note {
+  color: #f0d0d6;
+}
+
+.js-celeb-guide__maps-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.65rem;
+  margin-top: 0.85rem;
+  padding: 0.55rem 1.15rem;
+  border: 0;
+  background: var(--js-wine, #7a2332);
+  color: var(--js-ivory, #fff9f2);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.js-celeb-guide__maps-btn:focus-visible {
+  outline: 2px solid var(--js-wine, #7a2332);
+  outline-offset: 3px;
+}
+
+.js-celeb-guide__maps-btn--on-wine {
+  background: rgba(255, 249, 242, 0.16);
+  color: #fff9f2;
+  border: 1px solid rgba(255, 249, 242, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.js-celeb-guide__maps-btn--on-wine:hover {
+  background: rgba(255, 249, 242, 0.28);
+}
+
+.js-celeb-guide__maps-btn--on-wine:focus-visible {
+  outline-color: rgba(255, 249, 242, 0.7);
+}
+
+.js-celeb-guide__dialog-footer {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.js-celeb-guide__footer-btn {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.25rem;
+  border: 0;
+  background: transparent;
+  color: rgba(23, 19, 18, 0.62);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 0.35em;
+  text-decoration-color: rgba(23, 19, 18, 0.22);
+  cursor: pointer;
+}
+
+.js-celeb-guide__footer-btn:focus-visible {
+  outline: 2px solid var(--js-wine, #7a2332);
+  outline-offset: 3px;
+}
+
+.js-celeb-guide__preview-badge {
+  display: inline-block;
+  margin: 0 0 1rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px dashed var(--js-champagne-deep, #d6bfa2);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(23, 19, 18, 0.55);
+}
+
+.js-celeb-guide__gift-editorial {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+}
+
+.js-celeb-guide__gift-editorial-label {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__gift-editorial-store {
+  margin: 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.65rem, 4.8vw, 2.05rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__gift-editorial-address {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: rgba(23, 19, 18, 0.72);
+}
+
+.js-celeb-guide__gift-editorial-phone {
+  margin: 0.1rem 0 0.35rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--js-wine, #7a2332);
+  text-decoration: none;
+  transition: opacity 0.25s ease;
+}
+
+.js-celeb-guide__gift-editorial-phone:hover {
+  opacity: 0.72;
+}
+
+.js-celeb-guide__gift-editorial-phone:focus-visible {
+  outline: 2px solid rgba(122, 35, 50, 0.45);
+  outline-offset: 3px;
+}
+
+.js-celeb-guide__gift-editorial-registry {
+  margin: 0.55rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(122, 35, 50, 0.18);
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.02rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__gift-editorial-note {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: rgba(23, 19, 18, 0.62);
+}
+
+.js-celeb-guide__gift-editorial-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.95rem;
+}
+
+.js-celeb-guide__charity {
+  position: relative;
+  margin-top: clamp(1.75rem, 4.5vw, 2.85rem);
+}
+
+.js-celeb-guide__charity-panel {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.65rem, 4.2vw, 2.55rem) clamp(1.25rem, 3.5vw, 2.35rem);
+  border: 1px solid rgba(214, 191, 162, 0.55);
+  border-radius: 28px;
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.72) 0%, transparent 46%),
+    linear-gradient(
+      168deg,
+      rgba(255, 249, 242, 0.92) 0%,
+      rgba(241, 227, 207, 0.78) 48%,
+      rgba(232, 213, 187, 0.55) 100%
+    );
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.03),
+    0 22px 48px rgba(23, 19, 18, 0.07),
+    inset 0 1px 0 rgba(255, 249, 242, 0.9);
+}
+
+.js-celeb-guide__charity-ornament {
+  position: absolute;
+  top: -28%;
+  right: -12%;
+  width: min(52%, 18rem);
+  height: 78%;
+  background: radial-gradient(
+    circle,
+    rgba(122, 35, 50, 0.08) 0%,
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+.js-celeb-guide__charity-header {
+  position: relative;
+  z-index: 1;
+  max-width: 36rem;
+}
+
+.js-celeb-guide__charity-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.js-celeb-guide__charity-icon {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  color: var(--js-wine, #7a2332);
+  border: 1px solid rgba(122, 35, 50, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 249, 242, 0.55);
+}
+
+.js-celeb-guide__charity-eyebrow,
+.js-celeb-guide__charity-optional {
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.js-celeb-guide__charity-eyebrow {
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__charity-optional {
+  padding: 0.28rem 0.65rem;
+  color: rgba(23, 19, 18, 0.55);
+  border: 1px solid rgba(122, 35, 50, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 249, 242, 0.55);
+  letter-spacing: 0.16em;
+}
+
+.js-celeb-guide__charity-title {
+  margin: 0;
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.15rem, 6vw, 3rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__charity-rule {
+  display: block;
+  width: 3rem;
+  height: 1px;
+  margin-top: 0.95rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(122, 35, 50, 0.5),
+    transparent
+  );
+}
+
+.js-celeb-guide__charity-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.45rem;
+  margin-top: 1.35rem;
+}
+
+.js-celeb-guide__charity-copy {
+  min-width: 0;
+  max-width: 38rem;
+}
+
+.js-celeb-guide__charity-lead {
+  margin: 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.12rem, 3.2vw, 1.35rem);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__charity-body {
+  margin: 0.85rem 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: rgba(23, 19, 18, 0.68);
+}
+
+.js-celeb-guide__charity-whisper {
+  margin: 1.05rem 0 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.02rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__charity-verse {
+  position: relative;
+  margin: 0;
+  padding: 1.15rem 1.15rem 1.2rem 1.25rem;
+  border: 1px solid rgba(214, 191, 162, 0.55);
+  border-radius: 18px;
+  background: rgba(255, 249, 242, 0.62);
+}
+
+.js-celeb-guide__charity-quote-mark {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: 2.4rem;
+  line-height: 0.7;
+  color: rgba(122, 35, 50, 0.45);
+}
+
+.js-celeb-guide__charity-verse p {
+  margin: 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.02rem, 3.2vw, 1.18rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: rgba(23, 19, 18, 0.8);
+}
+
+.js-celeb-guide__charity-verse cite {
+  display: block;
+  margin-top: 0.7rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.56rem;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__gift-guidance {
+  padding: 1.35rem 1.25rem 1.5rem;
+  border: 1px solid var(--js-champagne-deep, #d6bfa2);
+  background: linear-gradient(
+    155deg,
+    var(--js-ivory, #fff9f2) 0%,
+    var(--js-champagne, #f1e3cf) 100%
+  );
+}
+
+.js-celeb-guide__gift-consult-label {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(23, 19, 18, 0.5);
+}
+
+.js-celeb-guide__gift-store {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.55rem, 4.5vw, 1.95rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-celeb-guide__gift-registry {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--js-ink, #171312);
+}
+
+.js-celeb-guide__gift-note {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: rgba(23, 19, 18, 0.68);
+}
+
+.js-celeb-guide__gift-guidance .js-celeb-guide__maps-btn {
+  margin-top: 0.85rem;
+}
+
+.js-celeb-guide__gifts-empty-lead {
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(23, 19, 18, 0.68);
+}
+
+@media (min-width: 768px) {
+  .js-celeb-guide__grid--duo {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 1.35rem;
+    align-items: stretch;
+  }
+
+  .js-celeb-guide__grid--trio {
+    grid-template-columns: 1fr;
+    gap: 1.15rem;
+  }
+
+  .js-celeb-guide__card {
+    min-height: 26rem;
+    border-radius: 44px;
+  }
+
+  .js-celeb-guide__grid--duo .js-celeb-guide__card--ivory {
+    margin-top: 1.5rem;
+  }
+
+  .js-celeb-guide__charity-panel {
+    border-radius: 36px;
+    padding: 2.45rem 2.55rem;
+  }
+
+  .js-celeb-guide__charity-layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+    align-items: stretch;
+    gap: 1.75rem;
+    margin-top: 1.55rem;
+  }
+
+  .js-celeb-guide__charity-verse {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .js-celeb-guide__gallery {
+    gap: 2.25rem;
+  }
+
+  .js-celeb-guide__gallery-media {
+    border-radius: 22px;
+    aspect-ratio: 3 / 4;
+  }
+
+  .js-celeb-guide__overlay {
+    align-items: center;
+    padding: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .js-celeb-guide__dialog {
+    width: min(90vw, 52rem);
+    max-height: min(88vh, 52rem);
+    border-radius: 28px;
+  }
+
+  .js-celeb-guide__dialog-inner {
+    padding: 0.75rem 2.25rem 2.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-celeb-guide__grid--trio {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.15rem;
+    align-items: stretch;
+  }
+
+  .js-celeb-guide__card {
+    min-height: 28rem;
+    border-radius: 52px;
+  }
+
+  .js-celeb-guide__grid--trio .js-celeb-guide__card {
+    min-height: 30rem;
+  }
+
+  .js-celeb-guide__grid--trio .js-celeb-guide__card:nth-child(2) {
+    margin-top: 1.35rem;
+  }
+
+  .js-celeb-guide__grid--trio .js-celeb-guide__card:nth-child(3) {
+    margin-top: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-celeb-guide__card,
+  .js-celeb-guide__card-img,
+  .js-celeb-guide__card-rule,
+  .js-celeb-guide__card-arrow {
+    transition: none;
+  }
+
+  .js-celeb-guide__card:hover,
+  .js-celeb-guide__card:focus-visible {
+    transform: none;
+  }
+
+  .js-celeb-guide__card:hover .js-celeb-guide__card-img,
+  .js-celeb-guide__card:focus-visible .js-celeb-guide__card-img {
+    transform: scale(1.03);
+  }
+
+  .js-celeb-guide__card:hover .js-celeb-guide__card-arrow,
+  .js-celeb-guide__card:focus-visible .js-celeb-guide__card-arrow {
+    transform: none;
+  }
+}
+
+/* Countdown editorial ? cart?o-joia ?O pr?ximo cap?tulo? */
+.js-chapter-countdown {
+  position: relative;
+  isolation: isolate;
+  color: rgba(255, 249, 242, 0.98);
+}
+
+.js-chapter-countdown__inner {
+  position: relative;
+  z-index: 1;
+}
+
+.js-chapter-countdown__stage {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+  align-items: center;
+}
+
+.js-chapter-countdown__photo-shell {
+  position: relative;
+  order: -1;
+  margin: 0 auto;
+  width: min(100%, 280px);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 2px solid rgba(255, 249, 242, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(201, 147, 155, 0.35),
+    0 22px 48px rgba(23, 19, 18, 0.28),
+    0 8px 20px rgba(23, 19, 18, 0.14),
+    inset 0 0 0 1px rgba(255, 249, 242, 0.12);
+  will-change: clip-path, transform, opacity;
+}
+
+.js-chapter-countdown__photo-shell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 249, 242, 0.14);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.js-chapter-countdown__photo {
+  position: absolute;
+  inset: 0;
+}
+
+.js-chapter-countdown__img {
+  object-fit: cover;
+  object-position: center 18%;
+  filter: contrast(1.05) saturate(0.9) brightness(1.02);
+  transform: scale(1.03);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-chapter-countdown__jewel:hover .js-chapter-countdown__img {
+  transform: scale(1.06);
+}
+
+.js-chapter-countdown__photo-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(23, 19, 18, 0.08) 0%,
+      transparent 28%,
+      transparent 62%,
+      rgba(23, 19, 18, 0.22) 100%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(122, 35, 50, 0.12) 0%,
+      transparent 45%
+    );
+}
+
+.js-chapter-countdown__narrative {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(0.7rem, 2vh, 1.1rem);
+  padding-inline: 0.25rem;
+}
+
+.js-chapter-countdown__eyebrow {
+  margin: 0;
+  font-family: var(--font-jost), 'Jost', system-ui, sans-serif;
+  font-size: clamp(0.58rem, 2vw, 0.68rem);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.62);
+}
+
+.js-chapter-countdown__quote {
+  margin: 0;
+  max-width: 18rem;
+  font-family: var(--font-great-vibes), 'Great Vibes', cursive;
+  font-size: clamp(1.85rem, 6vw, 2.45rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--js-ivory, #fff9f2);
+  text-shadow: 0 2px 18px rgba(23, 19, 18, 0.22);
+}
+
+.js-chapter-countdown__title {
+  margin: 0.15rem 0 0;
+  max-width: 16ch;
+  font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.45rem, 4.8vw, 1.95rem);
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  color: rgba(255, 249, 242, 0.96);
+}
+
+.js-chapter-countdown__title-slot {
+  min-height: 2.55em;
+}
+
+.js-chapter-countdown__closing-slot {
+  min-height: 1.45em;
+  margin-top: 0.35rem;
+}
+
+.js-chapter-countdown__meter {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  width: 100%;
+  max-width: 22rem;
+  margin-top: 0.55rem;
+  padding: 1rem 0.35rem 0.85rem;
+  border-top: 1px solid rgba(255, 249, 242, 0.18);
+  border-bottom: 1px solid rgba(255, 249, 242, 0.12);
+}
+
+.js-chapter-countdown__unit {
+  position: relative;
+  text-align: center;
+  padding: 0 0.15rem;
+}
+
+.js-chapter-countdown__rule {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  bottom: 0.55rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(255, 249, 242, 0.35),
+    transparent
+  );
+}
+
+.js-chapter-countdown__unit:first-child .js-chapter-countdown__rule {
+  display: none;
+}
+
+.js-chapter-countdown__value {
+  margin: 0;
+  font-family: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.75rem, 7.5vw, 2.55rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--js-ivory, #fff9f2);
+  text-shadow: 0 2px 16px rgba(23, 19, 18, 0.2);
+  transition: opacity 0.35s ease;
+}
+
+.js-chapter-countdown__label {
+  margin: 0.45rem 0 0;
+  font-family: var(--font-jost), 'Jost', system-ui, sans-serif;
+  font-size: clamp(0.48rem, 1.8vw, 0.56rem);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--js-rose, #c9939b);
+}
+
+.js-chapter-countdown__closing {
+  margin: 0.45rem 0 0;
+  max-width: 26rem;
+  font-family: var(--font-jost), 'Jost', system-ui, sans-serif;
+  font-size: clamp(0.88rem, 2.8vw, 0.98rem);
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 249, 242, 0.78);
+}
+
+@media (max-width: 359px) {
+  .js-chapter-countdown__meter {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 0.35rem;
+    max-width: 16rem;
+  }
+
+  .js-chapter-countdown__unit:nth-child(3) .js-chapter-countdown__rule {
+    display: none;
+  }
+
+  .js-chapter-countdown__value {
+    font-size: clamp(1.85rem, 11vw, 2.2rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .js-chapter-countdown__stage {
+    grid-template-columns: minmax(0, 0.58fr) minmax(0, 0.42fr);
+    gap: clamp(2rem, 4vw, 3.25rem);
+    align-items: center;
+  }
+
+  .js-chapter-countdown__photo-shell {
+    order: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 340px;
+    justify-self: end;
+    border-radius: 26px;
+  }
+
+  .js-chapter-countdown__narrative {
+    align-items: flex-start;
+    text-align: left;
+    padding-inline: 0;
+  }
+
+  .js-chapter-countdown__quote {
+    max-width: 20rem;
+  }
+
+  .js-chapter-countdown__title {
+    max-width: 14ch;
+  }
+
+  .js-chapter-countdown__meter {
+    max-width: 26rem;
+    margin-top: 0.75rem;
+    padding: 1.15rem 0.25rem 1rem;
+  }
+
+  .js-chapter-countdown__value {
+    font-size: clamp(2.15rem, 3.8vw, 2.85rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-chapter-countdown__stage {
+    grid-template-columns: minmax(0, 0.56fr) minmax(0, 0.44fr);
+    gap: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .js-chapter-countdown__photo-shell {
+    max-width: 380px;
+    border-radius: 28px;
+  }
+
+  .js-chapter-countdown__quote {
+    font-size: clamp(2.15rem, 2.8vw, 2.75rem);
+    max-width: 22rem;
+  }
+
+  .js-chapter-countdown__title {
+    font-size: clamp(1.75rem, 2.4vw, 2.15rem);
+    max-width: 15ch;
+  }
+
+  .js-chapter-countdown__meter {
+    max-width: 28rem;
+  }
+
+  .js-chapter-countdown__value {
+    font-size: clamp(2.5rem, 3.6vw, 3.35rem);
+  }
+
+  .js-chapter-countdown__closing {
+    max-width: 28rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-chapter-countdown__photo-shell,
+  .js-chapter-countdown__value,
+  .js-chapter-countdown__img,
+  .js-chapter-countdown__jewel:hover .js-chapter-countdown__img {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* RSVP ritual ? Jessica & Samuel */
+.js-rsvp-ritual {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.js-rsvp-ritual::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  transform: translateX(-50%);
+  width: min(92%, 640px);
+  height: 420px;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(255, 249, 242, 0.14) 0%,
+    transparent 68%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.js-rsvp-ritual > * {
+  position: relative;
+  z-index: 1;
+}
+
+.js-rsvp-ritual__panel {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.65rem, 4.5vw, 2.65rem);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 249, 242, 0.28);
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.14) 0%, transparent 42%),
+    linear-gradient(
+      168deg,
+      rgba(255, 249, 242, 0.1) 0%,
+      rgba(241, 227, 207, 0.06) 48%,
+      rgba(23, 19, 18, 0.12) 100%
+    );
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.06),
+    0 22px 48px rgba(23, 19, 18, 0.22),
+    0 0 0 1px rgba(201, 147, 155, 0.12),
+    inset 0 1px 0 rgba(255, 249, 242, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.js-rsvp-ritual__panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 249, 242, 0.22) 22%,
+    rgba(255, 249, 242, 0.48) 50%,
+    rgba(255, 249, 242, 0.22) 78%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.js-rsvp-ritual__panel::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: calc(28px - 8px);
+  border: 1px solid rgba(255, 249, 242, 0.1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.js-rsvp-ritual__panel--welcome,
+.js-rsvp-ritual__panel--success {
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.72) 0%, transparent 46%),
+    linear-gradient(
+      168deg,
+      var(--js-ivory, #fff9f2) 0%,
+      var(--js-champagne, #f1e3cf) 52%,
+      #ead6bc 100%
+    );
+  border-color: rgba(255, 249, 242, 0.72);
+  box-shadow:
+    0 4px 6px rgba(23, 19, 18, 0.04),
+    0 28px 56px rgba(23, 19, 18, 0.16),
+    0 12px 28px rgba(122, 35, 50, 0.18),
+    0 0 0 1px rgba(201, 147, 155, 0.22),
+    inset 0 1px 0 rgba(255, 249, 242, 0.9),
+    inset 0 -1px 0 rgba(122, 35, 50, 0.06);
+}
+
+.js-rsvp-ritual__panel--welcome::before,
+.js-rsvp-ritual__panel--success::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(122, 35, 50, 0.12) 22%,
+    rgba(122, 35, 50, 0.28) 50%,
+    rgba(122, 35, 50, 0.12) 78%,
+    transparent 100%
+  );
+}
+
+.js-rsvp-ritual__panel--welcome::after,
+.js-rsvp-ritual__panel--success::after {
+  border-color: rgba(122, 35, 50, 0.08);
+}
+
+.js-rsvp-ritual__panel--success {
+  color: var(--js-ink, #171312);
+}
+
+@media (min-width: 768px) {
+  .js-rsvp-ritual__panel {
+    border-radius: 36px;
+    padding: clamp(2rem, 3.5vw, 2.85rem);
+  }
+
+  .js-rsvp-ritual__panel::after {
+    border-radius: calc(36px - 8px);
+    inset: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-rsvp-ritual__panel {
+    border-radius: 44px;
+  }
+
+  .js-rsvp-ritual__panel::after {
+    border-radius: calc(44px - 10px);
+    inset: 14px;
+  }
+}
+
+.js-rsvp-ritual__monogram {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(2.4rem, 8vw, 3.4rem);
+  line-height: 1;
+  color: var(--js-ivory, #fff9f2);
+  letter-spacing: 0.04em;
+}
+
+.js-rsvp-ritual__panel--welcome .js-rsvp-ritual__monogram,
+.js-rsvp-ritual__panel--success .js-rsvp-ritual__monogram {
+  color: var(--js-wine, #7a2332);
+}
+
+.js-rsvp-ritual__title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.65rem, 5.5vw, 2.15rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-rsvp-ritual__title--ink,
+.js-rsvp-ritual__panel--welcome .js-rsvp-ritual__title {
+  color: var(--js-ink, #171312);
+}
+
+.js-rsvp-ritual__subtitle {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-weight: 400;
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-rsvp-ritual__lead {
+  margin: 0 auto;
+  max-width: 28rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 249, 242, 0.78);
+}
+
+.js-rsvp-ritual__lead--ink,
+.js-rsvp-ritual__panel--welcome .js-rsvp-ritual__lead {
+  color: rgba(23, 19, 18, 0.72);
+}
+
+.js-rsvp-ritual__personal {
+  margin: 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-rsvp-ritual__meta {
+  margin: 0.85rem 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.55);
+}
+
+.js-rsvp-ritual__meta--ink,
+.js-rsvp-ritual__panel--welcome .js-rsvp-ritual__meta {
+  color: rgba(23, 19, 18, 0.5);
+}
+
+.js-rsvp-ritual__countdown {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-rsvp-ritual__wine-line {
+  width: min(88px, 30%);
+  height: 1px;
+  margin: 0 auto 1.25rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--js-wine, #7a2332),
+    transparent
+  );
+}
+
+.js-rsvp-ritual__label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.55);
+}
+
+.js-rsvp-ritual__panel--welcome .js-rsvp-ritual__label,
+.js-rsvp-ritual__panel--success .js-rsvp-ritual__label {
+  color: rgba(23, 19, 18, 0.5);
+}
+
+.js-rsvp-ritual__input {
+  width: 100%;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 12px;
+  padding: 0.9rem 1.05rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 300;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 249, 242, 0.55);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+  scroll-margin-bottom: 7rem;
+}
+
+.js-rsvp-ritual__input:focus-visible {
+  border-color: var(--js-wine, #7a2332);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 249, 242, 0.55),
+    0 0 0 3px rgba(122, 35, 50, 0.12);
+}
+
+.js-rsvp-ritual__textarea {
+  resize: vertical;
+  min-height: 6.5rem;
+  line-height: 1.55;
+}
+
+.js-rsvp-ritual__btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.85rem 1.5rem;
+  border: 0;
+  border-radius: 14px;
+  background: var(--js-wine, #7a2332);
+  color: var(--js-ivory, #fff9f2);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow:
+    0 8px 22px rgba(122, 35, 50, 0.28),
+    inset 0 1px 0 rgba(255, 249, 242, 0.18);
+  transition:
+    opacity 0.35s ease,
+    background-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+}
+
+.js-rsvp-ritual__btn-primary.is-full {
+  width: 100%;
+}
+
+.js-rsvp-ritual__btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.js-rsvp-ritual__btn-primary:hover:not(:disabled) {
+  background: #681e2b;
+  box-shadow:
+    0 12px 28px rgba(122, 35, 50, 0.34),
+    inset 0 1px 0 rgba(255, 249, 242, 0.2);
+  transform: translateY(-1px);
+}
+
+.js-rsvp-ritual__btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 249, 242, 0.72);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.35em;
+  text-decoration-color: rgba(255, 249, 242, 0.25);
+}
+
+.js-rsvp-ritual__panel--welcome .js-rsvp-ritual__btn-ghost,
+.js-rsvp-ritual__panel--success .js-rsvp-ritual__btn-ghost {
+  color: rgba(23, 19, 18, 0.65);
+  text-decoration-color: rgba(23, 19, 18, 0.25);
+}
+
+.js-rsvp-ritual__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.js-rsvp-ritual__choice-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+.js-rsvp-ritual__choice {
+  position: relative;
+  min-height: 3.5rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid rgba(255, 249, 242, 0.32);
+  border-radius: 16px;
+  background:
+    linear-gradient(160deg, rgba(255, 249, 242, 0.1) 0%, rgba(255, 249, 242, 0.04) 100%);
+  color: var(--js-ivory, #fff9f2);
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.15rem;
+  text-align: left;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 249, 242, 0.16),
+    0 8px 20px rgba(23, 19, 18, 0.1);
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    color 0.4s ease,
+    box-shadow 0.4s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-rsvp-ritual__choice-mark {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.85rem;
+  opacity: 0;
+  font-size: 0.85rem;
+  transition: opacity 0.35s ease;
+}
+
+.js-rsvp-ritual__choice.is-selected {
+  background: linear-gradient(168deg, #8f2e3f 0%, var(--js-wine, #7a2332) 55%, #5c1a26 100%);
+  border-color: rgba(255, 249, 242, 0.42);
+  color: var(--js-ivory, #fff9f2);
+  transform: translateY(-1px);
+  box-shadow:
+    0 12px 28px rgba(122, 35, 50, 0.35),
+    inset 0 1px 0 rgba(255, 249, 242, 0.22);
+}
+
+.js-rsvp-ritual__choice.is-selected .js-rsvp-ritual__choice-mark {
+  opacity: 1;
+}
+
+.js-rsvp-ritual__choice.is-soft.is-selected {
+  background: rgba(23, 19, 18, 0.55);
+  border-color: rgba(255, 249, 242, 0.35);
+}
+
+.js-rsvp-ritual__companion-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.js-rsvp-ritual__pill {
+  min-height: 2.75rem;
+  min-width: 3.25rem;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid rgba(255, 249, 242, 0.32);
+  border-radius: 12px;
+  background: rgba(255, 249, 242, 0.04);
+  color: var(--js-ivory, #fff9f2);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 249, 242, 0.12);
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.js-rsvp-ritual__pill.is-selected {
+  background: linear-gradient(168deg, #8f2e3f 0%, var(--js-wine, #7a2332) 100%);
+  border-color: rgba(255, 249, 242, 0.4);
+  box-shadow:
+    0 8px 18px rgba(122, 35, 50, 0.28),
+    inset 0 1px 0 rgba(255, 249, 242, 0.2);
+}
+
+.js-rsvp-ritual__seat {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(255, 249, 242, 0.28);
+  border-radius: 16px;
+  background:
+    linear-gradient(160deg, rgba(255, 249, 242, 0.1) 0%, rgba(255, 249, 242, 0.04) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 249, 242, 0.14),
+    0 8px 18px rgba(23, 19, 18, 0.1);
+}
+
+.js-rsvp-ritual__seat-check {
+  display: inline-flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--js-wine, #7a2332);
+  color: var(--js-ivory, #fff9f2);
+  font-size: 0.75rem;
+}
+
+.js-rsvp-ritual__seat-name {
+  margin: 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.2rem;
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-rsvp-ritual__seat-meta {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.5);
+}
+
+.js-rsvp-ritual__summary {
+  list-style: none;
+  margin: 0;
+  padding: 0.15rem 0 0;
+  border-top: 1px solid rgba(255, 249, 242, 0.22);
+}
+
+.js-rsvp-ritual__summary li {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 249, 242, 0.16);
+}
+
+.js-rsvp-ritual__summary span {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.5);
+}
+
+.js-rsvp-ritual__summary strong {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-rsvp-ritual__divider {
+  height: 1px;
+  margin: 1.85rem auto 1.45rem;
+  width: min(160px, 48%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 249, 242, 0.5),
+    transparent
+  );
+}
+
+.js-rsvp-ritual__error {
+  margin: 1rem 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--js-champagne, #f1e3cf);
+}
+
+.js-rsvp-ritual__panel--welcome .js-rsvp-ritual__error {
+  color: var(--js-wine, #7a2332);
+}
+
+.js-rsvp-ritual__field-hint {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 249, 242, 0.5);
+  line-height: 1.4;
+}
+
+.js-rsvp-ritual__pack-meter {
+  margin-top: 0.65rem;
+  text-align: left;
+}
+
+.js-rsvp-ritual__pack-count {
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: rgba(255, 249, 242, 0.62);
+}
+
+.js-rsvp-ritual__pack-count.is-over {
+  color: #f0c9a0;
+}
+
+.js-rsvp-ritual__pack-hint {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  color: rgba(240, 201, 160, 0.85);
+  line-height: 1.45;
+}
+
+.js-rsvp-ritual__preview-banner {
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px dashed rgba(214, 191, 162, 0.55);
+  background: rgba(23, 19, 18, 0.35);
+  color: rgba(255, 249, 242, 0.85);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.js-rsvp-ritual__preview-banner code {
+  font-size: 0.7rem;
+  color: var(--js-champagne, #f1e3cf);
+}
+
+.js-rsvp-ritual__preview-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.js-rsvp-ritual__btn-primary:focus-visible,
+.js-rsvp-ritual__btn-ghost:focus-visible,
+.js-rsvp-ritual__choice:focus-visible,
+.js-rsvp-ritual__pill:focus-visible,
+.js-rsvp-ritual__input:focus-visible {
+  outline: 2px solid var(--js-rose, #c9939b);
+  outline-offset: 3px;
+}
+
+.js-rsvp-ritual__title:focus {
+  outline: none;
+}
+
+.js-rsvp-ritual__footnote {
+  margin: 1.75rem 0 0;
+  text-align: center;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  color: rgba(255, 249, 242, 0.45);
+}
+
+.js-rsvp-ritual__progress {
+  margin-bottom: 1.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 249, 242, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 249, 242, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 249, 242, 0.1);
+}
+
+.js-rsvp-ritual__progress-mobile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.24em;
+  color: rgba(255, 249, 242, 0.55);
+}
+
+.js-rsvp-ritual__progress-bar {
+  flex: 1;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 249, 242, 0.16);
+  overflow: hidden;
+}
+
+.js-rsvp-ritual__progress-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(201, 147, 155, 0.55),
+    var(--js-rose, #c9939b)
+  );
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-rsvp-ritual__progress-desktop {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.js-rsvp-ritual__progress-item {
+  display: flex;
+  gap: 0.45rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.35);
+}
+
+.js-rsvp-ritual__progress-item.is-active,
+.js-rsvp-ritual__progress-item.is-done {
+  color: rgba(255, 249, 242, 0.85);
+}
+
+@media (min-width: 768px) {
+  .js-rsvp-ritual__choice-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .js-rsvp-ritual__progress-mobile {
+    display: none;
+  }
+
+  .js-rsvp-ritual__progress-desktop {
+    display: flex;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-rsvp-ritual__choice,
+  .js-rsvp-ritual__progress-bar-fill,
+  .js-rsvp-ritual__btn-primary,
+  .js-rsvp-ritual__pill {
+    transition: none;
+  }
+
+  .js-rsvp-ritual__choice.is-selected,
+  .js-rsvp-ritual__btn-primary:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Galeria editorial ? Em preto & luz (mobile-first cinematogr?fica) */
+.js-ed-gallery {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(3.5rem, 10vw, 6rem) 0 clamp(4rem, 12vw, 7rem);
+}
+
+.js-ed-gallery__intro {
+  position: relative;
+  z-index: 2;
+  max-width: 28rem;
+  margin: 0 auto clamp(2.5rem, 8vw, 4rem);
+  padding-inline: clamp(1.25rem, 5vw, 2rem);
+  text-align: center;
+}
+
+.js-ed-gallery__eyebrow {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.62rem, 2.2vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-ed-gallery__title {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2.35rem, 9vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--js-ink, #171312);
+}
+
+.js-ed-gallery__lead {
+  margin: 0 auto;
+  max-width: 22rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.05rem, 3.6vw, 1.2rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(23, 19, 18, 0.68);
+}
+
+.js-ed-gallery__intro-rule {
+  width: min(72px, 28%);
+  height: 1px;
+  margin: 1.35rem auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--js-wine, #7a2332),
+    transparent
+  );
+}
+
+.js-ed-gallery__composition {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 5vw, 2.75rem);
+}
+
+/* Mobile: cada fotograma como um momento cinematogr?fico */
+.js-ed-gallery__frame {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  isolation: isolate;
+}
+
+.js-ed-gallery__media {
+  position: relative;
+  overflow: hidden;
+  background: var(--js-ink, #171312);
+  aspect-ratio: 3 / 4;
+  min-height: min(78svh, 640px);
+}
+
+.js-ed-gallery__frame--feature .js-ed-gallery__media {
+  aspect-ratio: 3 / 4;
+  min-height: min(86svh, 720px);
+}
+
+.js-ed-gallery__img {
+  object-fit: cover;
+  object-position: center 18%;
+  filter: contrast(1.03) saturate(0.94) brightness(1.02);
+  transform: scale(1.04);
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.js-ed-gallery__frame:hover .js-ed-gallery__img {
+  transform: scale(1.08);
+}
+
+.js-ed-gallery__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(23, 19, 18, 0.12) 0%,
+      transparent 28%,
+      transparent 52%,
+      rgba(23, 19, 18, 0.72) 100%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 60%,
+      rgba(241, 227, 207, 0.08) 100%
+    );
+}
+
+.js-ed-gallery__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: clamp(2.5rem, 8vw, 3.5rem) clamp(1.25rem, 5vw, 2rem)
+    clamp(1.35rem, 4vw, 1.85rem);
+  pointer-events: none;
+}
+
+.js-ed-gallery__chapter {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--js-rose, #c9939b);
+}
+
+.js-ed-gallery__name {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.55rem, 6vw, 2rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--js-ivory, #fff9f2);
+}
+
+.js-ed-gallery__line {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: clamp(0.78rem, 2.8vw, 0.88rem);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: rgba(255, 249, 242, 0.78);
+}
+
+@media (min-width: 768px) {
+  .js-ed-gallery {
+    padding: clamp(4.5rem, 8vw, 7rem) 0 clamp(5rem, 9vw, 8rem);
+  }
+
+  .js-ed-gallery__composition {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(1.25rem, 2vw, 1.75rem);
+    max-width: 1180px;
+    margin-inline: auto;
+    padding-inline: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .js-ed-gallery__frame--feature {
+    grid-column: 1 / -1;
+  }
+
+  .js-ed-gallery__frame--feature .js-ed-gallery__media {
+    aspect-ratio: 16 / 9;
+    min-height: min(62vh, 580px);
+  }
+
+  .js-ed-gallery__frame--feature .js-ed-gallery__img {
+    object-position: center 22%;
+  }
+
+  .js-ed-gallery__frame--pair {
+    grid-column: 1 / span 6;
+  }
+
+  .js-ed-gallery__frame--pair-b {
+    grid-column: 7 / span 6;
+    margin-top: clamp(3.5rem, 8vw, 6rem);
+  }
+
+  .js-ed-gallery__frame--pair .js-ed-gallery__media,
+  .js-ed-gallery__frame--pair-b .js-ed-gallery__media {
+    aspect-ratio: 3 / 4;
+    min-height: 0;
+  }
+
+  .js-ed-gallery__frame--closing {
+    grid-column: 3 / span 8;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .js-ed-gallery__frame--closing .js-ed-gallery__media {
+    aspect-ratio: 4 / 5;
+    min-height: min(70vh, 680px);
+  }
+
+  .js-ed-gallery__caption {
+    padding: 3rem 1.75rem 1.5rem;
+  }
+
+  .js-ed-gallery__frame--closing .js-ed-gallery__caption {
+    align-items: center;
+    text-align: center;
+  }
+
+  .js-ed-gallery__name {
+    font-size: clamp(1.65rem, 2.4vw, 2.15rem);
+  }
+}
+
+@media (min-width: 1100px) {
+  .js-ed-gallery__frame--pair {
+    grid-column: 1 / span 5;
+  }
+
+  .js-ed-gallery__frame--pair-b {
+    grid-column: 7 / span 5;
+    grid-column-end: 13;
+  }
+
+  .js-ed-gallery__frame--closing {
+    grid-column: 4 / span 6;
+  }
+
+  .js-ed-gallery__frame--feature .js-ed-gallery__media {
+    max-height: 620px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-ed-gallery__img,
+  .js-ed-gallery__frame:hover .js-ed-gallery__img {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Rose Elegance ? tipografia feminina */
 [data-render-profile="rose-elegance"] .font-display {
   font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
 }
@@ -818,6 +5117,12 @@
 html:has([data-render-profile="rose-elegance"]) {
   overflow-y: auto;
   scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE / Edge legado */
+}
+
+html:has([data-render-profile="rose-elegance"])::-webkit-scrollbar {
+  display: none;
 }
 
 .scroll-container {
@@ -839,4 +5144,564 @@ html:has([data-render-profile="rose-elegance"]) {
   scroll-snap-stop: always;
   min-height: 100vh;
   width: 100%;
+}
+
+/* Mem?rias do Nosso Dia ? Photo Wall Jessica & Samuel */
+.js-memories__cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.js-memories__cta,
+.js-memories__fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 48px;
+  padding: 0.85rem 1.35rem;
+  border: 1px solid rgba(122, 35, 50, 0.55);
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.92) 0%, rgba(241, 227, 207, 0.96) 100%);
+  color: var(--js-wine, #7a2332);
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.js-memories__cta:hover,
+.js-memories__fab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(122, 35, 50, 0.16);
+}
+
+.js-memories__cta:focus-visible,
+.js-memories__fab:focus-visible {
+  outline: 2px solid rgba(122, 35, 50, 0.45);
+  outline-offset: 3px;
+}
+
+.js-memories__qr-hint,
+.js-memories__teaser {
+  margin: 1.35rem auto 0;
+  max-width: 28rem;
+  text-align: center;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(23, 19, 18, 0.58);
+}
+
+.js-memories__qr-hint {
+  margin-top: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.js-memories__gallery-wrap {
+  margin-top: clamp(2rem, 5vw, 3rem);
+}
+
+.js-memories-gallery-shell {
+  width: 100%;
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+.js-memories-gallery__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-bottom: 0.95rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(23, 19, 18, 0.48);
+}
+
+.js-memories-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(5.4rem, 18vw);
+  grid-auto-flow: dense;
+  gap: 2px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(214, 191, 162, 0.45);
+  background: rgba(23, 19, 18, 0.04);
+  box-shadow:
+    0 1px 0 rgba(255, 249, 242, 0.65) inset,
+    0 18px 48px rgba(23, 19, 18, 0.08);
+}
+
+.js-memories-gallery__item {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: rgba(23, 19, 18, 0.08);
+  cursor: zoom-in;
+  isolation: isolate;
+}
+
+.js-memories-gallery__item.is-hero {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.js-memories-gallery__item.is-tall {
+  grid-row: span 2;
+}
+
+.js-memories-gallery__item.is-wide {
+  grid-column: span 2;
+}
+
+.js-memories-gallery__item.is-skeleton {
+  cursor: default;
+  background: linear-gradient(
+    110deg,
+    rgba(241, 227, 207, 0.35) 20%,
+    rgba(255, 249, 242, 0.7) 40%,
+    rgba(241, 227, 207, 0.35) 60%
+  );
+  background-size: 200% 100%;
+  animation: js-memories-shimmer 1.4s ease-in-out infinite;
+}
+
+.js-memories-gallery__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.01);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-memories-gallery__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 52%,
+    rgba(23, 19, 18, 0.42) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.js-memories-gallery__caption {
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 0.65rem;
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 0.92rem;
+  font-style: italic;
+  line-height: 1.25;
+  color: rgba(255, 249, 242, 0.95);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+  text-shadow: 0 1px 10px rgba(23, 19, 18, 0.45);
+  text-align: left;
+  pointer-events: none;
+}
+
+.js-memories-gallery__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  margin: 0;
+  color: #fff9f2;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 249, 242, 0.45);
+  background: rgba(23, 19, 18, 0.42);
+  backdrop-filter: blur(8px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.js-memories-gallery__item:hover .js-memories-gallery__media,
+.js-memories-gallery__item:focus-visible .js-memories-gallery__media {
+  transform: scale(1.045);
+}
+
+.js-memories-gallery__item:hover .js-memories-gallery__veil,
+.js-memories-gallery__item:focus-visible .js-memories-gallery__veil,
+.js-memories-gallery__item:hover .js-memories-gallery__caption,
+.js-memories-gallery__item:focus-visible .js-memories-gallery__caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.js-memories-gallery__item:focus-visible {
+  outline: 2px solid rgba(122, 35, 50, 0.55);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.js-memories-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.js-memories-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(23, 19, 18, 0.88);
+  cursor: pointer;
+}
+
+.js-memories-lightbox__close {
+  position: absolute;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(255, 249, 242, 0.22);
+  border-radius: 999px;
+  background: rgba(23, 19, 18, 0.45);
+  color: #fff9f2;
+  cursor: pointer;
+}
+
+.js-memories-lightbox__stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  width: min(100%, 56rem);
+  max-height: min(88svh, 900px);
+}
+
+.js-memories-lightbox__frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  touch-action: pan-y;
+  cursor: grab;
+  width: 100%;
+}
+
+.js-memories-lightbox__frame:active {
+  cursor: grabbing;
+}
+
+.js-memories-lightbox__media {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: min(78svh, 820px);
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.js-memories-lightbox__caption {
+  margin: 0;
+  max-width: 36rem;
+  padding-inline: 0.5rem;
+  text-align: center;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  line-height: 1.4;
+  color: rgba(255, 249, 242, 0.82);
+}
+
+.js-memories-lightbox__counter {
+  margin: 0;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.42);
+}
+
+.js-memories-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 249, 242, 0.18);
+  border-radius: 999px;
+  background: rgba(23, 19, 18, 0.4);
+  color: #fff9f2;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.js-memories-lightbox__nav:hover {
+  background: rgba(23, 19, 18, 0.62);
+  border-color: rgba(255, 249, 242, 0.32);
+}
+
+.js-memories-lightbox__nav--prev {
+  left: max(0.5rem, env(safe-area-inset-left));
+}
+
+.js-memories-lightbox__nav--next {
+  right: max(0.5rem, env(safe-area-inset-right));
+}
+
+.js-memories-lightbox__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.js-photo-upload-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.js-photo-upload-progress__track {
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 249, 242, 0.12);
+}
+
+.js-photo-upload-progress__fill {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  opacity: 0.92;
+}
+
+.js-photo-upload-progress__label {
+  margin: 0;
+  color: rgba(255, 249, 242, 0.48);
+}
+
+@media (max-width: 640px) {
+  .js-memories-lightbox__nav {
+    display: none;
+  }
+}
+
+@keyframes js-memories-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -40% 0;
+  }
+}
+
+.js-memories__fab {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+  z-index: 55;
+  border-radius: 999px;
+  box-shadow:
+    0 10px 28px rgba(23, 19, 18, 0.14),
+    0 4px 12px rgba(122, 35, 50, 0.18);
+}
+
+.js-memories__fab span {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .js-memories-gallery {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(7.5rem, 11vw);
+    gap: 3px;
+    border-radius: 22px;
+  }
+
+  .js-memories-gallery__item.is-hero {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .js-memories__fab {
+    right: 1.5rem;
+    bottom: 1.5rem;
+    border-radius: 999px;
+    padding-inline: 1.25rem;
+  }
+
+  .js-memories__fab span {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-memories__cta,
+  .js-memories__fab,
+  .js-memories-gallery__media,
+  .js-memories-gallery__veil,
+  .js-memories-gallery__caption {
+    transition: none;
+  }
+
+  .js-memories__cta:hover,
+  .js-memories__fab:hover,
+  .js-memories-gallery__item:hover .js-memories-gallery__media,
+  .js-memories-gallery__item:focus-visible .js-memories-gallery__media {
+    transform: none;
+  }
+
+  .js-memories-gallery__item.is-skeleton {
+    animation: none;
+  }
+}
+
+/* P�s-evento ? agradecimento + acesso ao �lbum */
+.js-post-event__type {
+  will-change: transform, opacity, filter;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-post-event__type {
+    will-change: auto;
+    filter: none !important;
+  }
+}
+
+.js-post-event__body {
+  margin-top: 1.5rem;
+}
+
+.js-post-event__signoff {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 1.75rem auto 0;
+  text-align: center;
+}
+
+.js-post-event__signoff span {
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(23, 19, 18, 0.5);
+}
+
+.js-post-event__signoff strong {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(1.85rem, 5vw, 2.35rem);
+  font-weight: 400;
+  color: var(--js-wine, #7a2332);
+}
+
+.js-post-event__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.js-post-event__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 48px;
+  padding: 0.85rem 1.35rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.js-post-event__cta--primary {
+  border: 1px solid rgba(122, 35, 50, 0.55);
+  background:
+    linear-gradient(155deg, rgba(255, 249, 242, 0.92) 0%, rgba(241, 227, 207, 0.96) 100%);
+  color: var(--js-wine, #7a2332);
+}
+
+.js-post-event__cta--ghost {
+  border: 1px solid rgba(122, 35, 50, 0.28);
+  background: transparent;
+  color: rgba(23, 19, 18, 0.72);
+}
+
+.js-post-event__cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(122, 35, 50, 0.14);
+}
+
+.js-post-event__cta:focus-visible {
+  outline: 2px solid rgba(122, 35, 50, 0.45);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-post-event__cta {
+    transition: none;
+  }
+
+  .js-post-event__cta:hover {
+    transform: none;
+  }
 }

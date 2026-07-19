@@ -260,6 +260,8 @@ function MonogramOrnament() {
 export function AudioToggle() {
   const { audioEnabled, audioPlayer, introComplete, theme } = useExperience();
   const isRose = theme.renderProfile === "rose-elegance";
+  const isWedding = theme.renderProfile === "jessica-samuel-wedding";
+  const useBrandToggle = isRose || isWedding;
 
   if (!introComplete || theme.audio.type === "silent") return null;
 
@@ -281,25 +283,31 @@ export function AudioToggle() {
       type="button"
       onClick={handleToggle}
       className={`fixed z-40 flex items-center justify-center rounded-full border backdrop-blur-md cursor-pointer transition-all duration-300 ease-out select-none touch-manipulation shadow-sm ${
-        isRose
+        useBrandToggle
           ? "top-5 right-5 h-12 w-12"
           : "top-6 right-6 h-11 w-11"
       }`}
       style={{
         borderColor: isRose
           ? `${theme.colors.secondary}66`
-          : `${theme.colors.accent}25`,
+          : isWedding
+            ? "rgba(255, 249, 242, 0.28)"
+            : `${theme.colors.accent}25`,
         backgroundColor: isRose
           ? theme.colors.secondary
-          : "rgba(255, 255, 255, 0.42)",
-        color: isRose
-          ? "#FFFFFF"
+          : isWedding
+            ? "rgba(122, 35, 50, 0.88)"
+            : "rgba(255, 255, 255, 0.42)",
+        color: useBrandToggle
+          ? "#FFF9F2"
           : audioEnabled
             ? theme.colors.accent
             : theme.colors.primary,
         boxShadow: isRose
           ? `0 4px 24px ${theme.colors.secondary}45`
-          : undefined,
+          : isWedding
+            ? "0 8px 28px rgba(122, 35, 50, 0.35)"
+            : undefined,
       }}
       aria-label={audioEnabled ? "Pausar música" : "Reproduzir música"}
       aria-pressed={audioEnabled}
@@ -307,8 +315,8 @@ export function AudioToggle() {
       <span
         className="absolute inset-0 rounded-full border pointer-events-none"
         style={{
-          borderColor: isRose
-            ? "rgba(255, 255, 255, 0.35)"
+          borderColor: useBrandToggle
+            ? "rgba(255, 249, 242, 0.28)"
             : `${theme.colors.accent}15`,
         }}
         aria-hidden
@@ -323,7 +331,11 @@ export function AudioToggle() {
             transition={{ duration: 0.2 }}
             className="relative flex items-center justify-center"
           >
-            <Pause size={isRose ? 18 : 16} strokeWidth={1.35} fill="currentColor" />
+            <Pause
+              size={useBrandToggle ? 18 : 16}
+              strokeWidth={1.35}
+              fill="currentColor"
+            />
           </motion.span>
         ) : (
           <motion.span
@@ -334,7 +346,11 @@ export function AudioToggle() {
             transition={{ duration: 0.2 }}
             className="relative flex items-center justify-center pl-0.5"
           >
-            <Play size={isRose ? 18 : 16} strokeWidth={1.35} fill="currentColor" />
+            <Play
+              size={useBrandToggle ? 18 : 16}
+              strokeWidth={1.35}
+              fill="currentColor"
+            />
           </motion.span>
         )}
       </AnimatePresence>
