@@ -1,35 +1,36 @@
 "use client";
 
-import Image from "next/image";
-import { Calendar, Clock, MapPin, Navigation, Shirt } from "lucide-react";
-import { motion } from "motion/react";
 import {
-  HAXR_AUTH,
-  formatCopyright,
-  formatStudioCredit,
+    HAXR_AUTH,
+    formatCopyright,
+    formatStudioCredit,
 } from "@lib/brand/authorship";
 import {
-  WEDDING_ASSETS,
-  WEDDING_COPY,
-  WEDDING_COUPLE,
-  WEDDING_EVENT,
-  WEDDING_ITINERARY,
-  WEDDING_PARENTS,
-  WEDDING_VENUE,
-  buildWeddingGoogleCalendarUrl,
-  downloadWeddingIcsFile,
-  formatWeddingEventDate,
-  formatWeddingHeroDateDots,
+    WEDDING_ASSETS,
+    WEDDING_COPY,
+    WEDDING_COUPLE,
+    WEDDING_EVENT,
+    WEDDING_ITINERARY,
+    WEDDING_PARENTS,
+    WEDDING_VENUE,
+    buildWeddingGoogleCalendarUrl,
+    downloadWeddingIcsFile,
+    formatWeddingEventDate,
+    formatWeddingHeroDateDots,
 } from "@lib/jessica-samuel-wedding/event-details";
+import { Calendar, Clock, MapPin, Navigation } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
+import { useId } from "react";
 import { useExperience } from "../../context";
-import { jsType } from "./jessica-samuel-typography";
-import {
-  JS_LAYOUT,
-  JS_SECTION_BG,
-  JS_SURFACES,
-} from "./jessica-samuel-surfaces";
-import { jsReveal, jsStagger, jsViewport } from "./jessica-samuel-motion";
 import { JessicaSamuelEditorialHeading } from "./jessica-samuel-editorial-heading";
+import { jsReveal, jsStagger, jsViewport } from "./jessica-samuel-motion";
+import {
+    JS_LAYOUT,
+    JS_SECTION_BG,
+    JS_SURFACES,
+} from "./jessica-samuel-surfaces";
+import { jsType } from "./jessica-samuel-typography";
 
 function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({
@@ -102,47 +103,251 @@ function HeroBottomCurve() {
   );
 }
 
+/** Rota editorial em “8” — altos, baixos e continuidade da jornada. */
+const JOURNEY_FLIGHT_PATH =
+  "M54 310 C156 350 304 302 350 222 C395 143 326 74 224 84 C116 94 88 168 150 214 C224 269 354 226 452 176 C552 124 682 143 710 218 C738 292 628 342 526 302 C426 263 396 170 458 98 C516 31 630 36 716 72";
+
 function JourneyPlaneIllustration() {
+  const reduceMotion = useReducedMotion();
+  const reactId = useId().replace(/:/g, "");
+  const pathId = `js-journey-path-${reactId}`;
+  const softGlowId = `js-journey-glow-${reactId}`;
+
   return (
-    <div className="relative mx-auto mt-10 w-full max-w-2xl" aria-hidden>
+    <div
+      className="js-wedding-journey-flight"
+      aria-hidden
+    >
       <svg
-        viewBox="0 0 720 220"
-        className="w-full h-auto"
+        viewBox="0 0 766 380"
+        className="js-wedding-journey-flight__svg"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
+        <defs>
+          <linearGradient id={softGlowId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={JS_SURFACES.rose} stopOpacity="0" />
+            <stop offset="35%" stopColor={JS_SURFACES.rose} stopOpacity="0.55" />
+            <stop offset="70%" stopColor={JS_SURFACES.champagneDeep} stopOpacity="0.7" />
+            <stop offset="100%" stopColor={JS_SURFACES.wine} stopOpacity="0.15" />
+          </linearGradient>
+          <filter id={`${reactId}-plane-shadow`} x="-40%" y="-40%" width="180%" height="180%">
+            <feDropShadow
+              dx="0"
+              dy="3"
+              stdDeviation="3.5"
+              floodColor={JS_SURFACES.ink}
+              floodOpacity="0.22"
+            />
+          </filter>
+        </defs>
+
+        {/* Elementos de mapa — nuvens, coordenadas e pontos de passagem */}
+        <g className="js-wedding-journey-flight__atmosphere">
+          <g transform="translate(112 66)">
+            <path
+              d="M0 18C0 12.5 4.5 8 10 8C11.8 3.4 16.3 0 21.7 0C28.6 0 34.2 5.2 34.8 11.9C40.4 12.1 45 16.7 45 22.4H0V18Z"
+              fill={JS_SURFACES.ivory}
+              stroke={JS_SURFACES.champagneDeep}
+              strokeWidth="0.9"
+            />
+          </g>
+          <g transform="translate(550 254) scale(0.85)">
+            <path
+              d="M0 18C0 12.5 4.5 8 10 8C11.8 3.4 16.3 0 21.7 0C28.6 0 34.2 5.2 34.8 11.9C40.4 12.1 45 16.7 45 22.4H0V18Z"
+              fill={JS_SURFACES.ivory}
+              stroke={JS_SURFACES.champagneDeep}
+              strokeWidth="0.9"
+            />
+          </g>
+          <g transform="translate(654 116) scale(0.66)">
+            <path
+              d="M0 18C0 12.5 4.5 8 10 8C11.8 3.4 16.3 0 21.7 0C28.6 0 34.2 5.2 34.8 11.9C40.4 12.1 45 16.7 45 22.4H0V18Z"
+              fill={JS_SURFACES.ivory}
+              stroke={JS_SURFACES.champagneDeep}
+              strokeWidth="1"
+            />
+          </g>
+
+          <g transform="translate(195 274)">
+            <path
+              d="M0 -9C5 -9 9 -5 9 0C9 6.5 0 15 0 15C0 15 -9 6.5 -9 0C-9 -5 -5 -9 0 -9Z"
+              fill={JS_SURFACES.rose}
+              fillOpacity="0.2"
+              stroke={JS_SURFACES.rose}
+              strokeWidth="1"
+            />
+            <circle r="2.6" fill={JS_SURFACES.rose} />
+          </g>
+          <g transform="translate(482 72)">
+            <path
+              d="M0 -9C5 -9 9 -5 9 0C9 6.5 0 15 0 15C0 15 -9 6.5 -9 0C-9 -5 -5 -9 0 -9Z"
+              fill={JS_SURFACES.wine}
+              fillOpacity="0.12"
+              stroke={JS_SURFACES.wine}
+              strokeWidth="1"
+            />
+            <circle r="2.6" fill={JS_SURFACES.wine} />
+          </g>
+
+          <g className="js-wedding-journey-flight__compass" transform="translate(76 116)">
+            <circle r="16" stroke={JS_SURFACES.champagneDeep} strokeWidth="0.8" />
+            <circle r="11" stroke={JS_SURFACES.champagneDeep} strokeWidth="0.5" />
+            <path
+              d="M0 -12L3 0L0 12L-3 0Z"
+              fill={JS_SURFACES.wine}
+              fillOpacity="0.7"
+            />
+            <path
+              d="M-12 0L0 -3L12 0L0 3Z"
+              fill={JS_SURFACES.rose}
+              fillOpacity="0.55"
+            />
+          </g>
+        </g>
+
+        {/* Aura subtil — leitura de rota em ecrã de bordo */}
         <path
-          d="M42 146C122 84 194 76 266 118C329 155 392 163 462 118C534 72 602 80 680 132"
+          d={JOURNEY_FLIGHT_PATH}
+          stroke={`url(#${softGlowId})`}
+          strokeWidth="12"
+          strokeLinecap="round"
+          opacity="0.22"
+        />
+
+        {/* Linha contínua inferior para preservar a forma do “8” */}
+        <path
+          d={JOURNEY_FLIGHT_PATH}
+          stroke={JS_SURFACES.wine}
+          strokeWidth="0.8"
+          strokeLinecap="round"
+          opacity="0.2"
+        />
+
+        {/* Rota principal tracejada */}
+        <path
+          id={pathId}
+          className={
+            reduceMotion
+              ? "js-wedding-journey-flight__path"
+              : "js-wedding-journey-flight__path js-wedding-journey-flight__path--live"
+          }
+          d={JOURNEY_FLIGHT_PATH}
           stroke={JS_SURFACES.champagneDeep}
-          strokeWidth="2.5"
+          strokeWidth="2"
           strokeLinecap="round"
-          strokeDasharray="7 9"
-          opacity="0.85"
+          strokeDasharray="2 10"
+          opacity="0.95"
         />
-        <path
-          d="M60 158C138 96 210 92 278 128C340 161 401 166 467 124C540 79 603 82 664 124"
-          stroke={JS_SURFACES.rose}
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          opacity="0.55"
-        />
-        <circle cx="61" cy="158" r="5" fill={JS_SURFACES.rose} opacity="0.7" />
-        <circle cx="664" cy="124" r="5" fill={JS_SURFACES.rose} opacity="0.7" />
-        <g transform="translate(350 92) rotate(-8)">
-          <path
-            d="M0 14L44 0L36 12L64 18L60 26L34 22L42 38L28 34L20 22L4 26L0 14Z"
-            fill={JS_SURFACES.ivory}
+
+        {/* Partida, cruzamentos e destino */}
+        <g className="js-wedding-journey-flight__markers">
+          <circle cx="54" cy="310" r="4.5" fill={JS_SURFACES.rose} opacity="0.9" />
+          <circle
+            cx="54"
+            cy="310"
+            r="9"
+            stroke={JS_SURFACES.rose}
+            strokeWidth="1"
+            opacity="0.35"
+            fill="none"
+          />
+          <circle cx="350" cy="222" r="2.4" fill={JS_SURFACES.champagneDeep} />
+          <circle cx="452" cy="176" r="2.4" fill={JS_SURFACES.champagneDeep} />
+          <circle cx="716" cy="72" r="4.5" fill={JS_SURFACES.wine} opacity="0.95" />
+          <circle
+            cx="716"
+            cy="72"
+            r="9"
             stroke={JS_SURFACES.wine}
             strokeWidth="1"
-            opacity="0.92"
+            opacity="0.35"
+            fill="none"
           />
-          <path
-            d="M18 16H41"
-            stroke={JS_SURFACES.wine}
-            strokeWidth="1"
-            strokeLinecap="round"
-            opacity="0.55"
-          />
+          <text
+            x="38"
+            y="340"
+            className="js-wedding-journey-flight__label"
+            fill={JS_SURFACES.wine}
+          >
+            PARTIDA
+          </text>
+          <text
+            x="662"
+            y="48"
+            className="js-wedding-journey-flight__label"
+            fill={JS_SURFACES.wine}
+          >
+            DESTINO
+          </text>
+        </g>
+
+        {/* Avião de papel — leve, editorial e luxuoso */}
+        <g
+          className="js-wedding-journey-flight__plane"
+          filter={`url(#${reactId}-plane-shadow)`}
+        >
+          <g transform="translate(-30 -24) scale(1.2)">
+            <path
+              d="M3 21 L53 3 L37 43 L26 27 L3 21 Z"
+              fill={JS_SURFACES.ivory}
+              stroke={JS_SURFACES.wine}
+              strokeWidth="1.05"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M3 21 L26 27 L53 3"
+              stroke={JS_SURFACES.champagneDeep}
+              strokeWidth="1"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M26 27 L37 43 L32 28 L53 3"
+              fill={JS_SURFACES.rose}
+              fillOpacity="0.35"
+              stroke={JS_SURFACES.wine}
+              strokeWidth="0.85"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M7 20 L53 3"
+              stroke={JS_SURFACES.ivory}
+              strokeWidth="0.7"
+              opacity="0.8"
+              strokeLinecap="round"
+            />
+          </g>
+
+          {reduceMotion ? (
+            <animateMotion
+              dur="0.01s"
+              fill="freeze"
+              rotate="auto"
+              keyPoints="0.52;0.52"
+              keyTimes="0;1"
+              calcMode="linear"
+            >
+              <mpath xlinkHref={`#${pathId}`} href={`#${pathId}`} />
+            </animateMotion>
+          ) : (
+            <animateMotion
+              dur="17s"
+              repeatCount="indefinite"
+              rotate="auto"
+              calcMode="linear"
+            >
+              <mpath xlinkHref={`#${pathId}`} href={`#${pathId}`} />
+            </animateMotion>
+          )}
+          {!reduceMotion ? (
+            <animate
+              attributeName="opacity"
+              dur="17s"
+              repeatCount="indefinite"
+              values="0;1;1;0"
+              keyTimes="0;0.04;0.95;1"
+            />
+          ) : null}
         </g>
       </svg>
     </div>
@@ -176,7 +381,7 @@ export function JessicaSamuelHeroSection() {
       initial="hidden"
       animate="visible"
       variants={jsStagger}
-      className="relative overflow-x-hidden min-h-[100svh] sm:min-h-[96svh]"
+      className="relative h-[100svh] max-h-[100svh] overflow-hidden"
       aria-labelledby="wedding-hero-heading"
     >
       <div className="absolute inset-0 z-0">
@@ -208,7 +413,7 @@ export function JessicaSamuelHeroSection() {
         }}
       />
 
-      <div className="relative z-[3] flex min-h-[100svh] items-end justify-center px-5 pb-24 sm:px-8 md:pb-28 lg:pb-32">
+      <div className="relative z-[3] flex h-full items-end justify-center px-5 pb-24 sm:px-8 md:pb-28 lg:pb-32">
         <motion.div
           variants={jsReveal}
           className="js-wedding-hero-intro__copy w-full max-w-3xl text-center"
@@ -652,50 +857,9 @@ export function JessicaSamuelLocationSection() {
   );
 }
 
-export function JessicaSamuelDressCodeSection() {
-  const { theme } = useExperience();
-
-  return (
-    <motion.section
-      id="dress-code"
-      initial="hidden"
-      whileInView="visible"
-      viewport={jsViewport}
-      variants={jsStagger}
-      className={`${JS_LAYOUT.section} py-16 md:py-24`}
-      style={{ backgroundColor: JS_SECTION_BG.secondary }}
-    >
-      <motion.div variants={jsReveal} className={JS_LAYOUT.containerNarrow}>
-        <SectionHeading
-          eyebrow={theme.copy.dressCode?.label ?? "Dress Code"}
-          title={theme.copy.dressCode?.title ?? WEDDING_EVENT.dressCode}
-        />
-        <div className="flex justify-center mb-8">
-          <Shirt
-            className="w-8 h-8"
-            style={{ color: JS_SURFACES.wine }}
-            aria-hidden
-          />
-        </div>
-        <p
-          className={`${jsType.body} text-center mb-4`}
-          style={{ color: JS_SURFACES.inkSoft }}
-        >
-          {theme.copy.dressCode?.description ?? WEDDING_COPY.dressCodeLead}
-        </p>
-        <p
-          className={`${jsType.bodyPoetic} text-center`}
-          style={{ color: JS_SURFACES.rose }}
-        >
-          {WEDDING_COPY.dressCodeBody}
-        </p>
-      </motion.div>
-    </motion.section>
-  );
-}
-
 export function JessicaSamuelGiftSection() {
   const hasStoreMaps = Boolean(WEDDING_EVENT.giftStoreMapsUrl);
+  const phoneHref = `tel:+${WEDDING_EVENT.giftStorePhoneTel}`;
 
   return (
     <motion.section
@@ -722,49 +886,44 @@ export function JessicaSamuelGiftSection() {
           {WEDDING_COPY.giftsLead}
         </p>
 
-        <div
-          className="mt-10 p-8 md:p-10 rounded-sm border text-left relative overflow-hidden"
-          style={{
-            background: `linear-gradient(155deg, ${JS_SURFACES.ivory} 0%, ${JS_SURFACES.champagne} 58%, rgba(201, 147, 155, 0.18) 100%)`,
-            borderColor: JS_SURFACES.line,
-            boxShadow: "0 18px 48px rgba(122, 35, 50, 0.08)",
-          }}
-        >
-          <div
-            className="absolute inset-x-0 top-0 h-1"
-            style={{ background: JS_SURFACES.wine }}
-            aria-hidden
-          />
+        <div className="mt-10 text-left max-w-md mx-auto">
           <p
-            className={`${jsType.micro} mb-3`}
-            style={{ color: JS_SURFACES.inkSoft }}
+            className={`${jsType.micro} mb-2`}
+            style={{ color: JS_SURFACES.wine }}
           >
             Consulta presencial
           </p>
           <p
-            className={`${jsType.sectionTitle} text-2xl sm:text-3xl mb-3`}
-            style={{ color: JS_SURFACES.wine }}
+            className={`${jsType.sectionTitle} text-2xl sm:text-3xl mb-1`}
+            style={{ color: JS_SURFACES.ink }}
           >
             {WEDDING_EVENT.giftStoreName}
           </p>
           <p
-            className={`${jsType.bodyPoetic} mb-4`}
+            className={`${jsType.bodyPoetic} mb-1`}
+            style={{ color: JS_SURFACES.inkSoft }}
+          >
+            {WEDDING_EVENT.giftStoreAddress}
+          </p>
+          <a
+            href={phoneHref}
+            className={`${jsType.body} inline-block mb-4`}
+            style={{ color: JS_SURFACES.wine }}
+          >
+            {WEDDING_EVENT.giftStorePhoneDisplay}
+          </a>
+          <p
+            className={`${jsType.bodyPoetic} mb-3`}
             style={{ color: JS_SURFACES.ink }}
           >
             {WEDDING_COPY.giftsRegistryNameNote}
           </p>
-          <p
-            className={`${jsType.body} mb-4`}
-            style={{ color: JS_SURFACES.inkSoft }}
-          >
+          <p className={jsType.body} style={{ color: JS_SURFACES.inkSoft }}>
             {WEDDING_COPY.giftsConsultNote}
           </p>
-          <p className={jsType.body} style={{ color: JS_SURFACES.inkSoft }}>
-            {WEDDING_COPY.giftsStoreNote}
-          </p>
 
-          {hasStoreMaps ? (
-            <div className="mt-8">
+          <div className="mt-8 flex flex-wrap gap-3">
+            {hasStoreMaps ? (
               <a
                 href={WEDDING_EVENT.giftStoreMapsUrl}
                 target="_blank"
@@ -777,10 +936,21 @@ export function JessicaSamuelGiftSection() {
                 }}
               >
                 <Navigation className="w-4 h-4" strokeWidth={1.5} aria-hidden />
-                Abrir localização da loja
+                Abrir no Maps
               </a>
-            </div>
-          ) : null}
+            ) : null}
+            <a
+              href={phoneHref}
+              className={`${jsType.micro} inline-flex items-center gap-2 px-6 py-3 border transition-colors`}
+              style={{
+                borderColor: JS_SURFACES.champagneDeep,
+                color: JS_SURFACES.ink,
+                backgroundColor: JS_SURFACES.ivory,
+              }}
+            >
+              Ligar
+            </a>
+          </div>
         </div>
       </motion.div>
     </motion.section>

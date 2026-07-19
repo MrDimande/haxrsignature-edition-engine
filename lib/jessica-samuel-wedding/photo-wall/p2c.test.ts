@@ -65,10 +65,19 @@ class FakeIntentRepository implements PhotoUploadIntentRepository {
 
 const originalEnv = { ...process.env };
 const originalPhotoWallEnabled = JESSICA_SAMUEL_PHOTO_WALL.enabled;
+const originalPhotoWallOpensAt = JESSICA_SAMUEL_PHOTO_WALL.opensAt;
+const originalPhotoWallClosesAt = JESSICA_SAMUEL_PHOTO_WALL.closesAt;
 
 function setPhotoWallEnabled(enabled: boolean): void {
-  (JESSICA_SAMUEL_PHOTO_WALL as unknown as { enabled: boolean }).enabled =
-    enabled;
+  const config = JESSICA_SAMUEL_PHOTO_WALL as unknown as {
+    enabled: boolean;
+    opensAt: string | null;
+    closesAt: string | null;
+  };
+  config.enabled = enabled;
+  // Em testes de upload, remover janela temporal para isolar o gate `enabled`.
+  config.opensAt = enabled ? null : originalPhotoWallOpensAt;
+  config.closesAt = enabled ? null : originalPhotoWallClosesAt;
 }
 
 function setSupabaseConfigured(): void {
@@ -92,7 +101,14 @@ function jpegBlob(): Blob {
 
 beforeEach(() => {
   process.env = { ...originalEnv };
-  setPhotoWallEnabled(originalPhotoWallEnabled);
+  const config = JESSICA_SAMUEL_PHOTO_WALL as unknown as {
+    enabled: boolean;
+    opensAt: string | null;
+    closesAt: string | null;
+  };
+  config.enabled = originalPhotoWallEnabled;
+  config.opensAt = originalPhotoWallOpensAt;
+  config.closesAt = originalPhotoWallClosesAt;
   __setPublicMutationRateLimitForTests(null);
   __setPhotoUploadIntentRepositoryForTests(null);
   __setSignedUploadUrlForTests(null);

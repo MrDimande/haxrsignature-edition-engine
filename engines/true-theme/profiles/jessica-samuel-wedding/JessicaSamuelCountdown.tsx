@@ -2,12 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   WEDDING_ASSETS,
   WEDDING_COPY,
   WEDDING_EVENT,
 } from "@lib/jessica-samuel-wedding/event-details";
+import {
+  getWeddingChapterPhase,
+  type WeddingChapterPhase,
+} from "@lib/jessica-samuel-wedding/chapter-phase";
 import { readWeddingRsvpStorage } from "@lib/jessica-samuel-wedding/rsvp-ritual";
 import { useExperience } from "../../context";
 import { JessicaSamuelEditorialHeading } from "./jessica-samuel-editorial-heading";
@@ -21,14 +25,15 @@ type CountdownParts = {
   complete: boolean;
 };
 
-type ChapterPhase = "before" | "today" | "after";
+type ChapterPhase = WeddingChapterPhase;
 
-/** Lógica funcional preservada — não alterar o alvo nem o cálculo.
- * Horário T18:00+02:00 no tick do countdown é legado do componente.
- * Calendário Google/.ics usa WEDDING_EVENT.timeLabel (provisório: 10h30;
- * divergência 08h00 vs 10h30 ainda por confirmar — não tratar como final). */
-function getCountdown(targetIso: string): CountdownParts {
-  const target = new Date(`${targetIso}T18:00:00+02:00`).getTime();
+/** Countdown até à cerimónia religiosa (WEDDING_EVENT.timeLabel = 10h30). */
+function getCountdown(targetIso: string, timeLabel: string): CountdownParts {
+  const match = timeLabel.match(/(\d{1,2})h(\d{2})?/i);
+  const hours = match ? Number(match[1]) : 10;
+  const minutes = match?.[2] ? Number(match[2]) : 30;
+  const padded = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`;
+  const target = new Date(`${targetIso}T${padded}+02:00`).getTime();
   const now = Date.now();
   const diff = target - now;
 
@@ -37,27 +42,21 @@ function getCountdown(targetIso: string): CountdownParts {
   }
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const hoursLeft = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutesLeft = Math.floor((diff / (1000 * 60)) % 60);
   const seconds = Math.floor((diff / 1000) % 60);
 
-  return { days, hours, minutes, seconds, complete: false };
+  return {
+    days,
+    hours: hoursLeft,
+    minutes: minutesLeft,
+    seconds,
+    complete: false,
+  };
 }
 
-function maputoCalendarDay(date: Date): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Africa/Maputo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
-
-function getChapterPhase(dateIso: string, now: Date = new Date()): ChapterPhase {
-  const today = maputoCalendarDay(now);
-  if (today < dateIso) return "before";
-  if (today === dateIso) return "today";
-  return "after";
+function getChapterPhase(dateIso: string): ChapterPhase {
+  return getWeddingChapterPhase(dateIso);
 }
 
 function padUnit(value: number): string {
@@ -79,7 +78,7 @@ export function JessicaSamuelCountdownSection({
   const { config } = useExperience();
   const reduceMotion = useReducedMotion();
   const [parts, setParts] = useState<CountdownParts>(() =>
-    getCountdown(WEDDING_EVENT.dateIso)
+    getCountdown(WEDDING_EVENT.dateIso, WEDDING_EVENT.timeLabel)
   );
   const [phase, setPhase] = useState<ChapterPhase>(() =>
     getChapterPhase(WEDDING_EVENT.dateIso)
@@ -89,7 +88,7 @@ export function JessicaSamuelCountdownSection({
 
   useEffect(() => {
     const tick = () => {
-      setParts(getCountdown(WEDDING_EVENT.dateIso));
+      setParts(getCountdown(WEDDING_EVENT.dateIso, WEDDING_EVENT.timeLabel));
       setPhase(getChapterPhase(WEDDING_EVENT.dateIso));
     };
     tick();
@@ -182,68 +181,115 @@ export function JessicaSamuelCountdownSection({
                   {WEDDING_COPY.countdownQuote}
                 </motion.p>
 
-                <motion.h2
-                  id="chapter-countdown-title"
-                  className="js-chapter-countdown__title"
-                  variants={{
-                    hidden: { opacity: 0, y: 18 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      transition: { duration: 0.85, ease: EASE },
-                    },
-                  }}
-                >
-                  {headline}
-                </motion.h2>
-
-                {showTimer ? (
-                  <motion.div
-                    className="js-chapter-countdown__meter"
-                    role="timer"
-                    aria-live="polite"
-                    aria-atomic="true"
-                    variants={{
-                      hidden: { opacity: 0, y: 20 },
-                      visible: {
+                <div className="js-chapter-countdown__title-slot">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.h2
+                      key={headline}
+                      id="chapter-countdown-title"
+                      className="js-chapter-countdown__title"
+                      initial={
+                        reduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: 16, filter: "blur(5px)" }
+                      }
+                      animate={{
                         opacity: 1,
                         y: 0,
-                        transition: { duration: 0.9, ease: EASE },
-                      },
-                    }}
-                  >
-                    {units.map((unit, index) => (
-                      <div key={unit.label} className="js-chapter-countdown__unit">
-                        {index > 0 ? (
-                          <span
-                            className="js-chapter-countdown__rule"
-                            aria-hidden
-                          />
-                        ) : null}
-                        <p className="js-chapter-countdown__value">
-                          {padUnit(unit.value)}
-                        </p>
-                        <p className="js-chapter-countdown__label">{unit.label}</p>
-                      </div>
-                    ))}
-                  </motion.div>
-                ) : null}
+                        filter: "blur(0px)",
+                      }}
+                      exit={
+                        reduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: -12, filter: "blur(4px)" }
+                      }
+                      transition={{
+                        duration: reduceMotion ? 0.2 : 0.7,
+                        ease: EASE,
+                      }}
+                    >
+                      {headline}
+                    </motion.h2>
+                  </AnimatePresence>
+                </div>
 
-                <motion.p
-                  className="js-chapter-countdown__closing"
-                  variants={{
-                    hidden: { opacity: 0, y: 14 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      transition: { duration: 0.75, ease: EASE },
-                    },
-                  }}
-                >
-                  {phase === "after" || parts.complete
-                    ? WEDDING_COPY.countdownComplete
-                    : closingLine}
-                </motion.p>
+                <AnimatePresence mode="wait" initial={false}>
+                  {showTimer ? (
+                    <motion.div
+                      key="countdown-meter"
+                      className="js-chapter-countdown__meter"
+                      role="timer"
+                      aria-live="polite"
+                      aria-atomic="true"
+                      initial={
+                        reduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: 18 }
+                      }
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={
+                        reduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: -10 }
+                      }
+                      transition={{
+                        duration: reduceMotion ? 0.2 : 0.65,
+                        ease: EASE,
+                      }}
+                    >
+                      {units.map((unit, index) => (
+                        <div
+                          key={unit.label}
+                          className="js-chapter-countdown__unit"
+                        >
+                          {index > 0 ? (
+                            <span
+                              className="js-chapter-countdown__rule"
+                              aria-hidden
+                            />
+                          ) : null}
+                          <p className="js-chapter-countdown__value">
+                            {padUnit(unit.value)}
+                          </p>
+                          <p className="js-chapter-countdown__label">
+                            {unit.label}
+                          </p>
+                        </div>
+                      ))}
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+
+                <div className="js-chapter-countdown__closing-slot">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.p
+                      key={
+                        phase === "after" || parts.complete
+                          ? "complete"
+                          : closingLine
+                      }
+                      className="js-chapter-countdown__closing"
+                      initial={
+                        reduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: 12 }
+                      }
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={
+                        reduceMotion
+                          ? { opacity: 0 }
+                          : { opacity: 0, y: -8 }
+                      }
+                      transition={{
+                        duration: reduceMotion ? 0.18 : 0.55,
+                        ease: EASE,
+                      }}
+                    >
+                      {phase === "after" || parts.complete
+                        ? WEDDING_COPY.countdownComplete
+                        : closingLine}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
               </div>
 
               <motion.figure

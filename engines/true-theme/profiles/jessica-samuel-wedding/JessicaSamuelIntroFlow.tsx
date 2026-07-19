@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useLenis } from "lenis/react";
 import { HAXR_AUTH } from "@lib/brand/authorship";
 import {
   WEDDING_ASSETS,
   WEDDING_COPY,
+  WEDDING_COUPLE,
 } from "@lib/jessica-samuel-wedding/event-details";
 import { getFlowExitTransition } from "../../../../theme/experience-tokens";
 import { useExperience } from "../../context";
@@ -21,25 +23,49 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function JessicaSamuelIntroFlow() {
   const { theme, introComplete, setIntroComplete, audioPlayer } =
     useExperience();
+  const lenis = useLenis();
+
+  const resetToHero = useCallback(() => {
+    lenis?.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [lenis]);
 
   useEffect(() => {
     if (introComplete) return;
     const prev = document.body.style.overflow;
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+    resetToHero();
     document.body.style.overflow = "hidden";
     document.documentElement.classList.add("lenis-stopped");
     return () => {
       document.body.style.overflow = prev;
+      window.history.scrollRestoration = previousScrollRestoration;
       document.documentElement.classList.remove("lenis-stopped");
     };
-  }, [introComplete]);
+  }, [introComplete, resetToHero]);
 
   if (introComplete) return null;
 
   const handleEnter = async () => {
+    resetToHero();
     if (audioPlayer && theme.audio.type !== "silent") {
       await audioPlayer.start();
     }
     setIntroComplete(true);
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        const hero = document.getElementById("hero");
+        if (hero && lenis) {
+          lenis.scrollTo(hero, { immediate: true, force: true });
+          return;
+        }
+        resetToHero();
+      });
+    });
   };
 
   return (
@@ -61,8 +87,6 @@ function JessicaSamuelIntroOverlay({
   const exit = getFlowExitTransition(theme.flow);
   const [isOpening, setIsOpening] = useState(false);
 
-  const headline = theme.copy.intro?.headline ?? "Jessica";
-  const surname = theme.copy.intro?.surname ?? "& Samuel";
   const subline =
     theme.copy.intro?.subline ?? config.metadata.subtitle ?? "";
 
@@ -163,8 +187,15 @@ function JessicaSamuelIntroOverlay({
               },
             }}
           >
-            <span className="js-wedding-cover__name">{headline}</span>
-            <span className="js-wedding-cover__amp">{surname}</span>
+            <span className="js-wedding-cover__name">
+              {WEDDING_COUPLE.bride}
+            </span>
+            <span className="js-wedding-cover__amp" aria-hidden>
+              &amp;
+            </span>
+            <span className="js-wedding-cover__name">
+              {WEDDING_COUPLE.groom}
+            </span>
           </motion.h1>
 
           <motion.div

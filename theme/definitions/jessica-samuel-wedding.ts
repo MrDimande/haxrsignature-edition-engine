@@ -58,7 +58,7 @@ export const jessicaSamuelWeddingTheme: TrueTheme = {
     },
     dressCode: {
       label: "Dress Code",
-      title: WEDDING_EVENT.dressCode,
+      title: "Traje de gala",
       description: WEDDING_COPY.dressCodeLead,
     },
     location: {

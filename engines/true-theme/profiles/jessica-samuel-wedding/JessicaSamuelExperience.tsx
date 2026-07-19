@@ -1,11 +1,13 @@
 "use client";
 
+import "./jessica-samuel-approved-additions.css";
 import { JessicaSamuelCelebrationGuideSection } from "./JessicaSamuelCelebrationGuide";
 import { JessicaSamuelCountdownSection } from "./JessicaSamuelCountdown";
-import { JessicaSamuelGallerySection } from "./JessicaSamuelGallerySection";
+import { JessicaSamuelDressCodeSection } from "./JessicaSamuelDressCodeSection";
+import { JessicaSamuelFloatingNav } from "./JessicaSamuelFloatingNav";
+import { JessicaSamuelPostEventSection } from "./JessicaSamuelPostEventSection";
 import {
   JessicaSamuelDetailsSection,
-  JessicaSamuelDressCodeSection,
   JessicaSamuelFamiliesSection,
   JessicaSamuelFooterSection,
   JessicaSamuelHeroSection,
@@ -14,6 +16,7 @@ import {
   JessicaSamuelLocationSection,
 } from "./JessicaSamuelSections";
 import { JessicaSamuelRSVPSection } from "./JessicaSamuelRSVP";
+import { MemoriesSection } from "./photos/MemoriesSection";
 
 /** Composição completa — Casamento Jessica & Samuel */
 export function JessicaSamuelExperience() {
@@ -28,14 +31,16 @@ export function JessicaSamuelExperience() {
       <JessicaSamuelJourneySection />
       <JessicaSamuelIntroSection />
       <JessicaSamuelFamiliesSection />
-      <JessicaSamuelGallerySection />
       <JessicaSamuelDetailsSection />
       <JessicaSamuelCelebrationGuideSection />
       <JessicaSamuelLocationSection />
       <JessicaSamuelDressCodeSection />
       <JessicaSamuelCountdownSection />
+      <JessicaSamuelPostEventSection />
+      <MemoriesSection />
       <JessicaSamuelRSVPSection />
       <JessicaSamuelFooterSection />
+      <JessicaSamuelFloatingNav />
     </div>
   );
 }

@@ -8,8 +8,10 @@ import { getPhotoUploadIntentRepository } from "./upload-intent-store";
 import {
   isPhotoWallOpen,
   matchesMagicBytes,
+  maxBytesForContentType,
   toPublicGalleryItem,
   validateCaption,
+  validateFileSize,
   validateGuestName,
 } from "./validation";
 
@@ -33,8 +35,20 @@ type PhotoWallRuntime = {
   }): Promise<boolean>;
 };
 
+/** Contador de acessos reais a Supabase — só para regressão em testes. */
+let supabaseAccessCountForTests = 0;
+
+export function __getPhotoWallSupabaseAccessCountForTests(): number {
+  return supabaseAccessCountForTests;
+}
+
+export function __resetPhotoWallSupabaseAccessCountForTests(): void {
+  supabaseAccessCountForTests = 0;
+}
+
 let runtime: PhotoWallRuntime = {
   async download(bucketName, storagePath) {
+    supabaseAccessCountForTests += 1;
     const supabase = createAdminClient();
     const { data, error } = await supabase.storage
       .from(bucketName)
@@ -42,10 +56,12 @@ let runtime: PhotoWallRuntime = {
     return error || !data ? null : data;
   },
   async remove(bucketName, storagePaths) {
+    supabaseAccessCountForTests += 1;
     const supabase = createAdminClient();
     await supabase.storage.from(bucketName).remove(storagePaths);
   },
   async insertPendingPhoto(input) {
+    supabaseAccessCountForTests += 1;
     const supabase = createAdminClient();
     const { error } = await supabase.from("wedding_photos").insert({
       id: input.id,
@@ -80,13 +96,13 @@ export async function completePhotoUpload(
 ): Promise<{ success: boolean; error?: string; code?: string; retryAfterSeconds?: number }> {
   const ctx = resolvePhotoWallContext(slug);
   if (!ctx) {
-    return { success: false, error: "Convite nÃ£o encontrado.", code: "NOT_FOUND" };
+    return { success: false, error: "Convite não encontrado.", code: "NOT_FOUND" };
   }
 
   if (!isPhotoWallOpen()) {
     return {
       success: false,
-      error: "A galeria de memÃ³rias ainda nÃ£o estÃ¡ disponÃ­vel.",
+      error: "A galeria de memórias ainda não está disponível.",
       code: "PHOTO_WALL_CLOSED",
     };
   }
@@ -95,10 +111,12 @@ export async function completePhotoUpload(
   if (!bucketName) {
     return {
       success: false,
-      error: "ServiÃ§o temporariamente indisponÃ­vel.",
+      error: "Serviço temporariamente indisponível.",
       code: "SERVICE_UNAVAILABLE",
     };
   }
+
+  const storageSlug = JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
 
   const nameError = validateGuestName(metadata.guestName);
   if (nameError) return { success: false, error: nameError };
@@ -131,7 +149,7 @@ export async function completePhotoUpload(
   if (!isSupabaseConfigured()) {
     return {
       success: false,
-      error: "ServiÃ§o temporariamente indisponÃ­vel.",
+      error: "Serviço temporariamente indisponível.",
       code: "SERVICE_UNAVAILABLE",
     };
   }
@@ -140,7 +158,7 @@ export async function completePhotoUpload(
   try {
     intent = await getPhotoUploadIntentRepository().consume({
       photoId,
-      slug: ctx.slug,
+      slug: storageSlug,
       bucketName,
       nowIso: new Date().toISOString(),
     });
@@ -148,7 +166,7 @@ export async function completePhotoUpload(
     console.error("[PhotoWall] consume intent error");
     return {
       success: false,
-      error: "NÃ£o foi possÃ­vel confirmar o envio.",
+      error: "Não foi possível confirmar o envio.",
       code: "INTENT_EXPIRED",
     };
   }
@@ -158,36 +176,41 @@ export async function completePhotoUpload(
   }
 
   if (
-    intent.slug !== ctx.slug ||
+    intent.slug !== storageSlug ||
     intent.bucketName !== bucketName ||
-    !isStoragePathIsolated(ctx.slug, intent.storagePath)
+    !isStoragePathIsolated(storageSlug, intent.storagePath)
   ) {
-    return { success: false, error: "Pedido de envio invÃ¡lido.", code: "INVALID_INTENT" };
+    return { success: false, error: "Pedido de envio inválido.", code: "INVALID_INTENT" };
   }
 
   const fileData = await runtime.download(bucketName, intent.storagePath);
   if (!fileData) {
     return {
       success: false,
-      error: "NÃ£o foi possÃ­vel confirmar o envio.",
+      error: "Não foi possível confirmar o envio.",
       code: "UPLOAD_MISSING",
     };
   }
 
   const buffer = new Uint8Array(await fileData.arrayBuffer());
-  if (
-    buffer.byteLength > JESSICA_SAMUEL_PHOTO_WALL.maxFileSizeBytes ||
-    buffer.byteLength > intent.declaredFileSizeBytes
-  ) {
+  const sizeError = validateFileSize(buffer.byteLength, intent.contentType);
+  if (sizeError || buffer.byteLength > intent.declaredFileSizeBytes) {
     await runtime.remove(bucketName, [intent.storagePath]);
-    return { success: false, error: "A imagem excede o limite de 5 MB." };
+    return {
+      success: false,
+      error:
+        sizeError ??
+        `O ficheiro excede o limite de ${Math.round(
+          maxBytesForContentType(intent.contentType) / (1024 * 1024)
+        )} MB.`,
+    };
   }
 
   if (!matchesMagicBytes(buffer, intent.contentType)) {
     await runtime.remove(bucketName, [intent.storagePath]);
     return {
       success: false,
-      error: "Tipo de ficheiro invÃ¡lido.",
+      error: "Tipo de ficheiro inválido.",
       code: "INVALID_SIGNATURE",
     };
   }
@@ -197,7 +220,7 @@ export async function completePhotoUpload(
 
   const inserted = await runtime.insertPendingPhoto({
     id: photoId,
-    invitationSlug: ctx.slug,
+    invitationSlug: storageSlug,
     storagePath: intent.storagePath,
     originalFilename,
     contentType: intent.contentType,
@@ -210,7 +233,7 @@ export async function completePhotoUpload(
     console.error("[PhotoWall] insert error");
     return {
       success: false,
-      error: "NÃ£o foi possÃ­vel registar a memÃ³ria.",
+      error: "Não foi possível registar a memória.",
       code: "DB_ERROR",
     };
   }
@@ -219,23 +242,27 @@ export async function completePhotoUpload(
 }
 
 export async function listApprovedPublicPhotos(slug = "jessica-samuel"): Promise<PublicWeddingPhoto[]> {
-  const ctx = resolveInvitationContext(slug);
-  const galleryEnabled = ctx?.photoWallEnabled ?? JESSICA_SAMUEL_PHOTO_WALL.publicGalleryEnabled;
+  // Gate de feature: com upload/galeria desactivados, zero I/O a Supabase.
+  if (!JESSICA_SAMUEL_PHOTO_WALL.enabled) {
+    return [];
+  }
 
-  if (
-    !galleryEnabled ||
-    !isSupabaseConfigured()
-  ) {
+  const ctx = resolveInvitationContext(slug);
+  const galleryEnabled =
+    Boolean(ctx?.photoWallEnabled) && JESSICA_SAMUEL_PHOTO_WALL.publicGalleryEnabled;
+
+  if (!galleryEnabled || !isSupabaseConfigured()) {
     return [];
   }
 
   const bucketName = ctx?.photoWallBucket || JESSICA_SAMUEL_PHOTO_WALL.bucket;
-  const invitationSlug = ctx?.slug || JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
+  const invitationSlug = JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
 
+  supabaseAccessCountForTests += 1;
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("wedding_photos")
-    .select("id, caption, created_at, storage_path")
+    .select("id, caption, created_at, storage_path, content_type")
     .eq("invitation_slug", invitationSlug)
     .eq("moderation_status", "approved")
     .order("created_at", { ascending: false })
@@ -258,6 +285,7 @@ export async function listApprovedPublicPhotos(slug = "jessica-samuel"): Promise
         caption: row.caption,
         created_at: row.created_at,
         signedUrl: signed.signedUrl,
+        content_type: row.content_type,
       })
     );
   }
