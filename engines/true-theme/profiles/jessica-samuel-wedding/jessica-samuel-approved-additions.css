@@ -69,7 +69,7 @@
 
 .js-wedding-nav__items {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 0.18rem;
   width: 100%;
 }
@@ -80,7 +80,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.42rem;
-  min-height: 2.65rem;
+  min-height: 2.75rem;
   padding: 0.55rem 0.75rem;
   border: 0;
   border-radius: 999px;
