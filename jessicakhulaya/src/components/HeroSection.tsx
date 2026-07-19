@@ -3,16 +3,16 @@
 import { useApp } from "@/lib/context";
 import { fadeIn, fadeUp, staggerContainer } from "@/lib/motion";
 import { COLORS } from "@/styles/tokens";
+import { useLenis } from "lenis/react";
 import {
-  motion,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
+    motion,
+    useMotionValue,
+    useScroll,
+    useSpring,
+    useTransform,
 } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { useLenis } from "lenis/react";
 
 const HERO_BG = "/images/jessica-kulaya-hero-bg.webp";
 
@@ -130,15 +130,24 @@ export default function HeroSection() {
 
       {/* ─── Mobile — scrim + selo inferior (liga ao O Ritual) ─── */}
       <div
-        className="absolute inset-x-0 bottom-0 h-[58%] z-[1] pointer-events-none md:hidden"
+        className="absolute inset-x-0 bottom-0 h-[68%] z-[1] pointer-events-none md:hidden"
         style={{
-          background: `linear-gradient(to top, ${COLORS.woodBrownDeep} 0%, ${COLORS.woodBrownDeep}f0 10%, ${COLORS.woodBrownDeep}dd 30%, ${COLORS.smoothBlack}b3 56%, transparent 100%)`,
+          background: `linear-gradient(to top, ${COLORS.smoothBlack} 0%, ${COLORS.smoothBlack}f5 12%, ${COLORS.smoothBlack}e0 28%, ${COLORS.woodBrownDeep}cc 48%, ${COLORS.smoothBlack}99 62%, transparent 100%)`,
         }}
         aria-hidden
       />
       <div
         className="absolute inset-x-0 bottom-0 h-3 z-[2] pointer-events-none md:hidden"
         style={{ backgroundColor: COLORS.woodBrownDeep }}
+        aria-hidden
+      />
+
+      {/* ─── Desktop — véu preto inferior ─── */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[42%] z-[1] pointer-events-none hidden md:block"
+        style={{
+          background: `linear-gradient(to top, ${COLORS.smoothBlack}cc 0%, ${COLORS.smoothBlack}88 28%, ${COLORS.smoothBlack}40 58%, transparent 100%)`,
+        }}
         aria-hidden
       />
 

@@ -9,6 +9,7 @@ import type { GiftItem } from "@data/gifts/rose-elegance";
 import { ROSE_ELEGANCE_GIFTS } from "@data/gifts/rose-elegance";
 import { roseType } from "./rose-typography";
 import { BrideSizesGuide } from "./BrideSizesGuide";
+import { buildEditionGiftStorageKey } from "@lib/rsvp/storage-keys";
 
 const EMOTIONAL_SUCCESS_MESSAGES = [
   "Um mimo foi guardado para a Jessica — ela vai adorar.",
@@ -316,7 +317,7 @@ function RoseGiftCardShell({
 }
 
 function GiftSelectionModal({ onClose }: { onClose: () => void }) {
-  const { theme } = useExperience();
+  const { theme, config } = useExperience();
   const [gifts, setGifts] = useState<GiftItem[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -330,7 +331,9 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("haxr_reserved_gift_id");
+      const stored = localStorage.getItem(
+        buildEditionGiftStorageKey(config.slug)
+      );
       if (stored) setSessionReservedId(stored);
     }
     fetchGifts();
@@ -349,7 +352,7 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
       document.documentElement.classList.remove("lenis-stopped");
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [onClose]);
+  }, [config.slug, onClose]);
 
   const fetchGifts = async () => {
     try {
@@ -459,7 +462,8 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           giftId: selectedGift.id,
-          reservedBy: confirmName.trim()
+          reservedBy: confirmName.trim(),
+          slug: config.slug,
         })
       });
       const data = await response.json();
@@ -478,7 +482,10 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
         setSessionReservedId(selectedGift.id);
 
         if (typeof window !== "undefined") {
-          localStorage.setItem("haxr_reserved_gift_id", selectedGift.id);
+          localStorage.setItem(
+            buildEditionGiftStorageKey(config.slug),
+            selectedGift.id
+          );
         }
 
         setTimeout(() => {
@@ -624,10 +631,11 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
               placeholder="Procurar peça de cozinha..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-sm pl-10 pr-4 py-2.5 text-xs font-display italic focus:outline-none focus:ring-1 transition-all border"
+              className="w-full min-h-[44px] rounded-sm pl-10 pr-4 py-2.5 text-xs font-display italic focus:outline-none transition-all border"
               style={{
-                backgroundColor: `${theme.colors.secondary}12`,
-                borderColor: `${theme.colors.accent}15`,
+                color: theme.colors.primary,
+                backgroundColor: "rgba(255, 255, 255, 0.65)",
+                borderColor: `${theme.colors.secondary}40`,
               }}
             />
           </div>
@@ -639,7 +647,7 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Main List Area */}
-        <div className="flex-1 overflow-y-auto pr-1 min-h-[200px] scrollbar-thin">
+        <div className="flex-1 overflow-y-auto pr-1 min-h-[200px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 space-y-3">
               <div className="w-5 h-5 border-2 border-t-transparent animate-spin rounded-full" style={{ borderColor: `${theme.colors.accent}40`, borderTopColor: theme.colors.accent }} />
@@ -728,7 +736,7 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
                       Confirmar escolha
                     </span>
                     <h3
-                      className={`${roseType.sectionTitle} text-lg sm:text-xl ${theme.palette.textPrimary}`}
+                      className={`${roseType.sectionTitle} text-lg sm:text-xl break-words ${theme.palette.textPrimary}`}
                     >
                       &ldquo;{selectedGift.name}&rdquo;
                     </h3>
@@ -747,36 +755,79 @@ function GiftSelectionModal({ onClose }: { onClose: () => void }) {
                     </p>
                   </div>
 
-                  <div className="space-y-4">
-                    <input
-                      required
-                      type="text"
-                      placeholder="O teu nome"
-                      value={confirmName}
-                      onChange={(e) => setConfirmName(e.target.value)}
-                      className={`w-full bg-transparent border-b py-3 text-sm text-center ${theme.palette.textPrimary} placeholder-black/25 focus:outline-none transition-all duration-500`}
-                      style={{ borderColor: `${theme.colors.accent}30` }}
-                    />
+                  <div className="space-y-4 text-left">
+                    <label className="block space-y-2">
+                      <span
+                        className={`${roseType.sectionLabel} block ${theme.palette.textSecondary}`}
+                      >
+                        O teu nome
+                      </span>
+                      <input
+                        required
+                        autoFocus
+                        type="text"
+                        name="guest-name"
+                        autoComplete="name"
+                        inputMode="text"
+                        placeholder="Escreve aqui o teu nome"
+                        aria-label="Escreve o teu nome para confirmar o mimo"
+                        value={confirmName}
+                        onChange={(e) => setConfirmName(e.target.value)}
+                        className={`w-full min-h-[52px] rounded-sm border px-4 py-3.5 text-sm text-left font-display italic ${theme.palette.textPrimary} placeholder:text-[#6B3548]/45 focus:outline-none transition-all duration-300`}
+                        style={{
+                          backgroundColor: "rgba(255, 255, 255, 0.55)",
+                          borderColor: `${theme.colors.secondary}45`,
+                          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.65), 0 1px 8px ${theme.colors.secondary}12`,
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor =
+                            theme.colors.secondary;
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(255, 255, 255, 0.78)";
+                          e.currentTarget.style.boxShadow = `0 0 0 3px ${theme.colors.secondary}22, 0 1px 10px ${theme.colors.accent}28`;
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = `${theme.colors.secondary}45`;
+                          e.currentTarget.style.backgroundColor =
+                            "rgba(255, 255, 255, 0.55)";
+                          e.currentTarget.style.boxShadow = `inset 0 1px 0 rgba(255,255,255,0.65), 0 1px 8px ${theme.colors.secondary}12`;
+                        }}
+                      />
+                    </label>
+                    <p
+                      className={`font-display italic text-[11px] leading-relaxed ${theme.palette.textSecondary} opacity-80`}
+                    >
+                      Podes escrever aqui — o teu nome fica ligado a este mimo.
+                    </p>
                     {errorMessage && (
-                      <p className="text-xs text-red-500 font-medium">{errorMessage}</p>
+                      <p className="text-xs text-red-500 font-medium">
+                        {errorMessage}
+                      </p>
                     )}
                   </div>
 
-                  <div className="flex gap-4">
+                  <div className="flex gap-3 sm:gap-4">
                     <button
                       type="button"
                       disabled={submitting}
                       onClick={() => setSelectedGift(null)}
-                      className="flex-1 py-3 font-display italic text-[10px] tracking-[0.08em] border transition-all duration-500 cursor-pointer"
-                      style={{ borderColor: "#E5E5E5" }}
+                      className="flex-1 min-h-[48px] py-3 font-display italic text-[11px] tracking-[0.08em] border rounded-sm transition-all duration-500 cursor-pointer disabled:opacity-50"
+                      style={{
+                        borderColor: `${theme.colors.secondary}40`,
+                        color: theme.colors.primary,
+                        backgroundColor: `${theme.colors.secondary}10`,
+                      }}
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={submitting || !confirmName.trim()}
-                      className="flex-1 py-3 font-display italic text-[10px] tracking-[0.08em] text-white transition-all duration-500 cursor-pointer flex items-center justify-center gap-2 hover:opacity-90"
-                      style={{ backgroundColor: theme.colors.accent }}
+                      className="flex-1 min-h-[48px] py-3 font-display italic text-[11px] tracking-[0.08em] text-white rounded-sm transition-all duration-500 cursor-pointer flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-45"
+                      style={{
+                        backgroundColor: theme.colors.secondary,
+                        boxShadow: `0 8px 22px ${theme.colors.secondary}33`,
+                      }}
                     >
                       {submitting ? (
                         <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent animate-spin rounded-full" />
@@ -890,17 +941,19 @@ function GiftCard({
           <button
             onClick={onSelect}
             disabled={disabled}
-            className={`w-full py-2.5 rounded-full border font-display italic text-[10px] tracking-[0.06em] transition-all duration-500 cursor-pointer flex items-center justify-center gap-1.5 ${
+            className={`w-full min-h-[44px] py-2.5 rounded-full border font-display italic text-[11px] tracking-[0.06em] transition-all duration-500 cursor-pointer flex items-center justify-center gap-1.5 ${
               disabled
                 ? "opacity-30 cursor-not-allowed"
-                : "hover:text-white"
+                : "hover:opacity-90"
             }`}
             style={{
-              borderColor: isHighlyRecommended ? "#9E3D6B" : "rgba(61, 36, 48, 0.22)",
-              color: "#3D2430",
+              borderColor: isHighlyRecommended
+                ? theme.colors.primary
+                : `${theme.colors.primary}40`,
+              color: isHighlyRecommended ? "#FFFFFF" : theme.colors.primary,
               backgroundColor: isHighlyRecommended
-                ? "rgba(232, 180, 200, 0.25)"
-                : "rgba(255, 255, 255, 0.9)",
+                ? theme.colors.primary
+                : "rgba(255, 255, 255, 0.95)",
             }}
           >
             Escolher este mimo

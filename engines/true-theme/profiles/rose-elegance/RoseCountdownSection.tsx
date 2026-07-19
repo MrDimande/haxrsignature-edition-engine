@@ -1,14 +1,14 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import { memo, useCallback, useEffect, useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import { useExperience } from "../../context";
-import { roseType } from "./rose-typography";
 import {
   cinematicRevealVariants,
   cinematicStagger,
   cinematicViewport,
 } from "./rose-motion";
+import { roseType } from "./rose-typography";
 
 type TimeLeft = {
   dias: number;
@@ -156,7 +156,7 @@ export function RoseCountdownSection() {
         className={`${roseType.bodyPoetic} text-sm max-w-md text-center mb-10 ${theme.palette.textSecondary} opacity-85`}
       >
         {isPast
-          ? "O grande dia chegou — mal posso esperar por vocês."
+          ? "O grande dia chegou, mal posso esperar por vocês."
           : "Cada segundo aproxima-nos da tarde só de mulheres que preparei com carinho."}
       </motion.p>
 
