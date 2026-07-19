@@ -49,19 +49,17 @@ export const WEDDING_RELIGIOUS_VENUE = {
 
 /**
  * FONTE ÚNICA do horário da cerimónia religiosa.
- * Divergência por confirmar: 08h00 vs 10h30.
- * Alterar apenas aqui — itinerário, detalhes e calendário/.ics consomem este valor.
- * Não considerar o itinerário pronto para publicação até
- * WEDDING_ITINERARY_SCHEDULE_CONFIRMED === true.
+ * Confirmado pela noiva: 10h30.
+ * Alterar apenas aqui — itinerário, detalhes, countdown e calendário/.ics consomem este valor.
  */
 export const WEDDING_RELIGIOUS_CEREMONY_TIME = "10h30" as const;
 
-/** false enquanto 08h00 vs 10h30 não estiver decidido. */
-export const WEDDING_ITINERARY_SCHEDULE_CONFIRMED = false;
+/** Horário da cerimónia religiosa confirmado (10h30). */
+export const WEDDING_ITINERARY_SCHEDULE_CONFIRMED = true;
 
 /**
  * Itinerário — 15 de Agosto de 2026.
- * Horário da religiosa: WEDDING_RELIGIOUS_CEREMONY_TIME (provisório).
+ * Horário da religiosa: WEDDING_RELIGIOUS_CEREMONY_TIME.
  */
 export const WEDDING_ITINERARY = [
   {
@@ -104,23 +102,39 @@ export const WEDDING_ITINERARY = [
 
 export const WEDDING_EVENT = {
   ceremonyLabel: "Casamento",
-  dressCode: "Black-tie · formal",
+  dressCode: "Traje de gala · a rigor",
   dateIso: "2026-08-15",
   /**
-   * Espelha WEDDING_RELIGIOUS_CEREMONY_TIME (fonte única).
-   * Provisório para Google Calendar / .ics até confirmação final.
+   * Espelha WEDDING_RELIGIOUS_CEREMONY_TIME (fonte única) — confirmado: 10h30.
    */
   timeLabel: WEDDING_RELIGIOUS_CEREMONY_TIME,
   locationName: WEDDING_VENUE.name,
   mapsUrl: WEDDING_VENUE.mapsUrl,
-  giftStoreName: "Casa das Loiças da Karl Marx",
-  giftStoreMapsUrl:
-    "https://www.google.com/maps/search/?api=1&query=Casa+das+Loi%C3%A7as+da+Karl+Marx+Maputo+Mo%C3%A7ambique",
+  giftStoreName: "Casa das Loiças",
+  giftStoreAddress: "Av. Karl Marx, Nº 450 · Maputo",
+  giftStorePhoneDisplay: "+258 82 311 5680",
+  giftStorePhoneTel: "258823115680",
+  giftStoreMapsUrl: "https://share.google/6KosbZqnYAnAZS1aX",
   calendarTitle: "Casamento — Jessica Muege & Samuel Govene",
   calendarDescription: `Casamento de Jessica Muege e Samuel Govene. Itinerário: ${WEDDING_RELIGIOUS_CEREMONY_TIME} Cerimónia Religiosa (Santos Mártires de Uganda, Malhampsene); 13h30 Cerimónia Civil (Vila Verde — percurso sugerido via Matola-Rio); 14h00 Sessão de Fotografias; 15h00 Copo de Água.`,
   bibleVerse:
     "Por essa razão, o homem deixará pai e mãe e unir-se-á à sua mulher, e eles se tornarão uma só carne.",
   bibleReference: "Gênesis 2:24",
+} as const;
+
+/** Pedido solidário opcional apresentado no Guia da Celebração. */
+export const WEDDING_CHARITY_REQUEST = {
+  eyebrow: "Um gesto que continua",
+  optionalLabel: "Participação opcional",
+  title: "Que a nossa alegria chegue mais longe.",
+  lead:
+    "Neste dia em que celebramos o amor, convidamo-vos — se o coração o pedir — a trazer um produto não perecível.",
+  body:
+    "As contribuições serão entregues a um orfanato, prolongando esta celebração através da partilha e do cuidado.",
+  whisper: "Um gesto simples. Uma mesa mais cheia de esperança.",
+  verse:
+    "Em verdade vos digo que, quando o fizestes a um destes meus pequeninos irmãos, a mim o fizestes.",
+  verseReference: "Mateus 25:40",
 } as const;
 
 export const WEDDING_ASSETS = {
@@ -129,54 +143,49 @@ export const WEDDING_ASSETS = {
   /** Countdown editorial — reutiliza asset existente (sem duplicar ficheiro). */
   countdownImage: "/images/jessica-samuel-wedding/couple.png",
   /**
-   * Capa / intro — retrato de revista (galeria I).
-   * Diferente do hero pós-entrada para criar progressão editorial.
+   * Capa / intro — retrato editorial black-tie.
+   * Diferente do hero pós-entrada para criar progressão visual.
    */
   coverImage: "/images/jessica-samuel-wedding/gallery-01.png",
 } as const;
 
-/** Galeria editorial — black-tie (sem placeholders). */
-export const WEDDING_GALLERY = [
-  {
-    id: "gallery-01",
-    src: "/images/jessica-samuel-wedding/gallery-01.png",
-    alt: "Jessica Muege e Samuel Govene — retrato editorial em preto",
-    layout: "feature" as const,
-    chapter: "I",
-    caption: "O encontro",
-    line: "Dois olhares. Uma promessa.",
-  },
-  {
-    id: "gallery-02",
-    src: "/images/jessica-samuel-wedding/gallery-02.png",
-    alt: "Jessica e Samuel — contraste e intimidade",
-    layout: "pair" as const,
-    chapter: "II",
-    caption: "Luz & sombra",
-    line: "O contraste que nos define.",
-  },
-  {
-    id: "gallery-03",
-    src: "/images/jessica-samuel-wedding/gallery-03.png",
-    alt: "Jessica e Samuel — elegância em arco",
-    layout: "pair" as const,
-    chapter: "III",
-    caption: "Presença",
-    line: "Elegância que se sente.",
-  },
-  {
-    id: "gallery-04",
-    src: "/images/jessica-samuel-wedding/gallery-04.png",
-    alt: "Jessica e Samuel — alta costura black-tie",
-    layout: "closing" as const,
-    chapter: "IV",
-    caption: "Alta costura",
-    line: "Black-tie. O nosso capítulo.",
-  },
-] as const;
-
-/** @deprecated usar WEDDING_GALLERY */
-export const WEDDING_GALLERY_IMAGES = WEDDING_GALLERY.map((item) => item.src);
+/** Referências editoriais — dress code (Save the Date). */
+export const WEDDING_DRESS_REFERENCES = {
+  her: [
+    {
+      id: "her-navy",
+      src: "/images/jessica-samuel-wedding/dress-code/her-navy.png",
+      alt: "Referência — vestido longo azul-noite com brilho",
+      label: "Azul-noite",
+    },
+    {
+      id: "her-red",
+      src: "/images/jessica-samuel-wedding/dress-code/her-red.png",
+      alt: "Referência — vestido longo vermelho de gala",
+      label: "Vermelho",
+    },
+    {
+      id: "her-rose",
+      src: "/images/jessica-samuel-wedding/dress-code/her-rose.png",
+      alt: "Referência — vestido longo rose gold com brilho",
+      label: "Rose gold",
+    },
+  ],
+  him: [
+    {
+      id: "him-suit",
+      src: "/images/jessica-samuel-wedding/dress-code/him-suit.png",
+      alt: "Referência — fato preto clássico com gravata",
+      label: "Fato preto",
+    },
+    {
+      id: "him-tuxedo",
+      src: "/images/jessica-samuel-wedding/dress-code/him-tuxedo.png",
+      alt: "Referência — smoking preto com laço",
+      label: "Smoking",
+    },
+  ],
+} as const;
 
 export const WEDDING_COPY = {
   heroLabel: "Casamento",
@@ -198,10 +207,6 @@ export const WEDDING_COPY = {
   itineraryLead:
     "Preparamos cada momento para celebrarmos juntos. Consulte os horários e acompanhe o percurso deste dia especial.",
   itineraryMapsCta: "Ver localização",
-  galleryEyebrow: "Alta Costura",
-  galleryTitle: "Em preto & luz",
-  galleryLead:
-    "Uma sequência editorial — intimidade, contraste e a assinatura do nosso amor.",
   coupleSectionTitle: "Os Noivos",
   familiesEyebrow: "União das Famílias",
   sonOfLabel: "Filho de",
@@ -210,17 +215,21 @@ export const WEDDING_COPY = {
   invitationBody:
     "Temos a honra de convidá-lo(a) a celebrar connosco o nosso casamento. A vossa presença será o maior presente neste dia.",
   dressCodeLead:
-    "Solicitamos traje black-tie formal, em harmonia com a elegância desta celebração.",
+    "Solicitamos a presença de todos em trajes de gala, vestidos a rigor, em harmonia com a elegância desta celebração.",
   dressCodeBody:
-    "Traje de gala para senhoras e smoking ou fraque para cavalheiros. Preferimos sobriedade, refinamento e discrição.",
+    "Para ela: vestido longo, com brilho ou sofisticação — qualquer cor, excepto branco. Para ele: fato preto ou smoking, camisa branca e gravata ou laço pretos.",
+  dressCodeHerTitle: "Para ela",
+  dressCodeHerLine:
+    "Vestido longo. Brilho, presença e elegância — qualquer cor, excepto branco.",
+  dressCodeHimTitle: "Para ele",
+  dressCodeHimLine:
+    "Fato preto ou smoking. Camisa branca, gravata ou laço pretos.",
   giftsLead:
     "Com delicadeza e respeito, preparamos uma lista de presentes para quem desejar honrar este momento connosco.",
   giftsRegistryNameNote:
-    "A lista vem em nome de Jessica Muege e Samuel Govene.",
+    "Lista em nome de Jessica Muege e Samuel Govene.",
   giftsConsultNote:
-    "A lista encontra-se disponível para consulta presencial. A equipa da loja receberá cada convidado com atenção e orientará com todo o cuidado.",
-  giftsStoreNote:
-    "Visite a loja com calma, escolha com o coração e deixe que a nossa lista o guie com proximidade e elegância.",
+    "Disponível para consulta presencial — a equipa da loja orienta com atenção.",
   countdownEyebrow: "Novo Capítulo · 15.08.2026",
   countdownTitle: "O nosso próximo capítulo começa em",
   countdownTitleToday: "O nosso capítulo começa hoje.",
@@ -248,6 +257,19 @@ export const WEDDING_COPY = {
   footerDirectoryLabel: "Contactos",
   footerInviteLabel: "Este Convite",
   footerSeasonLine: "Agosto 2026 · Matola",
+} as const;
+
+/** Mensagem pós-evento — agradecimento + acesso ao álbum. */
+export const WEDDING_POST_EVENT = {
+  eyebrow: "Com gratidão",
+  title: "Obrigado por celebrarem connosco.",
+  body:
+    "A vossa presença tornou o nosso dia ainda mais especial. Guardamos cada gesto, cada sorriso e cada abraço com o coração cheio.",
+  signOff: "Com amor,",
+  signNames: "Jessica & Samuel",
+  albumCta: "Ver o nosso álbum",
+  shareCta: "Partilhar ainda uma foto",
+  albumAnchorId: "memorias",
 } as const;
 
 export function formatWeddingEventDate(isoDate: string): string {
@@ -307,8 +329,6 @@ export function buildWeddingGoogleCalendarUrl(
   dateIso: string = WEDDING_EVENT.dateIso,
   timeLabel: string = WEDDING_EVENT.timeLabel,
 ): string | null {
-  // Não embutir horário provisório como facto em calendários externos.
-  if (!WEDDING_ITINERARY_SCHEDULE_CONFIRMED) return null;
   if (!timeLabel.match(/\d{1,2}h/i)) return null;
 
   const { start, end } = parseWeddingEventDateTime(dateIso, timeLabel);
@@ -330,8 +350,6 @@ export function buildWeddingIcsContent(
   dateIso: string = WEDDING_EVENT.dateIso,
   timeLabel: string = WEDDING_EVENT.timeLabel,
 ): string | null {
-  // Não gerar .ics enquanto o horário religioso não estiver confirmado.
-  if (!WEDDING_ITINERARY_SCHEDULE_CONFIRMED) return null;
   if (!timeLabel.match(/\d{1,2}h/i)) return null;
 
   const { start, end } = parseWeddingEventDateTime(dateIso, timeLabel);

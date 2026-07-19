@@ -18,15 +18,18 @@ export const giftListEnabled: boolean = true;
 /** Dados públicos da lista presencial (sem produtos). */
 export const WEDDING_GIFT_GUIDANCE = {
   storeName: WEDDING_EVENT.giftStoreName,
+  storeAddress: WEDDING_EVENT.giftStoreAddress,
+  storePhoneDisplay: WEDDING_EVENT.giftStorePhoneDisplay,
+  storePhoneTel: WEDDING_EVENT.giftStorePhoneTel,
   storeMapsUrl: WEDDING_EVENT.giftStoreMapsUrl,
   /** Nome sob o qual a lista está registada na loja. */
   registryName: `${WEDDING_COUPLE.bride} e ${WEDDING_COUPLE.groom}`,
   consultLabel: "Consulta presencial",
-  mapsCta: "Abrir localização da loja",
+  mapsCta: "Abrir no Maps",
+  phoneCta: "Ligar",
   lead: WEDDING_COPY.giftsLead,
   registryNameNote: WEDDING_COPY.giftsRegistryNameNote,
   consultNote: WEDDING_COPY.giftsConsultNote,
-  storeNote: WEDDING_COPY.giftsStoreNote,
 } as const;
 
 export function shouldShowWeddingGiftGuideCard(

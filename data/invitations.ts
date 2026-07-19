@@ -232,18 +232,20 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       date: "2026-08-15",
       time: "A confirmar",
       location: "Salão de Eventos Vila Verde, Matola",
-      dressCode: "Black-tie · formal",
+      dressCode: "Traje de gala · a rigor",
       subtitle: "Black-tie · Editorial · Celebração",
       description:
         "Convite digital de casamento editorial — uma experiência cinematográfica de amor, fé e união sob a assinatura HAXR.",
       eventDate: "2026-08-15",
       eventType: "Casamento",
+      ogImage: "/images/og/jessica-samuel-wedding-og.png",
     },
     admin: {
       clientName: "Jessica & Samuel",
       eventTypeLabel: "Casamento",
       adminEventName: "Edition · Casamento · Jessica & Samuel",
       envVar: "EDITION_EVENT_JESSICA_WEDDING_ID",
+      expectedRegistryKey: "jessica-samuel-wedding",
     },
   },
 };
