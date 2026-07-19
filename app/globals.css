@@ -2622,7 +2622,7 @@ html:has([data-render-profile="rose-elegance"]) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.65rem;
+  min-height: 2.75rem;
   margin-top: 0.85rem;
   padding: 0.55rem 1.15rem;
   border: 0;
