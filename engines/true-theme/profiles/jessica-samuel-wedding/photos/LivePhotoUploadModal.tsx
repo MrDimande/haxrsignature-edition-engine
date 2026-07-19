@@ -4,9 +4,18 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   JESSICA_SAMUEL_PHOTO_WALL,
+  PHOTO_WALL_ACCEPTED_MIME_TYPES,
+  PHOTO_WALL_COPY,
   PHOTO_WALL_UPLOAD_CONSENT,
   PHOTO_WALL_UPLOAD_SUCCESS,
 } from "@lib/jessica-samuel-wedding/photo-wall/config";
+import {
+  formatMegabytes,
+  isVideoContentType,
+  maxBytesForContentType,
+  resolveContentType,
+  validateFileSize,
+} from "@lib/jessica-samuel-wedding/photo-wall/validation";
 import { jsType } from "../jessica-samuel-typography";
 
 type LivePhotoUploadModalProps = {
@@ -15,6 +24,16 @@ type LivePhotoUploadModalProps = {
   accentColor: string;
   blushColor: string;
 };
+
+const ACCEPT_ATTR = [
+  ...PHOTO_WALL_ACCEPTED_MIME_TYPES,
+  "image/*",
+  "video/*",
+  ".heic",
+  ".heif",
+  ".mov",
+  ".mp4",
+].join(",");
 
 export function LivePhotoUploadModal({
   open,
@@ -26,22 +45,33 @@ export function LivePhotoUploadModal({
   const fileRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [previewKind, setPreviewKind] = useState<"image" | "video" | null>(
+    null
+  );
   const [guestName, setGuestName] = useState("");
   const [caption, setCaption] = useState("");
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState("A preparar…");
 
   const reset = useCallback(() => {
     setFile(null);
-    setPreview(null);
+    setPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setPreviewKind(null);
     setGuestName("");
     setCaption("");
     setConsent(false);
     setError(null);
     setSubmitting(false);
     setSuccess(false);
+    setProgress(0);
+    setProgressLabel("A preparar…");
     if (fileRef.current) fileRef.current.value = "";
   }, []);
 
@@ -61,29 +91,43 @@ export function LivePhotoUploadModal({
   const onFileChange = (next: File | null) => {
     setError(null);
     setFile(next);
-    if (preview) URL.revokeObjectURL(preview);
-    setPreview(next ? URL.createObjectURL(next) : null);
+    setPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return next ? URL.createObjectURL(next) : null;
+    });
+
+    if (!next) {
+      setPreviewKind(null);
+      return;
+    }
+
+    const resolved = resolveContentType(next.type, next.name);
+    setPreviewKind(
+      resolved && isVideoContentType(resolved) ? "video" : "image"
+    );
   };
 
   const handleSubmit = async () => {
     if (!file || !consent || submitting) return;
 
-    if (
-      !JESSICA_SAMUEL_PHOTO_WALL.acceptedMimeTypes.includes(
-        file.type as (typeof JESSICA_SAMUEL_PHOTO_WALL.acceptedMimeTypes)[number]
-      )
-    ) {
-      setError("Tipo de ficheiro não suportado. Use JPEG, PNG ou WebP.");
+    const resolvedType = resolveContentType(file.type, file.name);
+    if (!resolvedType) {
+      setError(
+        "Tipo não suportado. Use foto (JPEG, PNG, HEIC) ou vídeo (MP4, MOV)."
+      );
       return;
     }
 
-    if (file.size > JESSICA_SAMUEL_PHOTO_WALL.maxFileSizeBytes) {
-      setError("A imagem excede o limite de 5 MB.");
+    const sizeError = validateFileSize(file.size, resolvedType);
+    if (sizeError) {
+      setError(sizeError);
       return;
     }
 
     setSubmitting(true);
     setError(null);
+    setProgress(4);
+    setProgressLabel("A preparar o envio…");
 
     try {
       const intentRes = await fetch("/api/wedding-photos/upload-intent", {
@@ -92,7 +136,7 @@ export function LivePhotoUploadModal({
         body: JSON.stringify({
           slug: JESSICA_SAMUEL_PHOTO_WALL.invitationSlug,
           fileName: file.name,
-          contentType: file.type,
+          contentType: resolvedType,
           fileSizeBytes: file.size,
           guestName: guestName.trim() || undefined,
           caption: caption.trim() || undefined,
@@ -110,16 +154,32 @@ export function LivePhotoUploadModal({
         return;
       }
 
-      const uploadRes = await fetch(intent.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
+      setProgress(12);
+      setProgressLabel("A enviar a memória…");
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", intent.uploadUrl!);
+        xhr.setRequestHeader("Content-Type", resolvedType);
+        xhr.upload.onprogress = (event) => {
+          if (!event.lengthComputable) return;
+          const pct = Math.round((event.loaded / event.total) * 78) + 12;
+          setProgress(Math.min(90, pct));
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+            return;
+          }
+          reject(new Error("upload_failed"));
+        };
+        xhr.onerror = () => reject(new Error("network"));
+        xhr.onabort = () => reject(new Error("aborted"));
+        xhr.send(file);
       });
 
-      if (!uploadRes.ok) {
-        setError("Não foi possível enviar a imagem.");
-        return;
-      }
+      setProgress(92);
+      setProgressLabel("A concluir…");
 
       const completeRes = await fetch("/api/wedding-photos/complete", {
         method: "POST",
@@ -142,9 +202,15 @@ export function LivePhotoUploadModal({
         return;
       }
 
+      setProgress(100);
+      setProgressLabel("Memória guardada");
       setSuccess(true);
-    } catch {
-      setError("Ocorreu um erro. Tente novamente.");
+    } catch (err) {
+      if (err instanceof Error && err.message === "upload_failed") {
+        setError("Não foi possível enviar o ficheiro.");
+      } else {
+        setError("Ocorreu um erro. Tente novamente.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -195,7 +261,7 @@ export function LivePhotoUploadModal({
                 <input
                   ref={fileRef}
                   type="file"
-                  accept={JESSICA_SAMUEL_PHOTO_WALL.acceptedMimeTypes.join(",")}
+                  accept={ACCEPT_ATTR}
                   className="sr-only"
                   onChange={(e) =>
                     onFileChange(e.target.files?.[0] ?? null)
@@ -204,18 +270,28 @@ export function LivePhotoUploadModal({
 
                 {preview ? (
                   <div className="relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={preview}
-                      alt="Pré-visualização"
-                      className="max-h-48 w-full object-contain"
-                    />
+                    {previewKind === "video" ? (
+                      <video
+                        src={preview}
+                        className="max-h-48 w-full object-contain"
+                        controls
+                        playsInline
+                        muted
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={preview}
+                        alt="Pré-visualização"
+                        className="max-h-48 w-full object-contain"
+                      />
+                    )}
                     <button
                       type="button"
                       className={`${jsType.micro} mt-2 text-white/55 underline`}
                       onClick={() => fileRef.current?.click()}
                     >
-                      Alterar imagem
+                      Alterar ficheiro
                     </button>
                   </div>
                 ) : (
@@ -225,9 +301,21 @@ export function LivePhotoUploadModal({
                     className={`w-full border border-dashed px-4 py-10 ${jsType.micro} text-white/55`}
                     style={{ borderColor: `${blushColor}55` }}
                   >
-                    Seleccionar imagem
+                    Tirar ou seleccionar foto / vídeo
                   </button>
                 )}
+
+                <p className={`${jsType.micro} text-white/40`}>
+                  {PHOTO_WALL_COPY.acceptHint}
+                  {file
+                    ? ` · Limite deste ficheiro: ${formatMegabytes(
+                        maxBytesForContentType(
+                          resolveContentType(file.type, file.name) ??
+                            "image/jpeg"
+                        )
+                      )} MB`
+                    : null}
+                </p>
 
                 <input
                   type="text"
@@ -266,6 +354,35 @@ export function LivePhotoUploadModal({
                     {error}
                   </p>
                 )}
+
+                {submitting ? (
+                  <div
+                    className="js-photo-upload-progress"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={progress}
+                    aria-label={progressLabel}
+                  >
+                    <div className="js-photo-upload-progress__track">
+                      <motion.div
+                        className="js-photo-upload-progress__fill"
+                        style={{ backgroundColor: accentColor }}
+                        initial={false}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                      />
+                    </div>
+                    <p
+                      className={`${jsType.micro} js-photo-upload-progress__label`}
+                    >
+                      {progressLabel}
+                      {progress > 0 && progress < 100
+                        ? ` · ${progress}%`
+                        : null}
+                    </p>
+                  </div>
+                ) : null}
 
                 <button
                   type="button"
