@@ -226,8 +226,6 @@ export const WEDDING_COPY = {
     "Fato preto ou smoking. Camisa branca, gravata ou laço pretos.",
   giftsLead:
     "Com delicadeza e respeito, preparamos uma lista de presentes para quem desejar honrar este momento connosco.",
-  giftsRegistryNameNote:
-    "Lista em nome de Jessica Muege e Samuel Govene.",
   giftsConsultNote:
     "Disponível para consulta presencial — a equipa da loja orienta com atenção.",
   countdownEyebrow: "Novo Capítulo · 15.08.2026",

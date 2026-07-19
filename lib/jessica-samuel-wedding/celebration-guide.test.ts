@@ -15,6 +15,8 @@ import {
   shouldShowWeddingGiftGuideCard,
   WEDDING_GIFT_GUIDANCE,
 } from "./gifts/catalog";
+import { JESSICA_SAMUEL_GIFT_QUOTATION } from "./gifts/quotation-meta";
+import { TRADITIONAL_COPY } from "@lib/jessica-samuel-traditional/event-details";
 
 describe("jessica-samuel celebration guide config", () => {
   it("centraliza o horário da cerimónia religiosa numa única fonte", () => {
@@ -55,8 +57,16 @@ describe("jessica-samuel celebration guide config", () => {
     assert.match(WEDDING_GIFT_GUIDANCE.storeAddress, /450/);
     assert.equal(WEDDING_GIFT_GUIDANCE.storePhoneDisplay, "+258 82 311 5680");
     assert.ok(WEDDING_GIFT_GUIDANCE.storeMapsUrl.includes("share.google"));
-    assert.match(WEDDING_GIFT_GUIDANCE.registryName, /Jessica Muege/);
-    assert.match(WEDDING_GIFT_GUIDANCE.registryName, /Samuel Govene/);
+    assert.equal(WEDDING_GIFT_GUIDANCE.registryName, "Jessica & Samuel");
+    assert.equal(WEDDING_GIFT_GUIDANCE.registry.listName, "Jessica & Samuel");
+    assert.equal(
+      WEDDING_GIFT_GUIDANCE.registry.quotationLine,
+      "Cotação n.º 1044 · Série 2026"
+    );
+    assert.equal(
+      WEDDING_GIFT_GUIDANCE.registry.issuedLine,
+      "Emitida em 16 de junho de 2026"
+    );
     assert.equal(shouldShowWeddingGiftGuideCard(), true);
     assert.equal(shouldShowWeddingGiftGuideCard(false), false);
   });
@@ -79,5 +89,28 @@ describe("jessica-samuel celebration guide config", () => {
     assert.match(WEDDING_CHARITY_REQUEST.optionalLabel, /opcional/i);
     assert.match(WEDDING_CHARITY_REQUEST.title, /alegria/i);
     assert.equal(WEDDING_CHARITY_REQUEST.verseReference, "Mateus 25:40");
+  });
+});
+
+describe("jessica-samuel gift quotation 1044", () => {
+  it("expõe a identificação editorial canónica partilhada pelos dois convites", () => {
+    assert.equal(JESSICA_SAMUEL_GIFT_QUOTATION.listDisplayName, "Jessica & Samuel");
+    assert.equal(JESSICA_SAMUEL_GIFT_QUOTATION.number, "1044");
+    assert.equal(JESSICA_SAMUEL_GIFT_QUOTATION.seriesYear, "2026");
+    assert.equal(JESSICA_SAMUEL_GIFT_QUOTATION.issueDateIso, "2026-06-16");
+    assert.equal(
+      JESSICA_SAMUEL_GIFT_QUOTATION.quotationLine,
+      "Cotação n.º 1044 · Série 2026"
+    );
+    assert.equal(
+      JESSICA_SAMUEL_GIFT_QUOTATION.issuedLine,
+      "Emitida em 16 de junho de 2026"
+    );
+  });
+
+  it("remove o nome legal da copy de consulta do lobolo", () => {
+    assert.doesNotMatch(TRADITIONAL_COPY.giftsConsultNote, /Jessica Muege/);
+    assert.doesNotMatch(TRADITIONAL_COPY.giftsConsultNote, /Samuel Govene/);
+    assert.match(TRADITIONAL_COPY.giftsConsultNote, /consulta presencial/i);
   });
 });

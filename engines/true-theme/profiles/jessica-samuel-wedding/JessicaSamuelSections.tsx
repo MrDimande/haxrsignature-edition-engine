@@ -18,6 +18,7 @@ import {
     formatWeddingEventDate,
     formatWeddingHeroDateDots,
 } from "@lib/jessica-samuel-wedding/event-details";
+import { JESSICA_SAMUEL_GIFT_QUOTATION } from "@lib/jessica-samuel-wedding/gifts/quotation-meta";
 import { Calendar, Clock, MapPin, Navigation } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
@@ -912,12 +913,23 @@ export function JessicaSamuelGiftSection() {
           >
             {WEDDING_EVENT.giftStorePhoneDisplay}
           </a>
-          <p
-            className={`${jsType.bodyPoetic} mb-3`}
-            style={{ color: JS_SURFACES.ink }}
-          >
-            {WEDDING_COPY.giftsRegistryNameNote}
-          </p>
+          <div className="mb-3 space-y-1">
+            <p
+              className={`${jsType.bodyPoetic} text-lg`}
+              style={{ color: JS_SURFACES.ink }}
+            >
+              {JESSICA_SAMUEL_GIFT_QUOTATION.listDisplayName}
+            </p>
+            <p className={jsType.body} style={{ color: JS_SURFACES.inkSoft }}>
+              {JESSICA_SAMUEL_GIFT_QUOTATION.quotationLine}
+            </p>
+            <p
+              className={`${jsType.bodyPoetic}`}
+              style={{ color: JS_SURFACES.inkSoft }}
+            >
+              {JESSICA_SAMUEL_GIFT_QUOTATION.issuedLine}
+            </p>
+          </div>
           <p className={jsType.body} style={{ color: JS_SURFACES.inkSoft }}>
             {WEDDING_COPY.giftsConsultNote}
           </p>
