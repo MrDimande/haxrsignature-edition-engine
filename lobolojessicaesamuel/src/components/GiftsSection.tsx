@@ -56,6 +56,13 @@ export default function GiftsSection() {
 
         <motion.p
           variants={fadeUp}
+          className="mt-3 font-body text-sm font-light text-charcoal/70"
+        >
+          A lista vem em nome de Jessica Muege e Samuel Govene.
+        </motion.p>
+
+        <motion.p
+          variants={fadeUp}
           className="mt-4 font-body text-xs font-light text-warm-gray/60"
         >
           A sua presença é o nosso maior presente
