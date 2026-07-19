@@ -10,6 +10,8 @@ export type PublicWeddingPhoto = {
   caption: string | null;
   signedUrl: string;
   createdAt: string;
+  contentType: string;
+  kind: "image" | "video";
 };
 
 export type WeddingPhotoUploadIntentInput = {

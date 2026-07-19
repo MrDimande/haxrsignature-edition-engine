@@ -11,11 +11,12 @@ import { JESSICA_SAMUEL_PHOTO_WALL } from "./config";
 import {
   buildStoragePath,
   isPhotoWallOpen,
+  normalizeUploadFileName,
+  resolveContentType,
   validateCaption,
   validateContentType,
   validateFileSize,
   validateGuestName,
-  validateUploadFileName,
 } from "./validation";
 import { getPhotoUploadIntentRepository } from "./upload-intent-store";
 
@@ -49,7 +50,7 @@ function resolvePhotoWallContext(slug: string): InvitationContext | null {
 function closedResult(): WeddingPhotoUploadIntentResult {
   return {
     success: false,
-    error: "A galeria de memÃ³rias ainda nÃ£o estÃ¡ disponÃ­vel.",
+    error: "A galeria de memórias ainda não está disponível.",
     code: "PHOTO_WALL_CLOSED",
   };
 }
@@ -60,7 +61,7 @@ export async function createPhotoUploadIntent(
 ): Promise<WeddingPhotoUploadIntentResult> {
   const ctx = resolvePhotoWallContext(input.slug);
   if (!ctx) {
-    return { success: false, error: "Convite nÃ£o encontrado.", code: "NOT_FOUND" };
+    return { success: false, error: "Convite não encontrado.", code: "NOT_FOUND" };
   }
 
   if (!isPhotoWallOpen()) {
@@ -71,18 +72,26 @@ export async function createPhotoUploadIntent(
   if (!bucketName) {
     return {
       success: false,
-      error: "ServiÃ§o temporariamente indisponÃ­vel.",
+      error: "Serviço temporariamente indisponível.",
       code: "SERVICE_UNAVAILABLE",
     };
   }
 
-  const fileNameError = validateUploadFileName(input.fileName);
-  if (fileNameError) return { success: false, error: fileNameError };
+  /** Isolamento Storage/DB — sempre o slug interno do Photo Wall. */
+  const storageSlug = JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
+  const safeFileName = normalizeUploadFileName(input.fileName);
+  const resolvedType = resolveContentType(input.contentType, safeFileName);
+  if (!resolvedType) {
+    return {
+      success: false,
+      error: "Tipo não suportado. Use foto (JPEG, PNG, HEIC) ou vídeo (MP4, MOV).",
+    };
+  }
 
-  const typeError = validateContentType(input.contentType);
+  const typeError = validateContentType(resolvedType);
   if (typeError) return { success: false, error: typeError };
 
-  const sizeError = validateFileSize(input.fileSizeBytes);
+  const sizeError = validateFileSize(input.fileSizeBytes, resolvedType);
   if (sizeError) return { success: false, error: sizeError };
 
   const nameError = validateGuestName(input.guestName);
@@ -112,15 +121,15 @@ export async function createPhotoUploadIntent(
   if (!isSupabaseConfigured()) {
     return {
       success: false,
-      error: "ServiÃ§o temporariamente indisponÃ­vel.",
+      error: "Serviço temporariamente indisponível.",
       code: "SERVICE_UNAVAILABLE",
     };
   }
 
   const photoId = randomUUID();
-  const storagePath = buildStoragePath(photoId, input.contentType, ctx.slug);
+  const storagePath = buildStoragePath(photoId, resolvedType, storageSlug);
   if (!storagePath) {
-    return { success: false, error: "Tipo de ficheiro invÃ¡lido." };
+    return { success: false, error: "Tipo de ficheiro inválido." };
   }
 
   const expiresAt =
@@ -130,18 +139,18 @@ export async function createPhotoUploadIntent(
   try {
     await getPhotoUploadIntentRepository().create({
       photoId,
-      slug: ctx.slug,
+      slug: storageSlug,
       bucketName,
       storagePath,
-      contentType: input.contentType,
+      contentType: resolvedType,
       declaredFileSizeBytes: input.fileSizeBytes,
       expiresAt: expiresAtIso,
     });
-  } catch (error) {
+  } catch {
     console.error("[PhotoWall] upload intent repository error");
     return {
       success: false,
-      error: "NÃ£o foi possÃ­vel preparar o envio.",
+      error: "Não foi possível preparar o envio.",
       code: "STORAGE_ERROR",
     };
   }
@@ -151,7 +160,7 @@ export async function createPhotoUploadIntent(
     console.error("[PhotoWall] upload intent storage error");
     return {
       success: false,
-      error: "NÃ£o foi possÃ­vel preparar o envio.",
+      error: "Não foi possível preparar o envio.",
       code: "STORAGE_ERROR",
     };
   }
