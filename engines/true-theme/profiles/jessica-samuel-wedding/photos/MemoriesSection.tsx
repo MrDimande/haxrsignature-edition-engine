@@ -79,6 +79,10 @@ export function MemoriesSection() {
       setChapter(getWeddingChapterPhase(WEDDING_EVENT.dateIso));
     };
     sync();
+    // Sem polling contínuo enquanto o photo-wall está desactivado nesta release.
+    if (!JESSICA_SAMUEL_PHOTO_WALL.enabled) {
+      return;
+    }
     const id = window.setInterval(sync, 60_000);
     return () => window.clearInterval(id);
   }, []);

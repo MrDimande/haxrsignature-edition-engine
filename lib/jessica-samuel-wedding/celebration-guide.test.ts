@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { INVITATIONS } from "@data/invitations";
 import {
+  buildWeddingGoogleCalendarUrl,
+  buildWeddingIcsContent,
   WEDDING_CHARITY_REQUEST,
   WEDDING_EVENT,
   WEDDING_ITINERARY,
@@ -25,6 +28,24 @@ describe("jessica-samuel celebration guide config", () => {
   it("marca o horário da cerimónia religiosa como confirmado (10h30)", () => {
     assert.equal(WEDDING_ITINERARY_SCHEDULE_CONFIRMED, true);
     assert.equal(WEDDING_RELIGIOUS_CEREMONY_TIME, "10h30");
+  });
+
+  it("alinha invitations, calendário Google e .ics ao horário confirmado (UTC+02)", () => {
+    const meta = INVITATIONS.jessicasamuelwedding.metadata;
+    assert.equal(meta.time, WEDDING_RELIGIOUS_CEREMONY_TIME);
+    assert.equal(WEDDING_EVENT.dateIso, "2026-08-15");
+
+    const calendarUrl = buildWeddingGoogleCalendarUrl();
+    assert.ok(calendarUrl);
+    // 10h30 Africa/Maputo (+02) → 08:30 UTC; duração 5h → 13:30 UTC
+    assert.match(calendarUrl, /dates=20260815T083000Z\/20260815T133000Z/);
+    assert.ok(calendarUrl.includes(encodeURIComponent(WEDDING_RELIGIOUS_CEREMONY_TIME)));
+
+    const ics = buildWeddingIcsContent();
+    assert.ok(ics);
+    assert.match(ics, /DTSTART:20260815T103000/);
+    assert.match(ics, /DTEND:20260815T153000/);
+    assert.ok(ics.includes(WEDDING_RELIGIOUS_CEREMONY_TIME));
   });
 
   it("lista de presentes é orientação presencial — sem catálogo de produtos", () => {

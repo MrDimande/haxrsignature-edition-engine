@@ -35,8 +35,20 @@ type PhotoWallRuntime = {
   }): Promise<boolean>;
 };
 
+/** Contador de acessos reais a Supabase — só para regressão em testes. */
+let supabaseAccessCountForTests = 0;
+
+export function __getPhotoWallSupabaseAccessCountForTests(): number {
+  return supabaseAccessCountForTests;
+}
+
+export function __resetPhotoWallSupabaseAccessCountForTests(): void {
+  supabaseAccessCountForTests = 0;
+}
+
 let runtime: PhotoWallRuntime = {
   async download(bucketName, storagePath) {
+    supabaseAccessCountForTests += 1;
     const supabase = createAdminClient();
     const { data, error } = await supabase.storage
       .from(bucketName)
@@ -44,10 +56,12 @@ let runtime: PhotoWallRuntime = {
     return error || !data ? null : data;
   },
   async remove(bucketName, storagePaths) {
+    supabaseAccessCountForTests += 1;
     const supabase = createAdminClient();
     await supabase.storage.from(bucketName).remove(storagePaths);
   },
   async insertPendingPhoto(input) {
+    supabaseAccessCountForTests += 1;
     const supabase = createAdminClient();
     const { error } = await supabase.from("wedding_photos").insert({
       id: input.id,
@@ -228,6 +242,11 @@ export async function completePhotoUpload(
 }
 
 export async function listApprovedPublicPhotos(slug = "jessica-samuel"): Promise<PublicWeddingPhoto[]> {
+  // Gate de feature: com upload/galeria desactivados, zero I/O a Supabase.
+  if (!JESSICA_SAMUEL_PHOTO_WALL.enabled) {
+    return [];
+  }
+
   const ctx = resolveInvitationContext(slug);
   const galleryEnabled =
     Boolean(ctx?.photoWallEnabled) && JESSICA_SAMUEL_PHOTO_WALL.publicGalleryEnabled;
@@ -239,6 +258,7 @@ export async function listApprovedPublicPhotos(slug = "jessica-samuel"): Promise
   const bucketName = ctx?.photoWallBucket || JESSICA_SAMUEL_PHOTO_WALL.bucket;
   const invitationSlug = JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
 
+  supabaseAccessCountForTests += 1;
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("wedding_photos")

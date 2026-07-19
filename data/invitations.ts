@@ -230,7 +230,8 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     metadata: {
       title: "Casamento — Jessica Muege & Samuel Govene",
       date: "2026-08-15",
-      time: "A confirmar",
+      /** Espelha WEDDING_RELIGIOUS_CEREMONY_TIME (fonte única em event-details). */
+      time: "10h30",
       location: "Salão de Eventos Vila Verde, Matola",
       dressCode: "Traje de gala · a rigor",
       subtitle: "Black-tie · Editorial · Celebração",

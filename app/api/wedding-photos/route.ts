@@ -10,6 +10,23 @@ export async function GET(request: Request) {
       searchParams.get("slug")?.trim() ||
       JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
 
+    // Feature fechada nesta release — resposta vazia sem tocar Supabase/migrations.
+    if (!JESSICA_SAMUEL_PHOTO_WALL.enabled) {
+      return NextResponse.json(
+        {
+          success: true,
+          phase: getPhotoWallPhase(),
+          uploadOpen: false,
+          photos: [],
+        },
+        {
+          headers: {
+            "Cache-Control": "private, max-age=60",
+          },
+        }
+      );
+    }
+
     const [photos, phase] = await Promise.all([
       listApprovedPublicPhotos(slug),
       Promise.resolve(getPhotoWallPhase()),
