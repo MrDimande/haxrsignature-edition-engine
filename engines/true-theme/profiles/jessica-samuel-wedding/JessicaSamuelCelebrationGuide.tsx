@@ -223,9 +223,17 @@ function GiftsInlineCard() {
           >
             {guidance.storePhoneDisplay}
           </a>
-          <p className="js-celeb-guide__gift-editorial-registry">
-            {guidance.registryNameNote}
-          </p>
+          <div className="js-celeb-guide__gift-editorial-registry">
+            <p className="js-celeb-guide__gift-editorial-registry-name">
+              {guidance.registry.listName}
+            </p>
+            <p className="js-celeb-guide__gift-editorial-registry-quotation">
+              {guidance.registry.quotationLine}
+            </p>
+            <p className="js-celeb-guide__gift-editorial-registry-issued">
+              {guidance.registry.issuedLine}
+            </p>
+          </div>
           <p className="js-celeb-guide__gift-editorial-note">
             {guidance.consultNote}
           </p>

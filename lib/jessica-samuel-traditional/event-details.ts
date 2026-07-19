@@ -82,7 +82,7 @@ export const TRADITIONAL_COPY = {
   giftsLead:
     "Com delicadeza e respeito, preparamos uma lista de presentes para quem desejar honrar este momento connosco.",
   giftsConsultNote:
-    "A lista encontra-se disponível para consulta presencial, em nome de Jessica Muege e Samuel Govene. A equipa da loja receberá cada convidado com atenção e orientará com todo o cuidado.",
+    "A lista encontra-se disponível para consulta presencial. A equipa da loja receberá cada convidado com atenção e orientará com todo o cuidado.",
   giftsStoreNote:
     "Visite a loja com calma, escolha com o coração e deixe que a nossa lista o guie com proximidade e elegância.",
   countdownEyebrow: "Falta Pouco",

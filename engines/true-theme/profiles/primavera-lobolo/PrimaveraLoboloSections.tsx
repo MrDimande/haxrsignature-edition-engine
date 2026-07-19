@@ -28,6 +28,7 @@ import {
   formatTraditionalEventDate,
   formatTraditionalHeroDateDots,
 } from "@lib/jessica-samuel-traditional/event-details";
+import { JESSICA_SAMUEL_GIFT_QUOTATION } from "@lib/jessica-samuel-wedding/gifts/quotation-meta";
 import { useExperience } from "../../context";
 import { primaveraType } from "./primavera-typography";
 import {
@@ -633,6 +634,20 @@ export function PrimaveraGiftSection() {
             >
               {TRADITIONAL_EVENT.giftStoreName}
             </p>
+            <div className="mb-4 space-y-1">
+              <p
+                className={`${primaveraType.bodyPoetic} text-lg`}
+                style={{ color: PRIMAVERA_SURFACES.terracottaDeep }}
+              >
+                {JESSICA_SAMUEL_GIFT_QUOTATION.listDisplayName}
+              </p>
+              <p className={`${primaveraType.heroSubtitle} opacity-80`}>
+                {JESSICA_SAMUEL_GIFT_QUOTATION.quotationLine}
+              </p>
+              <p className={`${primaveraType.heroSubtitle} opacity-70 italic`}>
+                {JESSICA_SAMUEL_GIFT_QUOTATION.issuedLine}
+              </p>
+            </div>
             <p className={`${primaveraType.bodyPoetic} mb-4 opacity-90`}>
               {TRADITIONAL_COPY.giftsConsultNote}
             </p>
