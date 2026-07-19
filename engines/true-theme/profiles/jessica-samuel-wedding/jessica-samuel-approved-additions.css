@@ -458,6 +458,49 @@
   );
 }
 
+/* Itinerário sobre cartão vinho — contraste ivory (não afecta timeline em fundo claro) */
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-time {
+  color: rgba(255, 249, 242, 0.78);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-title {
+  color: #fff9f2;
+  text-shadow: 0 2px 14px rgba(23, 19, 18, 0.28);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-place {
+  color: rgba(255, 249, 242, 0.82);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-note {
+  color: rgba(255, 249, 242, 0.76);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-pin {
+  color: rgba(255, 249, 242, 0.86);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-icon {
+  color: rgba(255, 249, 242, 0.9);
+}
+
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-line {
+  background: rgba(255, 249, 242, 0.52);
+}
+
+.js-celeb-guide__maps-btn--on-wine {
+  border: 1px solid rgba(255, 249, 242, 0.24);
+  background: rgba(143, 46, 63, 0.94);
+  color: #fff9f2;
+  box-shadow: 0 8px 22px rgba(23, 19, 18, 0.18);
+  min-height: 2.75rem;
+}
+
+.js-celeb-guide__maps-btn--on-wine:focus-visible {
+  outline: 2px solid rgba(255, 249, 242, 0.72);
+  outline-offset: 3px;
+}
+
 .js-memories__cta-wrap {
   display: flex;
   flex-direction: column;
