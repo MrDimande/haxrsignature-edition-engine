@@ -32,6 +32,7 @@ export interface InvitationAdminBinding {
   eventTypeLabel: string;
   adminEventName: string;
   envVar: string;
+  expectedRegistryKey?: string;
 }
 
 export interface InvitationConfig {
@@ -204,13 +205,14 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Uma despedida de solteira feminina e íntima, cursiva, rosa e cheia de charme para celebrar a noiva antes do grande dia.",
       eventDate: "2026-07-25",
       eventType: "Despedida de Solteira",
-      ogImage: "/images/og/despedida-de-solteira-og.png",
+      ogImage: "/images/og/cha-de-lingerie-og.png",
     },
     admin: {
       clientName: "Jessica Muege",
       eventTypeLabel: "Despedida de Solteira",
       adminEventName: "Edition · Despedida de Solteira · Jessica Muege",
       envVar: "EDITION_EVENT_JESSICA_FAREWELL_ID",
+      expectedRegistryKey: "rose-elegance",
     },
   },
   jessicasamuelwedding: {
