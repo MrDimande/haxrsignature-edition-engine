@@ -94,6 +94,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Convite digital de casamento tradicional (Lobolo). Uma experiência HAXR Signature — cada celebração merece uma assinatura.",
       eventDate: "2026-08-29",
       eventType: "Lobolo",
+      ogImage: "/images/og/lobolo-jessica-samuel-og.png",
     },
     admin: {
       clientName: "Jessica & Samuel",
@@ -121,12 +122,14 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
         "Convite digital cerimonial para o Lobolo de Jessica & Samuel. Uma celebração da união das famílias com honra, tradição e elegância.",
       eventDate: "2026-08-08",
       eventType: "Casamento Tradicional · Lobolo",
+      ogImage: "/images/og/casamento-tradicional-jessica-samuel-og.png",
     },
     admin: {
       clientName: "Jessica & Samuel",
       eventTypeLabel: "Casamento Tradicional",
       adminEventName: "Edition · Casamento Tradicional · Jessica & Samuel",
       envVar: "EDITION_EVENT_JESSICA_TRADITIONAL_ID",
+      expectedRegistryKey: "traditional-wedding",
     },
   },
   /**
