@@ -1060,3 +1060,50 @@
   }
 }
 
+/* Capa — nomes na mesma família manuscrita do Hero (Great Vibes) */
+.js-wedding-cover__title {
+  gap: 0.12rem;
+}
+
+.js-wedding-cover__name {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(3rem, 12.5vw, 4.55rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+  padding-block: 0.04em;
+}
+
+.js-wedding-cover__amp {
+  font-family: var(--font-great-vibes), "Great Vibes", cursive;
+  font-size: clamp(1.4rem, 4.8vw, 1.9rem);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin-block: 0.02rem;
+  color: var(--js-rose, #c9939b);
+}
+
+@media (min-width: 1024px) {
+  .js-wedding-cover__name {
+    font-size: clamp(3.2rem, 4.6vw, 4.55rem);
+  }
+}
+
+@media (max-height: 700px) {
+  .js-wedding-cover__title {
+    gap: 0.06rem;
+  }
+
+  .js-wedding-cover__name {
+    font-size: clamp(2.55rem, 10vw, 3.55rem);
+    line-height: 1.06;
+  }
+
+  .js-wedding-cover__amp {
+    font-size: clamp(1.2rem, 4vw, 1.55rem);
+    margin-block: 0;
+  }
+}
+
