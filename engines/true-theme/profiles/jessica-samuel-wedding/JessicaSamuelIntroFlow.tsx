@@ -147,23 +147,23 @@ function JessicaSamuelIntroOverlay({
       <div className="js-wedding-cover__veil" aria-hidden />
       <div className="js-wedding-cover__grain" aria-hidden />
 
-      {/* Editorial floral corners decoration */}
+      {/* Editorial floral corners — mobile-first, pinned to extremities */}
       <Image
         src="/images/jessica-samuel-wedding/floral/floral-corner-top-left.webp"
         alt=""
-        width={300}
-        height={300}
+        width={280}
+        height={280}
         priority
-        sizes="(max-width: 480px) 130px, (max-width: 768px) 25vw, 320px"
+        sizes="(max-width: 479px) 34vw, (max-width: 767px) 24vw, (max-width: 1023px) 20vw, 18vw"
         className="js-wedding-floral-corner-tl"
         aria-hidden="true"
       />
       <Image
         src="/images/jessica-samuel-wedding/floral/floral-corner-bottom-right.webp"
         alt=""
-        width={300}
-        height={300}
-        sizes="(max-width: 480px) 130px, (max-width: 768px) 25vw, 320px"
+        width={240}
+        height={240}
+        sizes="(max-width: 479px) 30vw, (max-width: 767px) 20vw, (max-width: 1023px) 17vw, 15vw"
         className="js-wedding-floral-corner-br"
         aria-hidden="true"
       />
