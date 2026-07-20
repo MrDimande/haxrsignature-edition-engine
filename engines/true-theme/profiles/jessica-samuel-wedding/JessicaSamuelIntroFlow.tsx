@@ -151,19 +151,19 @@ function JessicaSamuelIntroOverlay({
       <Image
         src="/images/jessica-samuel-wedding/floral/floral-corner-top-left.webp"
         alt=""
-        width={280}
-        height={280}
+        width={920}
+        height={653}
         priority
-        sizes="(max-width: 479px) 34vw, (max-width: 767px) 24vw, (max-width: 1023px) 20vw, 18vw"
+        sizes="(max-width: 479px) 50vw, (max-width: 767px) 36vw, (max-width: 1023px) 28vw, 24vw"
         className="js-wedding-floral-corner-tl"
         aria-hidden="true"
       />
       <Image
         src="/images/jessica-samuel-wedding/floral/floral-corner-bottom-right.webp"
         alt=""
-        width={240}
-        height={240}
-        sizes="(max-width: 479px) 30vw, (max-width: 767px) 20vw, (max-width: 1023px) 17vw, 15vw"
+        width={920}
+        height={606}
+        sizes="(max-width: 479px) 42vw, (max-width: 767px) 30vw, (max-width: 1023px) 24vw, 20vw"
         className="js-wedding-floral-corner-br"
         aria-hidden="true"
       />
