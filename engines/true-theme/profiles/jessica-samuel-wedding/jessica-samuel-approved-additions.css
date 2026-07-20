@@ -2023,16 +2023,20 @@
 .js-wedding-couple-crown {
   position: absolute;
   left: 50%;
-  top: -7%;
+  top: -4%;
   z-index: 4;
-  width: 136%;
+  width: 144%;
   max-width: none;
   height: auto;
   translate: -50% 0;
   pointer-events: none;
   user-select: none;
-  opacity: 0.9;
-  filter: drop-shadow(0 8px 16px rgba(23, 19, 18, 0.28));
+  opacity: 0.84;
+  filter:
+    saturate(0.88)
+    brightness(0.94)
+    drop-shadow(0 6px 14px rgba(122, 35, 50, 0.34))
+    drop-shadow(0 2px 6px rgba(104, 27, 41, 0.22));
 }
 
 /* Move frame + crown together; cancel photo-only hover lift */
@@ -2057,16 +2061,16 @@
   }
 
   .js-wedding-couple-crown {
-    width: 140%;
-    top: -5.5%;
-    opacity: 0.88;
+    width: 148%;
+    top: -3%;
+    opacity: 0.82;
   }
 }
 
 @media (max-width: 380px) {
   .js-wedding-couple-crown {
-    width: 146%;
-    top: -4.5%;
+    width: 152%;
+    top: -2.5%;
   }
 }
 
