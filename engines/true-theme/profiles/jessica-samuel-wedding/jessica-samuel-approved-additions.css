@@ -1693,6 +1693,151 @@
   }
 }
 
+/* Micro petals — 4 ambient flecks; intentionally quiet */
+.js-wedding-cover__petals {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.js-wedding-petal {
+  position: absolute;
+  display: block;
+  width: 0.42rem;
+  height: 0.68rem;
+  border-radius: 70% 30% 70% 30%;
+  opacity: 0.14;
+  filter: blur(0.4px);
+  will-change: transform;
+  transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+}
+
+.js-wedding-petal--rose {
+  background: radial-gradient(
+    ellipse at 32% 28%,
+    rgba(201, 147, 155, 0.7) 0%,
+    rgba(143, 46, 63, 0.28) 62%,
+    transparent 100%
+  );
+}
+
+.js-wedding-petal--wine {
+  background: radial-gradient(
+    ellipse at 40% 30%,
+    rgba(143, 46, 63, 0.65) 0%,
+    rgba(104, 27, 41, 0.3) 65%,
+    transparent 100%
+  );
+}
+
+.js-wedding-petal--blush {
+  background: radial-gradient(
+    ellipse at 35% 25%,
+    rgba(232, 206, 210, 0.55) 0%,
+    rgba(201, 147, 155, 0.22) 60%,
+    transparent 100%
+  );
+}
+
+.js-wedding-petal--p1 {
+  top: 16%;
+  left: 24%;
+  --petal-rot: -18deg;
+  width: 0.38rem;
+  height: 0.58rem;
+  opacity: 0.13;
+  animation: js-petal-drift-a 11s ease-in-out 0.8s infinite;
+}
+
+.js-wedding-petal--p2 {
+  top: 28%;
+  right: 16%;
+  --petal-rot: 28deg;
+  width: 0.5rem;
+  height: 0.78rem;
+  opacity: 0.11;
+  animation: js-petal-drift-b 13.5s ease-in-out 1.2s infinite;
+}
+
+.js-wedding-petal--p3 {
+  top: 48%;
+  left: 10%;
+  --petal-rot: 42deg;
+  width: 0.34rem;
+  height: 0.52rem;
+  opacity: 0.12;
+  animation: js-petal-drift-c 12.2s ease-in-out 1.6s infinite;
+}
+
+.js-wedding-petal--p4 {
+  top: 58%;
+  right: 22%;
+  --petal-rot: -32deg;
+  width: 0.44rem;
+  height: 0.7rem;
+  opacity: 0.1;
+  animation: js-petal-drift-a 14s ease-in-out 2s infinite reverse;
+}
+
+@keyframes js-petal-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+  }
+  50% {
+    transform: translate3d(5px, 12px, 0) rotate(calc(var(--petal-rot, 18deg) + 14deg));
+  }
+}
+
+@keyframes js-petal-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+  }
+  50% {
+    transform: translate3d(-7px, 10px, 0) rotate(calc(var(--petal-rot, 18deg) - 12deg));
+  }
+}
+
+@keyframes js-petal-drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+  }
+  50% {
+    transform: translate3d(4px, -8px, 0) rotate(calc(var(--petal-rot, 18deg) + 10deg));
+  }
+}
+
+@media (min-width: 768px) {
+  .js-wedding-petal {
+    opacity: 0.12;
+  }
+
+  .js-wedding-petal--p1 {
+    left: 28%;
+  }
+
+  .js-wedding-petal--p2 {
+    right: 20%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-petal {
+    animation: none !important;
+    opacity: 0.08;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .js-wedding-cover__petals {
+    display: none;
+  }
+}
+
 /* Floral corners — hug device contour (bleed + scale into rounded edges) */
 .js-wedding-floral-corner-tl,
 .js-wedding-floral-corner-br {

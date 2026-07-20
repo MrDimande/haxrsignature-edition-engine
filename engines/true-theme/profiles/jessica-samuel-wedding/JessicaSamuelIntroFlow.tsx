@@ -15,6 +15,14 @@ import { useExperience } from "../../context";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/** Micro petals — low-contrast ambient drift (CSS-driven; paused under reduced motion). */
+const COVER_MICRO_PETALS = [
+  { id: "p1", tone: "rose" },
+  { id: "p2", tone: "wine" },
+  { id: "p3", tone: "blush" },
+  { id: "p4", tone: "rose" },
+] as const;
+
 /**
  * Capa editorial — abertura em «véu que se ergue».
  * Foto de revista (gallery-01) + tipografia ivory; ao entrar,
@@ -148,6 +156,16 @@ function JessicaSamuelIntroOverlay({
       <div className="js-wedding-cover__grain" aria-hidden />
       {/* Soft rose/bordeaux mist — bridges photo into corner florals */}
       <div className="js-wedding-cover__floral-mist" aria-hidden />
+
+      {/* Micro petals — ambient, very low contrast */}
+      <div className="js-wedding-cover__petals" aria-hidden>
+        {COVER_MICRO_PETALS.map((petal) => (
+          <span
+            key={petal.id}
+            className={`js-wedding-petal js-wedding-petal--${petal.id} js-wedding-petal--${petal.tone}`}
+          />
+        ))}
+      </div>
 
       {/* Editorial floral corners — grow in from extremities */}
       <motion.div
