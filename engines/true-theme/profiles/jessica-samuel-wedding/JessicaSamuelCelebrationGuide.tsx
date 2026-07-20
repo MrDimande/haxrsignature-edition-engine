@@ -46,24 +46,18 @@ function TimelineGestureCallout() {
       <p className="js-celeb-guide__timeline-gesture-kicker">
         <HandHeart
           className="js-celeb-guide__timeline-gesture-icon"
-          size={11}
+          size={10}
           strokeWidth={1.35}
           aria-hidden
         />
-        <span>{charity.eyebrow}</span>
-        <span className="js-celeb-guide__timeline-gesture-optional">
-          {charity.optionalLabel}
-        </span>
+        <span>{charity.optionalLabel}</span>
       </p>
-      <p className="js-celeb-guide__timeline-gesture-lead">{charity.lead}</p>
-      <p className="js-celeb-guide__timeline-gesture-body">{charity.body}</p>
-      <p className="js-celeb-guide__timeline-gesture-whisper">
-        {charity.whisper}
+      <p className="js-celeb-guide__timeline-gesture-copy">
+        {charity.timelineSummary}
       </p>
-      <blockquote className="js-celeb-guide__timeline-gesture-verse">
-        <p>{charity.verse}</p>
-        <cite>{charity.verseReference}</cite>
-      </blockquote>
+      <p className="js-celeb-guide__timeline-gesture-ref">
+        {charity.verseReference}
+      </p>
     </div>
   );
 }

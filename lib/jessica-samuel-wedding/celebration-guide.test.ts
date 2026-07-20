@@ -87,7 +87,8 @@ describe("jessica-samuel celebration guide config", () => {
     assert.match(WEDDING_CHARITY_REQUEST.lead, /produto não perecível/i);
     assert.match(WEDDING_CHARITY_REQUEST.body, /orfanato/i);
     assert.match(WEDDING_CHARITY_REQUEST.optionalLabel, /opcional/i);
-    assert.match(WEDDING_CHARITY_REQUEST.title, /alegria/i);
+    assert.match(WEDDING_CHARITY_REQUEST.timelineSummary, /produto não perecível/i);
+    assert.match(WEDDING_CHARITY_REQUEST.timelineSummary, /orfanato/i);
     assert.equal(WEDDING_CHARITY_REQUEST.verseReference, "Mateus 25:40");
   });
 });

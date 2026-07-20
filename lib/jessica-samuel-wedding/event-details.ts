@@ -128,10 +128,13 @@ export const WEDDING_CHARITY_REQUEST = {
   optionalLabel: "Participação opcional",
   title: "Que a nossa alegria chegue mais longe.",
   lead:
-    "Neste dia em que celebramos o amor, convidamo-vos — se o coração o pedir — a trazer um produto não perecível.",
+    "Neste dia em que celebramos o amor, convidamo-vos se o coração o pedir a trazer um produto não perecível.",
   body:
     "As contribuições serão entregues a um orfanato, prolongando esta celebração através da partilha e do cuidado.",
   whisper: "Um gesto simples. Uma mesa mais cheia de esperança.",
+  /** Resumo compacto para o itinerário (cerimónia religiosa). */
+  timelineSummary:
+    "Se o coração o pedir, traga um produto não perecível,será entregue a um orfanato.",
   verse:
     "Em verdade vos digo que, quando o fizestes a um destes meus pequeninos irmãos, a mim o fizestes.",
   verseReference: "Mateus 25:40",
@@ -193,10 +196,10 @@ export const WEDDING_COPY = {
     "Com alegria e gratidão, convidamo-vos a testemunhar a nossa união.",
   heroEyebrow: "O Casamento de",
   heroSubtitle:
-    "Uma celebração editorial de amor, fé e compromisso — black-tie, sob a nossa assinatura.",
+    "Uma celebração editorial de amor, fé e compromisso, black-tie, sob a nossa assinatura.",
   introWhisper: "Dois corações. Uma promessa.",
   intro:
-    "Com profunda gratidão, convidamo-vos a partilhar connosco este momento solene — a celebração do nosso casamento, em noite de elegância e bênção.",
+    "Com profunda gratidão, convidamo-vos a partilhar connosco este momento solene, a celebração do nosso casamento, em noite de elegância e bênção.",
   introScriptTitle: "Uma só carne...",
   introQuoteTitle: "Uma Promessa de Amor",
   introQuoteAttribution: "Casamento · Black-tie",
@@ -217,17 +220,17 @@ export const WEDDING_COPY = {
   dressCodeLead:
     "Solicitamos a presença de todos em trajes de gala, vestidos a rigor, em harmonia com a elegância desta celebração.",
   dressCodeBody:
-    "Para ela: vestido longo, com brilho ou sofisticação — qualquer cor, excepto branco. Para ele: fato preto ou smoking, camisa branca e gravata ou laço pretos.",
+    "Para ela: vestido longo, com brilho ou sofisticação, qualquer cor, excepto branco. Para ele: fato preto ou smoking, camisa branca e gravata ou laço pretos.",
   dressCodeHerTitle: "Para ela",
   dressCodeHerLine:
-    "Vestido longo. Brilho, presença e elegância — qualquer cor, excepto branco.",
+    "Vestido longo. Brilho, presença e elegância, qualquer cor, excepto branco.",
   dressCodeHimTitle: "Para ele",
   dressCodeHimLine:
     "Fato preto ou smoking. Camisa branca, gravata ou laço pretos.",
   giftsLead:
     "Com delicadeza e respeito, preparamos uma lista de presentes para quem desejar honrar este momento connosco.",
   giftsConsultNote:
-    "Disponível para consulta presencial — a equipa da loja orienta com atenção.",
+    "Disponível para consulta presencial, a equipa da loja orienta com atenção.",
   countdownEyebrow: "Novo Capítulo · 15.08.2026",
   countdownTitle: "O nosso próximo capítulo começa em",
   countdownTitleToday: "O nosso capítulo começa hoje.",
@@ -251,7 +254,7 @@ export const WEDDING_COPY = {
     "Que esta celebração seja testemunho de amor, fé e bênção sobre o nosso caminho.",
   footerStudioLabel: "Assinatura",
   footerStudioBody:
-    "Este convite digital foi criado pela HAXR Signature — uma experiência editorial black-tie pensada para Jessica & Samuel, com elegância, presença e memória.",
+    "Este convite digital foi criado pela HAXR Signature, uma experiência editorial black-tie pensada para Jessica & Samuel, com elegância, presença e memória.",
   footerDirectoryLabel: "Contactos",
   footerInviteLabel: "Este Convite",
   footerSeasonLine: "Agosto 2026 · Matola",
