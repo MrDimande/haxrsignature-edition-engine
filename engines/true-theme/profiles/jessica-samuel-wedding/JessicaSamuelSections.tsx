@@ -801,63 +801,6 @@ export function JessicaSamuelItinerarySection() {
   );
 }
 
-export function JessicaSamuelLocationSection() {
-  const { theme } = useExperience();
-  const mapUrl = theme.copy.location?.externalMapUrl;
-
-  return (
-    <motion.section
-      id="local"
-      initial="hidden"
-      whileInView="visible"
-      viewport={jsViewport}
-      variants={jsStagger}
-      className={`${JS_LAYOUT.section} py-16 md:py-24`}
-      style={{ backgroundColor: JS_SECTION_BG.primary }}
-    >
-      <motion.div variants={jsReveal} className={JS_LAYOUT.containerNarrow}>
-        <SectionHeading eyebrow="Onde" title="Localização" />
-        <p
-          className={`${jsType.body} text-center mb-8`}
-          style={{ color: JS_SURFACES.inkSoft }}
-        >
-          {theme.copy.location?.directions}
-        </p>
-        <p
-          className={`${jsType.sectionLabel} text-center mb-8`}
-          style={{ color: JS_SURFACES.ink }}
-        >
-          {WEDDING_VENUE.full}
-        </p>
-        {mapUrl ? (
-          <div className="text-center">
-            <a
-              href={mapUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${jsType.micro} inline-flex items-center gap-2 px-8 py-4 border-0`}
-              style={{
-                color: JS_SURFACES.ivory,
-                backgroundColor: JS_SURFACES.wine,
-              }}
-            >
-              <Navigation className="w-4 h-4" aria-hidden />
-              Abrir no Google Maps
-            </a>
-          </div>
-        ) : (
-          <p
-            className={`${jsType.heroMeta} text-center`}
-            style={{ color: JS_SURFACES.wine }}
-          >
-            Link do mapa a confirmar
-          </p>
-        )}
-      </motion.div>
-    </motion.section>
-  );
-}
-
 export function JessicaSamuelGiftSection() {
   const hasStoreMaps = Boolean(WEDDING_EVENT.giftStoreMapsUrl);
   const phoneHref = `tel:+${WEDDING_EVENT.giftStorePhoneTel}`;

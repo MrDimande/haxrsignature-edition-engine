@@ -38,6 +38,36 @@ const ITINERARY_ICONS: Record<
   "copo-de-agua": GlassWater,
 };
 
+function TimelineGestureCallout() {
+  const charity = WEDDING_CHARITY_REQUEST;
+
+  return (
+    <div className="js-celeb-guide__timeline-gesture" role="note">
+      <p className="js-celeb-guide__timeline-gesture-kicker">
+        <HandHeart
+          className="js-celeb-guide__timeline-gesture-icon"
+          size={11}
+          strokeWidth={1.35}
+          aria-hidden
+        />
+        <span>{charity.eyebrow}</span>
+        <span className="js-celeb-guide__timeline-gesture-optional">
+          {charity.optionalLabel}
+        </span>
+      </p>
+      <p className="js-celeb-guide__timeline-gesture-lead">{charity.lead}</p>
+      <p className="js-celeb-guide__timeline-gesture-body">{charity.body}</p>
+      <p className="js-celeb-guide__timeline-gesture-whisper">
+        {charity.whisper}
+      </p>
+      <blockquote className="js-celeb-guide__timeline-gesture-verse">
+        <p>{charity.verse}</p>
+        <cite>{charity.verseReference}</cite>
+      </blockquote>
+    </div>
+  );
+}
+
 function ItineraryTimeline({ tone = "panel" }: { tone?: "panel" | "wine" }) {
   const isWine = tone === "wine";
 
@@ -98,6 +128,9 @@ function ItineraryTimeline({ tone = "panel" }: { tone?: "panel" | "wine" }) {
                     ))}
                   </div>
                 </div>
+              ) : null}
+              {isWine && moment.id === "cerimonia-religiosa" ? (
+                <TimelineGestureCallout />
               ) : null}
               {moment.note ? (
                 <p className="js-celeb-guide__timeline-note">{moment.note}</p>
@@ -261,55 +294,7 @@ function GiftsInlineCard() {
   );
 }
 
-function CharityEditorialCallout() {
-  const charity = WEDDING_CHARITY_REQUEST;
-
-  return (
-    <aside
-      className="js-celeb-guide__charity"
-      aria-labelledby="js-charity-title"
-    >
-      <div className="js-celeb-guide__charity-panel">
-        <span className="js-celeb-guide__charity-ornament" aria-hidden />
-
-        <header className="js-celeb-guide__charity-header">
-          <div className="js-celeb-guide__charity-kicker">
-            <span className="js-celeb-guide__charity-icon" aria-hidden>
-              <HandHeart size={18} strokeWidth={1.35} />
-            </span>
-            <p className="js-celeb-guide__charity-eyebrow">{charity.eyebrow}</p>
-            <span className="js-celeb-guide__charity-optional">
-              {charity.optionalLabel}
-            </span>
-          </div>
-
-          <h3 className="js-celeb-guide__charity-title" id="js-charity-title">
-            {charity.title}
-          </h3>
-          <span className="js-celeb-guide__charity-rule" aria-hidden />
-        </header>
-
-        <div className="js-celeb-guide__charity-layout">
-          <div className="js-celeb-guide__charity-copy">
-            <p className="js-celeb-guide__charity-lead">{charity.lead}</p>
-            <p className="js-celeb-guide__charity-body">{charity.body}</p>
-            <p className="js-celeb-guide__charity-whisper">{charity.whisper}</p>
-          </div>
-
-          <blockquote className="js-celeb-guide__charity-verse">
-            <span className="js-celeb-guide__charity-quote-mark" aria-hidden>
-              “
-            </span>
-            <p>{charity.verse}</p>
-            <cite>{charity.verseReference}</cite>
-          </blockquote>
-        </div>
-      </div>
-    </aside>
-  );
-}
-
-/** Guia da Celebração — itinerário, presentes e gesto solidário. */
+/** Guia da Celebração — itinerário e presentes. */
 export function JessicaSamuelCelebrationGuideSection() {
   const showGiftCard = shouldShowWeddingGiftGuideCard();
 
@@ -346,7 +331,6 @@ export function JessicaSamuelCelebrationGuideSection() {
           <ItineraryInlineCard />
           {showGiftCard ? <GiftsInlineCard /> : null}
         </div>
-        <CharityEditorialCallout />
       </motion.div>
     </motion.section>
   );

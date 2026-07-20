@@ -69,7 +69,7 @@
 
 .js-wedding-nav__items {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.18rem;
   width: 100%;
 }
@@ -456,6 +456,105 @@
     rgba(255, 249, 242, 0.75),
     transparent
   );
+}
+
+/* Itinerário editorial — pin ao lado do local */
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-place-block {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-pin {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.js-celeb-guide__timeline--editorial .js-celeb-guide__timeline-place-block > div {
+  min-width: 0;
+}
+
+/* Gesto solidário — integrado na cerimónia religiosa (cartão vinho) */
+.js-celeb-guide__timeline--on-wine .js-celeb-guide__timeline-gesture {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 249, 242, 0.22);
+}
+
+.js-celeb-guide__timeline-gesture-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin: 0 0 0.45rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.72);
+}
+
+.js-celeb-guide__timeline-gesture-icon {
+  flex-shrink: 0;
+  color: rgba(255, 249, 242, 0.86);
+}
+
+.js-celeb-guide__timeline-gesture-optional {
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 249, 242, 0.12);
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  color: rgba(255, 249, 242, 0.88);
+}
+
+.js-celeb-guide__timeline-gesture-lead,
+.js-celeb-guide__timeline-gesture-body {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: rgba(255, 249, 242, 0.84);
+}
+
+.js-celeb-guide__timeline-gesture-whisper {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: rgba(255, 249, 242, 0.78);
+}
+
+.js-celeb-guide__timeline-gesture-verse {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border-left: 2px solid rgba(255, 249, 242, 0.35);
+  background: rgba(255, 249, 242, 0.06);
+}
+
+.js-celeb-guide__timeline-gesture-verse p {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 0.88rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: rgba(255, 249, 242, 0.8);
+}
+
+.js-celeb-guide__timeline-gesture-verse cite {
+  display: block;
+  font-family: var(--font-jost), "Jost", system-ui, sans-serif;
+  font-size: 0.56rem;
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 249, 242, 0.68);
 }
 
 /* Itinerário sobre cartão vinho — contraste ivory (não afecta timeline em fundo claro) */

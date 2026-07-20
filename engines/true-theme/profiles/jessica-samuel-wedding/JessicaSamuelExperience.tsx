@@ -13,7 +13,6 @@ import {
   JessicaSamuelHeroSection,
   JessicaSamuelIntroSection,
   JessicaSamuelJourneySection,
-  JessicaSamuelLocationSection,
 } from "./JessicaSamuelSections";
 import { JessicaSamuelRSVPSection } from "./JessicaSamuelRSVP";
 import { MemoriesSection } from "./photos/MemoriesSection";
@@ -33,7 +32,6 @@ export function JessicaSamuelExperience() {
       <JessicaSamuelFamiliesSection />
       <JessicaSamuelDetailsSection />
       <JessicaSamuelCelebrationGuideSection />
-      <JessicaSamuelLocationSection />
       <JessicaSamuelDressCodeSection />
       <JessicaSamuelCountdownSection />
       <JessicaSamuelPostEventSection />
