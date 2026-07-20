@@ -1639,3 +1639,18 @@
   }
 }
 
+@media (max-width: 360px) {
+  .js-wedding-floral-corner-tl,
+  .js-wedding-floral-corner-br {
+    width: clamp(72px, 20vw, 100px);
+    opacity: 0.72;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-floral-corner-tl,
+  .js-wedding-floral-corner-br {
+    transition: none !important;
+  }
+}
+
