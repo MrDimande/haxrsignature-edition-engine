@@ -325,8 +325,8 @@ export function JessicaSamuelCelebrationGuideSection() {
             <Image
               src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
               alt=""
-              width={200}
-              height={50}
+              width={900}
+              height={220}
               loading="lazy"
               sizes="200px"
               className="w-[160px] sm:w-[200px] h-auto object-contain opacity-80"

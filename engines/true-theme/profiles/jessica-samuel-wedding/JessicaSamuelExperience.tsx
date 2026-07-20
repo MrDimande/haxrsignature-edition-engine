@@ -44,11 +44,11 @@ export function JessicaSamuelExperience() {
         <Image
           src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
           alt=""
-          width={300}
-          height={60}
+          width={900}
+          height={220}
           loading="lazy"
           sizes="(max-width: 480px) 200px, 280px"
-          className="w-[200px] md:w-[280px] h-auto object-contain opacity-90"
+          className="w-[200px] md:w-[280px] h-auto object-contain opacity-85"
           style={{ height: "auto" }}
         />
       </div>
