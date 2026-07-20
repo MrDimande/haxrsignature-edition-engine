@@ -152,9 +152,9 @@ function JessicaSamuelIntroOverlay({
         src="/images/jessica-samuel-wedding/floral/floral-corner-top-left.webp"
         alt=""
         width={920}
-        height={653}
+        height={606}
         priority
-        sizes="(max-width: 479px) 50vw, (max-width: 767px) 36vw, (max-width: 1023px) 28vw, 24vw"
+        sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
         className="js-wedding-floral-corner-tl"
         aria-hidden="true"
       />
@@ -163,7 +163,7 @@ function JessicaSamuelIntroOverlay({
         alt=""
         width={920}
         height={606}
-        sizes="(max-width: 479px) 42vw, (max-width: 767px) 30vw, (max-width: 1023px) 24vw, 20vw"
+        sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
         className="js-wedding-floral-corner-br"
         aria-hidden="true"
       />

@@ -1598,7 +1598,7 @@
   }
 }
 
-/* Floral corners — assets trimmed flush; pin to canvas extremities */
+/* Floral corners — mirrored pair, flush to canvas extremities */
 .js-wedding-floral-corner-tl,
 .js-wedding-floral-corner-br {
   position: absolute;
@@ -1608,13 +1608,13 @@
   height: auto;
   max-width: none;
   object-fit: contain;
+  width: clamp(7.5rem, 44vw, 10.25rem);
+  opacity: 0.7;
 }
 
 .js-wedding-floral-corner-tl {
   top: 0;
   left: 0;
-  width: clamp(8.5rem, 50vw, 11.5rem);
-  opacity: 0.74;
   object-position: top left;
   transform-origin: top left;
 }
@@ -1622,43 +1622,30 @@
 .js-wedding-floral-corner-br {
   right: 0;
   bottom: 0;
-  width: clamp(7.25rem, 42vw, 9.75rem);
-  opacity: 0.64;
   object-position: bottom right;
   transform-origin: bottom right;
 }
 
 @media (min-width: 480px) {
-  .js-wedding-floral-corner-tl {
-    width: clamp(11rem, 36vw, 15.5rem);
-    opacity: 0.76;
-  }
-
+  .js-wedding-floral-corner-tl,
   .js-wedding-floral-corner-br {
-    width: clamp(9.25rem, 30vw, 13.5rem);
-    opacity: 0.66;
+    width: clamp(9.5rem, 32vw, 13.75rem);
+    opacity: 0.72;
   }
 }
 
 @media (min-width: 768px) {
-  .js-wedding-floral-corner-tl {
-    width: clamp(14rem, 28vw, 20rem);
-    opacity: 0.8;
-  }
-
+  .js-wedding-floral-corner-tl,
   .js-wedding-floral-corner-br {
-    width: clamp(12rem, 24vw, 17rem);
-    opacity: 0.7;
+    width: clamp(12.5rem, 26vw, 17.5rem);
+    opacity: 0.76;
   }
 }
 
 @media (min-width: 1024px) {
-  .js-wedding-floral-corner-tl {
-    width: clamp(16rem, 24vw, 22.5rem);
-  }
-
+  .js-wedding-floral-corner-tl,
   .js-wedding-floral-corner-br {
-    width: clamp(14rem, 20vw, 19rem);
+    width: clamp(14.5rem, 22vw, 19.5rem);
   }
 }
 
