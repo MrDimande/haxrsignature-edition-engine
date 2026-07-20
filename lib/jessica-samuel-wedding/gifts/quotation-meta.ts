@@ -7,7 +7,7 @@
 
 export const JESSICA_SAMUEL_GIFT_QUOTATION = {
   /** Nome editorial sob o qual a lista é referida ao convidado. */
-  listDisplayName: "Jessica & Samuel",
+  listDisplayName: "Lista em nome de Jessica & Samuel",
   number: "1044",
   seriesYear: "2026",
   issueDateIso: "2026-06-16",
