@@ -1690,3 +1690,36 @@
   }
 }
 
+/* Horizontal floral spray — editorial section divider (mobile-first) */
+.js-wedding-floral-divider {
+  display: block;
+  width: clamp(9.5rem, 52vw, 14rem);
+  height: auto;
+  margin-inline: auto;
+  object-fit: contain;
+  opacity: 0.78;
+  pointer-events: none;
+  user-select: none;
+}
+
+.js-wedding-floral-divider--guide {
+  width: clamp(8.5rem, 46vw, 12.5rem);
+  opacity: 0.72;
+  margin-top: 0.35rem;
+}
+
+.js-wedding-floral-divider--chapter {
+  width: clamp(11rem, 58vw, 17rem);
+  opacity: 0.8;
+}
+
+@media (min-width: 768px) {
+  .js-wedding-floral-divider--guide {
+    width: clamp(11rem, 22vw, 15rem);
+  }
+
+  .js-wedding-floral-divider--chapter {
+    width: clamp(14rem, 28vw, 20rem);
+  }
+}
+

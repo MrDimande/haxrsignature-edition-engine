@@ -325,12 +325,11 @@ export function JessicaSamuelCelebrationGuideSection() {
             <Image
               src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
               alt=""
-              width={900}
-              height={220}
+              width={591}
+              height={320}
               loading="lazy"
-              sizes="200px"
-              className="w-[160px] sm:w-[200px] h-auto object-contain opacity-80"
-              style={{ height: "auto" }}
+              sizes="(max-width: 767px) 46vw, 200px"
+              className="js-wedding-floral-divider js-wedding-floral-divider--guide"
             />
           </div>
         </header>

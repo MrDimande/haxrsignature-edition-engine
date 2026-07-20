@@ -38,18 +38,17 @@ export function JessicaSamuelExperience() {
       <JessicaSamuelPostEventSection />
       <MemoriesSection />
       <div
-        className="w-full flex justify-center py-10 sm:py-12 select-none pointer-events-none"
+        className="w-full flex justify-center py-8 sm:py-11 select-none pointer-events-none"
         aria-hidden="true"
       >
         <Image
           src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
           alt=""
-          width={900}
-          height={220}
+          width={591}
+          height={320}
           loading="lazy"
-          sizes="(max-width: 480px) 200px, 280px"
-          className="w-[200px] md:w-[280px] h-auto object-contain opacity-85"
-          style={{ height: "auto" }}
+          sizes="(max-width: 767px) 58vw, 280px"
+          className="js-wedding-floral-divider js-wedding-floral-divider--chapter"
         />
       </div>
       <JessicaSamuelRSVPSection />
