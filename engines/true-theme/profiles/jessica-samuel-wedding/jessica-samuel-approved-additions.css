@@ -1598,6 +1598,63 @@
   }
 }
 
+/* Floral mist — soft rose/bordeaux vignette bridging photo ↔ corner blooms */
+.js-wedding-cover__floral-mist {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 58% 46% at -2% -2%,
+      rgba(122, 35, 50, 0.38) 0%,
+      rgba(201, 147, 155, 0.14) 32%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 58% 46% at 102% 102%,
+      rgba(104, 27, 41, 0.34) 0%,
+      rgba(201, 147, 155, 0.12) 34%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 70% 55% at 50% 50%,
+      transparent 55%,
+      rgba(122, 35, 50, 0.06) 100%
+    );
+  mix-blend-mode: soft-light;
+}
+
+@media (min-width: 768px) {
+  .js-wedding-cover__floral-mist {
+    background:
+      radial-gradient(
+        ellipse 48% 40% at -2% -2%,
+        rgba(122, 35, 50, 0.32) 0%,
+        rgba(201, 147, 155, 0.12) 34%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 48% 40% at 102% 102%,
+        rgba(104, 27, 41, 0.28) 0%,
+        rgba(201, 147, 155, 0.1) 34%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 65% 50% at 50% 50%,
+        transparent 58%,
+        rgba(122, 35, 50, 0.05) 100%
+      );
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .js-wedding-cover__floral-mist {
+    opacity: 0.55;
+    mix-blend-mode: normal;
+  }
+}
+
 /* Floral corners — hug device contour (bleed + scale into rounded edges) */
 .js-wedding-floral-corner-tl,
 .js-wedding-floral-corner-br {

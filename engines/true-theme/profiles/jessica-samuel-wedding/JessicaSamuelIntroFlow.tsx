@@ -146,6 +146,8 @@ function JessicaSamuelIntroOverlay({
 
       <div className="js-wedding-cover__veil" aria-hidden />
       <div className="js-wedding-cover__grain" aria-hidden />
+      {/* Soft rose/bordeaux mist — bridges photo into corner florals */}
+      <div className="js-wedding-cover__floral-mist" aria-hidden />
 
       {/* Editorial floral corners — mobile-first, pinned to extremities */}
       <Image
