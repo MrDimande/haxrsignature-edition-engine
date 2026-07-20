@@ -149,26 +149,48 @@ function JessicaSamuelIntroOverlay({
       {/* Soft rose/bordeaux mist — bridges photo into corner florals */}
       <div className="js-wedding-cover__floral-mist" aria-hidden />
 
-      {/* Editorial floral corners — mobile-first, pinned to extremities */}
-      <Image
-        src="/images/jessica-samuel-wedding/floral/floral-corner-top-left.webp"
-        alt=""
-        width={920}
-        height={606}
-        priority
-        sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
+      {/* Editorial floral corners — grow in from extremities */}
+      <motion.div
         className="js-wedding-floral-corner-tl"
-        aria-hidden="true"
-      />
-      <Image
-        src="/images/jessica-samuel-wedding/floral/floral-corner-bottom-right.webp"
-        alt=""
-        width={920}
-        height={606}
-        sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.52 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: reduceMotion ? 0 : 1.15,
+          ease: EASE,
+          delay: reduceMotion ? 0 : 0.18,
+        }}
+        aria-hidden
+      >
+        <Image
+          src="/images/jessica-samuel-wedding/floral/floral-corner-top-left.webp"
+          alt=""
+          width={920}
+          height={606}
+          priority
+          sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
+          className="js-wedding-floral-corner-tl__bloom"
+        />
+      </motion.div>
+      <motion.div
         className="js-wedding-floral-corner-br"
-        aria-hidden="true"
-      />
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.52 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: reduceMotion ? 0 : 1.2,
+          ease: EASE,
+          delay: reduceMotion ? 0 : 0.32,
+        }}
+        aria-hidden
+      >
+        <Image
+          src="/images/jessica-samuel-wedding/floral/floral-corner-bottom-right.webp"
+          alt=""
+          width={920}
+          height={606}
+          sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
+          className="js-wedding-floral-corner-br__bloom"
+        />
+      </motion.div>
 
       <div className="js-wedding-cover__stage">
         <motion.div

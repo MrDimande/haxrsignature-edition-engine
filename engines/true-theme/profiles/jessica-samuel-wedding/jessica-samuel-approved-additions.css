@@ -1127,7 +1127,31 @@
 
 /* Capa — nomes na mesma família manuscrita do Hero (Great Vibes) */
 .js-wedding-cover__title {
+  position: relative;
+  isolation: isolate;
   gap: 0.12rem;
+}
+
+/* Warm editorial glow — sits behind names, softer than corner florals */
+.js-wedding-cover__title::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: -1;
+  width: min(21rem, 108%);
+  height: 78%;
+  pointer-events: none;
+  translate: -50% -50%;
+  background: radial-gradient(
+    ellipse closest-side at center,
+    rgba(201, 147, 155, 0.32) 0%,
+    rgba(143, 46, 63, 0.16) 38%,
+    rgba(122, 35, 50, 0.06) 58%,
+    transparent 74%
+  );
+  filter: blur(20px);
+  opacity: 0.9;
 }
 
 .js-wedding-cover__name {
@@ -1137,6 +1161,10 @@
   line-height: 1.08;
   letter-spacing: 0.01em;
   padding-block: 0.04em;
+  text-shadow:
+    0 0 22px rgba(201, 147, 155, 0.26),
+    0 0 48px rgba(122, 35, 50, 0.16),
+    0 4px 28px rgba(23, 19, 18, 0.42);
 }
 
 .js-wedding-cover__amp {
@@ -1148,6 +1176,16 @@
   letter-spacing: 0.02em;
   margin-block: 0.02rem;
   color: var(--js-rose, #c9939b);
+  text-shadow:
+    0 0 18px rgba(201, 147, 155, 0.28),
+    0 2px 16px rgba(23, 19, 18, 0.35);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .js-wedding-cover__title::before {
+    opacity: 0.45;
+    filter: blur(10px);
+  }
 }
 
 @media (min-width: 1024px) {
@@ -1662,16 +1700,26 @@
   z-index: 2;
   pointer-events: none;
   user-select: none;
+  width: clamp(8.25rem, 48vw, 11.25rem);
+}
+
+.js-wedding-floral-corner-tl__bloom,
+.js-wedding-floral-corner-br__bloom {
+  display: block;
+  width: 100%;
   height: auto;
   max-width: none;
   object-fit: contain;
-  width: clamp(8.25rem, 48vw, 11.25rem);
   opacity: 0.72;
 }
 
 .js-wedding-floral-corner-tl {
   top: calc(-0.55rem - (env(safe-area-inset-top, 0px) * 0.2));
   left: calc(-0.7rem - (env(safe-area-inset-left, 0px) * 0.25));
+  transform-origin: top left;
+}
+
+.js-wedding-floral-corner-tl__bloom {
   object-position: top left;
   transform: scale(1.12);
   transform-origin: top left;
@@ -1680,6 +1728,10 @@
 .js-wedding-floral-corner-br {
   right: calc(-0.7rem - (env(safe-area-inset-right, 0px) * 0.25));
   bottom: calc(-0.55rem - (env(safe-area-inset-bottom, 0px) * 0.3));
+  transform-origin: bottom right;
+}
+
+.js-wedding-floral-corner-br__bloom {
   object-position: bottom right;
   transform: scale(1.12);
   transform-origin: bottom right;
@@ -1689,18 +1741,25 @@
   .js-wedding-floral-corner-tl,
   .js-wedding-floral-corner-br {
     width: clamp(10.25rem, 34vw, 14.5rem);
+  }
+
+  .js-wedding-floral-corner-tl__bloom,
+  .js-wedding-floral-corner-br__bloom {
     opacity: 0.74;
   }
 
   .js-wedding-floral-corner-tl {
     top: -0.65rem;
     left: -0.85rem;
-    transform: scale(1.1);
   }
 
   .js-wedding-floral-corner-br {
     right: -0.85rem;
     bottom: -0.65rem;
+  }
+
+  .js-wedding-floral-corner-tl__bloom,
+  .js-wedding-floral-corner-br__bloom {
     transform: scale(1.1);
   }
 }
@@ -1709,19 +1768,22 @@
   .js-wedding-floral-corner-tl,
   .js-wedding-floral-corner-br {
     width: clamp(13rem, 27vw, 18rem);
+  }
+
+  .js-wedding-floral-corner-tl__bloom,
+  .js-wedding-floral-corner-br__bloom {
     opacity: 0.76;
+    transform: scale(1.08);
   }
 
   .js-wedding-floral-corner-tl {
     top: -0.75rem;
     left: -0.95rem;
-    transform: scale(1.08);
   }
 
   .js-wedding-floral-corner-br {
     right: -0.95rem;
     bottom: -0.75rem;
-    transform: scale(1.08);
   }
 }
 
@@ -1736,9 +1798,12 @@
 @media (max-height: 700px) {
   .js-wedding-floral-corner-br {
     width: clamp(6rem, 36vw, 7.75rem);
-    opacity: 0.54;
     right: -0.45rem;
     bottom: calc(-0.2rem - (env(safe-area-inset-bottom, 0px) * 0.15));
+  }
+
+  .js-wedding-floral-corner-br__bloom {
+    opacity: 0.54;
     transform: scale(1.06);
   }
 }
@@ -1750,9 +1815,12 @@
 
   .js-wedding-floral-corner-tl {
     width: clamp(7rem, 42vw, 9.25rem);
-    opacity: 0.62;
     top: -0.35rem;
     left: -0.45rem;
+  }
+
+  .js-wedding-floral-corner-tl__bloom {
+    opacity: 0.62;
     transform: scale(1.06);
   }
 }
