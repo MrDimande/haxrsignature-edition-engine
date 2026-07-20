@@ -1,32 +1,32 @@
 "use client";
 
-import Image from "next/image";
 import {
-  Camera,
-  Church,
-  GlassWater,
-  HandHeart,
-  MapPin,
-  Navigation,
-  Phone,
-  Scale,
-  type LucideIcon,
-} from "lucide-react";
-import { motion } from "motion/react";
-import {
-  WEDDING_ASSETS,
-  WEDDING_CHARITY_REQUEST,
-  WEDDING_ITINERARY,
+    WEDDING_ASSETS,
+    WEDDING_CHARITY_REQUEST,
+    WEDDING_ITINERARY,
 } from "@lib/jessica-samuel-wedding/event-details";
 import {
-  WEDDING_GIFT_GUIDANCE,
-  shouldShowWeddingGiftGuideCard,
+    WEDDING_GIFT_GUIDANCE,
+    shouldShowWeddingGiftGuideCard,
 } from "@lib/jessica-samuel-wedding/gifts/catalog";
-import { jsType } from "./jessica-samuel-typography";
-import { JS_SURFACES } from "./jessica-samuel-surfaces";
+import {
+    Camera,
+    Church,
+    GlassWater,
+    HandHeart,
+    MapPin,
+    Navigation,
+    Phone,
+    Scale,
+    type LucideIcon,
+} from "lucide-react";
+import { motion } from "motion/react";
+import Image from "next/image";
+import { CardMediaParallax } from "./CardMediaParallax";
 import { JessicaSamuelEditorialHeading } from "./jessica-samuel-editorial-heading";
 import { jsReveal, jsStagger, jsViewport } from "./jessica-samuel-motion";
-import { CardMediaParallax } from "./CardMediaParallax";
+import { JS_SURFACES } from "./jessica-samuel-surfaces";
+import { jsType } from "./jessica-samuel-typography";
 
 const ITINERARY_ICONS: Record<
   (typeof WEDDING_ITINERARY)[number]["id"],
@@ -321,6 +321,18 @@ export function JessicaSamuelCelebrationGuideSection() {
           >
             Horários, percursos e orientação de presentes — tudo no mesmo olhar.
           </p>
+          <div className="flex justify-center mt-6 select-none pointer-events-none" aria-hidden="true">
+            <Image
+              src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
+              alt=""
+              width={200}
+              height={50}
+              loading="lazy"
+              sizes="200px"
+              className="w-[160px] sm:w-[200px] h-auto object-contain opacity-80"
+              style={{ height: "auto" }}
+            />
+          </div>
         </header>
 
         <div className={gridClass}>

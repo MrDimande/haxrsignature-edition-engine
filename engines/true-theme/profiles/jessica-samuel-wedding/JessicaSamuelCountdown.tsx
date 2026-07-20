@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
-  WEDDING_ASSETS,
-  WEDDING_COPY,
-  WEDDING_EVENT,
-} from "@lib/jessica-samuel-wedding/event-details";
-import {
-  getWeddingChapterPhase,
-  type WeddingChapterPhase,
+    getWeddingChapterPhase,
+    type WeddingChapterPhase,
 } from "@lib/jessica-samuel-wedding/chapter-phase";
+import {
+    WEDDING_ASSETS,
+    WEDDING_COPY,
+    WEDDING_EVENT,
+} from "@lib/jessica-samuel-wedding/event-details";
 import { readWeddingRsvpStorage } from "@lib/jessica-samuel-wedding/rsvp-ritual";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useExperience } from "../../context";
 import { JessicaSamuelEditorialHeading } from "./jessica-samuel-editorial-heading";
 import { jsReveal, jsStagger, jsViewport } from "./jessica-samuel-motion";

@@ -1576,3 +1576,66 @@
     transform: none;
   }
 }
+
+/* ============================================================
+   JESSICA & SAMUEL - FLORAL ART DIRECTION & LAYOUT FIXES
+   ============================================================ */
+
+/* Cover Page (Capa) responsive safety adjustment for short viewports */
+@media (max-height: 740px) {
+  .js-wedding-cover__stage {
+    padding-bottom: max(0.6rem, env(safe-area-inset-bottom)) !important;
+    padding-top: max(0.6rem, env(safe-area-inset-top)) !important;
+  }
+  .js-wedding-cover__content {
+    padding-bottom: 0.25rem !important;
+  }
+  .js-wedding-cover__monogram {
+    margin-bottom: 0.5rem !important;
+  }
+  .js-wedding-cover__brand {
+    margin-top: 0.75rem !important;
+  }
+}
+
+/* Floral Corner Classes */
+.js-wedding-floral-corner-tl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2; /* Positioned above cover veil/grain (z-index 1-2) but below text container (z-index 3) */
+  pointer-events: none;
+  user-select: none;
+  width: clamp(140px, 28vw, 300px);
+  height: auto;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+.js-wedding-floral-corner-br {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  width: clamp(140px, 28vw, 300px);
+  height: auto;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+@media (max-width: 480px) {
+  .js-wedding-floral-corner-tl,
+  .js-wedding-floral-corner-br {
+    width: clamp(90px, 22vw, 130px);
+  }
+}
+
+/* Hide bottom-right cover floral decoration only under extremely short screen heights to protect CTA visibility */
+@media (max-height: 600px) {
+  .js-wedding-floral-corner-br {
+    display: none !important;
+  }
+}
+

@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useLenis } from "lenis/react";
 import { HAXR_AUTH } from "@lib/brand/authorship";
 import {
-  WEDDING_ASSETS,
-  WEDDING_COPY,
-  WEDDING_COUPLE,
+    WEDDING_ASSETS,
+    WEDDING_COPY,
+    WEDDING_COUPLE,
 } from "@lib/jessica-samuel-wedding/event-details";
+import { useLenis } from "lenis/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import { getFlowExitTransition } from "../../../../theme/experience-tokens";
 import { useExperience } from "../../context";
 
@@ -146,6 +146,27 @@ function JessicaSamuelIntroOverlay({
 
       <div className="js-wedding-cover__veil" aria-hidden />
       <div className="js-wedding-cover__grain" aria-hidden />
+
+      {/* Editorial floral corners decoration */}
+      <Image
+        src="/images/jessica-samuel-wedding/floral/floral-corner-top-left.webp"
+        alt=""
+        width={300}
+        height={300}
+        priority
+        sizes="(max-width: 480px) 130px, (max-width: 768px) 25vw, 320px"
+        className="js-wedding-floral-corner-tl"
+        aria-hidden="true"
+      />
+      <Image
+        src="/images/jessica-samuel-wedding/floral/floral-corner-bottom-right.webp"
+        alt=""
+        width={300}
+        height={300}
+        sizes="(max-width: 480px) 130px, (max-width: 768px) 25vw, 320px"
+        className="js-wedding-floral-corner-br"
+        aria-hidden="true"
+      />
 
       <div className="js-wedding-cover__stage">
         <motion.div

@@ -1,11 +1,12 @@
 "use client";
 
-import "./jessica-samuel-approved-additions.css";
+import Image from "next/image";
 import { JessicaSamuelCelebrationGuideSection } from "./JessicaSamuelCelebrationGuide";
 import { JessicaSamuelCountdownSection } from "./JessicaSamuelCountdown";
 import { JessicaSamuelDressCodeSection } from "./JessicaSamuelDressCodeSection";
 import { JessicaSamuelFloatingNav } from "./JessicaSamuelFloatingNav";
 import { JessicaSamuelPostEventSection } from "./JessicaSamuelPostEventSection";
+import { JessicaSamuelRSVPSection } from "./JessicaSamuelRSVP";
 import {
   JessicaSamuelDetailsSection,
   JessicaSamuelFamiliesSection,
@@ -14,7 +15,7 @@ import {
   JessicaSamuelIntroSection,
   JessicaSamuelJourneySection,
 } from "./JessicaSamuelSections";
-import { JessicaSamuelRSVPSection } from "./JessicaSamuelRSVP";
+import "./jessica-samuel-approved-additions.css";
 import { MemoriesSection } from "./photos/MemoriesSection";
 
 /** Composição completa — Casamento Jessica & Samuel */
@@ -36,6 +37,21 @@ export function JessicaSamuelExperience() {
       <JessicaSamuelCountdownSection />
       <JessicaSamuelPostEventSection />
       <MemoriesSection />
+      <div
+        className="w-full flex justify-center py-10 sm:py-12 select-none pointer-events-none"
+        aria-hidden="true"
+      >
+        <Image
+          src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
+          alt=""
+          width={300}
+          height={60}
+          loading="lazy"
+          sizes="(max-width: 480px) 200px, 280px"
+          className="w-[200px] md:w-[280px] h-auto object-contain opacity-90"
+          style={{ height: "auto" }}
+        />
+      </div>
       <JessicaSamuelRSVPSection />
       <JessicaSamuelFooterSection />
       <JessicaSamuelFloatingNav />
