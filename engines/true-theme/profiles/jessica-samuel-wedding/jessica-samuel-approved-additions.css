@@ -2002,7 +2002,7 @@
 
 /* Couple photo crown — arches over «Os noivos» portrait only */
 .js-wedding-couple-photo-column {
-  padding-top: 1.15rem;
+  padding-top: 1.45rem;
 }
 
 .js-wedding-couple-photo-frame {
@@ -2023,7 +2023,7 @@
 .js-wedding-couple-crown {
   position: absolute;
   left: 50%;
-  top: -8%;
+  top: -11%;
   z-index: 4;
   width: 144%;
   max-width: none;
@@ -2062,7 +2062,7 @@
 
   .js-wedding-couple-crown {
     width: 148%;
-    top: -6.5%;
+    top: -9%;
     opacity: 0.82;
   }
 }
@@ -2070,7 +2070,7 @@
 @media (max-width: 380px) {
   .js-wedding-couple-crown {
     width: 152%;
-    top: -5.5%;
+    top: -8%;
   }
 }
 
