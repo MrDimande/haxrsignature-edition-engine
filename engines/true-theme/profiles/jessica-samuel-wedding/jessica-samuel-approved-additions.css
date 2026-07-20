@@ -2002,7 +2002,7 @@
 
 /* Couple photo crown — arches over «Os noivos» portrait only */
 .js-wedding-couple-photo-column {
-  padding-top: 1.45rem;
+  padding-top: 1.7rem;
 }
 
 .js-wedding-couple-photo-frame {
@@ -2023,7 +2023,7 @@
 .js-wedding-couple-crown {
   position: absolute;
   left: 50%;
-  top: -11%;
+  top: -13.5%;
   z-index: 4;
   width: 144%;
   max-width: none;
@@ -2031,12 +2031,13 @@
   translate: -50% 0;
   pointer-events: none;
   user-select: none;
-  opacity: 0.84;
+  opacity: 0.86;
   filter:
-    saturate(0.88)
-    brightness(0.94)
-    drop-shadow(0 6px 14px rgba(122, 35, 50, 0.34))
-    drop-shadow(0 2px 6px rgba(104, 27, 41, 0.22));
+    saturate(1.08)
+    brightness(0.92)
+    hue-rotate(-6deg)
+    drop-shadow(0 6px 14px rgba(122, 35, 50, 0.36))
+    drop-shadow(0 2px 6px rgba(104, 27, 41, 0.24));
 }
 
 /* Move frame + crown together; cancel photo-only hover lift */
@@ -2062,15 +2063,15 @@
 
   .js-wedding-couple-crown {
     width: 148%;
-    top: -9%;
-    opacity: 0.82;
+    top: -11.5%;
+    opacity: 0.84;
   }
 }
 
 @media (max-width: 380px) {
   .js-wedding-couple-crown {
     width: 152%;
-    top: -8%;
+    top: -10%;
   }
 }
 
