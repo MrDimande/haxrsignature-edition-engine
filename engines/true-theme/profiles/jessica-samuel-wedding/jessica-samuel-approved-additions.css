@@ -1127,7 +1127,31 @@
 
 /* Capa — nomes na mesma família manuscrita do Hero (Great Vibes) */
 .js-wedding-cover__title {
+  position: relative;
+  isolation: isolate;
   gap: 0.12rem;
+}
+
+/* Warm editorial glow — sits behind names, softer than corner florals */
+.js-wedding-cover__title::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: -1;
+  width: min(21rem, 108%);
+  height: 78%;
+  pointer-events: none;
+  translate: -50% -50%;
+  background: radial-gradient(
+    ellipse closest-side at center,
+    rgba(201, 147, 155, 0.32) 0%,
+    rgba(143, 46, 63, 0.16) 38%,
+    rgba(122, 35, 50, 0.06) 58%,
+    transparent 74%
+  );
+  filter: blur(20px);
+  opacity: 0.9;
 }
 
 .js-wedding-cover__name {
@@ -1137,6 +1161,10 @@
   line-height: 1.08;
   letter-spacing: 0.01em;
   padding-block: 0.04em;
+  text-shadow:
+    0 0 22px rgba(201, 147, 155, 0.26),
+    0 0 48px rgba(122, 35, 50, 0.16),
+    0 4px 28px rgba(23, 19, 18, 0.42);
 }
 
 .js-wedding-cover__amp {
@@ -1148,6 +1176,16 @@
   letter-spacing: 0.02em;
   margin-block: 0.02rem;
   color: var(--js-rose, #c9939b);
+  text-shadow:
+    0 0 18px rgba(201, 147, 155, 0.28),
+    0 2px 16px rgba(23, 19, 18, 0.35);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .js-wedding-cover__title::before {
+    opacity: 0.45;
+    filter: blur(10px);
+  }
 }
 
 @media (min-width: 1024px) {
@@ -1576,3 +1614,480 @@
     transform: none;
   }
 }
+
+/* ============================================================
+   JESSICA & SAMUEL - FLORAL ART DIRECTION & LAYOUT FIXES
+   ============================================================ */
+
+/* Cover Page (Capa) responsive safety adjustment for short viewports */
+@media (max-height: 740px) {
+  .js-wedding-cover__stage {
+    padding-bottom: max(0.6rem, env(safe-area-inset-bottom)) !important;
+    padding-top: max(0.6rem, env(safe-area-inset-top)) !important;
+  }
+  .js-wedding-cover__content {
+    padding-bottom: 0.25rem !important;
+  }
+  .js-wedding-cover__monogram {
+    margin-bottom: 0.5rem !important;
+  }
+  .js-wedding-cover__brand {
+    margin-top: 0.75rem !important;
+  }
+}
+
+/* Floral mist — soft rose/bordeaux vignette bridging photo ↔ corner blooms */
+.js-wedding-cover__floral-mist {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 58% 46% at -2% -2%,
+      rgba(122, 35, 50, 0.38) 0%,
+      rgba(201, 147, 155, 0.14) 32%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 58% 46% at 102% 102%,
+      rgba(104, 27, 41, 0.34) 0%,
+      rgba(201, 147, 155, 0.12) 34%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 70% 55% at 50% 50%,
+      transparent 55%,
+      rgba(122, 35, 50, 0.06) 100%
+    );
+  mix-blend-mode: soft-light;
+}
+
+@media (min-width: 768px) {
+  .js-wedding-cover__floral-mist {
+    background:
+      radial-gradient(
+        ellipse 48% 40% at -2% -2%,
+        rgba(122, 35, 50, 0.32) 0%,
+        rgba(201, 147, 155, 0.12) 34%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 48% 40% at 102% 102%,
+        rgba(104, 27, 41, 0.28) 0%,
+        rgba(201, 147, 155, 0.1) 34%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 65% 50% at 50% 50%,
+        transparent 58%,
+        rgba(122, 35, 50, 0.05) 100%
+      );
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .js-wedding-cover__floral-mist {
+    opacity: 0.55;
+    mix-blend-mode: normal;
+  }
+}
+
+/* Micro petals — 4 ambient flecks; intentionally quiet */
+.js-wedding-cover__petals {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.js-wedding-petal {
+  position: absolute;
+  display: block;
+  width: 0.42rem;
+  height: 0.68rem;
+  border-radius: 70% 30% 70% 30%;
+  opacity: 0.14;
+  filter: blur(0.4px);
+  will-change: transform;
+  transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+}
+
+.js-wedding-petal--rose {
+  background: radial-gradient(
+    ellipse at 32% 28%,
+    rgba(201, 147, 155, 0.7) 0%,
+    rgba(143, 46, 63, 0.28) 62%,
+    transparent 100%
+  );
+}
+
+.js-wedding-petal--wine {
+  background: radial-gradient(
+    ellipse at 40% 30%,
+    rgba(143, 46, 63, 0.65) 0%,
+    rgba(104, 27, 41, 0.3) 65%,
+    transparent 100%
+  );
+}
+
+.js-wedding-petal--blush {
+  background: radial-gradient(
+    ellipse at 35% 25%,
+    rgba(232, 206, 210, 0.55) 0%,
+    rgba(201, 147, 155, 0.22) 60%,
+    transparent 100%
+  );
+}
+
+.js-wedding-petal--p1 {
+  top: 16%;
+  left: 24%;
+  --petal-rot: -18deg;
+  width: 0.38rem;
+  height: 0.58rem;
+  opacity: 0.13;
+  animation: js-petal-drift-a 11s ease-in-out 0.8s infinite;
+}
+
+.js-wedding-petal--p2 {
+  top: 28%;
+  right: 16%;
+  --petal-rot: 28deg;
+  width: 0.5rem;
+  height: 0.78rem;
+  opacity: 0.11;
+  animation: js-petal-drift-b 13.5s ease-in-out 1.2s infinite;
+}
+
+.js-wedding-petal--p3 {
+  top: 48%;
+  left: 10%;
+  --petal-rot: 42deg;
+  width: 0.34rem;
+  height: 0.52rem;
+  opacity: 0.12;
+  animation: js-petal-drift-c 12.2s ease-in-out 1.6s infinite;
+}
+
+.js-wedding-petal--p4 {
+  top: 58%;
+  right: 22%;
+  --petal-rot: -32deg;
+  width: 0.44rem;
+  height: 0.7rem;
+  opacity: 0.1;
+  animation: js-petal-drift-a 14s ease-in-out 2s infinite reverse;
+}
+
+@keyframes js-petal-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+  }
+  50% {
+    transform: translate3d(5px, 12px, 0) rotate(calc(var(--petal-rot, 18deg) + 14deg));
+  }
+}
+
+@keyframes js-petal-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+  }
+  50% {
+    transform: translate3d(-7px, 10px, 0) rotate(calc(var(--petal-rot, 18deg) - 12deg));
+  }
+}
+
+@keyframes js-petal-drift-c {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--petal-rot, 18deg));
+  }
+  50% {
+    transform: translate3d(4px, -8px, 0) rotate(calc(var(--petal-rot, 18deg) + 10deg));
+  }
+}
+
+@media (min-width: 768px) {
+  .js-wedding-petal {
+    opacity: 0.12;
+  }
+
+  .js-wedding-petal--p1 {
+    left: 28%;
+  }
+
+  .js-wedding-petal--p2 {
+    right: 20%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-petal {
+    animation: none !important;
+    opacity: 0.08;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .js-wedding-cover__petals {
+    display: none;
+  }
+}
+
+/* Floral corners — hug device contour (bleed + scale into rounded edges) */
+.js-wedding-floral-corner-tl,
+.js-wedding-floral-corner-br {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  width: clamp(8.25rem, 48vw, 11.25rem);
+}
+
+.js-wedding-floral-corner-tl__bloom,
+.js-wedding-floral-corner-br__bloom {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  object-fit: contain;
+  opacity: 0.72;
+}
+
+.js-wedding-floral-corner-tl {
+  top: calc(-0.55rem - (env(safe-area-inset-top, 0px) * 0.2));
+  left: calc(-0.7rem - (env(safe-area-inset-left, 0px) * 0.25));
+  transform-origin: top left;
+}
+
+.js-wedding-floral-corner-tl__bloom {
+  object-position: top left;
+  transform: scale(1.12);
+  transform-origin: top left;
+}
+
+.js-wedding-floral-corner-br {
+  right: calc(-0.7rem - (env(safe-area-inset-right, 0px) * 0.25));
+  bottom: calc(-0.55rem - (env(safe-area-inset-bottom, 0px) * 0.3));
+  transform-origin: bottom right;
+}
+
+.js-wedding-floral-corner-br__bloom {
+  object-position: bottom right;
+  transform: scale(1.12);
+  transform-origin: bottom right;
+}
+
+@media (min-width: 480px) {
+  .js-wedding-floral-corner-tl,
+  .js-wedding-floral-corner-br {
+    width: clamp(10.25rem, 34vw, 14.5rem);
+  }
+
+  .js-wedding-floral-corner-tl__bloom,
+  .js-wedding-floral-corner-br__bloom {
+    opacity: 0.74;
+  }
+
+  .js-wedding-floral-corner-tl {
+    top: -0.65rem;
+    left: -0.85rem;
+  }
+
+  .js-wedding-floral-corner-br {
+    right: -0.85rem;
+    bottom: -0.65rem;
+  }
+
+  .js-wedding-floral-corner-tl__bloom,
+  .js-wedding-floral-corner-br__bloom {
+    transform: scale(1.1);
+  }
+}
+
+@media (min-width: 768px) {
+  .js-wedding-floral-corner-tl,
+  .js-wedding-floral-corner-br {
+    width: clamp(13rem, 27vw, 18rem);
+  }
+
+  .js-wedding-floral-corner-tl__bloom,
+  .js-wedding-floral-corner-br__bloom {
+    opacity: 0.76;
+    transform: scale(1.08);
+  }
+
+  .js-wedding-floral-corner-tl {
+    top: -0.75rem;
+    left: -0.95rem;
+  }
+
+  .js-wedding-floral-corner-br {
+    right: -0.95rem;
+    bottom: -0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .js-wedding-floral-corner-tl,
+  .js-wedding-floral-corner-br {
+    width: clamp(15rem, 22vw, 20rem);
+  }
+}
+
+/* Short viewports — keep CTA clear */
+@media (max-height: 700px) {
+  .js-wedding-floral-corner-br {
+    width: clamp(6rem, 36vw, 7.75rem);
+    right: -0.45rem;
+    bottom: calc(-0.2rem - (env(safe-area-inset-bottom, 0px) * 0.15));
+  }
+
+  .js-wedding-floral-corner-br__bloom {
+    opacity: 0.54;
+    transform: scale(1.06);
+  }
+}
+
+@media (max-height: 600px) {
+  .js-wedding-floral-corner-br {
+    display: none !important;
+  }
+
+  .js-wedding-floral-corner-tl {
+    width: clamp(7rem, 42vw, 9.25rem);
+    top: -0.35rem;
+    left: -0.45rem;
+  }
+
+  .js-wedding-floral-corner-tl__bloom {
+    opacity: 0.62;
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-floral-corner-tl,
+  .js-wedding-floral-corner-br {
+    transition: none !important;
+  }
+}
+
+/* Horizontal floral spray — editorial section divider (mobile-first) */
+.js-wedding-floral-divider {
+  display: block;
+  width: clamp(9.5rem, 52vw, 14rem);
+  height: auto;
+  margin-inline: auto;
+  object-fit: contain;
+  opacity: 0.78;
+  pointer-events: none;
+  user-select: none;
+}
+
+.js-wedding-floral-divider--guide {
+  width: clamp(8.5rem, 46vw, 12.5rem);
+  opacity: 0.72;
+  margin-top: 0.35rem;
+}
+
+.js-wedding-floral-divider--chapter {
+  width: clamp(11rem, 58vw, 17rem);
+  opacity: 0.8;
+}
+
+/* Couple photo crown — arches over «Os noivos» portrait only */
+.js-wedding-couple-photo-column {
+  padding-top: 1.7rem;
+}
+
+.js-wedding-couple-photo-frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 208px;
+  margin-inline: auto;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js-wedding-couple-photo-frame .js-wedding-couple-photo {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+}
+
+.js-wedding-couple-crown {
+  position: absolute;
+  left: 50%;
+  top: -13.5%;
+  z-index: 4;
+  width: 144%;
+  max-width: none;
+  height: auto;
+  translate: -50% 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.86;
+  filter:
+    saturate(1.08)
+    brightness(0.92)
+    hue-rotate(-6deg)
+    drop-shadow(0 6px 14px rgba(122, 35, 50, 0.36))
+    drop-shadow(0 2px 6px rgba(104, 27, 41, 0.24));
+}
+
+/* Move frame + crown together; cancel photo-only hover lift */
+.js-wedding-couple-wrap:hover .js-wedding-couple-photo-frame {
+  transform: translateY(-3px) scale(1.01);
+}
+
+.js-wedding-couple-wrap:hover
+  .js-wedding-couple-photo-frame
+  .js-wedding-couple-photo {
+  transform: none;
+  box-shadow:
+    0 0 0 1px rgba(255, 249, 242, 0.2),
+    0 28px 56px rgba(23, 19, 18, 0.24),
+    0 12px 28px rgba(23, 19, 18, 0.14),
+    inset 0 0 0 1px rgba(255, 249, 242, 0.15);
+}
+
+@media (max-width: 980px) {
+  .js-wedding-couple-photo-frame {
+    max-width: min(220px, 68vw);
+  }
+
+  .js-wedding-couple-crown {
+    width: 148%;
+    top: -11.5%;
+    opacity: 0.84;
+  }
+}
+
+@media (max-width: 380px) {
+  .js-wedding-couple-crown {
+    width: 152%;
+    top: -10%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js-wedding-couple-wrap:hover .js-wedding-couple-photo-frame {
+    transform: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .js-wedding-floral-divider--guide {
+    width: clamp(11rem, 22vw, 15rem);
+  }
+
+  .js-wedding-floral-divider--chapter {
+    width: clamp(14rem, 28vw, 20rem);
+  }
+}
+

@@ -1,19 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useLenis } from "lenis/react";
 import { HAXR_AUTH } from "@lib/brand/authorship";
 import {
-  WEDDING_ASSETS,
-  WEDDING_COPY,
-  WEDDING_COUPLE,
+    WEDDING_ASSETS,
+    WEDDING_COPY,
+    WEDDING_COUPLE,
 } from "@lib/jessica-samuel-wedding/event-details";
+import { useLenis } from "lenis/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import { getFlowExitTransition } from "../../../../theme/experience-tokens";
 import { useExperience } from "../../context";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Micro petals — low-contrast ambient drift (CSS-driven; paused under reduced motion). */
+const COVER_MICRO_PETALS = [
+  { id: "p1", tone: "rose" },
+  { id: "p2", tone: "wine" },
+  { id: "p3", tone: "blush" },
+  { id: "p4", tone: "rose" },
+] as const;
 
 /**
  * Capa editorial — abertura em «véu que se ergue».
@@ -146,6 +154,61 @@ function JessicaSamuelIntroOverlay({
 
       <div className="js-wedding-cover__veil" aria-hidden />
       <div className="js-wedding-cover__grain" aria-hidden />
+      {/* Soft rose/bordeaux mist — bridges photo into corner florals */}
+      <div className="js-wedding-cover__floral-mist" aria-hidden />
+
+      {/* Micro petals — ambient, very low contrast */}
+      <div className="js-wedding-cover__petals" aria-hidden>
+        {COVER_MICRO_PETALS.map((petal) => (
+          <span
+            key={petal.id}
+            className={`js-wedding-petal js-wedding-petal--${petal.id} js-wedding-petal--${petal.tone}`}
+          />
+        ))}
+      </div>
+
+      {/* Editorial floral corners — grow in from extremities */}
+      <motion.div
+        className="js-wedding-floral-corner-tl"
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.52 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: reduceMotion ? 0 : 1.15,
+          ease: EASE,
+          delay: reduceMotion ? 0 : 0.18,
+        }}
+        aria-hidden
+      >
+        <Image
+          src="/images/jessica-samuel-wedding/floral/floral-corner-top-left.webp"
+          alt=""
+          width={920}
+          height={606}
+          priority
+          sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
+          className="js-wedding-floral-corner-tl__bloom"
+        />
+      </motion.div>
+      <motion.div
+        className="js-wedding-floral-corner-br"
+        initial={reduceMotion ? false : { opacity: 0, scale: 0.52 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: reduceMotion ? 0 : 1.2,
+          ease: EASE,
+          delay: reduceMotion ? 0 : 0.32,
+        }}
+        aria-hidden
+      >
+        <Image
+          src="/images/jessica-samuel-wedding/floral/floral-corner-bottom-right.webp"
+          alt=""
+          width={920}
+          height={606}
+          sizes="(max-width: 479px) 44vw, (max-width: 767px) 32vw, (max-width: 1023px) 26vw, 22vw"
+          className="js-wedding-floral-corner-br__bloom"
+        />
+      </motion.div>
 
       <div className="js-wedding-cover__stage">
         <motion.div

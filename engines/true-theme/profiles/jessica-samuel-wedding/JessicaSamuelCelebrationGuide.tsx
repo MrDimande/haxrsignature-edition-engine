@@ -1,32 +1,32 @@
 "use client";
 
-import Image from "next/image";
 import {
-  Camera,
-  Church,
-  GlassWater,
-  HandHeart,
-  MapPin,
-  Navigation,
-  Phone,
-  Scale,
-  type LucideIcon,
-} from "lucide-react";
-import { motion } from "motion/react";
-import {
-  WEDDING_ASSETS,
-  WEDDING_CHARITY_REQUEST,
-  WEDDING_ITINERARY,
+    WEDDING_ASSETS,
+    WEDDING_CHARITY_REQUEST,
+    WEDDING_ITINERARY,
 } from "@lib/jessica-samuel-wedding/event-details";
 import {
-  WEDDING_GIFT_GUIDANCE,
-  shouldShowWeddingGiftGuideCard,
+    WEDDING_GIFT_GUIDANCE,
+    shouldShowWeddingGiftGuideCard,
 } from "@lib/jessica-samuel-wedding/gifts/catalog";
-import { jsType } from "./jessica-samuel-typography";
-import { JS_SURFACES } from "./jessica-samuel-surfaces";
+import {
+    Camera,
+    Church,
+    GlassWater,
+    HandHeart,
+    MapPin,
+    Navigation,
+    Phone,
+    Scale,
+    type LucideIcon,
+} from "lucide-react";
+import { motion } from "motion/react";
+import Image from "next/image";
+import { CardMediaParallax } from "./CardMediaParallax";
 import { JessicaSamuelEditorialHeading } from "./jessica-samuel-editorial-heading";
 import { jsReveal, jsStagger, jsViewport } from "./jessica-samuel-motion";
-import { CardMediaParallax } from "./CardMediaParallax";
+import { JS_SURFACES } from "./jessica-samuel-surfaces";
+import { jsType } from "./jessica-samuel-typography";
 
 const ITINERARY_ICONS: Record<
   (typeof WEDDING_ITINERARY)[number]["id"],
@@ -321,6 +321,17 @@ export function JessicaSamuelCelebrationGuideSection() {
           >
             Horários, percursos e orientação de presentes — tudo no mesmo olhar.
           </p>
+          <div className="flex justify-center mt-6 select-none pointer-events-none" aria-hidden="true">
+            <Image
+              src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
+              alt=""
+              width={591}
+              height={320}
+              loading="lazy"
+              sizes="(max-width: 767px) 46vw, 200px"
+              className="js-wedding-floral-divider js-wedding-floral-divider--guide"
+            />
+          </div>
         </header>
 
         <div className={gridClass}>
