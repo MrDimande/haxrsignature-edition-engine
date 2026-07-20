@@ -558,16 +558,27 @@ export function JessicaSamuelFamiliesSection() {
               />
 
               <div className="js-wedding-couple-photo-column">
-                <figure className="js-wedding-couple-photo">
+                <div className="js-wedding-couple-photo-frame">
+                  <figure className="js-wedding-couple-photo">
+                    <Image
+                      src={WEDDING_ASSETS.coupleImage}
+                      alt={`${WEDDING_COUPLE.bride} e ${WEDDING_COUPLE.groom}`}
+                      width={416}
+                      height={1040}
+                      className="js-wedding-couple-photo__img"
+                      sizes="(max-width: 980px) 72vw, 208px"
+                    />
+                  </figure>
                   <Image
-                    src={WEDDING_ASSETS.coupleImage}
-                    alt={`${WEDDING_COUPLE.bride} e ${WEDDING_COUPLE.groom}`}
-                    width={416}
-                    height={1040}
-                    className="js-wedding-couple-photo__img"
-                    sizes="(max-width: 980px) 72vw, 208px"
+                    src="/images/jessica-samuel-wedding/floral/floral-crown.webp"
+                    alt=""
+                    width={865}
+                    height={570}
+                    className="js-wedding-couple-crown"
+                    sizes="(max-width: 980px) 90vw, 280px"
+                    aria-hidden
                   />
-                </figure>
+                </div>
               </div>
 
               <CoupleParentBlock
