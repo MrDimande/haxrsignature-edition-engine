@@ -549,17 +549,21 @@
   background: rgba(255, 249, 242, 0.52);
 }
 
-.js-celeb-guide__maps-btn--on-wine {
-  border: 1px solid rgba(255, 249, 242, 0.24);
-  background: rgba(143, 46, 63, 0.94);
-  color: #fff9f2;
-  box-shadow: 0 8px 22px rgba(23, 19, 18, 0.18);
+.js-celeb-guide__timeline-maps-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  margin-top: 0.85rem;
   min-height: 2.75rem;
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
 }
 
-.js-celeb-guide__maps-btn--on-wine:focus-visible {
-  outline: 2px solid rgba(255, 249, 242, 0.72);
-  outline-offset: 3px;
+.js-celeb-guide__timeline-maps-cta:focus-visible {
+  outline: 2px solid var(--js-rose, #c9939b);
+  outline-offset: 4px;
 }
 
 .js-memories__cta-wrap {

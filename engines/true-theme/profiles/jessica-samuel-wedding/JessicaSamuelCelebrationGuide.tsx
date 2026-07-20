@@ -136,14 +136,16 @@ function ItineraryTimeline({ tone = "panel" }: { tone?: "panel" | "wine" }) {
                   rel="noopener noreferrer"
                   className={
                     isWine
-                      ? "js-celeb-guide__maps-btn js-celeb-guide__maps-btn--on-wine"
+                      ? "js-wedding-cover__cta js-celeb-guide__timeline-maps-cta"
                       : "js-celeb-guide__maps-btn"
                   }
                 >
                   {isWine ? (
                     <>
                       <Navigation size={11} strokeWidth={1.5} aria-hidden />
-                      <span>Abrir no Maps</span>
+                      <span className="js-wedding-cover__cta-label">
+                        Abrir no Maps
+                      </span>
                     </>
                   ) : (
                     "Ver localização"
