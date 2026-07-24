@@ -2000,9 +2000,15 @@
   opacity: 0.8;
 }
 
-/* Couple photo crown — arches over «Os noivos» portrait only */
+/* Couple photo floral arch — full editorial frame around «Os noivos» */
+#familias .js-wedding-couple-wrap {
+  overflow: visible;
+}
+
 .js-wedding-couple-photo-column {
-  padding-top: 1.7rem;
+  padding-top: 1.35rem;
+  padding-bottom: 0.35rem;
+  overflow: visible;
 }
 
 .js-wedding-couple-photo-frame {
@@ -2011,6 +2017,7 @@
   width: 100%;
   max-width: 208px;
   margin-inline: auto;
+  overflow: visible;
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -2023,24 +2030,23 @@
 .js-wedding-couple-crown {
   position: absolute;
   left: 50%;
-  top: -13.5%;
+  top: -10%;
   z-index: 4;
-  width: 144%;
+  width: 162%;
   max-width: none;
   height: auto;
   translate: -50% 0;
   pointer-events: none;
   user-select: none;
-  opacity: 0.86;
+  opacity: 0.92;
   filter:
-    saturate(1.08)
-    brightness(0.92)
-    hue-rotate(-6deg)
-    drop-shadow(0 6px 14px rgba(122, 35, 50, 0.36))
-    drop-shadow(0 2px 6px rgba(104, 27, 41, 0.24));
+    saturate(0.96)
+    brightness(0.98)
+    drop-shadow(0 10px 22px rgba(122, 35, 50, 0.32))
+    drop-shadow(0 3px 8px rgba(104, 27, 41, 0.2));
 }
 
-/* Move frame + crown together; cancel photo-only hover lift */
+/* Move frame + arch together; cancel photo-only hover lift */
 .js-wedding-couple-wrap:hover .js-wedding-couple-photo-frame {
   transform: translateY(-3px) scale(1.01);
 }
@@ -2062,16 +2068,16 @@
   }
 
   .js-wedding-couple-crown {
-    width: 148%;
-    top: -11.5%;
-    opacity: 0.84;
+    width: 158%;
+    top: -8%;
+    opacity: 0.9;
   }
 }
 
 @media (max-width: 380px) {
   .js-wedding-couple-crown {
-    width: 152%;
-    top: -10%;
+    width: 154%;
+    top: -7%;
   }
 }
 

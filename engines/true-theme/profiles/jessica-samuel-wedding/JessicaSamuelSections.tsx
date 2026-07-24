@@ -572,10 +572,10 @@ export function JessicaSamuelFamiliesSection() {
                   <Image
                     src="/images/jessica-samuel-wedding/floral/floral-crown.webp"
                     alt=""
-                    width={865}
-                    height={570}
+                    width={989}
+                    height={985}
                     className="js-wedding-couple-crown"
-                    sizes="(max-width: 980px) 90vw, 280px"
+                    sizes="(max-width: 980px) 95vw, 340px"
                     aria-hidden
                   />
                 </div>
