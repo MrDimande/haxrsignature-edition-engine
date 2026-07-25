@@ -69,6 +69,7 @@ export const WEDDING_ITINERARY = [
     location: WEDDING_RELIGIOUS_VENUE.name,
     locationLines: WEDDING_RELIGIOUS_VENUE.locationLines,
     mapsUrl: WEDDING_RELIGIOUS_VENUE.mapsUrl,
+    /** Traje e ofertório vivem no bloco editorial da timeline (não nesta note). */
     note: null as string | null,
   },
   {
@@ -122,22 +123,16 @@ export const WEDDING_EVENT = {
   bibleReference: "Gênesis 2:24",
 } as const;
 
-/** Pedido solidário opcional apresentado no Guia da Celebração. */
+/** Notas editoriais da cerimónia religiosa (itinerário no Guia). */
+export const WEDDING_RELIGIOUS_CEREMONY_NOTES = {
+  dressNote: "Solicitamos traje decente.",
+} as const;
+
+/** Pedido solidário opcional — ofertório na cerimónia religiosa. */
 export const WEDDING_CHARITY_REQUEST = {
-  eyebrow: "Um gesto que continua",
   optionalLabel: "Participação opcional",
-  title: "Que a nossa alegria chegue mais longe.",
-  lead:
-    "Neste dia em que celebramos o amor, convidamo-vos se o coração o pedir a trazer um produto não perecível.",
-  body:
-    "As contribuições serão entregues a um orfanato, prolongando esta celebração através da partilha e do cuidado.",
-  whisper: "Um gesto simples. Uma mesa mais cheia de esperança.",
   /** Resumo compacto para o itinerário (cerimónia religiosa). */
-  timelineSummary:
-    "Se o coração o pedir, traga um produto não perecível,será entregue a um orfanato.",
-  verse:
-    "Em verdade vos digo que, quando o fizestes a um destes meus pequeninos irmãos, a mim o fizestes.",
-  verseReference: "Mateus 25:40",
+  timelineSummary: "Um produto não perecível para o ofertório solene.",
 } as const;
 
 export const WEDDING_ASSETS = {

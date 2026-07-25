@@ -4,6 +4,7 @@ import {
     WEDDING_ASSETS,
     WEDDING_CHARITY_REQUEST,
     WEDDING_ITINERARY,
+    WEDDING_RELIGIOUS_CEREMONY_NOTES,
 } from "@lib/jessica-samuel-wedding/event-details";
 import {
     WEDDING_GIFT_GUIDANCE,
@@ -38,11 +39,13 @@ const ITINERARY_ICONS: Record<
   "copo-de-agua": GlassWater,
 };
 
-function TimelineGestureCallout() {
+function ReligiousCeremonyEditorialNotes() {
   const charity = WEDDING_CHARITY_REQUEST;
+  const { dressNote } = WEDDING_RELIGIOUS_CEREMONY_NOTES;
 
   return (
     <div className="js-celeb-guide__timeline-gesture" role="note">
+      <p className="js-celeb-guide__timeline-gesture-dress">{dressNote}</p>
       <p className="js-celeb-guide__timeline-gesture-kicker">
         <HandHeart
           className="js-celeb-guide__timeline-gesture-icon"
@@ -54,9 +57,6 @@ function TimelineGestureCallout() {
       </p>
       <p className="js-celeb-guide__timeline-gesture-copy">
         {charity.timelineSummary}
-      </p>
-      <p className="js-celeb-guide__timeline-gesture-ref">
-        {charity.verseReference}
       </p>
     </div>
   );
@@ -124,7 +124,7 @@ function ItineraryTimeline({ tone = "panel" }: { tone?: "panel" | "wine" }) {
                 </div>
               ) : null}
               {isWine && moment.id === "cerimonia-religiosa" ? (
-                <TimelineGestureCallout />
+                <ReligiousCeremonyEditorialNotes />
               ) : null}
               {moment.note ? (
                 <p className="js-celeb-guide__timeline-note">{moment.note}</p>
@@ -325,10 +325,11 @@ export function JessicaSamuelCelebrationGuideSection() {
             <Image
               src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
               alt=""
-              width={591}
-              height={320}
+              width={1024}
+              height={193}
               loading="lazy"
-              sizes="(max-width: 767px) 46vw, 200px"
+              unoptimized
+              sizes="(max-width: 767px) 72vw, 320px"
               className="js-wedding-floral-divider js-wedding-floral-divider--guide"
             />
           </div>

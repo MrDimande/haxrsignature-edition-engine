@@ -8,6 +8,7 @@ import {
   WEDDING_EVENT,
   WEDDING_ITINERARY,
   WEDDING_ITINERARY_SCHEDULE_CONFIRMED,
+  WEDDING_RELIGIOUS_CEREMONY_NOTES,
   WEDDING_RELIGIOUS_CEREMONY_TIME,
 } from "./event-details";
 import {
@@ -83,13 +84,20 @@ describe("jessica-samuel celebration guide config", () => {
     assert.equal(civil.note, "Percurso sugerido: via Matola-Rio.");
   });
 
-  it("apresenta o pedido solidário como opcional e com referência bíblica", () => {
-    assert.match(WEDDING_CHARITY_REQUEST.lead, /produto não perecível/i);
-    assert.match(WEDDING_CHARITY_REQUEST.body, /orfanato/i);
+  it("apresenta traje e ofertório na cerimónia religiosa, sem versículo", () => {
+    assert.equal(
+      WEDDING_RELIGIOUS_CEREMONY_NOTES.dressNote,
+      "Solicitamos traje decente."
+    );
     assert.match(WEDDING_CHARITY_REQUEST.optionalLabel, /opcional/i);
-    assert.match(WEDDING_CHARITY_REQUEST.timelineSummary, /produto não perecível/i);
-    assert.match(WEDDING_CHARITY_REQUEST.timelineSummary, /orfanato/i);
-    assert.equal(WEDDING_CHARITY_REQUEST.verseReference, "Mateus 25:40");
+    assert.equal(
+      WEDDING_CHARITY_REQUEST.timelineSummary,
+      "Um produto não perecível para o ofertório solene."
+    );
+    assert.equal(
+      "verseReference" in WEDDING_CHARITY_REQUEST,
+      false
+    );
   });
 });
 

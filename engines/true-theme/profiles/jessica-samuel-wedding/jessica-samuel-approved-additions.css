@@ -483,6 +483,17 @@
   border-top: 1px solid rgba(255, 249, 242, 0.16);
 }
 
+.js-celeb-guide__timeline-gesture-dress {
+  margin: 0 0 0.7rem;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-size: 0.92rem;
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  color: rgba(255, 249, 242, 0.88);
+}
+
 .js-celeb-guide__timeline-gesture-kicker {
   display: inline-flex;
   align-items: center;
@@ -508,15 +519,6 @@
   font-weight: 300;
   line-height: 1.5;
   color: rgba(255, 249, 242, 0.76);
-}
-
-.js-celeb-guide__timeline-gesture-ref {
-  margin: 0.35rem 0 0;
-  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  font-size: 0.82rem;
-  font-style: italic;
-  line-height: 1.35;
-  color: rgba(255, 249, 242, 0.58);
 }
 
 /* Itinerário sobre cartão vinho — contraste ivory (não afecta timeline em fundo claro) */
@@ -1980,29 +1982,35 @@
 /* Horizontal floral spray — editorial section divider (mobile-first) */
 .js-wedding-floral-divider {
   display: block;
-  width: clamp(9.5rem, 52vw, 14rem);
+  width: clamp(11rem, 58vw, 18rem);
   height: auto;
   margin-inline: auto;
   object-fit: contain;
-  opacity: 0.78;
+  opacity: 0.88;
   pointer-events: none;
   user-select: none;
+  filter: drop-shadow(0 6px 14px rgba(28, 3, 12, 0.12));
 }
 
 .js-wedding-floral-divider--guide {
-  width: clamp(8.5rem, 46vw, 12.5rem);
-  opacity: 0.72;
-  margin-top: 0.35rem;
+  width: clamp(14rem, 68vw, 22rem);
+  opacity: 0.94;
+  margin-top: 0.45rem;
 }
 
 .js-wedding-floral-divider--chapter {
-  width: clamp(11rem, 58vw, 17rem);
-  opacity: 0.8;
+  width: clamp(16rem, 78vw, 34rem);
+  opacity: 0.94;
 }
 
-/* Couple photo floral arch — full editorial frame around «Os noivos» */
+/* «Os noivos» — ornamento editorial desconstruído atrás do telemóvel */
+#familias.js-wedding-couple-section {
+  overflow-x: clip;
+}
+
+/* Original card chrome: clip florals to rounded corners, no page overflow */
 #familias .js-wedding-couple-wrap {
-  overflow: visible;
+  overflow: hidden;
 }
 
 .js-wedding-couple-photo-column {
@@ -2011,8 +2019,9 @@
   overflow: visible;
 }
 
-.js-wedding-couple-photo-frame {
+.js-wedding-couple-photo-stage {
   position: relative;
+  isolation: isolate;
   z-index: 1;
   width: 100%;
   max-width: 208px;
@@ -2021,79 +2030,150 @@
   transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.js-wedding-couple-photo-frame .js-wedding-couple-photo {
+/* Absolute host — never participates in the grid */
+.js-wedding-couple-ornament {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 145%;
+  max-width: none;
+  height: auto;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+.js-wedding-couple-ornament__media {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: none !important;
+  position: relative !important;
+  opacity: 0.96;
+  filter: drop-shadow(0 10px 18px rgba(28, 3, 12, 0.18));
+}
+
+.js-wedding-couple-photo-stage .js-wedding-couple-photo {
+  position: relative;
+  z-index: 2;
   max-width: none;
   width: 100%;
   margin: 0;
+  overflow: hidden;
 }
 
-.js-wedding-couple-crown {
-  position: absolute;
-  left: 50%;
-  top: -10%;
-  z-index: 4;
-  width: 162%;
-  max-width: none;
-  height: auto;
-  translate: -50% 0;
-  pointer-events: none;
-  user-select: none;
-  opacity: 0.92;
-  filter:
-    saturate(0.96)
-    brightness(0.98)
-    drop-shadow(0 10px 22px rgba(122, 35, 50, 0.32))
-    drop-shadow(0 3px 8px rgba(104, 27, 41, 0.2));
-}
-
-/* Move frame + arch together; cancel photo-only hover lift */
-.js-wedding-couple-wrap:hover .js-wedding-couple-photo-frame {
+.js-wedding-couple-wrap:hover .js-wedding-couple-photo-stage {
   transform: translateY(-3px) scale(1.01);
 }
 
-.js-wedding-couple-wrap:hover
-  .js-wedding-couple-photo-frame
-  .js-wedding-couple-photo {
+.js-wedding-couple-wrap:hover .js-wedding-couple-photo-stage .js-wedding-couple-photo {
   transform: none;
-  box-shadow:
-    0 0 0 1px rgba(255, 249, 242, 0.2),
-    0 28px 56px rgba(23, 19, 18, 0.24),
-    0 12px 28px rgba(23, 19, 18, 0.14),
-    inset 0 0 0 1px rgba(255, 249, 242, 0.15);
+}
+
+/* —— Mobile / tablet (<1024): approved — do not regress —— */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .js-wedding-couple-ornament {
+    width: 150%;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1023px) {
+  .js-wedding-couple-photo-stage {
+    max-width: 220px;
+  }
+
+  .js-wedding-couple-ornament {
+    width: 148%;
+  }
 }
 
 @media (max-width: 980px) {
-  .js-wedding-couple-photo-frame {
+  .js-wedding-couple-photo-stage {
     max-width: min(220px, 68vw);
   }
 
-  .js-wedding-couple-crown {
-    width: 158%;
-    top: -8%;
-    opacity: 0.9;
+  .js-wedding-couple-ornament {
+    width: 145%;
   }
 }
 
-@media (max-width: 380px) {
-  .js-wedding-couple-crown {
-    width: 154%;
-    top: -7%;
+@media (max-width: 430px) {
+  .js-wedding-couple-ornament {
+    width: 142%;
+  }
+}
+
+/*
+ * Desktop (≥1024): only phone + floral proportions.
+ * Card, grid, columns, names and affiliations stay untouched.
+ */
+@media (min-width: 1024px) {
+  #familias .js-wedding-couple-photo-stage {
+    width: clamp(220px, 21vw, 270px);
+    max-width: none;
+  }
+
+  #familias .js-wedding-couple-photo-stage .js-wedding-couple-photo {
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 260 / 455;
+    height: auto;
+    max-height: none;
+  }
+
+  /* Absolute floral tracks the phone; never participates in the grid */
+  #familias .js-wedding-couple-ornament {
+    width: 180%;
+    height: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #familias .js-wedding-couple-ornament__media {
+    opacity: 0.98;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js-wedding-couple-ornament {
+    animation: js-couple-ornament-float 10s ease-in-out infinite;
+  }
+}
+
+@keyframes js-couple-ornament-float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 2px));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js-wedding-couple-wrap:hover .js-wedding-couple-photo-frame {
+  .js-wedding-couple-ornament {
+    animation: none !important;
+  }
+
+  .js-wedding-couple-wrap:hover .js-wedding-couple-photo-stage {
     transform: none;
   }
 }
 
+#familias .js-wedding-couple-card {
+  position: relative;
+  z-index: 3;
+}
+
 @media (min-width: 768px) {
   .js-wedding-floral-divider--guide {
-    width: clamp(11rem, 22vw, 15rem);
+    width: clamp(18rem, 36vw, 28rem);
   }
 
   .js-wedding-floral-divider--chapter {
-    width: clamp(14rem, 28vw, 20rem);
+    width: clamp(22rem, 48vw, 36rem);
   }
 }
 

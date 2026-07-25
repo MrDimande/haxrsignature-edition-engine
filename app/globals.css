@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../engines/true-theme/profiles/jessica-samuel-wedding/jessica-samuel-approved-additions.css";
 
 @source "../jessicakhulaya/src/**/*.{js,ts,jsx,tsx}";
 @source "../lobolojessicaesamuel/src/**/*.{js,ts,jsx,tsx}";

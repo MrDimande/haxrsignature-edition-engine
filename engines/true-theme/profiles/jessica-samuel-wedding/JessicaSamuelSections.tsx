@@ -558,7 +558,17 @@ export function JessicaSamuelFamiliesSection() {
               />
 
               <div className="js-wedding-couple-photo-column">
-                <div className="js-wedding-couple-photo-frame">
+                <div className="js-wedding-couple-photo-stage">
+                  <div className="js-wedding-couple-ornament" aria-hidden="true">
+                    <Image
+                      src="/images/jessica-samuel-wedding/floral/arco-editorial-desconstruido.webp"
+                      alt=""
+                      width={680}
+                      height={988}
+                      className="js-wedding-couple-ornament__media"
+                      sizes="(max-width: 1023px) 70vw, 420px"
+                    />
+                  </div>
                   <figure className="js-wedding-couple-photo">
                     <Image
                       src={WEDDING_ASSETS.coupleImage}
@@ -566,18 +576,9 @@ export function JessicaSamuelFamiliesSection() {
                       width={416}
                       height={1040}
                       className="js-wedding-couple-photo__img"
-                      sizes="(max-width: 980px) 72vw, 208px"
+                      sizes="(max-width: 1023px) 72vw, 260px"
                     />
                   </figure>
-                  <Image
-                    src="/images/jessica-samuel-wedding/floral/floral-crown.webp"
-                    alt=""
-                    width={989}
-                    height={985}
-                    className="js-wedding-couple-crown"
-                    sizes="(max-width: 980px) 95vw, 340px"
-                    aria-hidden
-                  />
                 </div>
               </div>
 
