@@ -44,10 +44,11 @@ export function JessicaSamuelExperience() {
         <Image
           src="/images/jessica-samuel-wedding/floral/floral-divider.webp"
           alt=""
-          width={591}
-          height={320}
+          width={1024}
+          height={193}
           loading="lazy"
-          sizes="(max-width: 767px) 58vw, 280px"
+          unoptimized
+          sizes="(max-width: 767px) 78vw, 520px"
           className="js-wedding-floral-divider js-wedding-floral-divider--chapter"
         />
       </div>
