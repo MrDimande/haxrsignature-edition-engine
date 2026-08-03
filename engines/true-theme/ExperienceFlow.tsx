@@ -261,9 +261,20 @@ export function AudioToggle() {
   const { audioEnabled, audioPlayer, introComplete, theme } = useExperience();
   const isRose = theme.renderProfile === "rose-elegance";
   const isWedding = theme.renderProfile === "jessica-samuel-wedding";
+  const isStan = theme.renderProfile === "stan-real-madrid";
   const useBrandToggle = isRose || isWedding;
+  const hasAudioSrc =
+    typeof theme.audio.src === "string" && theme.audio.src.trim().length > 0;
 
-  if (!introComplete || theme.audio.type === "silent") return null;
+  /** Stan usa StanAudioControl (canto inferior esquerdo) */
+  if (
+    isStan ||
+    !introComplete ||
+    theme.audio.type === "silent" ||
+    !hasAudioSrc
+  ) {
+    return null;
+  }
 
   const handleToggle = async () => {
     if (!audioPlayer) return;

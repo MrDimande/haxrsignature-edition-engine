@@ -7,4 +7,5 @@ export type RegistryThemeKey =
   | "bride-to-be-illustration"
   | "rose-elegance-farewell"
   | "primavera-lobolo"
-  | "jessica-samuel-wedding";
+  | "jessica-samuel-wedding"
+  | "stan-real-madrid";
