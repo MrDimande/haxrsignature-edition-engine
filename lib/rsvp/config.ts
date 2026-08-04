@@ -8,6 +8,7 @@ import { resolveSlug } from "@lib/engine";
 import { FAREWELL_EVENT } from "@lib/farewell/event-details";
 import { TRADITIONAL_WEDDING_SLUG } from "@lib/jessica-samuel-traditional/event-details";
 import { WEDDING_SLUG } from "@lib/jessica-samuel-wedding/event-details";
+import { STAN_SLUG } from "@lib/stan/event-details";
 
 export interface RsvpEventEmailConfig {
   eventName: string;
@@ -86,6 +87,17 @@ export const WEDDING_RSVP_EMAIL: RsvpEventEmailConfig = {
   replyTo: PRIMARY_INBOX,
 };
 
+export const STAN_RSVP_EMAIL: RsvpEventEmailConfig = {
+  eventName:
+    getInvitationAdminBinding(STAN_SLUG)?.adminEventName ??
+    "Edition ?? Anivers??rio ?? Stan",
+  slug: STAN_SLUG,
+  channel: "rsvp",
+  notifyTo: [haxrMailboxes.rsvp],
+  cc: [],
+  replyTo: PRIMARY_INBOX,
+};
+
 export function getRsvpEmailConfig(slug?: string): RsvpEventEmailConfig | null {
   if (!slug) return null;
   const canonicalSlug = resolveSlug(slug);
@@ -107,6 +119,9 @@ export function getRsvpEmailConfig(slug?: string): RsvpEventEmailConfig | null {
   }
   if (canonicalSlug === WEDDING_SLUG) {
     return WEDDING_RSVP_EMAIL;
+  }
+  if (canonicalSlug === STAN_SLUG) {
+    return STAN_RSVP_EMAIL;
   }
   return null;
 }

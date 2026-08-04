@@ -26,5 +26,10 @@ export function AmbientLayer() {
     return <JessicaSamuelAmbient />;
   }
 
+  /* Ambient pr??prio no hero/est??dio ??? sem AmbientBackground gen??rico */
+  if (theme.renderProfile === "stan-real-madrid") {
+    return null;
+  }
+
   return <AmbientBackground />;
 }

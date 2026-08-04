@@ -305,6 +305,22 @@ export function getJessicaSamuelWeddingPalette(): TrueTheme["palette"] {
   };
 }
 
+export function getStanRealMadridPalette(): TrueTheme["palette"] {
+  return {
+    bgBase: "#0B132B",
+    textPrimary: "text-[#F7F4EF]",
+    textSecondary: "text-[#94A3B8]",
+    accent: "#C59B27",
+    accentLight: "rgba(197, 155, 39, 0.15)",
+    cardBg:
+      "bg-[#1C2541]/70 backdrop-blur-md border border-[#C59B27]/30 shadow-[0_12px_36px_rgba(0,0,0,0.4)]",
+    blob1: "rgba(28, 37, 65, 0.4)",
+    blob2: "rgba(11, 19, 43, 0.9)",
+    blob3: "rgba(197, 155, 39, 0.2)",
+    divider: "rgba(197, 155, 39, 0.35)",
+  };
+}
+
 export function getFlowExitTransition(flow: FlowLayer): {
   duration: number;
   ease: readonly [number, number, number, number];
