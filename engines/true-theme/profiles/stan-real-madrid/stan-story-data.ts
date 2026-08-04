@@ -2,6 +2,8 @@
  * Narrativa editorial — Os Cinco Actos de um Pequeno Campeão
  * Dados desacoplados do UI. Textos universais (sem factos inventados).
  * Trocar fotografias / copy aqui sem abrir o componente.
+ *
+ * Regra: cada `src` aparece no máximo uma vez em STAN_STORY_ACTS.
  */
 
 export type StanImageOrientation = "portrait" | "landscape" | "square";
@@ -53,8 +55,8 @@ export const STAN_STORY_EPILOGUE = {
 } as const;
 
 /**
- * Acto IV: sem fotografia que confirme futebol explícito nesta fase —
- * título neutro (não inventar “primeiro golo” / Real Madrid).
+ * 7 fotografias reais — uma por slot, sem repetir.
+ * Actos I e IV/V: um herói. Actos II e III: herói + apoio.
  */
 export const STAN_STORY_ACTS: StanStoryAct[] = [
   {
@@ -69,19 +71,10 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     heroImage: {
       id: "act1-hero",
       src: "/images/stan/story/chapter-01/primary.png",
-      alt: "Primeiro acto — o começo da história do Stan",
+      alt: "Stan bebé nos braços da mãe — o começo",
       orientation: "portrait",
-      focalPosition: "center",
+      focalPosition: "center 35%",
     },
-    supportingImages: [
-      {
-        id: "act1-support",
-        src: "/images/stan/story/chapter-01/detail.png",
-        alt: "Um momento íntimo dos primeiros dias",
-        orientation: "portrait",
-        focalPosition: "center top",
-      },
-    ],
   },
   {
     id: "act-2",
@@ -95,17 +88,17 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     heroImage: {
       id: "act2-hero",
       src: "/images/stan/story/chapter-02/primary.png",
-      alt: "Stan nas primeiras descobertas",
+      alt: "Stan em pé, sorridente, nas primeiras descobertas",
       orientation: "portrait",
-      focalPosition: "center 20%",
+      focalPosition: "center 18%",
     },
     supportingImages: [
       {
         id: "act2-support",
         src: "/images/stan/story/chapter-02/detail.png",
-        alt: "Um instante espontâneo de descoberta",
+        alt: "Stan no parque ao pôr do sol",
         orientation: "portrait",
-        focalPosition: "center",
+        focalPosition: "center 30%",
         caption: "Cada dia, um novo horizonte.",
       },
     ],
@@ -122,22 +115,15 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     heroImage: {
       id: "act3-hero",
       src: "/images/stan/story/chapter-03/primary.png",
-      alt: "Stan em movimento, a explorar o mundo",
+      alt: "Stan de costas com a camisola STANLEY 10 e a bola no campo",
       orientation: "landscape",
-      focalPosition: "center 30%",
+      focalPosition: "center 55%",
     },
     supportingImages: [
       {
-        id: "act3-a",
-        src: "/images/stan/story/chapter-02/detail.png",
-        alt: "Detalhe de um dia em movimento",
-        orientation: "portrait",
-        focalPosition: "center",
-      },
-      {
-        id: "act3-b",
-        src: "/images/stan/story/chapter-02/primary.png",
-        alt: "Alegria e energia da infância",
+        id: "act3-support",
+        src: "/images/stan/story/chapter-03/detail.png",
+        alt: "Stan a brincar no parque, com a bola por perto",
         orientation: "portrait",
         focalPosition: "center 25%",
       },
@@ -148,33 +134,17 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     actNumber: "04",
     roman: "IV",
     age: "Ano 4",
-    title: "A Paixão Começa a Ganhar Forma",
-    text: "Entre movimento, alegria e imaginação, um universo começou a ganhar forma — um lugar onde os sonhos correm com o coração aberto.",
+    title: "Nasce uma Paixão",
+    text: "Entre balões, luzes e uma camisola branca, o sonho ganhou cor — e o coração começou a bater ao ritmo do jogo.",
     tone: "dark",
     layout: "editorial-mosaic",
     heroImage: {
       id: "act4-hero",
       src: "/images/stan/story/chapter-04/primary.png",
-      alt: "Stan — a paixão a ganhar forma",
+      alt: "Stan no 4º aniversário com a camisola do Real Madrid",
       orientation: "portrait",
-      focalPosition: "center 15%",
+      focalPosition: "center 20%",
     },
-    supportingImages: [
-      {
-        id: "act4-a",
-        src: "/images/stan/story/chapter-03/primary.png",
-        alt: "Energia e imaginação",
-        orientation: "landscape",
-        focalPosition: "center",
-      },
-      {
-        id: "act4-b",
-        src: "/images/stan/story/chapter-02/detail.png",
-        alt: "Um momento de luz",
-        orientation: "portrait",
-        focalPosition: "center",
-      },
-    ],
   },
   {
     id: "act-5",
@@ -187,20 +157,11 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     layout: "champion-finale",
     heroImage: {
       id: "act5-hero",
-      src: "/images/stan/closing/closing-stan.png",
-      alt: "Stan — o pequeno campeão",
+      src: "/images/stan/story/chapter-05/primary.png",
+      alt: "Stan de braços cruzados com a camisola do Real Madrid — o pequeno campeão",
       orientation: "portrait",
       focalPosition: "center 18%",
     },
-    supportingImages: [
-      {
-        id: "act5-joy",
-        src: "/images/stan/story/chapter-04/primary.png",
-        alt: "A alegria que antecipa o grande dia",
-        orientation: "portrait",
-        focalPosition: "center 20%",
-      },
-    ],
   },
 ];
 
@@ -210,4 +171,23 @@ export function isValidStanStorySrc(src: string): boolean {
   if (!trimmed.startsWith("/")) return false;
   if (/\s/.test(trimmed)) return false;
   return /\.(jpe?g|png|webp|gif|avif)$/i.test(trimmed);
+}
+
+/** Garante que nenhum src se repete na narrativa activa */
+export function findDuplicateStanStorySrcs(
+  acts: StanStoryAct[] = STAN_STORY_ACTS
+): string[] {
+  const seen = new Set<string>();
+  const dupes: string[] = [];
+  for (const act of acts) {
+    const srcs = [
+      act.heroImage.src,
+      ...(act.supportingImages?.map((img) => img.src) ?? []),
+    ];
+    for (const src of srcs) {
+      if (seen.has(src)) dupes.push(src);
+      else seen.add(src);
+    }
+  }
+  return dupes;
 }
