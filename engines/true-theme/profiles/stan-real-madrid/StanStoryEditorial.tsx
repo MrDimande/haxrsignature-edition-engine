@@ -424,20 +424,32 @@ function ActCardCinematic({ act }: { act: StanStoryAct }) {
   );
 }
 
-/** Acto IV — mosaico */
+/** Acto IV — mosaico (herói a full-width quando não há apoios) */
 function ActCardMosaic({ act }: { act: StanStoryAct }) {
   const [a, b] = act.supportingImages ?? [];
+  const hasSupport = Boolean(a || b);
   return (
     <EditorialCard id={act.id} tone="dark">
       <Reveal>
         <ActHeader act={act} light={false} />
       </Reveal>
       <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-12 sm:gap-4">
-        <Reveal delay={0.08} className="sm:col-span-7 sm:row-span-2">
+        <Reveal
+          delay={0.08}
+          className={
+            hasSupport
+              ? "sm:col-span-7 sm:row-span-2"
+              : "mx-auto w-full max-w-lg sm:col-span-12 sm:max-w-xl"
+          }
+        >
           <StoryImage
             image={act.heroImage}
             className="aspect-[3/4] w-full sm:aspect-[4/5]"
-            sizes="(max-width: 640px) 100vw, 55vw"
+            sizes={
+              hasSupport
+                ? "(max-width: 640px) 100vw, 55vw"
+                : "(max-width: 640px) 100vw, 520px"
+            }
           />
         </Reveal>
         {a ? (
