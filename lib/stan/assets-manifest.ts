@@ -154,7 +154,7 @@ export const STAN_ASSETS_MANIFEST: StanAssetSpec[] = [
     mobileVariantRequired: false,
     focalPosition: "center bottom",
     status: "generated",
-    notes: "rembg a partir de closing/closing-stan.png",
+    notes: "rembg a partir de closing/closing-stan.png (kit Real Madrid + bola)",
   },
   {
     id: "hero-boots",
