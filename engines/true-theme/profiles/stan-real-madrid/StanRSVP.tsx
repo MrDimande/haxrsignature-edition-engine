@@ -309,16 +309,19 @@ export function StanRSVPSection() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="space-y-5">
-                <div className="absolute -left-[9999px] opacity-0" aria-hidden>
-                  <label htmlFor="stan-rsvp-company">Empresa</label>
+                {/* Honeypot: sem label "Empresa"/company — autofill do browser
+                    preenchia o campo e o servidor rejeitava com outcome honeypot. */}
+                <div className="hidden" aria-hidden="true">
                   <input
-                    id="stan-rsvp-company"
+                    type="text"
+                    name="stan_rsvp_hp"
                     tabIndex={-1}
                     autoComplete="off"
                     value={form.honeypot}
                     onChange={(e) =>
                       setForm((p) => ({ ...p, honeypot: e.target.value }))
                     }
+                    className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
                   />
                 </div>
 
