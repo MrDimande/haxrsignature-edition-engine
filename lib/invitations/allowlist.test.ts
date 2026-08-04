@@ -16,6 +16,7 @@ describe("invitation allowlist / slug resolution", () => {
       "cha-de-panela",
       "jessicachadelingerie",
       "jessicasamuelwedding",
+      "stanturns5",
     ]) {
       assert.ok(ACTIVE_INVITATION_ALLOWLIST.includes(slug));
       assert.equal(isActiveInvitationSlug(slug), true);
@@ -86,5 +87,10 @@ describe("invitation allowlist / slug resolution", () => {
     // Aliases do stub Muege deixam de ser activos (draft cha-de-lingerie)
     assert.equal(resolveActiveInvitationSlug("chadelingerie"), null);
     assert.equal(resolveActiveInvitationSlug("jessica-cha-de-lingerie"), null);
+
+    assert.equal(resolveActiveInvitationSlug("stanturns5"), "stanturns5");
+    assert.equal(resolveActiveInvitationSlug("stan"), "stanturns5");
+    assert.equal(resolveActiveInvitationSlug("convite-stan"), "stanturns5");
+    assert.equal(resolveActiveInvitationSlug("stan-5-anos"), "stanturns5");
   });
 });

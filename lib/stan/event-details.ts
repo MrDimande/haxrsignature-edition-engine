@@ -6,7 +6,7 @@
  * e NÃO devem ser inventados na interface pública.
  */
 
-export const STAN_SLUG = "stan" as const;
+export const STAN_SLUG = "stanturns5" as const;
 export const STAN_TIMEZONE = "Africa/Maputo" as const;
 /** CAT — Maputo não observa horário de verão */
 export const STAN_UTC_OFFSET = "+02:00" as const;

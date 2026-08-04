@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { HaxrAuthorshipMeta } from "@lib/brand/HaxrAuthorshipMeta";
 import { EngineRenderer } from "@engines/index";
 import {
@@ -80,7 +80,7 @@ export default async function InvitationPage({ params }: InvitationPageProps) {
   const { slug } = await params;
 
   if (LEGACY_SLUG_REDIRECTS[slug]) {
-    redirect(`/${LEGACY_SLUG_REDIRECTS[slug]}`);
+    permanentRedirect(`/${LEGACY_SLUG_REDIRECTS[slug]}`);
   }
 
   const canonicalSlug = resolveSlug(slug);

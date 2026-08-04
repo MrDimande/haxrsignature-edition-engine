@@ -249,33 +249,33 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       expectedRegistryKey: "jessica-samuel-wedding",
     },
   },
-  stan: {
-    slug: "stan",
-    aliases: ["convite-stan", "stan-5-anos"],
+  stanturns5: {
+    slug: "stanturns5",
+    aliases: ["stan", "convite-stan", "stan-5-anos"],
     engine: "theme",
     theme: "stan-real-madrid",
     experienceType: "editorial",
-    sourcePath: "/stan",
+    sourcePath: "/stanturns5",
     legacyFolder: "stan",
     status: "active",
     metadata: {
-      title: "5?? Anivers??rio do Stan ??? Real Madrid Experience",
+      title: "5º Aniversário do Stan — Real Madrid Experience",
       date: "2026-09-12",
       time: "11h00",
-      /** Resid??ncia do S5 ?? Belo Horizonte (Maputo) */
-      location: "Resid??ncia do S5 ?? Belo Horizonte, Maputo",
-      dressCode: "Kit Matchday ?? navy, azul, cream e areia",
-      subtitle: "Real Madrid Luxury Experience ?? 5?? Anivers??rio",
+      /** Residência do S5 · Belo Horizonte (Maputo) */
+      location: "Residência do S5 · Belo Horizonte, Maputo",
+      dressCode: "Kit Matchday · navy, azul, cream e areia",
+      subtitle: "Real Madrid Luxury Experience · 5º Aniversário",
       description:
-        "Convite digital imersivo de anivers??rio infantil. Uma celebra????o inesquec??vel de futebol de luxo, paix??o, alegria e mem??rias preciosas.",
+        "Convite digital imersivo de aniversário infantil. Uma celebração inesquecível de futebol de luxo, paixão, alegria e memórias preciosas.",
       eventDate: "2026-09-12",
-      eventType: "Anivers??rio Infantil",
+      eventType: "Aniversário Infantil",
       ogImage: "/images/stan/social/stan-og.png",
     },
     admin: {
       clientName: "Stan",
-      eventTypeLabel: "Anivers??rio",
-      adminEventName: "Edition ?? Anivers??rio ?? Stan",
+      eventTypeLabel: "Aniversário",
+      adminEventName: "Edition · Aniversário · Stan",
       envVar: "EDITION_EVENT_STAN_ID",
       expectedRegistryKey: "stan-real-madrid",
     },
@@ -315,6 +315,8 @@ export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
   "despedida-de-solteira": "jessicachadelingerie",
   "jessica-farewell": "jessicachadelingerie",
   "jessica-samuel": "jessicasamuelwedding",
+  /** Stan — rota antiga → canónica /stanturns5 */
+  stan: "stanturns5",
 };
 
 export const ALIAS_INDEX: Record<string, string> = {};

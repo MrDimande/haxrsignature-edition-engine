@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { STAN_SLUG } from "@lib/stan/event-details";
 import { reserveStanGift } from "@lib/stan/gifts";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS, rateLimitResponse } from "@lib/security/rate-limit";
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
     const limit = await publicMutationRateLimit(
       {
         scope: "gifts",
-        slug: "stan",
+        slug: STAN_SLUG,
         action: "reserve",
         request,
       },
