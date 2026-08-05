@@ -262,13 +262,15 @@ export function AudioToggle() {
   const isRose = theme.renderProfile === "rose-elegance";
   const isWedding = theme.renderProfile === "jessica-samuel-wedding";
   const isStan = theme.renderProfile === "stan-real-madrid";
+  const isNian = theme.renderProfile === "nian-night-of-the-web";
   const useBrandToggle = isRose || isWedding;
   const hasAudioSrc =
     typeof theme.audio.src === "string" && theme.audio.src.trim().length > 0;
 
-  /** Stan usa StanAudioControl (canto inferior esquerdo) */
+  /** Stan / Nian usam controlos próprios — não o AudioToggle global */
   if (
     isStan ||
+    isNian ||
     !introComplete ||
     theme.audio.type === "silent" ||
     !hasAudioSrc

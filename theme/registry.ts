@@ -6,6 +6,7 @@ import { kulayaTrueTheme } from "./definitions/kulaya-traditional";
 import { pinkLingerieTrueTheme } from "./definitions/pink-lingerie";
 import { roseEleganceFarewellTheme } from "./definitions/rose-elegance-farewell";
 import { stanRealMadridTheme } from "./definitions/stan-real-madrid";
+import { nianNightOfTheWebTheme } from "./definitions/nian-night-of-the-web";
 import type { TrueTheme } from "./true-types";
 import type { RegistryThemeKey } from "./registry-types";
 
@@ -21,6 +22,7 @@ export const ThemeRegistry: Record<RegistryThemeKey, TrueTheme> = {
   "primavera-lobolo": primaveraLoboloTheme,
   "jessica-samuel-wedding": jessicaSamuelWeddingTheme,
   "stan-real-madrid": stanRealMadridTheme,
+  "nian-night-of-the-web": nianNightOfTheWebTheme,
 };
 
 export type { RegistryThemeKey };

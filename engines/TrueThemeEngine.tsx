@@ -77,16 +77,27 @@ export default function TrueThemeEngine({
   useEffect(() => {
     const player = new ExperienceAudioPlayer(theme, setAudioEnabled);
     setAudioPlayer(player);
-    return () => player.stop();
+    return () => {
+      player.stop();
+      player.dispose();
+    };
   }, [theme]);
 
   useEffect(() => {
+    /** Nian (and any explicit-user-choice profile): never auto-start on introComplete */
+    if (theme.audio.audioStartMode === "explicit-user-choice") return;
     if (!introComplete || !audioPlayer || theme.audio.type === "silent") return;
     if (!theme.audio.src) return;
     if (!audioPlayer.isPlaying()) {
       void audioPlayer.start();
     }
-  }, [introComplete, audioPlayer, theme.audio.type, theme.audio.src]);
+  }, [
+    introComplete,
+    audioPlayer,
+    theme.audio.type,
+    theme.audio.src,
+    theme.audio.audioStartMode,
+  ]);
 
   return (
     <ExperienceProvider
