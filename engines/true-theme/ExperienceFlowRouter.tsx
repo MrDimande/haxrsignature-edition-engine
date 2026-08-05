@@ -27,5 +27,10 @@ export function ExperienceFlowRouter() {
     return <JessicaSamuelIntroFlow />;
   }
 
+  /* Gate próprio em StanGateOverlay — evita o StandardExperienceFlow */
+  if (theme.renderProfile === "stan-real-madrid") {
+    return null;
+  }
+
   return <StandardExperienceFlow />;
 }

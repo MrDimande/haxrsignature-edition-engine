@@ -82,10 +82,11 @@ export default function TrueThemeEngine({
 
   useEffect(() => {
     if (!introComplete || !audioPlayer || theme.audio.type === "silent") return;
+    if (!theme.audio.src) return;
     if (!audioPlayer.isPlaying()) {
       void audioPlayer.start();
     }
-  }, [introComplete, audioPlayer, theme.audio.type]);
+  }, [introComplete, audioPlayer, theme.audio.type, theme.audio.src]);
 
   return (
     <ExperienceProvider
