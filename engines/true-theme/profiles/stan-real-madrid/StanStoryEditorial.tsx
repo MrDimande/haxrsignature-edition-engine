@@ -16,6 +16,7 @@ import {
   type StanStoryAct,
   type StanStoryImage,
 } from "./stan-story-data";
+import { StanTypeLine } from "./StanTypeLine";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -78,7 +79,16 @@ function StoryImage({
   }
 
   return (
-    <div ref={frameRef} className={`relative overflow-hidden ${className}`}>
+    <motion.div
+      ref={frameRef}
+      className={`relative overflow-hidden ${className}`}
+      initial={
+        reduceMotion ? false : { clipPath: "inset(0 100% 0 0)" }
+      }
+      whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{ duration: 1.05, ease: EASE }}
+    >
       <motion.div
         className="absolute inset-[-8%] will-change-transform"
         style={{ y: enableParallax ? y : 0 }}
@@ -98,7 +108,7 @@ function StoryImage({
           onError={() => setFailed(true)}
         />
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -274,12 +284,12 @@ function StoryCoverCard() {
               {STAN_STORY_PROLOGUE.lead}
             </p>
 
-            <p
+            <StanTypeLine
+              text={STAN_STORY_PROLOGUE.line}
               className="mt-8 font-body text-[11px] font-semibold uppercase tracking-[0.34em]"
               style={{ color: COLORS.camel }}
-            >
-              {STAN_STORY_PROLOGUE.line}
-            </p>
+              startDelay={200}
+            />
 
             <h2
               id="stan-story-title"
@@ -426,26 +436,19 @@ function ActCardDuo({ act }: { act: StanStoryAct }) {
 /** Acto III — movimento cinematográfico */
 function ActCardCinematic({ act }: { act: StanStoryAct }) {
   const supports = act.supportingImages ?? [];
-  const reduce = useReducedMotion();
   return (
     <EditorialCard id={act.id} tone="light">
       <Reveal>
         <ActHeader act={act} light />
       </Reveal>
       <Reveal delay={0.1} className="mt-10">
-        <motion.div
-          className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]"
-          initial={reduce ? false : { clipPath: "inset(0 10% 0 10%)" }}
-          whileInView={{ clipPath: "inset(0 0% 0 0%)" }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 1.15, ease: EASE }}
-        >
+        <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]">
           <StoryImage
             image={act.heroImage}
             className="absolute inset-0 h-full w-full"
             sizes="100vw"
           />
-        </motion.div>
+        </div>
       </Reveal>
       {supports.length > 0 ? (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4">

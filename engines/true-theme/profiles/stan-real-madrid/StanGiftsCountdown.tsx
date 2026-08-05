@@ -33,16 +33,37 @@ function calcTimeLeft(target: Date): TimeLeft {
   };
 }
 
-function CountdownUnit({ value, label }: { value: number; label: string }) {
+function CountdownUnit({
+  value,
+  label,
+  index = 0,
+}: {
+  value: number;
+  label: string;
+  index?: number;
+}) {
+  const reduceMotion = useReducedMotion();
   return (
-    <div className="flex flex-col items-center">
-      <span className="font-display text-3xl font-light tabular-nums text-[#F7F4EF] sm:text-4xl">
+    <motion.div
+      className="flex flex-col items-center"
+      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.55, delay: 0.08 + index * 0.07, ease: EASE }}
+    >
+      <motion.span
+        key={value}
+        className="inline-block font-display text-3xl font-light tabular-nums text-[#F7F4EF] sm:text-4xl"
+        initial={reduceMotion ? false : { scale: 1.04 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.28, ease: EASE }}
+      >
         {String(value).padStart(2, "0")}
-      </span>
+      </motion.span>
       <span className="mt-1 font-body text-[9px] font-semibold uppercase tracking-[0.28em] text-[#C9A86A]">
         {label}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -290,19 +311,19 @@ export function StanGiftsSection() {
               </p>
             ) : (
               <div className="mt-10 flex flex-wrap items-end justify-between gap-4 sm:gap-2">
-                <CountdownUnit value={timeLeft.dias} label="Dias" />
+                <CountdownUnit value={timeLeft.dias} label="Dias" index={0} />
                 <span className="pb-6 font-display text-2xl text-[#C9A86A]/50" aria-hidden>
                   :
                 </span>
-                <CountdownUnit value={timeLeft.horas} label="Horas" />
+                <CountdownUnit value={timeLeft.horas} label="Horas" index={1} />
                 <span className="pb-6 font-display text-2xl text-[#C9A86A]/50" aria-hidden>
                   :
                 </span>
-                <CountdownUnit value={timeLeft.minutos} label="Min" />
+                <CountdownUnit value={timeLeft.minutos} label="Min" index={2} />
                 <span className="pb-6 font-display text-2xl text-[#C9A86A]/50" aria-hidden>
                   :
                 </span>
-                <CountdownUnit value={timeLeft.segundos} label="Seg" />
+                <CountdownUnit value={timeLeft.segundos} label="Seg" index={3} />
               </div>
             )}
 
