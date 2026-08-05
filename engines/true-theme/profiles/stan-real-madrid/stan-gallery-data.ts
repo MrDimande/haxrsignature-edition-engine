@@ -149,7 +149,7 @@ export const STAN_IDOL_PHOTOS = {
     focalPosition: "center 22%",
   },
   mbappe: {
-    src: "/images/stan/idols/mbappe.jpg",
+    src: "/images/stan/idols/mbappe-v2.jpg",
     alt: "Kylian Mbappé — inspiração",
     orientation: "portrait" as const,
     focalPosition: "center 22%",

@@ -314,7 +314,7 @@ export const STAN_ASSETS_MANIFEST: StanAssetSpec[] = [
   },
   {
     id: "idol-mbappe",
-    file: "/images/stan/idols/mbappe.jpg",
+    file: "/images/stan/idols/mbappe-v2.jpg",
     purpose: "Fotografia de Kylian Mbappé (inspiração)",
     orientation: "portrait",
     aspectRatio: "3:4",
@@ -322,7 +322,7 @@ export const STAN_ASSETS_MANIFEST: StanAssetSpec[] = [
     mobileVariantRequired: false,
     focalPosition: "center top",
     status: "received",
-    notes: "Ainda o Mbappé real (não trocada) — celebração braços cruzados; crop 3:4",
+    notes: "Atualizada — cache-bust v2; crop 3:4",
   },
   {
     id: "idol-cristiano",
