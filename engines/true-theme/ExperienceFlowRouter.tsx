@@ -32,5 +32,10 @@ export function ExperienceFlowRouter() {
     return null;
   }
 
+  /* Gate próprio NianRitualGate — evita o StandardExperienceFlow */
+  if (theme.renderProfile === "nian-night-of-the-web") {
+    return null;
+  }
+
   return <StandardExperienceFlow />;
 }
