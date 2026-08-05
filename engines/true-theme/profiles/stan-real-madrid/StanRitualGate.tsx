@@ -222,16 +222,16 @@ export function StanRitualGate() {
       animate={phase === "exit" ? { opacity: 0 } : { opacity: 1 }}
       transition={{ duration: 0.45, ease: EASE }}
     >
-      {/* Túnel — começa escuro, luz sobe no tempo 1 */}
+      {/* Túnel — grade navy/ouro alinhado ao Hero */}
       <motion.div
         className="absolute inset-0"
         initial={false}
         animate={
           opening
-            ? { scale: 1.08, filter: "brightness(1.32) saturate(1.06)" }
+            ? { scale: 1.08, filter: "brightness(1.28) saturate(1.04)" }
             : reveal >= 1
               ? { scale: 1.02, filter: "brightness(1)" }
-              : { scale: 1.06, filter: "brightness(0.45)" }
+              : { scale: 1.06, filter: "brightness(0.42)" }
         }
         transition={{ duration: 1.35, ease: EASE }}
       >
@@ -246,10 +246,32 @@ export function StanRitualGate() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-center opacity-[0.88]"
+            style={{
+              filter:
+                "saturate(0.62) brightness(0.78) contrast(1.12) sepia(0.22) hue-rotate(-8deg)",
+            }}
             aria-hidden
           />
         </picture>
+        <div
+          aria-hidden
+          className="absolute inset-0 mix-blend-soft-light opacity-70"
+          style={{
+            background:
+              "linear-gradient(165deg, rgba(201,168,106,0.22) 0%, rgba(11,19,43,0.5) 45%, rgba(5,10,18,0.55) 100%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(ellipse 70% 55% at 50% 42%, rgba(11,19,43,0.25) 0%, transparent 68%),
+              linear-gradient(180deg, rgba(5,10,18,0.55) 0%, transparent 28%, transparent 58%, rgba(5,10,18,0.9) 100%)
+            `,
+          }}
+        />
       </motion.div>
 
       {/* Raios — sobem com a luz */}
@@ -300,8 +322,7 @@ export function StanRitualGate() {
         className="pointer-events-none absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse 70% 55% at 50% 45%, transparent 20%, rgba(5,10,18,0.55) 100%),
-            linear-gradient(180deg, rgba(5,10,18,0.72) 0%, transparent 22%, transparent 62%, rgba(5,10,18,0.88) 100%)
+            radial-gradient(ellipse 70% 55% at 50% 45%, transparent 28%, rgba(5,10,18,0.5) 100%)
           `,
         }}
       />
@@ -433,7 +454,7 @@ export function StanRitualGate() {
             if (idle) setSealVibrant(true);
           }}
           onTapCancel={() => setSealVibrant(false)}
-          className="relative mb-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#C9A86A] disabled:cursor-default sm:mb-12"
+          className="relative mb-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#C9A86A] disabled:cursor-default sm:mb-8"
           initial={false}
           animate={
             opening
@@ -485,7 +506,7 @@ export function StanRitualGate() {
           />
         </motion.button>
 
-        {/* Tipografia — tempo 3, ~100ms após selo */}
+        {/* Tipografia — marca hero + apoio */}
         <motion.div
           className="flex max-w-md flex-col items-center text-center"
           initial={false}
@@ -498,17 +519,20 @@ export function StanRitualGate() {
           }
           transition={{ duration: 0.95, ease: EASE }}
         >
-          <p className="mb-3 font-body text-[10px] font-medium uppercase tracking-[0.42em] text-[#E8DCC8]/65">
-            Antes do apito inicial
-          </p>
-          <h1 className="mb-8 max-w-[16ch] font-display text-[clamp(1.85rem,5.8vw,2.9rem)] font-light leading-[1.08] tracking-tight text-[#F7F4EF] sm:mb-10">
-            Um pequeno campeão prepara-se para entrar em campo
+          <h1 className="font-display text-[clamp(3.25rem,16vw,5.5rem)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-[#F7F4EF]">
+            Stan
           </h1>
+          <p className="mt-3 font-body text-[11px] font-semibold uppercase tracking-[0.42em] text-[#C9A86A]">
+            S · 5
+          </p>
+          <p className="mt-5 max-w-[22ch] font-display text-[clamp(1.05rem,3.4vw,1.35rem)] font-light leading-snug text-[#E8DCC8]/85">
+            Um pequeno campeão prepara-se para entrar em campo
+          </p>
         </motion.div>
 
-        {/* CTA — tempo 4 */}
+        {/* CTA — um principal + secundário música */}
         <motion.div
-          className="flex w-full max-w-xs flex-col items-center gap-5 sm:max-w-sm"
+          className="mt-10 flex w-full max-w-xs flex-col items-center gap-4 sm:mt-12 sm:max-w-sm"
           initial={false}
           animate={
             opening
@@ -523,9 +547,9 @@ export function StanRitualGate() {
             type="button"
             disabled={phase !== "ready"}
             onClick={() => void openGate(false)}
-            className="flex min-h-12 w-full items-center justify-center rounded-full bg-[#C9A86A] px-6 py-3.5 font-body text-[11px] font-bold uppercase tracking-[0.28em] text-[#050A12] transition hover:bg-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F7F4EF] disabled:opacity-50"
+            className="flex min-h-12 w-full items-center justify-center rounded-full bg-[#C9A86A] px-6 py-3.5 font-body text-[11px] font-extrabold uppercase tracking-[0.28em] text-[#050A12] shadow-[0_14px_40px_rgba(201,168,106,0.28)] transition hover:bg-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F7F4EF] disabled:opacity-50"
           >
-            Abrir o túnel
+            Abrir o convite
           </button>
 
           {audioReady ? (
@@ -533,15 +557,11 @@ export function StanRitualGate() {
               type="button"
               disabled={phase !== "ready"}
               onClick={() => void openGate(true)}
-              className="font-body text-[10px] font-medium uppercase tracking-[0.32em] text-[#C9A86A]/85 transition hover:text-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86A] disabled:opacity-50"
+              className="font-body text-[10px] font-medium uppercase tracking-[0.32em] text-[#C9A86A]/90 underline decoration-[#C9A86A]/35 underline-offset-4 transition hover:text-[#D4B87A] hover:decoration-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86A] disabled:opacity-50"
             >
-              Abrir com Hala Madrid
+              Com Hala Madrid
             </button>
-          ) : (
-            <p className="font-body text-[10px] tracking-[0.2em] text-[#94A3B8]/70">
-              Toca o selo para entrar
-            </p>
-          )}
+          ) : null}
         </motion.div>
       </div>
 
