@@ -1,8 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "motion/react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import {
   STAN_STORY_ACTS,
   STAN_STORY_EPILOGUE,
@@ -11,6 +16,7 @@ import {
   type StanStoryAct,
   type StanStoryImage,
 } from "./stan-story-data";
+import { StanTypeLine } from "./StanTypeLine";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -22,6 +28,20 @@ const COLORS = {
   inkSoft: "#5B6B7C",
   slate: "#3D4F63",
 } as const;
+
+function subscribeMd(onStoreChange: () => void) {
+  const mq = window.matchMedia("(min-width: 768px)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function useIsDesktopMd() {
+  return useSyncExternalStore(
+    subscribeMd,
+    () => window.matchMedia("(min-width: 768px)").matches,
+    () => false
+  );
+}
 
 function StoryImage({
   image,
@@ -35,6 +55,16 @@ function StoryImage({
   priority?: boolean;
 }) {
   const [failed, setFailed] = useState(!isValidStanStorySrc(image.src));
+  const reduceMotion = useReducedMotion();
+  const isDesktop = useIsDesktopMd();
+  const frameRef = useRef<HTMLDivElement>(null);
+  const enableParallax = Boolean(isDesktop && !reduceMotion);
+
+  const { scrollYProgress } = useScroll({
+    target: frameRef,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
 
   if (failed) {
     return (
@@ -49,22 +79,36 @@ function StoryImage({
   }
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
-      <Image
-        src={image.src}
-        alt={image.alt}
-        fill
-        priority={priority}
-        sizes={sizes}
-        className="object-cover"
-        style={
-          image.focalPosition
-            ? { objectPosition: image.focalPosition }
-            : undefined
-        }
-        onError={() => setFailed(true)}
-      />
-    </div>
+    <motion.div
+      ref={frameRef}
+      className={`relative overflow-hidden ${className}`}
+      initial={
+        reduceMotion ? false : { clipPath: "inset(0 100% 0 0)" }
+      }
+      whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+      viewport={{ once: true, amount: 0.35 }}
+      transition={{ duration: 1.05, ease: EASE }}
+    >
+      <motion.div
+        className="absolute inset-[-8%] will-change-transform"
+        style={{ y: enableParallax ? y : 0 }}
+      >
+        <Image
+          src={image.src}
+          alt={image.alt}
+          fill
+          priority={priority}
+          sizes={sizes}
+          className="object-cover scale-[1.12]"
+          style={
+            image.focalPosition
+              ? { objectPosition: image.focalPosition }
+              : undefined
+          }
+          onError={() => setFailed(true)}
+        />
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -240,12 +284,12 @@ function StoryCoverCard() {
               {STAN_STORY_PROLOGUE.lead}
             </p>
 
-            <p
+            <StanTypeLine
+              text={STAN_STORY_PROLOGUE.line}
               className="mt-8 font-body text-[11px] font-semibold uppercase tracking-[0.34em]"
               style={{ color: COLORS.camel }}
-            >
-              {STAN_STORY_PROLOGUE.line}
-            </p>
+              startDelay={200}
+            />
 
             <h2
               id="stan-story-title"
@@ -302,9 +346,13 @@ function StoryCoverCard() {
   );
 }
 
-/** Acto I — retrato íntimo */
+/** Acto I — retrato íntimo (ultrassom landscape ou retrato clássico) */
 function ActCardIntimate({ act }: { act: StanStoryAct }) {
   const support = act.supportingImages?.[0];
+  const heroAspect =
+    act.heroImage.orientation === "landscape"
+      ? "aspect-[4/3] sm:aspect-[5/4]"
+      : "aspect-[3/4]";
   return (
     <EditorialCard id={act.id} tone="light">
       <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
@@ -318,7 +366,7 @@ function ActCardIntimate({ act }: { act: StanStoryAct }) {
           </span>
           <StoryImage
             image={act.heroImage}
-            className="relative z-10 aspect-[3/4] w-full"
+            className={`relative z-10 w-full ${heroAspect}`}
             sizes="(max-width: 1024px) 100vw, 55vw"
             priority
           />
@@ -345,6 +393,8 @@ function ActCardIntimate({ act }: { act: StanStoryAct }) {
 /** Acto II — duo assimétrico */
 function ActCardDuo({ act }: { act: StanStoryAct }) {
   const support = act.supportingImages?.[0];
+  const supportAspect =
+    support?.orientation === "landscape" ? "aspect-[4/3]" : "aspect-square";
   return (
     <EditorialCard id={act.id} tone="dark">
       <Reveal>
@@ -365,7 +415,7 @@ function ActCardDuo({ act }: { act: StanStoryAct }) {
           >
             <StoryImage
               image={support}
-              className="aspect-square w-full"
+              className={`${supportAspect} w-full`}
               sizes="(max-width: 640px) 100vw, 35vw"
             />
             {support.caption ? (
@@ -386,35 +436,28 @@ function ActCardDuo({ act }: { act: StanStoryAct }) {
 /** Acto III — movimento cinematográfico */
 function ActCardCinematic({ act }: { act: StanStoryAct }) {
   const supports = act.supportingImages ?? [];
-  const reduce = useReducedMotion();
   return (
     <EditorialCard id={act.id} tone="light">
       <Reveal>
         <ActHeader act={act} light />
       </Reveal>
       <Reveal delay={0.1} className="mt-10">
-        <motion.div
-          className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]"
-          initial={reduce ? false : { clipPath: "inset(0 10% 0 10%)" }}
-          whileInView={{ clipPath: "inset(0 0% 0 0%)" }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 1.15, ease: EASE }}
-        >
+        <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]">
           <StoryImage
             image={act.heroImage}
             className="absolute inset-0 h-full w-full"
             sizes="100vw"
           />
-        </motion.div>
+        </div>
       </Reveal>
       {supports.length > 0 ? (
         <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4">
-          {supports.slice(0, 2).map((img, i) => (
-            <Reveal key={img.id} delay={0.08 + i * 0.08}>
+          {supports.slice(0, 4).map((img, i) => (
+            <Reveal key={img.id} delay={0.08 + i * 0.06}>
               <StoryImage
                 image={img}
                 className="aspect-[4/5] w-full"
-                sizes="(max-width: 640px) 50vw, 320px"
+                sizes="(max-width: 640px) 50vw, 280px"
               />
             </Reveal>
           ))}
@@ -424,32 +467,20 @@ function ActCardCinematic({ act }: { act: StanStoryAct }) {
   );
 }
 
-/** Acto IV — mosaico (herói a full-width quando não há apoios) */
+/** Acto IV — mosaico */
 function ActCardMosaic({ act }: { act: StanStoryAct }) {
   const [a, b] = act.supportingImages ?? [];
-  const hasSupport = Boolean(a || b);
   return (
     <EditorialCard id={act.id} tone="dark">
       <Reveal>
         <ActHeader act={act} light={false} />
       </Reveal>
       <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-12 sm:gap-4">
-        <Reveal
-          delay={0.08}
-          className={
-            hasSupport
-              ? "sm:col-span-7 sm:row-span-2"
-              : "mx-auto w-full max-w-lg sm:col-span-12 sm:max-w-xl"
-          }
-        >
+        <Reveal delay={0.08} className="sm:col-span-7 sm:row-span-2">
           <StoryImage
             image={act.heroImage}
             className="aspect-[3/4] w-full sm:aspect-[4/5]"
-            sizes={
-              hasSupport
-                ? "(max-width: 640px) 100vw, 55vw"
-                : "(max-width: 640px) 100vw, 520px"
-            }
+            sizes="(max-width: 640px) 100vw, 55vw"
           />
         </Reveal>
         {a ? (
@@ -503,12 +534,17 @@ function ActCardFinale({ act }: { act: StanStoryAct }) {
           </Reveal>
 
           {side ? (
-            <Reveal delay={0.2} className="w-[72%] max-w-[220px] sm:mb-8 sm:w-[34%] sm:max-w-none">
+            <Reveal delay={0.2} className="flex w-[72%] max-w-[220px] flex-col gap-2 sm:mb-8 sm:w-[34%] sm:max-w-none">
               <StoryImage
                 image={side}
                 className="aspect-[3/4] w-full shadow-[0_16px_40px_rgba(10,22,40,0.1)]"
                 sizes="220px"
               />
+              {side.caption ? (
+                <p className="font-display text-center text-sm italic text-[#0A1628]/65 sm:text-left">
+                  {side.caption}
+                </p>
+              ) : null}
             </Reveal>
           ) : null}
         </div>

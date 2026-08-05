@@ -40,7 +40,6 @@ export function isValidStanImageSrc(src: string): boolean {
   return /\.(jpe?g|png|webp|gif|avif)$/i.test(trimmed);
 }
 
-/** Espelho leve da narrativa activa — sem repetir srcs entre capítulos */
 export const STAN_CHAPTERS_DATA: StanChapter[] = [
   {
     id: "chapter-1",
@@ -50,10 +49,10 @@ export const STAN_CHAPTERS_DATA: StanChapter[] = [
     layoutType: "single-vertical",
     bgTheme: "light",
     primaryPhoto: {
-      src: "/images/stan/story/chapter-01/primary.png",
-      alt: "Stan bebé nos braços da mãe",
-      orientation: "portrait",
-      focalPosition: "center 35%",
+      src: "/images/stan/story/chapter-01/ultrasound.png",
+      alt: "Ultrassom — o primeiro encontro com o Stan",
+      orientation: "landscape",
+      focalPosition: "center 45%",
     },
   },
   {
@@ -65,16 +64,15 @@ export const STAN_CHAPTERS_DATA: StanChapter[] = [
     bgTheme: "dark",
     primaryPhoto: {
       src: "/images/stan/story/chapter-02/primary.png",
-      alt: "Stan nas primeiras descobertas",
+      alt: "Stan no seu 2º ano de vida",
       orientation: "portrait",
-      focalPosition: "center 18%",
+      focalPosition: "center",
     },
     secondaryPhotos: [
       {
         src: "/images/stan/story/chapter-02/detail.png",
-        alt: "Stan no parque ao pôr do sol",
-        orientation: "portrait",
-        focalPosition: "center 30%",
+        alt: "Momento especial do Stan",
+        orientation: "square",
       },
     ],
   },
@@ -87,18 +85,10 @@ export const STAN_CHAPTERS_DATA: StanChapter[] = [
     bgTheme: "light",
     primaryPhoto: {
       src: "/images/stan/story/chapter-03/primary.png",
-      alt: "Stan com a camisola STANLEY 10 no campo",
+      alt: "Stan no seu 3º ano de vida",
       orientation: "landscape",
-      focalPosition: "center 55%",
+      focalPosition: "center",
     },
-    secondaryPhotos: [
-      {
-        src: "/images/stan/story/chapter-03/detail.png",
-        alt: "Stan a brincar no parque",
-        orientation: "portrait",
-        focalPosition: "center 25%",
-      },
-    ],
   },
   {
     id: "chapter-4",
@@ -109,10 +99,17 @@ export const STAN_CHAPTERS_DATA: StanChapter[] = [
     bgTheme: "dark",
     primaryPhoto: {
       src: "/images/stan/story/chapter-04/primary.png",
-      alt: "Stan no 4º aniversário com a camisola do Real Madrid",
+      alt: "Stan no seu 4º ano de vida",
       orientation: "portrait",
-      focalPosition: "center 20%",
+      focalPosition: "center",
     },
+    secondaryPhotos: [
+      {
+        src: "/images/stan/story/chapter-02/detail.png",
+        alt: "Detalhe de jogo e bola",
+        orientation: "square",
+      },
+    ],
   },
   {
     id: "chapter-5",
@@ -123,9 +120,9 @@ export const STAN_CHAPTERS_DATA: StanChapter[] = [
     bgTheme: "light",
     primaryPhoto: {
       src: "/images/stan/story/chapter-05/primary.png",
-      alt: "Stan — o pequeno campeão",
+      alt: "Stan a celebrar 5 anos",
       orientation: "portrait",
-      focalPosition: "center 18%",
+      focalPosition: "center",
     },
   },
 ];

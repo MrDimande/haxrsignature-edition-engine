@@ -1,16 +1,93 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { useLenis } from "lenis/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useExperience } from "../../context";
 import { isStanAudioReady } from "@lib/stan/event-details";
+import { StanleyWordmark } from "./StanleyWordmark";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 /** Abertura: pulse → portas → luz → dissolve */
 const OPEN_MS = 1750;
+const WHISTLE_SRC = "/audio/stan/whistle.mp3";
+/** Clip já cortado (~0,38s) — margem de segurança */
+const WHISTLE_MS = 420;
 
 type GatePhase = "idle" | "ready" | "opening" | "exit";
+
+let whistleEl: HTMLAudioElement | null = null;
+
+function getWhistleAudio(): HTMLAudioElement | null {
+  if (typeof window === "undefined") return null;
+  if (!whistleEl) {
+    whistleEl = new Audio(WHISTLE_SRC);
+    whistleEl.preload = "auto";
+    whistleEl.volume = 0.72;
+  }
+  return whistleEl;
+}
+
+function preloadWhistle(): void {
+  getWhistleAudio()?.load();
+}
+
+/** Apito real ~0,3s — MP3; fallback Web Audio se falhar */
+async function playWhistleChirp(): Promise<void> {
+  if (typeof window === "undefined") return;
+  const audio = getWhistleAudio();
+  if (audio) {
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = 0.72;
+      await audio.play();
+      await new Promise<void>((resolve) => {
+        window.setTimeout(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          resolve();
+        }, WHISTLE_MS);
+      });
+      return;
+    } catch {
+      /* cai no sintetizador */
+    }
+  }
+
+  try {
+    const Ctx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    if (ctx.state === "suspended") await ctx.resume();
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.42, now + 0.012);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+    master.connect(ctx.destination);
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(2100, now);
+    osc.frequency.exponentialRampToValueAtTime(2680, now + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(1950, now + 0.28);
+    osc.connect(master);
+    osc.start(now);
+    osc.stop(now + 0.32);
+    await new Promise<void>((resolve) => {
+      window.setTimeout(() => {
+        void ctx.close().catch(() => undefined);
+        resolve();
+      }, 340);
+    });
+  } catch {
+    /* silêncio */
+  }
+}
 
 /** Medalha S·5 — selo limpo + specular sweep no aro */
 function ChampionSeal({
@@ -151,11 +228,49 @@ function ChampionSeal({
 export function StanRitualGate() {
   const { introComplete, setIntroComplete, setAudioEnabled, theme, audioPlayer } =
     useExperience();
+  const lenis = useLenis();
   const reduceMotion = useReducedMotion();
   const audioReady = isStanAudioReady(theme.audio.src);
   const [reveal, setReveal] = useState(0);
   const [phase, setPhase] = useState<GatePhase>("idle");
   const [sealVibrant, setSealVibrant] = useState(false);
+  const [sealHintVisible, setSealHintVisible] = useState(true);
+
+  const snapToHero = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash && window.location.hash !== "#hero") {
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}${window.location.search}`,
+      );
+    }
+    const hero = document.getElementById("hero");
+    if (hero && lenis) {
+      lenis.scrollTo(hero, { immediate: true, force: true, offset: 0 });
+    } else if (lenis) {
+      lenis.scrollTo(0, { immediate: true, force: true });
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [lenis]);
+
+  /* Enquanto o gate está aberto: sem scroll por baixo + sempre no topo */
+  useEffect(() => {
+    if (introComplete) return;
+    const prevOverflow = document.body.style.overflow;
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+    snapToHero();
+    document.body.style.overflow = "hidden";
+    document.documentElement.classList.add("lenis-stopped");
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.history.scrollRestoration = previousScrollRestoration;
+      document.documentElement.classList.remove("lenis-stopped");
+    };
+  }, [introComplete, snapToHero]);
 
   /* Entrada ~2s: escuridão → luz → selo → tipografia → botão */
   useEffect(() => {
@@ -180,30 +295,54 @@ export function StanRitualGate() {
     };
   }, [introComplete, reduceMotion]);
 
+  /* Pré-carga: apito + Hala Madrid no idle */
+  useEffect(() => {
+    if (introComplete || phase === "opening" || phase === "exit") return;
+    preloadWhistle();
+    if (audioReady) audioPlayer?.preload();
+  }, [introComplete, phase, audioReady, audioPlayer]);
+
   useEffect(() => {
     if (phase !== "opening") return;
     const done = window.setTimeout(() => {
       setPhase("exit");
-      window.setTimeout(() => setIntroComplete(true), reduceMotion ? 0 : 380);
+      window.setTimeout(() => {
+        snapToHero();
+        setIntroComplete(true);
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => snapToHero());
+        });
+      }, reduceMotion ? 0 : 380);
     }, reduceMotion ? 0 : OPEN_MS);
     return () => window.clearTimeout(done);
-  }, [phase, reduceMotion, setIntroComplete]);
+  }, [phase, reduceMotion, setIntroComplete, snapToHero]);
 
   if (introComplete) return null;
 
-  const openGate = async (withAudio: boolean) => {
+  const openGate = async () => {
     if (phase === "opening" || phase === "exit") return;
-    const enable = withAudio && audioReady;
-    setAudioEnabled(enable);
-    if (enable && audioPlayer) {
+    setSealHintVisible(false);
+    snapToHero();
+
+    // Apito → Hala Madrid (volume suave no tema)
+    if (!reduceMotion) {
+      await playWhistleChirp();
+    }
+
+    if (audioReady && audioPlayer) {
       try {
         await audioPlayer.start();
+        setAudioEnabled(true);
       } catch {
         setAudioEnabled(false);
       }
     }
     if (reduceMotion) {
+      snapToHero();
       setIntroComplete(true);
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => snapToHero());
+      });
       return;
     }
     setPhase("opening");
@@ -216,22 +355,22 @@ export function StanRitualGate() {
     <motion.div
       role="dialog"
       aria-modal="true"
-      aria-label="Entrada na celebração do Stan"
+      aria-label="Entrada na celebração do Stanley"
       className="fixed inset-0 z-50 overflow-hidden text-[#F7F4EF]"
       style={{ minHeight: "100svh", backgroundColor: "#050A12" }}
       animate={phase === "exit" ? { opacity: 0 } : { opacity: 1 }}
       transition={{ duration: 0.45, ease: EASE }}
     >
-      {/* Túnel — começa escuro, luz sobe no tempo 1 */}
+      {/* Túnel — grade navy/ouro alinhado ao Hero */}
       <motion.div
         className="absolute inset-0"
         initial={false}
         animate={
           opening
-            ? { scale: 1.08, filter: "brightness(1.32) saturate(1.06)" }
+            ? { scale: 1.08, filter: "brightness(1.28) saturate(1.04)" }
             : reveal >= 1
               ? { scale: 1.02, filter: "brightness(1)" }
-              : { scale: 1.06, filter: "brightness(0.45)" }
+              : { scale: 1.06, filter: "brightness(0.42)" }
         }
         transition={{ duration: 1.35, ease: EASE }}
       >
@@ -246,10 +385,32 @@ export function StanRitualGate() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-center opacity-[0.88]"
+            style={{
+              filter:
+                "saturate(0.62) brightness(0.78) contrast(1.12) sepia(0.22) hue-rotate(-8deg)",
+            }}
             aria-hidden
           />
         </picture>
+        <div
+          aria-hidden
+          className="absolute inset-0 mix-blend-soft-light opacity-70"
+          style={{
+            background:
+              "linear-gradient(165deg, rgba(201,168,106,0.22) 0%, rgba(11,19,43,0.5) 45%, rgba(5,10,18,0.55) 100%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background: `
+              radial-gradient(ellipse 70% 55% at 50% 42%, rgba(11,19,43,0.25) 0%, transparent 68%),
+              linear-gradient(180deg, rgba(5,10,18,0.55) 0%, transparent 28%, transparent 58%, rgba(5,10,18,0.9) 100%)
+            `,
+          }}
+        />
       </motion.div>
 
       {/* Raios — sobem com a luz */}
@@ -300,8 +461,7 @@ export function StanRitualGate() {
         className="pointer-events-none absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse 70% 55% at 50% 45%, transparent 20%, rgba(5,10,18,0.55) 100%),
-            linear-gradient(180deg, rgba(5,10,18,0.72) 0%, transparent 22%, transparent 62%, rgba(5,10,18,0.88) 100%)
+            radial-gradient(ellipse 70% 55% at 50% 45%, transparent 28%, rgba(5,10,18,0.5) 100%)
           `,
         }}
       />
@@ -422,18 +582,21 @@ export function StanRitualGate() {
         {/* Selo — tempo 2: 0.92→1; abertura: pulse → funde na luz */}
         <motion.button
           type="button"
-          aria-label="Abrir o convite"
+          aria-label="Abrir o túnel"
           disabled={phase !== "ready"}
-          onClick={() => void openGate(false)}
+          onClick={() => void openGate()}
           onHoverStart={() => {
             if (idle) setSealVibrant(true);
           }}
           onHoverEnd={() => setSealVibrant(false)}
           onTapStart={() => {
-            if (idle) setSealVibrant(true);
+            if (idle) {
+              setSealVibrant(true);
+              setSealHintVisible(false);
+            }
           }}
           onTapCancel={() => setSealVibrant(false)}
-          className="relative mb-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#C9A86A] disabled:cursor-default sm:mb-12"
+          className="relative mb-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-[#C9A86A] disabled:cursor-default sm:mb-8"
           initial={false}
           animate={
             opening
@@ -459,23 +622,48 @@ export function StanRitualGate() {
               ? { scale: 1.02 }
               : undefined
           }
-          whileTap={idle ? { scale: 0.99 } : undefined}
+          whileTap={
+            idle
+              ? { scale: 0.94, transition: { duration: 0.12 } }
+              : undefined
+          }
         >
-          {/* Halo — respiração */}
+          {/* Halo — respiração mais óbvia no mobile (selo = abre) */}
           {idle && !reduceMotion ? (
-            <motion.span
-              aria-hidden
-              className="pointer-events-none absolute inset-[-18%] rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(201,168,106,0.3) 0%, rgba(201,168,106,0.06) 42%, transparent 70%)",
-              }}
-              animate={{
-                scale: [1, 1.05, 1],
-                opacity: sealVibrant ? [0.7, 0.95, 0.7] : [0.45, 0.75, 0.45],
-              }}
-              transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
-            />
+            <>
+              <motion.span
+                aria-hidden
+                className="pointer-events-none absolute inset-[-22%] rounded-full md:inset-[-18%]"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(201,168,106,0.42) 0%, rgba(201,168,106,0.1) 40%, transparent 68%)",
+                }}
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: sealVibrant
+                    ? [0.75, 1, 0.75]
+                    : [0.55, 0.9, 0.55],
+                }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              <motion.span
+                aria-hidden
+                className="pointer-events-none absolute inset-[-6%] rounded-full border border-[#C9A86A]/45 md:border-[#C9A86A]/30"
+                animate={{
+                  scale: [1, 1.06, 1],
+                  opacity: [0.35, 0.85, 0.35],
+                }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </>
           ) : null}
 
           <ChampionSeal
@@ -485,7 +673,24 @@ export function StanRitualGate() {
           />
         </motion.button>
 
-        {/* Tipografia — tempo 3, ~100ms após selo */}
+        <div className="mb-5 flex h-4 items-center justify-center sm:mb-0 sm:h-0">
+          <AnimatePresence>
+            {idle && sealHintVisible && reveal >= 2 ? (
+              <motion.p
+                key="seal-hint"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4, ease: EASE }}
+                className="font-body text-[9px] font-medium uppercase tracking-[0.38em] text-[#C9A86A]/80 sm:hidden"
+              >
+                Toca no selo
+              </motion.p>
+            ) : null}
+          </AnimatePresence>
+        </div>
+
+        {/* Tipografia — marca hero + apoio */}
         <motion.div
           className="flex max-w-md flex-col items-center text-center"
           initial={false}
@@ -498,17 +703,18 @@ export function StanRitualGate() {
           }
           transition={{ duration: 0.95, ease: EASE }}
         >
-          <p className="mb-3 font-body text-[10px] font-medium uppercase tracking-[0.42em] text-[#E8DCC8]/65">
-            Antes do apito inicial
+          <StanleyWordmark size="gate" />
+          <p className="mt-3 font-body text-[10px] font-semibold uppercase tracking-[0.42em] text-[#C9A86A] sm:mt-3.5 sm:text-[11px]">
+            S · 5
           </p>
-          <h1 className="mb-8 max-w-[16ch] font-display text-[clamp(1.85rem,5.8vw,2.9rem)] font-light leading-[1.08] tracking-tight text-[#F7F4EF] sm:mb-10">
+          <p className="mt-4 max-w-[22ch] px-1 font-display text-[clamp(0.95rem,3.2vw,1.35rem)] font-light leading-snug text-[#E8DCC8]/85 sm:mt-5">
             Um pequeno campeão prepara-se para entrar em campo
-          </h1>
+          </p>
         </motion.div>
 
-        {/* CTA — tempo 4 */}
+        {/* CTA — um gesto: abre com Hala Madrid (pause no canto depois) */}
         <motion.div
-          className="flex w-full max-w-xs flex-col items-center gap-5 sm:max-w-sm"
+          className="mt-10 flex w-full max-w-xs flex-col items-center sm:mt-12 sm:max-w-sm"
           initial={false}
           animate={
             opening
@@ -522,32 +728,17 @@ export function StanRitualGate() {
           <button
             type="button"
             disabled={phase !== "ready"}
-            onClick={() => void openGate(false)}
-            className="flex min-h-12 w-full items-center justify-center rounded-full bg-[#C9A86A] px-6 py-3.5 font-body text-[11px] font-bold uppercase tracking-[0.28em] text-[#050A12] transition hover:bg-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F7F4EF] disabled:opacity-50"
+            onClick={() => void openGate()}
+            className="flex min-h-12 w-full items-center justify-center rounded-full bg-[#C9A86A] px-6 py-3.5 font-body text-[11px] font-extrabold uppercase tracking-[0.28em] text-[#050A12] shadow-[0_14px_40px_rgba(201,168,106,0.28)] transition hover:bg-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F7F4EF] disabled:opacity-50"
           >
             Abrir o túnel
           </button>
-
-          {audioReady ? (
-            <button
-              type="button"
-              disabled={phase !== "ready"}
-              onClick={() => void openGate(true)}
-              className="font-body text-[10px] font-medium uppercase tracking-[0.32em] text-[#C9A86A]/85 transition hover:text-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86A] disabled:opacity-50"
-            >
-              Abrir com Hala Madrid
-            </button>
-          ) : (
-            <p className="font-body text-[10px] tracking-[0.2em] text-[#94A3B8]/70">
-              Toca o selo para entrar
-            </p>
-          )}
         </motion.div>
       </div>
 
       {opening ? (
         <span className="sr-only" aria-live="polite">
-          A abrir o convite do campeão.
+          A abrir o túnel do campeão.
         </span>
       ) : null}
     </motion.div>

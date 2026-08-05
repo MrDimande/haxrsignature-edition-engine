@@ -17,6 +17,8 @@ import {
   getStanWhatsAppUrl,
 } from "@lib/stan/event-details";
 import { useExperience } from "../../context";
+import { StanTypeLine } from "./StanTypeLine";
+import { StanMatchSpark } from "./StanMatchSpark";
 
 const RSVP_FETCH_TIMEOUT_MS = 30_000;
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -274,33 +276,37 @@ export function StanRSVPSection() {
               <div
                 role="status"
                 aria-live="polite"
-                className="space-y-5 py-4 text-center"
+                className="relative space-y-5 overflow-hidden py-4 text-center"
               >
+                <StanMatchSpark />
                 <CheckCircle2
                   size={44}
-                  className="mx-auto text-[#C9A86A]"
+                  className="relative z-10 mx-auto text-[#C9A86A]"
                   aria-hidden
                 />
-                <h3 className="font-display text-2xl font-light text-[#F7F4EF]">
+                <h3 className="relative z-10 font-display text-2xl font-light text-[#F7F4EF]">
                   Está na lista de convocados
                 </h3>
-                <p className="font-body text-sm font-light leading-relaxed text-[#F7F4EF]/70">
+                <p className="relative z-10 font-body text-sm font-light leading-relaxed text-[#F7F4EF]/70">
                   Obrigado,{" "}
                   <strong className="font-semibold text-[#F7F4EF]">
                     {form.name.trim()}
                   </strong>
                   . A sua resposta foi registada. Nos vemos na estreia do Big 5.
                 </p>
-                <p className="font-body text-[10px] uppercase tracking-[0.28em] text-[#C9A86A]">
-                  See you on Matchday
-                </p>
+                <StanTypeLine
+                  text="See you on Matchday"
+                  className="relative z-10 font-body text-[10px] uppercase tracking-[0.28em] text-[#C9A86A]"
+                  startDelay={120}
+                  charMs={42}
+                />
 
                 {whatsappUrl ? (
                   <a
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center gap-2 bg-[#25D366] px-6 py-3 font-body text-[11px] font-bold uppercase tracking-[0.18em] text-white"
+                    className="relative z-10 inline-flex min-h-11 items-center gap-2 bg-[#25D366] px-6 py-3 font-body text-[11px] font-bold uppercase tracking-[0.18em] text-white"
                   >
                     <Send size={14} aria-hidden />
                     Contactar por WhatsApp

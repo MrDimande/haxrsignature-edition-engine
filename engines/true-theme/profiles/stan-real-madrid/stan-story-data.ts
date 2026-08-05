@@ -1,7 +1,6 @@
 /**
  * Narrativa editorial — Os Cinco Actos de um Pequeno Campeão
- * Dados desacoplados do UI. Textos universais (sem factos inventados).
- * Trocar fotografias / copy aqui sem abrir o componente.
+ * Dados desacoplados do UI. Trocar fotografias / copy aqui sem abrir o componente.
  *
  * Regra: cada `src` aparece no máximo uma vez em STAN_STORY_ACTS.
  */
@@ -55,51 +54,65 @@ export const STAN_STORY_EPILOGUE = {
 } as const;
 
 /**
- * 7 fotografias reais — uma por slot, sem repetir.
- * Actos I e IV/V: um herói. Actos II e III: herói + apoio.
+ * Arco com as fotos reais (sem repetir):
+ * I ultrassom + recém-nascido
+ * II mãe + bebé sentado
+ * III STANLEY 10 + toddler + parque
+ * IV 4º aniversário + parque ao pôr do sol
+ * V campeão
  */
 export const STAN_STORY_ACTS: StanStoryAct[] = [
   {
     id: "act-1",
     actNumber: "01",
     roman: "I",
-    age: "Ano 1",
+    age: "O início",
     title: "O Começo",
-    text: "Antes de o mundo conhecer a sua energia, chegou um sorriso pequeno o suficiente para caber nos braços — e grande o suficiente para transformar tudo.",
+    text: "Antes do primeiro choro, já havia um sonho a ganhar forma e depois um sono quieto que mudou tudo.",
     tone: "light",
     layout: "intimate-portrait",
     heroImage: {
       id: "act1-hero",
-      src: "/images/stan/story/chapter-01/primary.png",
-      alt: "Stan bebé nos braços da mãe — o começo",
-      orientation: "portrait",
-      focalPosition: "center 35%",
+      src: "/images/stan/story/chapter-01/ultrasound.png",
+      alt: "Ultrassom — o primeiro encontro com o Stan",
+      orientation: "landscape",
+      focalPosition: "center 45%",
     },
+    supportingImages: [
+      {
+        id: "act1-support",
+        src: "/images/stan/story/chapter-01/newborn.png",
+        alt: "Stan recém-nascido a dormir",
+        orientation: "portrait",
+        focalPosition: "center 30%",
+        caption: "O primeiro capítulo, em silêncio.",
+      },
+    ],
   },
   {
     id: "act-2",
     actNumber: "02",
     roman: "II",
-    age: "Ano 2",
-    title: "As Primeiras Descobertas",
-    text: "O mundo começou a abrir-se diante dele: novas formas, novos sons, novos passos e a alegria de descobrir um pouco mais a cada dia.",
+    age: "Ano 1",
+    title: "Nos Braços do Amor",
+    text: "Entre sorrisos, tecidos claros e o olhar de quem o segura, o mundo tornou-se casa e cada dia um novo abraço.",
     tone: "dark",
     layout: "asymmetric-duo",
     heroImage: {
       id: "act2-hero",
       src: "/images/stan/story/chapter-02/primary.png",
-      alt: "Stan em pé, sorridente, nas primeiras descobertas",
+      alt: "Stan bebé com a mãe",
       orientation: "portrait",
-      focalPosition: "center 18%",
+      focalPosition: "center 35%",
     },
     supportingImages: [
       {
         id: "act2-support",
         src: "/images/stan/story/chapter-02/detail.png",
-        alt: "Stan no parque ao pôr do sol",
-        orientation: "portrait",
-        focalPosition: "center 30%",
-        caption: "Cada dia, um novo horizonte.",
+        alt: "Stan bebé sentado, a sorrir",
+        orientation: "landscape",
+        focalPosition: "center 40%",
+        caption: "O sorriso que abre o segundo acto.",
       },
     ],
   },
@@ -107,9 +120,9 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     id: "act-3",
     actNumber: "03",
     roman: "III",
-    age: "Ano 3",
+    age: "Anos 2–3",
     title: "O Mundo em Movimento",
-    text: "Correr, explorar, imaginar. A infância ganhou velocidade — e cada novo dia tornou-se uma aventura.",
+    text: "Do pátio ao parque, cada dia uma descoberta. Correr, explorar, imaginar — a infância ganhou velocidade e a bola encontrou o seu lugar.",
     tone: "light",
     layout: "cinematic-landscape",
     heroImage: {
@@ -121,11 +134,32 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     },
     supportingImages: [
       {
-        id: "act3-support",
+        id: "act3-a",
         src: "/images/stan/story/chapter-03/detail.png",
-        alt: "Stan a brincar no parque, com a bola por perto",
+        alt: "Stan em pé, nas primeiras descobertas do dia a dia",
+        orientation: "portrait",
+        focalPosition: "center 18%",
+      },
+      {
+        id: "act3-b",
+        src: "/images/stan/story/chapter-03/detail-b.png",
+        alt: "Stan a brincar no parque, a escalar e a sorrir",
         orientation: "portrait",
         focalPosition: "center 25%",
+      },
+      {
+        id: "act3-c",
+        src: "/images/stan/story/chapter-03/detail-c.png",
+        alt: "Stan a sorrir junto a um pneu, a explorar o exterior",
+        orientation: "portrait",
+        focalPosition: "center 30%",
+      },
+      {
+        id: "act3-d",
+        src: "/images/stan/story/chapter-03/detail-d.png",
+        alt: "Stan no pátio, nas primeiras aventuras ao ar livre",
+        orientation: "portrait",
+        focalPosition: "center 20%",
       },
     ],
   },
@@ -135,7 +169,7 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     roman: "IV",
     age: "Ano 4",
     title: "Nasce uma Paixão",
-    text: "Entre balões, luzes e uma camisola branca, o sonho ganhou cor — e o coração começou a bater ao ritmo do jogo.",
+    text: "Entre balões, luzes e uma camisola branca, o sonho ganhou cor e o coração começou a bater ao ritmo do jogo.",
     tone: "dark",
     layout: "editorial-mosaic",
     heroImage: {
@@ -145,6 +179,15 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
       orientation: "portrait",
       focalPosition: "center 20%",
     },
+    supportingImages: [
+      {
+        id: "act4-support",
+        src: "/images/stan/story/chapter-04/detail.png",
+        alt: "Stan no parque ao pôr do sol",
+        orientation: "portrait",
+        focalPosition: "center 30%",
+      },
+    ],
   },
   {
     id: "act-5",
@@ -152,7 +195,7 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     roman: "V",
     age: "Ano 5",
     title: "O Pequeno Campeão",
-    text: "Cinco anos depois, o menino dos primeiros passos prepara-se para entrar em campo para o seu maior acto até agora.",
+    text: "Braços cruzados, camisola branca, olhar firme. Cinco anos depois, o pequeno campeão prepara-se para o seu maior acto até agora.",
     tone: "light",
     layout: "champion-finale",
     heroImage: {
@@ -162,6 +205,16 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
       orientation: "portrait",
       focalPosition: "center 18%",
     },
+    supportingImages: [
+      {
+        id: "act5-support",
+        src: "/images/stan/story/chapter-05/detail.png",
+        alt: "Stan com a bola — navy e chuteiras azuis, pronto para o jogo",
+        orientation: "portrait",
+        focalPosition: "center 20%",
+        caption: "O plantel está formado.",
+      },
+    ],
   },
 ];
 

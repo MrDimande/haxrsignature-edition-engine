@@ -26,9 +26,9 @@ export const stanRealMadridTheme: TrueTheme = {
   },
   audio: {
     type: "ambient",
-    fadeIn: 3000,
+    fadeIn: 4500,
     fadeOut: 2000,
-    volume: 0.38,
+    volume: 0.26,
     src: "/audio/stan/hala-madrid.mp3",
     credit: {
       title: "Hala Madrid… y nada más",

@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { CalendarPlus, Download, MapPin } from "lucide-react";
 import {
-  STAN_EVENT,
-  STAN_VENUE,
-  STAN_DRESS_CODE,
-  buildStanGoogleCalendarUrl,
-  downloadStanIcsFile,
-  formatStanDisplayDate,
-  getStanVenueDisplayName,
-  isStanDressCodeConfirmed,
-  isStanVenueConfirmed,
+    STAN_DRESS_CODE,
+    STAN_EVENT,
+    STAN_VENUE,
+    buildStanGoogleCalendarUrl,
+    downloadStanIcsFile,
+    formatStanDisplayDate,
+    getStanVenueDisplayName,
+    isStanDressCodeConfirmed,
+    isStanVenueConfirmed,
 } from "@lib/stan/event-details";
+import { CalendarPlus, Download, MapPin } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
+import React, { useState } from "react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 

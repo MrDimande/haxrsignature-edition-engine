@@ -265,9 +265,9 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       /** Residência do S5 · Belo Horizonte (Maputo) */
       location: "Residência do S5 · Belo Horizonte, Maputo",
       dressCode: "Kit Matchday · navy, azul, cream e areia",
-      subtitle: "Real Madrid Luxury Experience · 5º Aniversário",
+      subtitle: "O Quinto Acto de um Pequeno Campeão",
       description:
-        "Convite digital imersivo de aniversário infantil. Uma celebração inesquecível de futebol de luxo, paixão, alegria e memórias preciosas.",
+        "12 de Setembro de 2026 · 11h00 · Residência do S5, Belo Horizonte. O Quinto Acto de um Pequeno Campeão.",
       eventDate: "2026-09-12",
       eventType: "Aniversário Infantil",
       ogImage: "/images/stan/social/stan-og.png",

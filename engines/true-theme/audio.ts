@@ -108,6 +108,26 @@ export class ExperienceAudioPlayer {
     }
   }
 
+  /** Pré-carrega a faixa sem tocar (ex.: idle do gate) */
+  preload(): void {
+    if (
+      !this.audio ||
+      this.theme.audio.type === "silent" ||
+      !this.theme.audio.src
+    ) {
+      return;
+    }
+    const absoluteSrc = new URL(
+      this.theme.audio.src,
+      window.location.origin
+    ).href;
+    this.audio.preload = "auto";
+    if (this.audio.src !== absoluteSrc) {
+      this.audio.src = this.theme.audio.src;
+    }
+    this.audio.load();
+  }
+
   stop(): void {
     if (!this.audio || !this.active) return;
     this.active = false;
