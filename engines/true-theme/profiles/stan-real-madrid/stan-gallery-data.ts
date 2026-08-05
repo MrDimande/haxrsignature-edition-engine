@@ -143,10 +143,10 @@ export const STAN_CLOSING_PHOTO: StanPhoto = {
 
 export const STAN_IDOL_PHOTOS = {
   stan: {
-    src: "/images/stan/idols/stan.png",
-    alt: "Stan — o pequeno campeão",
+    src: "/images/stan/idols/stanley.png",
+    alt: "Stanley Mayse — o pequeno campeão",
     orientation: "portrait" as const,
-    focalPosition: "center",
+    focalPosition: "center 22%",
   },
   mbappe: {
     src: "/images/stan/idols/mbappe.jpg",

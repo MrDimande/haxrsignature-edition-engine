@@ -122,36 +122,22 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     roman: "III",
     age: "Anos 2–3",
     title: "O Mundo em Movimento",
-    text: "Do pátio ao parque, cada dia uma descoberta. Correr, explorar, imaginar — a infância ganhou velocidade e a bola encontrou o seu lugar.",
+    text: "Do pátio ao parque, cada dia uma descoberta. Correr, explorar, imaginar — a infância ganhou velocidade.",
     tone: "light",
-    layout: "cinematic-landscape",
+    layout: "editorial-mosaic",
     heroImage: {
       id: "act3-hero",
-      src: "/images/stan/story/chapter-03/primary.png",
-      alt: "Stan de costas com a camisola STANLEY 10 e a bola no campo",
-      orientation: "landscape",
-      focalPosition: "center 55%",
+      src: "/images/stan/story/chapter-03/detail.png",
+      alt: "Stan a sorrir, nas primeiras descobertas do dia a dia",
+      orientation: "portrait",
+      focalPosition: "center 18%",
     },
     supportingImages: [
-      {
-        id: "act3-a",
-        src: "/images/stan/story/chapter-03/detail.png",
-        alt: "Stan em pé, nas primeiras descobertas do dia a dia",
-        orientation: "portrait",
-        focalPosition: "center 18%",
-      },
-      {
-        id: "act3-b",
-        src: "/images/stan/story/chapter-03/detail-b.png",
-        alt: "Stan a brincar no parque, a escalar e a sorrir",
-        orientation: "portrait",
-        focalPosition: "center 25%",
-      },
       {
         id: "act3-c",
         src: "/images/stan/story/chapter-03/detail-c.png",
         alt: "Stan a sorrir junto a um pneu, a explorar o exterior",
-        orientation: "portrait",
+        orientation: "landscape",
         focalPosition: "center 30%",
       },
       {
@@ -182,10 +168,10 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
     supportingImages: [
       {
         id: "act4-support",
-        src: "/images/stan/story/chapter-04/detail.png",
-        alt: "Stan no parque ao pôr do sol",
+        src: "/images/stan/story/chapter-04/primary2.png",
+        alt: "Stan de costas com a camisola STANLEY 10 e a bola no campo",
         orientation: "portrait",
-        focalPosition: "center 30%",
+        focalPosition: "center 45%",
       },
     ],
   },
@@ -204,17 +190,8 @@ export const STAN_STORY_ACTS: StanStoryAct[] = [
       alt: "Stan de braços cruzados com a camisola do Real Madrid — o pequeno campeão",
       orientation: "portrait",
       focalPosition: "center 18%",
+      caption: "O plantel está formado.",
     },
-    supportingImages: [
-      {
-        id: "act5-support",
-        src: "/images/stan/story/chapter-05/detail.png",
-        alt: "Stan com a bola — navy e chuteiras azuis, pronto para o jogo",
-        orientation: "portrait",
-        focalPosition: "center 20%",
-        caption: "O plantel está formado.",
-      },
-    ],
   },
 ];
 
