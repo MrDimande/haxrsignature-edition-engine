@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -11,17 +11,22 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  */
 export function StanHeroStoryBridge() {
   const reduceMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const animateIn = mounted && !reduceMotion;
 
   return (
     <div
       aria-hidden
       className="relative z-[5] -mt-px w-full overflow-hidden"
       style={{
-        background:
-          "linear-gradient(180deg, #F7F4EF 0%, #F7F4EF 100%)",
+        background: "linear-gradient(180deg, #F7F4EF 0%, #F7F4EF 100%)",
       }}
     >
-      {/* Continuação do fade do estádio */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-24 sm:h-28"
         style={{
@@ -37,8 +42,8 @@ export function StanHeroStoryBridge() {
       />
 
       <motion.div
-        initial={reduceMotion ? false : { opacity: 0, scaleX: 0.4 }}
-        whileInView={{ opacity: 1, scaleX: 1 }}
+        initial={animateIn ? { opacity: 0, scaleX: 0.4 } : false}
+        whileInView={animateIn ? { opacity: 1, scaleX: 1 } : undefined}
         viewport={{ once: true, amount: 0.6 }}
         transition={{ duration: 1.1, ease: EASE }}
         className="relative mx-auto flex h-16 w-full max-w-xs flex-col items-center justify-center sm:h-20 sm:max-w-sm"

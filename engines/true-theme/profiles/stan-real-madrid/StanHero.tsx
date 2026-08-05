@@ -38,6 +38,12 @@ function useIsDesktopMd() {
  */
 export function StanHeroSection() {
   const { introComplete } = useExperience();
+  // useScroll precisa do nó montado — só monta o hero após o gate
+  if (!introComplete) return null;
+  return <StanHeroMounted />;
+}
+
+function StanHeroMounted() {
   const reduceMotion = useReducedMotion();
   const isDesktop = useIsDesktopMd();
   const sectionRef = useRef<HTMLElement>(null);
@@ -51,8 +57,6 @@ export function StanHeroSection() {
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 48]);
   const midY = useTransform(scrollYProgress, [0, 1], [0, 28]);
   const fgY = useTransform(scrollYProgress, [0, 1], [0, 12]);
-
-  if (!introComplete) return null;
 
   const venueLine = getStanVenueShortName();
   const matchDay = STAN_EVENT.dateIso.slice(8, 10).replace(/^0/, "");

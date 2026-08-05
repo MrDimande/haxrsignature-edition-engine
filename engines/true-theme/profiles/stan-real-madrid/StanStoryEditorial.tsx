@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useSyncExternalStore } from "react";
+import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -55,16 +55,6 @@ function StoryImage({
   priority?: boolean;
 }) {
   const [failed, setFailed] = useState(!isValidStanStorySrc(image.src));
-  const reduceMotion = useReducedMotion();
-  const isDesktop = useIsDesktopMd();
-  const frameRef = useRef<HTMLDivElement>(null);
-  const enableParallax = Boolean(isDesktop && !reduceMotion);
-
-  const { scrollYProgress } = useScroll({
-    target: frameRef,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
 
   if (failed) {
     return (
@@ -79,13 +69,59 @@ function StoryImage({
   }
 
   return (
+    <StoryImageMounted
+      image={image}
+      className={className}
+      sizes={sizes}
+      priority={priority}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+function StoryImageMounted({
+  image,
+  className = "",
+  sizes,
+  priority = false,
+  onError,
+}: {
+  image: StanStoryImage;
+  className?: string;
+  sizes: string;
+  priority?: boolean;
+  onError: () => void;
+}) {
+  const reduceMotion = useReducedMotion();
+  const isDesktop = useIsDesktopMd();
+  const frameRef = useRef<HTMLDivElement>(null);
+  const enableParallax = Boolean(isDesktop && !reduceMotion);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const { scrollYProgress } = useScroll({
+    target: frameRef,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
+
+  const wipe =
+    mounted && !reduceMotion
+      ? {
+          initial: { clipPath: "inset(0 100% 0 0)" } as const,
+          whileInView: { clipPath: "inset(0 0% 0 0)" } as const,
+        }
+      : { initial: false as const, whileInView: undefined };
+
+  return (
     <motion.div
       ref={frameRef}
       className={`relative overflow-hidden ${className}`}
-      initial={
-        reduceMotion ? false : { clipPath: "inset(0 100% 0 0)" }
-      }
-      whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+      initial={wipe.initial}
+      whileInView={wipe.whileInView}
       viewport={{ once: true, amount: 0.35 }}
       transition={{ duration: 1.05, ease: EASE }}
     >
@@ -105,7 +141,7 @@ function StoryImage({
               ? { objectPosition: image.focalPosition }
               : undefined
           }
-          onError={() => setFailed(true)}
+          onError={onError}
         />
       </motion.div>
     </motion.div>
@@ -124,11 +160,19 @@ function Reveal({
   y?: number;
 }) {
   const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const animateIn = mounted && !reduce;
+
   return (
     <motion.div
       className={className}
-      initial={reduce ? false : { opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={animateIn ? { opacity: 0, y } : false}
+      whileInView={animateIn ? { opacity: 1, y: 0 } : undefined}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.9, delay, ease: EASE }}
     >
@@ -467,13 +511,14 @@ function ActCardCinematic({ act }: { act: StanStoryAct }) {
   );
 }
 
-/** Acto IV — mosaico */
+/** Acto IV — mosaico (também Acto III com 3 fotos) */
 function ActCardMosaic({ act }: { act: StanStoryAct }) {
   const [a, b] = act.supportingImages ?? [];
+  const light = act.tone === "light";
   return (
-    <EditorialCard id={act.id} tone="dark">
+    <EditorialCard id={act.id} tone={act.tone}>
       <Reveal>
-        <ActHeader act={act} light={false} />
+        <ActHeader act={act} light={light} />
       </Reveal>
       <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-12 sm:gap-4">
         <Reveal delay={0.08} className="sm:col-span-7 sm:row-span-2">

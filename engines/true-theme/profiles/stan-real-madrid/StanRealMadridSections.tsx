@@ -240,7 +240,7 @@ export function StanInspirationsSection() {
           <div className="order-1 sm:order-2 sm:-translate-y-4">
             <PhotoFrame photo={STAN_IDOL_PHOTOS.stan} aspect="aspect-[3/4]" />
             <p className="mt-3 font-display text-base sm:text-lg font-semibold tracking-widest uppercase text-[#C59B27]">
-              Stan
+              Stanley Mayse
             </p>
           </div>
 
