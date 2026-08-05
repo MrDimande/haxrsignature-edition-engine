@@ -17,20 +17,17 @@ export const STAN_EVENT = {
   subtitle: "O Quinto Acto de um Pequeno Campeão",
   calendarTitle: "5º Aniversário do Stan — O Quinto Acto de um Pequeno Campeão",
   calendarDescription:
-    "Venha celebrar o 5º Aniversário do Stan na Residência do S5 (Belo Horizonte, Maputo)! Kit Matchday: navy, azul, cream e areia. Uma tarde de alegria e memórias preciosas.",
+    "Venha celebrar o 5º Aniversário do Stan na Residência do S5 (Belo Horizonte, Maputo)! 11h00–15h00. Kit Matchday: navy, azul, cream e areia. Uma tarde de alegria e memórias preciosas.",
   dateIso: "2026-09-12",
   /** Hora local Maputo (Africa/Maputo) */
   timeLabel: "11h00",
   timeHour: 11,
   timeMinute: 0,
-  /**
-   * Término opcional — null enquanto a família não confirmar.
-   * Google Calendar usa janela provisória; ICS omite DTEND.
-   */
-  endTimeLabel: null as string | null,
-  endTimeHour: null as number | null,
-  endTimeMinute: null as number | null,
-  /** Soft window só para Google Calendar TEMPLATE (exige fim) */
+  /** Término confirmado — festa da manhã / início da tarde */
+  endTimeLabel: "15h00",
+  endTimeHour: 15,
+  endTimeMinute: 0,
+  /** Soft window só se endTime* voltar a null (Google Calendar exige fim) */
   googleSoftDurationHours: 4,
   eventType: "Aniversário Infantil",
   city: "Maputo",
@@ -40,10 +37,12 @@ export const STAN_EVENT = {
 
 export type StanFieldStatus = "pending" | "confirmed";
 
-/** Coordenadas OSM — Residência do S5 · Belo Horizonte */
+/** Coordenadas — Residência do S5 · Belo Horizonte
+ * 26°01'42.4"S 32°23'53.0"E
+ */
 export const STAN_VENUE_COORDS = {
-  lat: -26.0199559,
-  lng: 32.3992847,
+  lat: -26.028454,
+  lng: 32.398056,
 } as const;
 
 function buildStanMapLinks(lat: number, lng: number, label: string) {
@@ -110,13 +109,13 @@ export const STAN_DRESS_CODE: {
   status: "confirmed",
   label: "Cores do plantel",
   title: "Kit Matchday",
-  lead: "Vista as cores do plantel — navy, azul, cream e areia.",
+  lead: "Vista as cores do plantel",
   note: "Chegue confortável e elegante, pronto para a estreia do Quinto Acto.",
   palette: [
-    { id: "navy", name: "Navy", hex: "#0B1C2C" },
-    { id: "azul", name: "Azul", hex: "#5E7A8C" },
+    { id: "navy", name: "Navy Blue", hex: "#0B1C2C" },
+    { id: "slate-blue", name: "Slate Blue", hex: "#5E7A8C" },
     { id: "cream", name: "Cream", hex: "#EDE6D9" },
-    { id: "areia", name: "Areia", hex: "#C4A882" },
+    { id: "camel", name: "Camel", hex: "#C4A882" },
   ],
 };
 

@@ -1,8 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "motion/react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "motion/react";
 import { useExperience } from "../../context";
 import {
   STAN_EVENT,
@@ -10,6 +15,20 @@ import {
 } from "@lib/stan/event-details";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+function subscribeMd(onStoreChange: () => void) {
+  const mq = window.matchMedia("(min-width: 768px)");
+  mq.addEventListener("change", onStoreChange);
+  return () => mq.removeEventListener("change", onStoreChange);
+}
+
+function useIsDesktopMd() {
+  return useSyncExternalStore(
+    subscribeMd,
+    () => window.matchMedia("(min-width: 768px)").matches,
+    () => false
+  );
+}
 
 /**
  * Hero — Poster do Pequeno Campeão
@@ -19,6 +38,18 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function StanHeroSection() {
   const { introComplete } = useExperience();
   const reduceMotion = useReducedMotion();
+  const isDesktop = useIsDesktopMd();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  const enableParallax = Boolean(isDesktop && !reduceMotion);
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 48]);
+  const midY = useTransform(scrollYProgress, [0, 1], [0, 28]);
+  const fgY = useTransform(scrollYProgress, [0, 1], [0, 12]);
 
   if (!introComplete) return null;
 
@@ -26,14 +57,26 @@ export function StanHeroSection() {
   const matchDay = STAN_EVENT.dateIso.slice(8, 10).replace(/^0/, "");
   const kickHour = String(STAN_EVENT.timeHour);
 
+  // Grade navy/ouro — no mobile o FG ocupa mais e precisa de mais wash
+  const stadiumFilter = isDesktop
+    ? "saturate(0.72) brightness(0.82) contrast(1.12) sepia(0.18) hue-rotate(-8deg)"
+    : "saturate(0.52) brightness(0.7) contrast(1.16) sepia(0.3) hue-rotate(-10deg)";
+  const midFilter = isDesktop
+    ? "drop-shadow(0 14px 28px rgba(5,10,18,0.55)) drop-shadow(0 0 14px rgba(201,168,106,0.12)) sepia(0.28) saturate(0.62) brightness(0.82) contrast(1.06) hue-rotate(-4deg)"
+    : "drop-shadow(0 14px 28px rgba(5,10,18,0.55)) drop-shadow(0 0 14px rgba(201,168,106,0.12)) sepia(0.34) saturate(0.55) brightness(0.78) contrast(1.08) hue-rotate(-5deg)";
+  const fgFilter = isDesktop
+    ? "drop-shadow(0 18px 36px rgba(5,10,18,0.45)) sepia(0.08) saturate(0.92) brightness(0.98) contrast(1.03) hue-rotate(-2deg)"
+    : "drop-shadow(0 18px 36px rgba(5,10,18,0.5)) sepia(0.22) saturate(0.7) brightness(0.88) contrast(1.06) hue-rotate(-5deg)";
+
   return (
     <section
+      ref={sectionRef}
       id="hero"
       aria-labelledby="stan-hero-title"
       className="relative flex min-h-[100svh] w-full scroll-mt-24 flex-col overflow-hidden text-[#F7F4EF] sm:scroll-mt-28"
       style={{ backgroundColor: "#050A12" }}
     >
-      {/* Atmosfera estádio */}
+      {/* Atmosfera estádio — grade navy / ouro unificado */}
       <div className="absolute inset-0">
         <Image
           src="/images/stan/hero/stadium-bg-desktop.png"
@@ -41,19 +84,44 @@ export function StanHeroSection() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[center_22%] opacity-60 scale-105"
+          className="object-cover object-[center_22%] opacity-55 scale-105 max-md:opacity-[0.48]"
+          style={{
+            filter: stadiumFilter,
+          }}
           aria-hidden
         />
         <div
           className="absolute inset-0"
           style={{
             background: `
-              radial-gradient(ellipse 42% 70% at 50% 0%, rgba(247,244,239,0.35) 0%, rgba(201,168,106,0.14) 28%, transparent 62%),
-              radial-gradient(ellipse 90% 50% at 50% 100%, rgba(5,10,18,0.95) 0%, transparent 55%),
-              linear-gradient(180deg, rgba(5,10,18,0.45) 0%, rgba(5,10,18,0.15) 30%, rgba(5,10,18,0.7) 68%, rgba(5,10,18,0.97) 100%)
+              radial-gradient(ellipse 42% 70% at 50% 0%, rgba(247,244,239,0.28) 0%, rgba(201,168,106,0.16) 28%, transparent 62%),
+              radial-gradient(ellipse 70% 55% at 50% 45%, rgba(11,19,43,0.35) 0%, transparent 70%),
+              radial-gradient(ellipse 90% 50% at 50% 100%, rgba(5,10,18,0.97) 0%, transparent 55%),
+              linear-gradient(180deg, rgba(5,10,18,0.55) 0%, rgba(5,10,18,0.22) 30%, rgba(5,10,18,0.72) 68%, rgba(5,10,18,0.98) 100%),
+              linear-gradient(90deg, rgba(5,10,18,0.35) 0%, transparent 22%, transparent 78%, rgba(5,10,18,0.35) 100%)
             `,
           }}
         />
+        {/* Véu de cor — une estádio + fotos no mesmo clima */}
+        <div
+          aria-hidden
+          className="absolute inset-0 mix-blend-soft-light opacity-70 max-md:opacity-75"
+          style={{
+            background:
+              "linear-gradient(165deg, rgba(201,168,106,0.22) 0%, rgba(11,19,43,0.45) 42%, rgba(5,10,18,0.55) 100%)",
+          }}
+        />
+        {/* Wash navy extra no mobile — só no estádio (as fotos têm grade próprio) */}
+        {!isDesktop ? (
+          <div
+            aria-hidden
+            className="absolute inset-0 mix-blend-color opacity-35"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(11,19,43,0.65) 0%, rgba(201,168,106,0.2) 42%, rgba(5,10,18,0.7) 100%)",
+            }}
+          />
+        ) : null}
       </div>
 
       {/* Feixe vertical de luz — como na referência */}
@@ -163,34 +231,36 @@ export function StanHeroSection() {
         </div>
       </div>
 
-      {/* Stage */}
-      <div className="relative z-20 flex min-h-0 w-full flex-1">
-        {/* Halo dourado atrás do sujeito */}
+      {/* Stage — colagem mobile; no desktop alarga para Stanley + fotos maiores */}
+      <div className="relative z-20 mx-auto min-h-0 w-full max-w-[26.5rem] flex-1 sm:max-w-[28rem] md:max-w-[36rem] lg:max-w-[40rem] [container-type:inline-size]">
+        {/* Halo dourado atrás do sujeito — mesma temperatura do estádio */}
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-[36%] h-[50%] w-[75%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          className="pointer-events-none absolute left-1/2 top-[34%] h-[48%] w-[min(88%,520px)] -translate-x-1/2 -translate-y-1/2 rounded-full md:top-[32%] md:h-[52%]"
           style={{
             background:
-              "radial-gradient(circle, rgba(201,168,106,0.4) 0%, rgba(247,244,239,0.08) 42%, transparent 70%)",
+              "radial-gradient(circle, rgba(201,168,106,0.38) 0%, rgba(11,19,43,0.22) 45%, rgba(5,10,18,0.08) 62%, transparent 72%)",
             filter: "blur(32px)",
           }}
         />
 
-        {/* BG — grande, suave, sob o feixe */}
+        {/* BG — suave, centrado atrás */}
         <motion.div
           aria-hidden
           initial={reduceMotion ? false : { opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5, ease: EASE }}
-          className="pointer-events-none absolute left-1/2 top-[-4%] z-[1] h-[84%] w-[200%] -translate-x-1/2 sm:top-[-2%] sm:h-[90%] sm:w-[160%] md:top-[-6%] md:h-[96%] md:w-[140%] lg:w-[125%]"
+          className="pointer-events-none absolute left-1/2 top-[-2%] z-[1] h-[72%] w-[170%] max-w-none -translate-x-1/2 md:top-[-18%] md:h-[78%] md:w-[160%] md:origin-[center_22%] md:scale-[1.55]"
           style={{
+            y: enableParallax ? bgY : 0,
             WebkitMaskImage:
               "linear-gradient(180deg, #000 0%, #000 48%, transparent 88%)",
             maskImage:
               "linear-gradient(180deg, #000 0%, #000 48%, transparent 88%)",
-            filter:
-              "drop-shadow(0 0 48px rgba(201,168,106,0.22)) saturate(0.7) brightness(0.9) contrast(1.05)",
-            opacity: 0.48,
+            filter: isDesktop
+              ? "drop-shadow(0 0 48px rgba(201,168,106,0.18)) sepia(0.42) saturate(0.48) brightness(0.72) contrast(1.08) hue-rotate(-6deg)"
+              : "drop-shadow(0 0 48px rgba(201,168,106,0.18)) sepia(0.48) saturate(0.42) brightness(0.68) contrast(1.1) hue-rotate(-8deg)",
+            opacity: isDesktop ? 0.38 : 0.34,
           }}
         >
           <Image
@@ -198,25 +268,25 @@ export function StanHeroSection() {
             alt=""
             fill
             priority
-            sizes="100vw"
+            sizes="(max-width: 640px) 100vw, 640px"
             className="object-contain object-[center_18%]"
           />
         </motion.div>
 
-        {/* MID — acção subordinada; no desktop sobe e estreita à direita */}
+        {/* MID — apoio à direita (atrás do título) */}
         <motion.div
           aria-hidden
           initial={reduceMotion ? false : { opacity: 0, x: 28 }}
-          animate={{ opacity: 0.72, x: 0 }}
+          animate={{ opacity: 0.7, x: 0 }}
           transition={{ duration: 1.2, delay: 0.18, ease: EASE }}
-          className="pointer-events-none absolute right-[-2%] top-[22%] z-[2] h-[46%] w-[56%] sm:right-[5%] sm:top-[18%] sm:h-[52%] sm:w-[42%] md:right-[9%] md:top-[11%] md:h-[58%] md:w-[34%] lg:right-[11%] lg:top-[8%] lg:h-[62%] lg:w-[30%] xl:right-[13%] xl:w-[28%]"
+          className="pointer-events-none absolute right-[-8%] top-[12%] z-[2] h-[54%] w-[62%] md:right-[-4%] md:top-[10%] md:h-[60%] md:w-[58%]"
           style={{
+            y: enableParallax ? midY : 0,
             WebkitMaskImage:
               "linear-gradient(180deg, #000 0%, #000 72%, transparent 100%)",
             maskImage:
               "linear-gradient(180deg, #000 0%, #000 72%, transparent 100%)",
-            filter:
-              "drop-shadow(0 14px 28px rgba(0,0,0,0.4)) drop-shadow(0 0 14px rgba(201,168,106,0.1)) saturate(0.82) brightness(0.93)",
+            filter: midFilter,
           }}
         >
           <Image
@@ -224,19 +294,152 @@ export function StanHeroSection() {
             alt=""
             fill
             priority
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 36vw, 28vw"
+            sizes="(max-width: 640px) 50vw, 320px"
             className="object-contain object-bottom"
           />
         </motion.div>
 
-        {/* FG — herói; desktop: mais centrado-esquerdo, acima do título */}
+        {/* Tipografia — Stan no mobile · Stanley no desktop */}
+        <div className="absolute inset-x-0 bottom-[10%] z-[5] flex flex-col items-center px-4 pb-1 text-center md:bottom-[9%]">
+          <motion.h1
+            id="stan-hero-title"
+            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.95, delay: 0.45, ease: EASE }}
+            className="relative inline-block font-display text-[clamp(5.25rem,36cqi,8.5rem)] font-semibold uppercase leading-[0.78] tracking-[-0.06em] md:text-[clamp(5.5rem,22cqi,7.75rem)] md:tracking-[-0.045em]"
+          >
+            {/* Sombra dura — navy/bronze */}
+            <span
+              aria-hidden
+              className="absolute inset-0 select-none"
+              style={{
+                color: "#1A1520",
+                transform: "translate(0.04em, 0.05em)",
+                opacity: 0.78,
+                textShadow: "0.03em 0.04em 0 rgba(12, 10, 18, 0.5)",
+              }}
+            >
+              <span className="md:hidden">Stan</span>
+              <span className="hidden md:inline">Stanley</span>
+            </span>
+            {/* Contorno prateado + ouro */}
+            <span
+              aria-hidden
+              className="absolute inset-0 select-none"
+              style={{
+                color: "transparent",
+                WebkitTextStroke: "0.018em rgba(201, 168, 106, 0.55)",
+                textShadow: `
+                  -0.012em -0.01em 0 rgba(232, 236, 242, 0.7),
+                  0.012em 0.01em 0 rgba(148, 163, 184, 0.45),
+                  0 0 0.06em rgba(201, 168, 106, 0.35),
+                  0.06em 0.08em 0.14em rgba(90, 72, 40, 0.4)
+                `,
+              }}
+            >
+              <span className="md:hidden">Stan</span>
+              <span className="hidden md:inline">Stanley</span>
+            </span>
+            {/* Face — branco Los Blancos + veios metálicos ouro/prata */}
+            <span
+              className="relative"
+              style={{
+                backgroundImage: `
+                  linear-gradient(
+                    168deg,
+                    #FFFFFF 0%,
+                    #F7F4EF 12%,
+                    #E8ECF2 22%,
+                    #FFFFFF 34%,
+                    #F2E6C9 42%,
+                    #FFFFFF 52%,
+                    #D4D8E0 62%,
+                    #FFFFFF 74%,
+                    #C9A86A 82%,
+                    #F7F4EF 90%,
+                    #FFFFFF 100%
+                  )
+                `,
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                WebkitTextStroke: "0.008em rgba(247, 244, 239, 0.5)",
+                filter: `
+                  drop-shadow(0 1px 0 rgba(255,255,255,0.55))
+                  drop-shadow(0 -1px 0 rgba(148,163,184,0.35))
+                  drop-shadow(0 0 0.5px rgba(201,168,106,0.4))
+                `,
+              }}
+            >
+              <span className="md:hidden">Stan</span>
+              <span className="hidden md:inline">Stanley</span>
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.62, duration: 0.75 }}
+            className="mt-1.5 font-body text-[10px] font-bold uppercase tracking-[0.44em] text-[#C9A86A] sm:mt-2 sm:text-[11px]"
+          >
+            Celebra 5 Anos
+          </motion.p>
+
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.78, duration: 0.75 }}
+            className="mt-3 flex items-end justify-center gap-4 sm:mt-4 sm:gap-6"
+          >
+            {/* Data — estilo stats: número grande + label */}
+            <div className="flex items-baseline gap-2">
+              <time
+                dateTime={STAN_EVENT.dateIso}
+                className="font-display text-[1.55rem] font-light leading-none tracking-tight text-[#F7F4EF] sm:text-[1.85rem]"
+              >
+                {matchDay}
+              </time>
+              <div className="flex flex-col items-start gap-0.5 pb-0.5">
+                <span className="font-body text-[8px] font-semibold uppercase leading-tight tracking-[0.22em] text-[#C9A86A] sm:text-[9px] sm:tracking-[0.24em]">
+                  Setembro 2026
+                </span>
+                <span className="font-body text-[7px] uppercase tracking-[0.28em] text-[#C9A86A]/70 sm:text-[8px]">
+                  Matchday
+                </span>
+              </div>
+            </div>
+
+            <span
+              className="mb-1 h-7 w-px bg-[#C9A86A]/25 sm:h-8"
+              aria-hidden
+            />
+
+            {/* Kick-off — mesmo ritmo tipográfico */}
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-[1.55rem] font-light leading-none tracking-tight text-[#F7F4EF] sm:text-[1.85rem]">
+                {kickHour}
+              </span>
+              <div className="flex flex-col items-start gap-0.5 pb-0.5">
+                <span className="max-w-[9.5rem] text-left font-body text-[8px] font-semibold uppercase leading-tight tracking-[0.16em] text-[#C9A86A] sm:max-w-none sm:text-[9px] sm:tracking-[0.2em]">
+                  h{String(STAN_EVENT.timeMinute).padStart(2, "0")} · {venueLine}
+                </span>
+                <span className="font-body text-[7px] uppercase tracking-[0.28em] text-[#C9A86A]/70 sm:text-[8px]">
+                  Kick-off
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* FG — herói central, ampliado no desktop */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1.15, delay: 0.32, ease: EASE }}
-          className="absolute bottom-[28%] left-[4%] z-[3] h-[46%] w-[66%] sm:bottom-[24%] sm:left-[12%] sm:h-[52%] sm:w-[44%] md:bottom-[17%] md:left-[16%] md:h-[60%] md:w-[38%] lg:bottom-[14%] lg:left-[19%] lg:h-[64%] lg:w-[34%] xl:left-[21%] xl:w-[32%]"
+          className="pointer-events-none absolute bottom-[24%] left-[-4%] z-[4] h-[56%] w-[76%] md:bottom-[28%] md:left-[-2%] md:h-[58%] md:w-[64%] lg:h-[60%] lg:w-[62%]"
           style={{
-            filter: "drop-shadow(0 28px 52px rgba(0,0,0,0.58))",
+            y: enableParallax ? fgY : 0,
+            filter: fgFilter,
             WebkitMaskImage:
               "linear-gradient(180deg, #000 0%, #000 88%, transparent 100%)",
             maskImage:
@@ -283,11 +486,11 @@ export function StanHeroSection() {
             />
 
             <Image
-              src="/images/stan/hero/poster-fg.png"
+              src="/images/stan/hero/poster-fg-cut.png"
               alt="Stan, o pequeno campeão"
               fill
               priority
-              sizes="(max-width: 640px) 72vw, 420px"
+              sizes="(max-width: 640px) 72vw, 520px"
               className="relative z-[1] object-contain object-bottom"
             />
             {/* Drop-shadow ouro localizado na bola */}
@@ -304,145 +507,28 @@ export function StanHeroSection() {
               }}
             >
               <Image
-                src="/images/stan/hero/poster-fg.png"
+                src="/images/stan/hero/poster-fg-cut.png"
                 alt=""
                 fill
-                sizes="(max-width: 640px) 72vw, 420px"
+                sizes="(max-width: 640px) 72vw, 520px"
                 className="object-contain object-bottom"
               />
             </div>
           </motion.div>
         </motion.div>
-
-        {/* Tipografia — sob as figuras; no desktop desce ligeiro para dar ar ao FG */}
-        <div className="absolute inset-x-0 bottom-[5%] z-30 flex flex-col items-center px-5 pb-1 text-center sm:bottom-[6%] md:bottom-[4.5%] lg:bottom-[3.5%]">
-          <motion.h1
-            id="stan-hero-title"
-            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.95, delay: 0.45, ease: EASE }}
-            className="relative inline-block font-display text-[clamp(8.5rem,36vw,19.5rem)] font-semibold uppercase leading-[0.78] tracking-[-0.06em] sm:text-[clamp(9.5rem,28vw,18rem)] md:text-[clamp(11rem,22vw,17rem)] lg:text-[clamp(12rem,18vw,16.5rem)]"
-          >
-            {/* Sombra dura — navy/bronze */}
-            <span
-              aria-hidden
-              className="absolute inset-0 select-none"
-              style={{
-                color: "#1A1520",
-                transform: "translate(0.04em, 0.05em)",
-                opacity: 0.78,
-                textShadow: "0.03em 0.04em 0 rgba(12, 10, 18, 0.5)",
-              }}
-            >
-              Stan
-            </span>
-            {/* Contorno prateado + ouro */}
-            <span
-              aria-hidden
-              className="absolute inset-0 select-none"
-              style={{
-                color: "transparent",
-                WebkitTextStroke: "0.018em rgba(201, 168, 106, 0.55)",
-                textShadow: `
-                  -0.012em -0.01em 0 rgba(232, 236, 242, 0.7),
-                  0.012em 0.01em 0 rgba(148, 163, 184, 0.45),
-                  0 0 0.06em rgba(201, 168, 106, 0.35),
-                  0.06em 0.08em 0.14em rgba(90, 72, 40, 0.4)
-                `,
-              }}
-            >
-              Stan
-            </span>
-            {/* Face — branco Los Blancos + veios metálicos ouro/prata */}
-            <span
-              className="relative"
-              style={{
-                backgroundImage: `
-                  linear-gradient(
-                    168deg,
-                    #FFFFFF 0%,
-                    #F7F4EF 12%,
-                    #E8ECF2 22%,
-                    #FFFFFF 34%,
-                    #F2E6C9 42%,
-                    #FFFFFF 52%,
-                    #D4D8E0 62%,
-                    #FFFFFF 74%,
-                    #C9A86A 82%,
-                    #F7F4EF 90%,
-                    #FFFFFF 100%
-                  )
-                `,
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-                WebkitTextStroke: "0.008em rgba(247, 244, 239, 0.5)",
-                filter: `
-                  drop-shadow(0 1px 0 rgba(255,255,255,0.55))
-                  drop-shadow(0 -1px 0 rgba(148,163,184,0.35))
-                  drop-shadow(0 0 0.5px rgba(201,168,106,0.4))
-                `,
-              }}
-            >
-              Stan
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.62, duration: 0.75 }}
-            className="mt-1.5 font-body text-[10px] font-bold uppercase tracking-[0.44em] text-[#C9A86A] sm:mt-2 sm:text-[11px]"
-          >
-            Celebra 5 Anos
-          </motion.p>
-
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.78, duration: 0.75 }}
-            className="mt-4 flex items-end justify-center gap-6 sm:mt-7 sm:gap-14"
-          >
-            {/* Data — estilo stats: número grande + label */}
-            <div className="flex items-baseline gap-2 sm:gap-3">
-              <time
-                dateTime={STAN_EVENT.dateIso}
-                className="font-display text-[1.75rem] font-light leading-none tracking-tight text-[#F7F4EF] sm:text-5xl"
-              >
-                {matchDay}
-              </time>
-              <div className="flex flex-col items-start gap-0.5 pb-0.5">
-                <span className="font-body text-[8px] font-semibold uppercase leading-tight tracking-[0.22em] text-[#C9A86A] sm:text-[10px] sm:tracking-[0.28em]">
-                  Setembro 2026
-                </span>
-                <span className="font-body text-[7px] uppercase tracking-[0.28em] text-[#C9A86A]/70 sm:text-[9px]">
-                  Matchday
-                </span>
-              </div>
-            </div>
-
-            <span
-              className="mb-1 hidden h-8 w-px bg-[#C9A86A]/25 sm:mb-2 sm:block sm:h-12"
-              aria-hidden
-            />
-
-            {/* Kick-off — mesmo ritmo tipográfico */}
-            <div className="flex items-baseline gap-2 sm:gap-3">
-              <span className="font-display text-[1.75rem] font-light leading-none tracking-tight text-[#F7F4EF] sm:text-5xl">
-                {kickHour}
-              </span>
-              <div className="flex flex-col items-start gap-0.5 pb-0.5">
-                <span className="font-body text-[8px] font-semibold uppercase leading-tight tracking-[0.22em] text-[#C9A86A] sm:text-[10px] sm:tracking-[0.28em]">
-                  h{String(STAN_EVENT.timeMinute).padStart(2, "0")} · {venueLine}
-                </span>
-                <span className="font-body text-[7px] uppercase tracking-[0.28em] text-[#C9A86A]/70 sm:text-[9px]">
-                  Kick-off
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
       </div>
+
+      {/* Véu unificador mobile — cobre colagem + estádio no mesmo clima */}
+      {!isDesktop ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[6] mix-blend-soft-light opacity-45"
+          style={{
+            background:
+              "linear-gradient(165deg, rgba(201,168,106,0.28) 0%, rgba(11,19,43,0.55) 48%, rgba(5,10,18,0.5) 100%)",
+          }}
+        />
+      ) : null}
 
       {/* Fade para a História — navy → bege editorial */}
       <div
