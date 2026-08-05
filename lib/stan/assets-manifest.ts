@@ -359,6 +359,18 @@ export const STAN_ASSETS_MANIFEST: StanAssetSpec[] = [
     status: "received",
     notes: "Licença / uso autorizado pela família para o convite Edition",
   },
+  {
+    id: "audio-whistle",
+    file: "/audio/stan/whistle.mp3",
+    purpose: "Apito curto (~0,3s) no toque do selo / botão do gate",
+    orientation: "landscape",
+    aspectRatio: "n/a",
+    minResolution: "n/a",
+    mobileVariantRequired: false,
+    focalPosition: "n/a",
+    status: "received",
+    notes: "SFX curto (~0,38s mono 48kbps) — derivado do pack Files Multifários",
+  },
 ];
 
 export function getStanAssetById(id: string): StanAssetSpec | undefined {

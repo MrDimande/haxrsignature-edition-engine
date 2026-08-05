@@ -13,6 +13,7 @@ import {
   STAN_EVENT,
   getStanVenueShortName,
 } from "@lib/stan/event-details";
+import { StanleyWordmark } from "./StanleyWordmark";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -299,82 +300,16 @@ export function StanHeroSection() {
           />
         </motion.div>
 
-        {/* Tipografia — Stan no mobile · Stanley no desktop */}
-        <div className="absolute inset-x-0 bottom-[10%] z-[5] flex flex-col items-center px-4 pb-1 text-center md:bottom-[9%]">
-          <motion.h1
-            id="stan-hero-title"
+        {/* Tipografia — STANLEY cream/camel (alinhado à capa) */}
+        <div className="absolute inset-x-0 bottom-[10%] z-[5] flex w-full flex-col items-center px-3 pb-1 text-center sm:px-4 md:bottom-[9%]">
+          <motion.div
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.95, delay: 0.45, ease: EASE }}
-            className="relative inline-block font-display text-[clamp(5.25rem,36cqi,8.5rem)] font-semibold uppercase leading-[0.78] tracking-[-0.06em] md:text-[clamp(5.5rem,22cqi,7.75rem)] md:tracking-[-0.045em]"
+            className="w-full max-w-full"
           >
-            {/* Sombra dura — navy/bronze */}
-            <span
-              aria-hidden
-              className="absolute inset-0 select-none"
-              style={{
-                color: "#1A1520",
-                transform: "translate(0.04em, 0.05em)",
-                opacity: 0.78,
-                textShadow: "0.03em 0.04em 0 rgba(12, 10, 18, 0.5)",
-              }}
-            >
-              <span className="md:hidden">Stan</span>
-              <span className="hidden md:inline">Stanley</span>
-            </span>
-            {/* Contorno prateado + ouro */}
-            <span
-              aria-hidden
-              className="absolute inset-0 select-none"
-              style={{
-                color: "transparent",
-                WebkitTextStroke: "0.018em rgba(201, 168, 106, 0.55)",
-                textShadow: `
-                  -0.012em -0.01em 0 rgba(232, 236, 242, 0.7),
-                  0.012em 0.01em 0 rgba(148, 163, 184, 0.45),
-                  0 0 0.06em rgba(201, 168, 106, 0.35),
-                  0.06em 0.08em 0.14em rgba(90, 72, 40, 0.4)
-                `,
-              }}
-            >
-              <span className="md:hidden">Stan</span>
-              <span className="hidden md:inline">Stanley</span>
-            </span>
-            {/* Face — branco Los Blancos + veios metálicos ouro/prata */}
-            <span
-              className="relative"
-              style={{
-                backgroundImage: `
-                  linear-gradient(
-                    168deg,
-                    #FFFFFF 0%,
-                    #F7F4EF 12%,
-                    #E8ECF2 22%,
-                    #FFFFFF 34%,
-                    #F2E6C9 42%,
-                    #FFFFFF 52%,
-                    #D4D8E0 62%,
-                    #FFFFFF 74%,
-                    #C9A86A 82%,
-                    #F7F4EF 90%,
-                    #FFFFFF 100%
-                  )
-                `,
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-                WebkitTextStroke: "0.008em rgba(247, 244, 239, 0.5)",
-                filter: `
-                  drop-shadow(0 1px 0 rgba(255,255,255,0.55))
-                  drop-shadow(0 -1px 0 rgba(148,163,184,0.35))
-                  drop-shadow(0 0 0.5px rgba(201,168,106,0.4))
-                `,
-              }}
-            >
-              <span className="md:hidden">Stan</span>
-              <span className="hidden md:inline">Stanley</span>
-            </span>
-          </motion.h1>
+            <StanleyWordmark size="hero" id="stan-hero-title" />
+          </motion.div>
 
           <motion.p
             initial={reduceMotion ? false : { opacity: 0 }}
