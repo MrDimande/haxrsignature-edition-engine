@@ -6,9 +6,13 @@ import { NianAudioControl } from "./NianAudioControl";
 import { NianOriginSection } from "./NianOrigin";
 import { NianMissionBriefSection } from "./NianMissionBrief";
 import { NianActionBeatSection } from "./NianActionBeat";
+import { NianUniformeSection } from "./NianUniforme";
+import { NianTeamUpSection } from "./NianTeamUp";
+import { NianSquadModeSection } from "./NianSquadMode";
 
 /**
- * Nian · NIGHT OF THE WEB — Fase 2A: Gate → Hero → Origin → Brief → Action.
+ * Nian · NIGHT OF THE WEB — Fase 2B:
+ * Gate → Hero → Origin → Brief → Action → Uniforme → Team-Up → Squad Mode.
  * Isolado a renderProfile "nian-night-of-the-web".
  */
 export function NianNightOfTheWebExperience() {
@@ -28,8 +32,12 @@ export function NianNightOfTheWebExperience() {
       <NianOriginSection />
       <NianMissionBriefSection />
       <NianActionBeatSection />
-      {/* Encerramento temporário — Fase 2B+ diferida */}
+      <NianUniformeSection />
+      <NianTeamUpSection />
+      <NianSquadModeSection />
+      {/* Encerramento temporário — Fase 2C (Local / Closing / RSVP) diferida */}
       <p
+        id="continua"
         className="px-5 pb-16 pt-6 text-center text-[9px] uppercase tracking-[0.36em] text-[#8FA3D1]/55"
         aria-hidden
       >
