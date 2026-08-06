@@ -16,29 +16,8 @@ import {
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 import { NianImageArtifactMask } from "./NianImageArtifactMask";
 
-function SubtleWeb({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden
-      className={className}
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <g fill="none" stroke="#F4F6FB" strokeWidth="0.12" opacity="0.28">
-        <path d="M0 18 L52 55 L100 12" />
-        <path d="M8 100 L50 48 L95 100" />
-        <path d="M0 55 L100 48" />
-      </g>
-      <g fill="none" stroke="#4169E1" strokeWidth="0.14" opacity="0.22">
-        <path d="M12 0 L50 52 L20 100" />
-      </g>
-    </svg>
-  );
-}
-
 /**
- * Action Beat — full-bleed rooftop intensity.
+ * Action Beat — full-bleed intensity (mobile) / dual-layer editorial (desktop).
  * Isolado a nian-night-of-the-web.
  */
 export function NianActionBeatSection() {
@@ -57,11 +36,6 @@ export function NianActionBeatSection() {
     [0, 1],
     reduceMotion ? [1, 1] : [1.03, 1]
   );
-  const webY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    reduceMotion ? [0, 0] : [10, -8]
-  );
   const copyY = useTransform(
     scrollYProgress,
     [0, 1],
@@ -77,51 +51,85 @@ export function NianActionBeatSection() {
       style={{ backgroundColor: NIAN_COLORS.bg }}
     >
       {image ? (
-        <motion.div className="absolute inset-0" style={{ scale: imgScale }}>
-          {/* Desktop support blur — avoids stretching small plate */}
-          <div className="absolute inset-0 hidden md:block" aria-hidden>
-            <Image
-              src={image.src}
-              alt=""
-              fill
-              sizes="100vw"
-              className="scale-110 object-cover opacity-50 blur-3xl"
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(ellipse 70% 60% at 50% 40%, transparent 0%, rgba(5,6,10,0.55) 100%)",
-              }}
-            />
-          </div>
-          <div className="absolute inset-0 md:inset-y-0 md:left-1/2 md:w-[min(100%,720px)] md:-translate-x-1/2">
+        <>
+          {/* —— Mobile: single full-bleed plate —— */}
+          <motion.div
+            className="absolute inset-0 md:hidden"
+            style={{ scale: imgScale }}
+          >
             <Image
               src={image.src}
               alt={image.alt}
               fill
               sizes={NIAN_CINEMATIC_SIZES}
-              className="object-cover object-[center_22%] md:object-[center_18%]"
+              className="object-cover object-[center_22%]"
               priority={false}
             />
             {image.hasCornerArtifact ? (
               <NianImageArtifactMask intensity="medium" />
             ) : null}
+          </motion.div>
+
+          {/* —— Desktop: blurred full-bleed + sharp vertical plate —— */}
+          <div className="absolute inset-0 z-0 hidden overflow-hidden md:block" aria-hidden>
+            <Image
+              src={image.src}
+              alt=""
+              fill
+              sizes="100vw"
+              className="scale-[1.1] object-cover object-center brightness-[0.85] saturate-[0.95] blur-[20px]"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `
+                  linear-gradient(90deg, rgba(3,5,11,0.4) 0%, rgba(3,5,11,0.05) 32%, rgba(3,5,11,0.05) 68%, rgba(3,5,11,0.4) 100%),
+                  radial-gradient(ellipse 85% 75% at 50% 35%, transparent 0%, rgba(3,5,11,0.28) 100%),
+                  linear-gradient(180deg, rgba(65,105,225,0.16) 0%, transparent 36%, rgba(3,5,11,0.42) 100%)
+                `,
+              }}
+            />
           </div>
-        </motion.div>
+
+          <motion.div
+            className="absolute inset-x-0 top-[2%] bottom-[14%] z-[1] hidden md:block"
+            style={{ scale: imgScale }}
+          >
+            <div className="relative mx-auto h-full w-[min(46vw,560px)] overflow-hidden rounded-[2px]">
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                sizes="(min-width: 768px) 46vw, 100vw"
+                className="object-cover object-[center_16%]"
+                priority={false}
+              />
+              {image.hasCornerArtifact ? (
+                <NianImageArtifactMask intensity="medium" />
+              ) : null}
+              {/* Soft edge integration — no hard letterbox bars */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  boxShadow:
+                    "inset 0 0 48px 18px rgba(3,5,11,0.55), inset 0 -40px 60px 10px rgba(3,5,11,0.65)",
+                }}
+              />
+            </div>
+          </motion.div>
+        </>
       ) : null}
 
-      <motion.div className="pointer-events-none absolute inset-0 z-[1]" style={{ y: webY }}>
-        <SubtleWeb className="h-full w-full opacity-70 mix-blend-screen" />
-      </motion.div>
+      {/* No radial SVG across the viewport — photo webs only */}
 
       {/* Controlled bottom wash — keep face/hands clear */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[58%]"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-[58%] md:h-[48%]"
         style={{
           background: `
-            linear-gradient(180deg, transparent 0%, rgba(5,6,10,0.35) 32%, rgba(5,6,10,0.88) 68%, #05060A 100%)
+            linear-gradient(180deg, transparent 0%, rgba(3,5,11,0.3) 32%, rgba(3,5,11,0.88) 68%, #03050b 100%)
           `,
         }}
       />
@@ -132,11 +140,7 @@ export function NianActionBeatSection() {
           aria-hidden
           className="pointer-events-none absolute inset-0 z-[2] mix-blend-soft-light"
           initial={{ opacity: 0 }}
-          animate={
-            inView
-              ? { opacity: [0, 0.35, 0.15] }
-              : undefined
-          }
+          animate={inView ? { opacity: [0, 0.35, 0.15] } : undefined}
           transition={{ duration: 2.4, ease: NIAN_EASE }}
           style={{
             background: `
@@ -146,8 +150,9 @@ export function NianActionBeatSection() {
         />
       ) : null}
 
+      {/* Typography — elevated above fixed audio control (~88×88 reserved) */}
       <motion.div
-        className="relative z-10 px-5 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-32 text-center sm:px-8 sm:pb-14"
+        className="relative z-10 px-5 pt-32 text-center sm:px-8 pb-[calc(env(safe-area-inset-bottom,0px)+7rem)]"
         style={{ y: copyY }}
       >
         <motion.p
@@ -162,11 +167,7 @@ export function NianActionBeatSection() {
         <div className="mx-auto mt-4 max-w-3xl overflow-hidden">
           <motion.h2
             id="nian-action-title"
-            initial={
-              reduceMotion
-                ? false
-                : { opacity: 0, y: "110%" }
-            }
+            initial={reduceMotion ? false : { opacity: 0, y: "110%" }}
             animate={inView ? { opacity: 1, y: "0%" } : undefined}
             transition={{ duration: 0.75, delay: 0.08, ease: NIAN_EASE }}
             className="text-[clamp(2.1rem,7vw,4rem)] font-semibold uppercase leading-[0.98] tracking-[0.05em] text-[#F4F6FB]"
@@ -182,7 +183,10 @@ export function NianActionBeatSection() {
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
           animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.65, delay: 0.22, ease: NIAN_EASE }}
-          className="mt-4 text-[clamp(0.95rem,2.5vw,1.25rem)] font-medium uppercase tracking-[0.28em] text-[#E10600]/90"
+          className="mt-4 text-[clamp(0.95rem,2.5vw,1.25rem)] font-medium uppercase text-[#E10600]/90"
+          style={{
+            letterSpacing: "clamp(0.18em, 0.55vw, 0.28em)",
+          }}
         >
           Nian entrou em acção.
         </motion.p>

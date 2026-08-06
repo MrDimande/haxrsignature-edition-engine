@@ -22,7 +22,7 @@ describe("nian assets-manifest", () => {
     assert.ok(origin);
     assert.equal(origin.src, NIAN_ASSET_PATHS.story.origin);
     assert.match(origin.alt, /Retrato editorial/);
-    assert.equal(origin.hasCornerArtifact, true);
+    assert.equal(origin.hasCornerArtifact, false);
   });
 
   it("registers spiderSquad without exposing a section yet", () => {

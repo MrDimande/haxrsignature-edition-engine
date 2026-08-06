@@ -14,10 +14,10 @@ import {
   NIAN_CINEMATIC_SIZES,
 } from "@lib/nian/assets-manifest";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
-import { NianImageArtifactMask } from "./NianImageArtifactMask";
 
 /**
  * Origin Beat — o menino por trás do herói.
+ * Artefacto inferior direito: crop por scale (overflow:hidden), não máscara.
  * Isolado a nian-night-of-the-web.
  */
 export function NianOriginSection() {
@@ -36,10 +36,10 @@ export function NianOriginSection() {
     [0, 1],
     reduceMotion ? [0, 0] : [18, -12]
   );
-  const imgScale = useTransform(
+  const scrollScale = useTransform(
     scrollYProgress,
     [0, 1],
-    reduceMotion ? [1, 1] : [1.02, 1]
+    reduceMotion ? [1, 1] : [1.01, 1]
   );
 
   return (
@@ -59,8 +59,8 @@ export function NianOriginSection() {
           animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.75, ease: NIAN_EASE }}
         >
+          {/* overflow:hidden + ~3.5% scale crop — hides bottom-right sparkle */}
           <div className="relative mx-auto aspect-[3/4] w-[min(100%,300px)] overflow-hidden md:w-full md:max-w-lg lg:max-w-none">
-            {/* Soft support plate — desktop without stretching small asset */}
             {image ? (
               <>
                 <div className="absolute inset-0 hidden md:block" aria-hidden>
@@ -73,27 +73,33 @@ export function NianOriginSection() {
                   />
                 </div>
                 <motion.div
-                  className="relative h-full w-full"
-                  style={{ scale: imgScale }}
+                  className="relative h-full w-full overflow-hidden"
+                  style={{ scale: scrollScale }}
                 >
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    sizes={NIAN_CINEMATIC_SIZES}
-                    className="object-cover object-[center_18%] md:object-[center_22%]"
-                    priority={false}
-                  />
+                  {/* Mild scale crop inside overflow — cinematic already sparkle-free */}
+                  <div
+                    className="absolute inset-0 overflow-hidden"
+                    style={{
+                      transform: "scale(1.03)",
+                      transformOrigin: "center top",
+                    }}
+                  >
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      sizes={NIAN_CINEMATIC_SIZES}
+                      className="object-cover object-[center_16%] md:object-[center_18%]"
+                      priority={false}
+                    />
+                  </div>
                 </motion.div>
-                {image.hasCornerArtifact ? (
-                  <NianImageArtifactMask intensity="soft" />
-                ) : null}
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0"
                   style={{
                     background:
-                      "linear-gradient(180deg, transparent 62%, rgba(5,6,10,0.55) 100%)",
+                      "linear-gradient(180deg, transparent 62%, rgba(3,5,11,0.55) 100%)",
                   }}
                 />
               </>
@@ -131,7 +137,7 @@ export function NianOriginSection() {
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={inView ? { opacity: 1, y: 0 } : undefined}
             transition={{ duration: 0.65, delay: 0.22, ease: NIAN_EASE }}
-            className="mt-6 space-y-4 text-[1.02rem] leading-relaxed text-[#8FA3D1] md:text-[1.08rem]"
+            className="mt-6 space-y-4 text-[1.02rem] leading-relaxed text-[#8FA3D1] md:text-[1.08rem] md:text-[#B0BED8]"
           >
             <p>
               Nesta noite, a cidade não pede salvação —

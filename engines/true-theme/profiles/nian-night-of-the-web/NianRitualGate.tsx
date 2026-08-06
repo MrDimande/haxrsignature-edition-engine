@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useLenis } from "lenis/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useExperience } from "../../context";
@@ -11,14 +11,18 @@ import {
   writeNianAudioPreference,
 } from "@lib/nian/event-details";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
+import "./nian-gate.css";
 
 const OPEN_MS = 1100;
+
+/** CTA enable delay from client mount — aligns with CSS step 4. */
+const CTA_READY_MS = 850;
 
 type GatePhase = "idle" | "ready" | "opening" | "exit";
 
 /**
  * Ritual dual — Entrar com música / Entrar sem música.
- * Áudio só inicia no gesture de “com música”.
+ * Copy stagger via CSS (nian-gate.css) from first paint.
  * Isolado a nian-night-of-the-web.
  */
 export function NianRitualGate() {
@@ -33,7 +37,8 @@ export function NianRitualGate() {
   const lenis = useLenis();
   const audioReady = isNianAudioReady(theme.audio.src);
   const [phase, setPhase] = useState<GatePhase>("idle");
-  const [reveal, setReveal] = useState(0);
+  const [ctasReady, setCtasReady] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const snapToTop = useCallback(() => {
@@ -44,6 +49,10 @@ export function NianRitualGate() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, [lenis]);
+
+  useLayoutEffect(() => {
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
     if (introComplete) return;
@@ -61,24 +70,20 @@ export function NianRitualGate() {
   }, [introComplete, snapToTop]);
 
   useEffect(() => {
-    if (introComplete) return;
-    if (reduceMotion) {
-      setReveal(3);
+    if (introComplete || !hydrated) return;
+    if (reduceMotion === true) {
+      setCtasReady(true);
       setPhase("ready");
       return;
     }
-    const t1 = window.setTimeout(() => setReveal(1), 220);
-    const t2 = window.setTimeout(() => setReveal(2), 640);
-    const t3 = window.setTimeout(() => {
-      setReveal(3);
+    const tCta = window.setTimeout(() => {
+      setCtasReady(true);
       setPhase("ready");
-    }, 1100);
+    }, CTA_READY_MS);
     return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
+      window.clearTimeout(tCta);
     };
-  }, [introComplete, reduceMotion]);
+  }, [introComplete, reduceMotion, hydrated]);
 
   useEffect(() => {
     if (introComplete || phase === "opening" || phase === "exit") return;
@@ -142,7 +147,7 @@ export function NianRitualGate() {
 
   if (introComplete) return null;
 
-  const ctasReady = phase === "ready" || reveal >= 3;
+  const interactive = phase === "ready" || ctasReady;
 
   return (
     <AnimatePresence>
@@ -152,6 +157,9 @@ export function NianRitualGate() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="nian-gate-title"
+          data-nian-gate=""
+          data-nian-hydrated={hydrated ? "true" : "false"}
+          data-nian-reduce={reduceMotion === true ? "true" : "false"}
           initial={{ opacity: 1 }}
           exit={
             reduceMotion
@@ -162,7 +170,6 @@ export function NianRitualGate() {
           className="fixed inset-0 z-[80] flex flex-col items-center justify-center overflow-hidden px-5"
           style={{ backgroundColor: NIAN_COLORS.bg }}
         >
-          {/* City night atmosphere */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
@@ -171,12 +178,11 @@ export function NianRitualGate() {
                 radial-gradient(ellipse 70% 50% at 50% 110%, rgba(65,105,225,0.28) 0%, transparent 55%),
                 radial-gradient(ellipse 40% 35% at 18% 30%, rgba(225,6,0,0.14) 0%, transparent 60%),
                 radial-gradient(ellipse 45% 40% at 82% 25%, rgba(65,105,225,0.16) 0%, transparent 55%),
-                linear-gradient(180deg, #05060A 0%, #0A0C14 48%, #05060A 100%)
+                linear-gradient(180deg, #03050b 0%, #0A0C14 48%, #03050b 100%)
               `,
             }}
           />
 
-          {/* Subtle web lines */}
           <svg
             aria-hidden
             className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.14]"
@@ -189,48 +195,34 @@ export function NianRitualGate() {
           </svg>
 
           <div className="relative z-10 flex w-full max-w-md flex-col items-center text-center">
-            <motion.p
+            <p
               id="nian-gate-eyebrow"
-              initial={false}
-              animate={{ opacity: reveal >= 1 ? 1 : 0, y: reveal >= 1 ? 0 : 10 }}
-              transition={{ duration: 0.55, ease: NIAN_EASE }}
+              data-gate-step="1"
               className="mb-4 text-[10px] font-semibold uppercase tracking-[0.42em] text-[#4169E1]"
             >
               A noite está a mudar
-            </motion.p>
+            </p>
 
-            <motion.h1
+            <h1
               id="nian-gate-title"
-              initial={false}
-              animate={{ opacity: reveal >= 2 ? 1 : 0, y: reveal >= 2 ? 0 : 14 }}
-              transition={{ duration: 0.65, ease: NIAN_EASE }}
+              data-gate-step="2"
               className="text-[clamp(2.1rem,8vw,3.25rem)] font-semibold uppercase leading-[0.95] tracking-[0.04em] text-[#F4F6FB]"
               style={{ fontFamily: "var(--font-jost), var(--font-montserrat), sans-serif" }}
             >
               Entra na cidade.
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={false}
-              animate={{ opacity: reveal >= 2 ? 1 : 0 }}
-              transition={{ duration: 0.6, delay: 0.08, ease: NIAN_EASE }}
+            <p
+              data-gate-step="3"
               className="mt-4 max-w-sm text-[0.95rem] leading-relaxed text-[#8FA3D1]"
             >
               Uma experiência para o aniversário do Nian.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={false}
-              animate={{
-                opacity: ctasReady ? 1 : 0,
-                y: ctasReady ? 0 : 16,
-              }}
-              transition={{ duration: 0.55, ease: NIAN_EASE }}
-              className="mt-10 flex w-full flex-col gap-3"
-            >
+            <div data-gate-step="4" className="mt-10 flex w-full flex-col gap-3">
               <button
                 type="button"
-                disabled={!ctasReady || busy}
+                disabled={!interactive || busy}
                 onClick={() => void completeGate("with-music")}
                 className="flex h-13 min-h-[3.25rem] w-full items-center justify-center rounded-sm border border-[#4169E1] bg-[#4169E1] px-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F4F6FB] transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4169E1] disabled:opacity-60"
               >
@@ -238,24 +230,22 @@ export function NianRitualGate() {
               </button>
               <button
                 type="button"
-                disabled={!ctasReady || busy}
+                disabled={!interactive || busy}
                 onClick={() => void completeGate("without-music")}
-                className="flex h-13 min-h-[3.25rem] w-full items-center justify-center rounded-sm border border-[#F4F6FB]/28 bg-transparent px-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F4F6FB] transition hover:border-[#F4F6FB]/55 hover:bg-[#F4F6FB]/05 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F4F6FB] disabled:opacity-60"
+                className="flex h-13 min-h-[3.25rem] w-full items-center justify-center rounded-sm border border-[#F4F6FB]/28 bg-transparent px-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F4F6FB] transition hover:border-[#F4F6FB]/55 hover:bg-[#F4F6FB]/05 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F4F6FB] disabled:opacity-60"
               >
                 Entrar sem música
               </button>
-            </motion.div>
+            </div>
 
-            <motion.p
-              initial={false}
-              animate={{ opacity: ctasReady ? 0.75 : 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+            <p
+              data-gate-step="5"
               className="mt-6 text-[9px] uppercase tracking-[0.32em] text-[#8FA3D1]"
             >
               {isNianAuthorizedTrackActive()
                 ? "Trilha — Sunflower · Spider-Verse"
                 : "Trilha — Sunflower · aguarda ficheiro autorizado"}
-            </motion.p>
+            </p>
           </div>
 
           {phase === "opening" && !reduceMotion ? (
