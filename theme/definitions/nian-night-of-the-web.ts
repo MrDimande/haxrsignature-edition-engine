@@ -34,10 +34,10 @@ export const nianNightOfTheWebTheme: TrueTheme = {
     audioStartMode: "explicit-user-choice",
     credit: {
       title: "Sunflower",
-      artist: "Post Malone, Swae Lee",
-      rightsHolder: "Spider-Man: Into the Spider-Verse · respectivos titulares",
+      artist: "Post Malone & Swae Lee",
+      rightsHolder: "Spider-Man: Into the Spider-Verse",
       disclaimer:
-        "Trilha de ambiente no convite apenas com ficheiro autorizado pela organização do evento. HAXR Signature não detém nem reivindica direitos sobre esta obra musical.",
+        "Trilha de ambiente no convite apenas com ficheiro autorizado pela organização do evento.",
     },
   },
   colors: {
