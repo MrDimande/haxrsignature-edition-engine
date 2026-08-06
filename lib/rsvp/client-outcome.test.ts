@@ -9,8 +9,16 @@ import { buildLocalRsvpSuccessBody } from "./local-response";
 
 describe("resolveRsvpClientOutcome", () => {
   it("trata envelope mínimo 200 como sucesso", () => {
-    const payload = buildLocalRsvpSuccessBody();
+    const payload = buildLocalRsvpSuccessBody(false);
     const outcome = resolveRsvpClientOutcome(true, payload);
+    assert.equal(outcome.kind, "success");
+  });
+
+  it("ignora persisted — clientes legados mantêm sucesso em 200", () => {
+    const outcome = resolveRsvpClientOutcome(
+      true,
+      buildLocalRsvpSuccessBody(false)
+    );
     assert.equal(outcome.kind, "success");
   });
 

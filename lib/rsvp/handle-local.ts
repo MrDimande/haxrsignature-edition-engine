@@ -139,6 +139,7 @@ export async function handleLocalRsvpPost(
             success: false,
             error:
               "Não foi possível registar a confirmação. Tente novamente em instantes.",
+            persisted: false,
           },
           { status: 502 }
         );
@@ -169,7 +170,7 @@ export async function handleLocalRsvpPost(
             guestEmailSent: Boolean(emailResult.guestSent),
           });
 
-          return NextResponse.json(buildLocalRsvpSuccessBody(), {
+          return NextResponse.json(buildLocalRsvpSuccessBody(false), {
             status: 200,
           });
         } catch (emailError) {
@@ -200,7 +201,9 @@ export async function handleLocalRsvpPost(
       guestEmailSent: false,
     });
 
-    return NextResponse.json(buildLocalRsvpSuccessBody(), { status: 200 });
+    return NextResponse.json(buildLocalRsvpSuccessBody(persisted), {
+      status: 200,
+    });
   } catch (error) {
     console.error("RSVP Server Error:", error);
     logStage(requestId, "complete", startedAt, 500, "server_error");
