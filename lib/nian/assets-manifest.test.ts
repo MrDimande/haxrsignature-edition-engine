@@ -25,7 +25,12 @@ describe("nian assets-manifest", () => {
     assert.equal(origin.hasCornerArtifact, false);
   });
 
-  it("registers spiderSquad without exposing a section yet", () => {
+  it("exposes teamUp and spiderSquad plates for phase 2b sections", () => {
+    const teamUp = getNianStoryImage("teamUp");
+    assert.ok(teamUp);
+    assert.equal(teamUp.src, NIAN_ASSET_PATHS.story.teamUp);
+    assert.match(teamUp.alt, /companheiro/);
+
     const squad = getNianStoryImage("spiderSquad");
     assert.ok(squad);
     assert.equal(squad.src, NIAN_ASSET_PATHS.story.spiderSquad);

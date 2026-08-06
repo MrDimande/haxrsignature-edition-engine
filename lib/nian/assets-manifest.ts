@@ -161,8 +161,8 @@ export const NIAN_ASSETS_MANIFEST: NianAssetSpec[] = [
   {
     id: "story-spider-squad",
     file: NIAN_ASSET_PATHS.story.spiderSquad,
-    purpose: "Spider Squad — Foto 3 (secção ainda não implementada)",
-    section: "spider-squad",
+    purpose: "Squad Mode — Foto 3",
+    section: "squad-mode",
     orientation: "portrait",
     aspectRatio: "3:4",
     status: "received",
@@ -171,7 +171,7 @@ export const NIAN_ASSETS_MANIFEST: NianAssetSpec[] = [
     height: 1024,
     hasCornerArtifact: true,
     notes:
-      "Master: originals/nian-gallery-alt-master.png. Não usar no Hero. Secção diferida.",
+      "Master: originals/nian-gallery-alt-master.png. UI label: Squad Mode. Sem logos oficiais.",
   },
   {
     id: "gallery-alt-master",
