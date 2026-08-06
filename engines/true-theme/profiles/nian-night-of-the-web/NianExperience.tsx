@@ -9,10 +9,13 @@ import { NianActionBeatSection } from "./NianActionBeat";
 import { NianUniformeSection } from "./NianUniforme";
 import { NianTeamUpSection } from "./NianTeamUp";
 import { NianSquadModeSection } from "./NianSquadMode";
+import { NianLocationSection } from "./NianLocation";
+import { NianClosingSection } from "./NianClosing";
+import { NianRsvpSection } from "./NianRsvp";
 
 /**
- * Nian · NIGHT OF THE WEB — Fase 2B:
- * Gate → Hero → Origin → Brief → Action → Uniforme → Team-Up → Squad Mode.
+ * Nian · NIGHT OF THE WEB — Fase 2C:
+ * … → Squad Mode → Localização → Closing → RSVP.
  * Isolado a renderProfile "nian-night-of-the-web".
  */
 export function NianNightOfTheWebExperience() {
@@ -35,14 +38,9 @@ export function NianNightOfTheWebExperience() {
       <NianUniformeSection />
       <NianTeamUpSection />
       <NianSquadModeSection />
-      {/* Encerramento temporário — Fase 2C (Local / Closing / RSVP) diferida */}
-      <p
-        id="continua"
-        className="px-5 pb-16 pt-6 text-center text-[9px] uppercase tracking-[0.36em] text-[#8FA3D1]/55"
-        aria-hidden
-      >
-        Continua em breve
-      </p>
+      <NianLocationSection />
+      <NianClosingSection />
+      <NianRsvpSection />
     </div>
   );
 }
