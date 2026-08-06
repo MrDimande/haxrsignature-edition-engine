@@ -17,7 +17,7 @@ export const STAN_EVENT = {
   subtitle: "O Quinto Acto de um Pequeno Campeão",
   calendarTitle: "5º Aniversário do Stan — O Quinto Acto de um Pequeno Campeão",
   calendarDescription:
-    "Venha celebrar o 5º Aniversário do Stan na Residência do S5 (Belo Horizonte, Maputo)! 11h00–15h00. Kit Matchday: navy, azul, cream e areia. Uma tarde de alegria e memórias preciosas.",
+    "Venha celebrar o 5º Aniversário do Stan na Residência dos avós do S5 (Belo Horizonte, Maputo)! 11h00–15h00. Kit Matchday: navy, azul, cream e areia. Uma tarde de alegria e memórias preciosas.",
   dateIso: "2026-09-12",
   /** Hora local Maputo (Africa/Maputo) */
   timeLabel: "11h00",
@@ -37,7 +37,7 @@ export const STAN_EVENT = {
 
 export type StanFieldStatus = "pending" | "confirmed";
 
-/** Coordenadas — Residência do S5 · Belo Horizonte
+/** Coordenadas — Residência dos avós do S5 · Belo Horizonte
  * 26°01'42.4"S 32°23'53.0"E
  */
 export const STAN_VENUE_COORDS = {
@@ -57,7 +57,7 @@ function buildStanMapLinks(lat: number, lng: number, label: string) {
   } as const;
 }
 
-/** Local — Residência do S5 · Belo Horizonte (Maputo) */
+/** Local — Residência dos avós do S5 · Belo Horizonte (Maputo) */
 export const STAN_VENUE: {
   status: StanFieldStatus;
   name: string | null;
@@ -72,22 +72,22 @@ export const STAN_VENUE: {
   pendingLabel: string;
 } = {
   status: "confirmed",
-  name: "Residência do S5",
+  name: "Residência dos avós do S5",
   shortName: "Belo Horizonte",
   address: "Belo Horizonte · Maputo, Moçambique",
-  directions: "Residência do S5 — bairro Belo Horizonte, Maputo.",
+  directions: "Residência dos avós do S5 — bairro Belo Horizonte, Maputo.",
   mapCoordinates: `${STAN_VENUE_COORDS.lat},${STAN_VENUE_COORDS.lng}`,
   lat: STAN_VENUE_COORDS.lat,
   lng: STAN_VENUE_COORDS.lng,
   mapsUrl: buildStanMapLinks(
     STAN_VENUE_COORDS.lat,
     STAN_VENUE_COORDS.lng,
-    "Residência do S5 · Belo Horizonte"
+    "Residência dos avós do S5 · Belo Horizonte"
   ).google,
   mapLinks: buildStanMapLinks(
     STAN_VENUE_COORDS.lat,
     STAN_VENUE_COORDS.lng,
-    "Residência do S5 · Belo Horizonte"
+    "Residência dos avós do S5 · Belo Horizonte"
   ),
   pendingLabel: "Localização a confirmar · Maputo",
 };
@@ -121,7 +121,7 @@ export const STAN_DRESS_CODE: {
 
 /**
  * RSVP — prazo e acompanhantes.
- * deadlineIso null = não mostrar prazo inventado ao convidado.
+ * deadlineIso: data limite (fim do dia, Maputo / CAT).
  */
 export const STAN_RSVP = {
   title: "Estreia do Big 5",
@@ -129,8 +129,8 @@ export const STAN_RSVP = {
     "Você está na lista de convocados do S5. Confirme a sua presença na estreia do pequeno campeão.",
   closing:
     "Você está na lista de convocados do S5. Confirme a sua presença na estreia do pequeno campeão.",
-  deadlineIso: null as string | null,
-  deadlineLabel: null as string | null,
+  deadlineIso: "2026-08-28",
+  deadlineLabel: "28 de Agosto de 2026",
   /** Máximo de acompanhantes além do convidado principal */
   maxCompanions: 4,
   /** Exige nomes dos acompanhantes quando companions > 0 */
