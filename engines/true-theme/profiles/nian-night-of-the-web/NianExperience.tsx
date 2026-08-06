@@ -14,9 +14,10 @@ import { NianActionBeatSection } from "./NianActionBeat";
 export function NianNightOfTheWebExperience() {
   return (
     <div
-      className="w-full min-h-screen bg-[#05060A] text-[#F4F6FB]"
+      className="w-full min-h-screen text-[#F4F6FB]"
       data-render-profile="nian-night-of-the-web"
       style={{
+        backgroundColor: "#03050b",
         fontFamily:
           "var(--font-montserrat), var(--font-jost), system-ui, sans-serif",
       }}

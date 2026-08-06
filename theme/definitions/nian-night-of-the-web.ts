@@ -44,10 +44,10 @@ export const nianNightOfTheWebTheme: TrueTheme = {
     primary: "#F4F6FB",
     secondary: "#8FA3D1",
     accent: "#4169E1",
-    background: "#05060A",
+    background: "#03050b",
   },
   palette: {
-    bgBase: "#05060A",
+    bgBase: "#03050b",
     textPrimary: "text-[#F4F6FB]",
     textSecondary: "text-[#8FA3D1]",
     accent: "#4169E1",

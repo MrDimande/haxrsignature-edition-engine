@@ -66,13 +66,31 @@ export function NianMissionBriefSection() {
         style={{
           background: `
             radial-gradient(ellipse 55% 45% at 50% 0%, rgba(65,105,225,0.16) 0%, transparent 60%),
-            radial-gradient(ellipse 40% 35% at 85% 70%, rgba(225,6,0,0.08) 0%, transparent 55%),
-            linear-gradient(180deg, #05060A 0%, #070912 50%, #05060A 100%)
+            radial-gradient(ellipse 42% 38% at 92% 88%, rgba(225,6,0,0.11) 0%, transparent 58%),
+            linear-gradient(180deg, #03050b 0%, #070912 50%, #03050b 100%)
           `,
         }}
       />
 
-      <div className="relative mx-auto flex min-h-[100svh] w-full max-w-3xl flex-col justify-center px-5 py-20 md:px-10 md:py-28">
+      {/* Oversized date numeral — atmospheric only */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-[8%] top-[8%] z-0 select-none md:-right-[4%] md:top-[4%]"
+        style={{
+          fontFamily: "var(--font-jost), var(--font-montserrat), sans-serif",
+          fontSize: "clamp(14rem, 42vw, 28rem)",
+          fontWeight: 700,
+          lineHeight: 0.85,
+          letterSpacing: "-0.06em",
+          color: "transparent",
+          WebkitTextStroke: "1.5px rgba(65,105,225,0.9)",
+          opacity: 0.026,
+        }}
+      >
+        12
+      </div>
+
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-3xl flex-col justify-start px-5 pb-20 pt-16 sm:justify-center sm:py-20 md:px-10 md:py-28">
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           animate={inView ? { opacity: 1, y: 0 } : undefined}
@@ -97,7 +115,7 @@ export function NianMissionBriefSection() {
           tudo acontece.
         </motion.h2>
 
-        <div className="mt-12 md:mt-14">
+        <div className="mt-10 md:mt-14">
           <BriefLine
             label="Quando"
             value={NIAN_EVENT.dateDisplayShort}

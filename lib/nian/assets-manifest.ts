@@ -37,7 +37,7 @@ export const NIAN_ASSET_PATHS = {
     og: "/images/nian/social/nian-og.png",
   },
   story: {
-    origin: "/images/nian/cinematic/nian-origin.webp",
+    origin: "/images/nian/cinematic/nian-origin-v2.webp",
     action: "/images/nian/cinematic/nian-action.webp",
     teamUp: "/images/nian/cinematic/nian-team-up.webp",
     closing: "/images/nian/cinematic/nian-closing.webp",
@@ -115,7 +115,9 @@ export const NIAN_ASSETS_MANIFEST: NianAssetSpec[] = [
     alt: NIAN_ASSET_ALTS.origin,
     width: 687,
     height: 1024,
-    hasCornerArtifact: true,
+    hasCornerArtifact: false,
+    notes:
+      "Cinematic: right-edge crop from master to remove floor sparkle. Master untouched.",
   },
   {
     id: "story-action",
