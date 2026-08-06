@@ -88,7 +88,8 @@ describe("nian RSVP contract reuse", () => {
     });
     assert.equal(result.ok, true);
     if (result.ok) {
-      assert.equal(result.slug, "nian");
+      // Client sends "nian"; server resolves to public canonical route slug
+      assert.equal(result.slug, "nianwebnight");
       assert.equal(result.submission.attending, true);
       assert.equal(result.submission.guests, 1);
     }

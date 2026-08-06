@@ -17,7 +17,6 @@ import {
   NIAN_RSVP_NOT_PERSISTED_MESSAGE,
   shouldAcceptNianRsvpSuccess,
 } from "@lib/nian/rsvp-persist";
-import { useExperience } from "../../context";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 
 const RSVP_FETCH_TIMEOUT_MS = 30_000;
@@ -83,9 +82,8 @@ function loadLocal(slug: string): NianRsvpLocalRecord | null {
  * Isolado a nian-night-of-the-web.
  */
 export function NianRsvpSection() {
-  const { config } = useExperience();
   const reduceMotion = useReducedMotion();
-  const slug = config.slug || NIAN_SLUG;
+  const slug = NIAN_SLUG;
   const formId = useId();
 
   const [form, setForm] = useState<FormState>(initialForm);

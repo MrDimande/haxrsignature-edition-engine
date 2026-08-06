@@ -280,13 +280,18 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       expectedRegistryKey: "stan-real-madrid",
     },
   },
-  nian: {
-    slug: "nian",
-    aliases: ["nightoftheweb", "convite-nian", "nian-night-of-the-web"],
+  nianwebnight: {
+    slug: "nianwebnight",
+    aliases: [
+      "nian",
+      "nightoftheweb",
+      "convite-nian",
+      "nian-night-of-the-web",
+    ],
     engine: "theme",
     theme: "nian-night-of-the-web",
     experienceType: "editorial",
-    sourcePath: "/nian",
+    sourcePath: "/nianwebnight",
     legacyFolder: "nian",
     status: "active",
     metadata: {
@@ -348,6 +353,8 @@ export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
   "jessica-samuel": "jessicasamuelwedding",
   /** Stan — rota antiga → canónica /stanturns5 */
   stan: "stanturns5",
+  /** Nian — rota antiga → canónica /nianwebnight */
+  nian: "nianwebnight",
 };
 
 export const ALIAS_INDEX: Record<string, string> = {};
