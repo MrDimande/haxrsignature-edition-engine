@@ -532,7 +532,11 @@ function ActCardMosaic({ act }: { act: StanStoryAct }) {
           <Reveal delay={0.14} className="sm:col-span-5">
             <StoryImage
               image={a}
-              className="aspect-[16/10] w-full"
+              className={
+                a.orientation === "landscape"
+                  ? "aspect-[16/10] w-full"
+                  : "aspect-[3/4] w-full sm:aspect-[4/5]"
+              }
               sizes="(max-width: 640px) 100vw, 40vw"
             />
           </Reveal>
@@ -541,7 +545,11 @@ function ActCardMosaic({ act }: { act: StanStoryAct }) {
           <Reveal delay={0.2} className="sm:col-span-5">
             <StoryImage
               image={b}
-              className="aspect-square w-full sm:aspect-[4/5]"
+              className={
+                b.orientation === "landscape"
+                  ? "aspect-[16/10] w-full"
+                  : "aspect-[3/4] w-full sm:aspect-[4/5]"
+              }
               sizes="(max-width: 640px) 100vw, 35vw"
             />
           </Reveal>
