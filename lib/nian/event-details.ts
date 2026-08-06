@@ -163,7 +163,7 @@ export const NIAN_AUDIO_PATHS = {
  * Flip to `true` only when the organisation-supplied authorised file
  * is committed at `NIAN_AUDIO_PATHS.authorized`.
  */
-export const NIAN_AUDIO_AUTHORIZED = false;
+export const NIAN_AUDIO_AUTHORIZED = true;
 
 export function resolveNianAudioSrc(): string {
   return NIAN_AUDIO_AUTHORIZED
