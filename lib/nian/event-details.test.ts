@@ -25,11 +25,11 @@ describe("nian event-details", () => {
     assert.equal(shouldShowNianEventTime(), false);
   });
 
-  it("resolves placeholder audio until authorised flag is true", () => {
-    assert.equal(NIAN_AUDIO_AUTHORIZED, false);
+  it("uses authorised sunflower track when flag is enabled", () => {
+    assert.equal(NIAN_AUDIO_AUTHORIZED, true);
     assert.equal(
       resolveNianAudioSrc(),
-      "/audio/nian/sunflower-placeholder.mp3"
+      "/audio/nian/sunflower-authorized.mp3"
     );
   });
 
@@ -116,7 +116,7 @@ describe("nian-night-of-the-web theme", () => {
     assert.equal(theme.renderProfile, "nian-night-of-the-web");
     assert.equal(theme.audio.audioStartMode, "explicit-user-choice");
     assert.equal(theme.audio.loop, false);
-    assert.equal(theme.audio.src, "/audio/nian/sunflower-placeholder.mp3");
+    assert.equal(theme.audio.src, "/audio/nian/sunflower-authorized.mp3");
   });
 
   it("does not change stan audio start defaults", () => {
