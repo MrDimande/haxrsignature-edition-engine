@@ -64,6 +64,11 @@ describe("invitation allowlist / slug resolution", () => {
       resolveActiveInvitationSlug("jessicabridetobe"),
       "cha-de-panela"
     );
+    assert.equal(resolveActiveInvitationSlug("nian"), "nianwebnight");
+    assert.equal(
+      resolveActiveInvitationSlug("nianwebnight"),
+      "nianwebnight"
+    );
   });
 
   it("mantém chaves de registry esperadas para convites Edition críticos", () => {
@@ -78,6 +83,10 @@ describe("invitation allowlist / slug resolution", () => {
     assert.equal(
       INVITATIONS.jessicasamuelwedding.admin?.expectedRegistryKey,
       "jessica-samuel-wedding"
+    );
+    assert.equal(
+      INVITATIONS.nianwebnight.admin?.expectedRegistryKey,
+      "nian-night-of-the-web"
     );
   });
 });
