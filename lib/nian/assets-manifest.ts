@@ -192,7 +192,7 @@ export const NIAN_ASSETS_MANIFEST: NianAssetSpec[] = [
     section: "audio",
     orientation: "landscape",
     aspectRatio: "n/a",
-    status: "pending",
+    status: "received",
   },
   {
     id: "audio-sunflower-placeholder",

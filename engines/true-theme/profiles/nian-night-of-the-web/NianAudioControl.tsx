@@ -10,6 +10,7 @@ import {
   readNianAudioPreference,
 } from "@lib/nian/event-details";
 import { NIAN_EASE } from "./nian-motion";
+import { NianSoundtrackCredits } from "./NianSoundtrackCredits";
 
 function AudioGlyph({
   mode,
@@ -110,12 +111,13 @@ export function NianAudioControl() {
         }
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.4, ease: NIAN_EASE }}
-        className="pointer-events-none fixed z-[55]"
+        className="pointer-events-none fixed z-[55] flex flex-col items-start gap-2"
         style={{
           left: "max(0.75rem, env(safe-area-inset-left))",
           bottom: "max(1rem, env(safe-area-inset-bottom))",
         }}
       >
+        <NianSoundtrackCredits />
         <button
           type="button"
           onClick={() => void toggle()}
