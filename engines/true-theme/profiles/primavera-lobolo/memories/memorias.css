@@ -1,0 +1,51 @@
+/* Estilos isolados para a experiência Memórias do Nosso Dia (Primavera Lobolo) */
+
+.memorias-container {
+  background-color: #F5EDE4;
+  color: #2A1810;
+  min-h-screen: 100vh;
+}
+
+.memorias-card {
+  background-color: #FBF6F0;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  box-shadow: 0 4px 20px rgba(42, 24, 16, 0.04);
+}
+
+.memorias-card-completed {
+  background-color: #F3DFD0;
+  border-color: rgba(196, 92, 38, 0.4);
+}
+
+.memorias-badge-pending {
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  color: #9E4218;
+  background-color: rgba(201, 162, 39, 0.08);
+}
+
+.memorias-badge-completed {
+  background-color: #C45C26;
+  color: #FBF6F0;
+}
+
+.memorias-button-primary {
+  background-color: #C45C26;
+  color: #FBF6F0;
+  box-shadow: 0 4px 16px rgba(196, 92, 38, 0.25);
+  transition: all 0.3s ease;
+}
+
+.memorias-button-primary:hover {
+  background-color: #9E4218;
+}
+
+.memorias-button-outline {
+  border: 1px solid #C9A227;
+  color: #2A1810;
+  background-color: rgba(255, 250, 245, 0.6);
+  transition: all 0.3s ease;
+}
+
+.memorias-button-outline:hover {
+  background-color: rgba(201, 162, 39, 0.12);
+}
