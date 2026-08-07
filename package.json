@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts",
+    "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts lib/jessica-samuel-traditional/memories/isolation.test.ts",
     "typecheck": "tsc --noEmit",
     "secret-scan": "node scripts/secret-scan.mjs",
     "smoke:rsvp-reminders": "node scripts/smoke-rsvp-reminders.mjs",

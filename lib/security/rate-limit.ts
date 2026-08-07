@@ -27,6 +27,10 @@ export const RATE_LIMITS = {
   jessicaSamuelPhotoIntent: { max: 5, windowMs: 15 * 60 * 1000 },
   /** Jessica & Samuel photo wall — upload completion */
   jessicaSamuelPhotoComplete: { max: 8, windowMs: 15 * 60 * 1000 },
+  /** Traditional wedding memories — signed upload intent */
+  memoriesIntent: { max: 10, windowMs: 15 * 60 * 1000 },
+  /** Traditional wedding memories — upload completion */
+  memoriesComplete: { max: 15, windowMs: 15 * 60 * 1000 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 function pruneExpiredBuckets(now: number): void {

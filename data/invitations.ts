@@ -35,6 +35,12 @@ export interface InvitationAdminBinding {
   expectedRegistryKey?: string;
 }
 
+export interface InvitationFeatures {
+  memories?: {
+    enabled: boolean;
+  };
+}
+
 export interface InvitationConfig {
   slug: string;
   aliases?: string[];
@@ -46,6 +52,7 @@ export interface InvitationConfig {
   status: InvitationStatus;
   metadata: InvitationMetadata;
   admin?: InvitationAdminBinding;
+  features?: InvitationFeatures;
 }
 
 export const INVITATIONS: Record<string, InvitationConfig> = {
@@ -130,6 +137,11 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       adminEventName: "Edition · Casamento Tradicional · Jessica & Samuel",
       envVar: "EDITION_EVENT_JESSICA_TRADITIONAL_ID",
       expectedRegistryKey: "traditional-wedding",
+    },
+    features: {
+      memories: {
+        enabled: true,
+      },
     },
   },
   /**
