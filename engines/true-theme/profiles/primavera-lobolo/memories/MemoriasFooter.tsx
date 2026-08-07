@@ -19,12 +19,12 @@ export function MemoriasFooter() {
             className="inline-block transition-transform hover:scale-[1.02]"
             aria-label={`${HAXR_AUTH.brand} — site oficial`}
           >
-            <div className="relative w-44 h-12 sm:w-56 sm:h-14 mx-auto">
+            <div className="relative w-56 h-20 sm:w-72 sm:h-24 mx-auto my-1">
               <Image
                 src={HAXR_AUTH.assets.logoHorizontal}
                 alt={HAXR_AUTH.brand}
                 fill
-                sizes="224px"
+                sizes="288px"
                 className="object-contain object-center"
               />
             </div>
@@ -33,15 +33,12 @@ export function MemoriasFooter() {
           <WovenDivider className="w-44 h-3 opacity-70" color="#C9A227" />
         </div>
 
-        {/* Marca & Assinatura de Alta-Costura */}
+        {/* Assinatura de Alta-Costura */}
         <div className="space-y-1">
           <p className="font-display text-[10px] sm:text-[11px] font-medium tracking-[0.45em] uppercase text-[#C45C26]">
             ALTA-COSTURA DIGITAL
           </p>
-          <h4 className="font-display text-lg sm:text-xl font-light text-[#2A1810] tracking-wide">
-            Alta-Costura Digital
-          </h4>
-          <p className="font-body text-xs text-[#4A3020]/75 italic max-w-md mx-auto">
+          <p className="font-body text-xs sm:text-sm text-[#4A3020]/80 italic max-w-md mx-auto">
             "Engenharia de experiências digitais de luxo, desenhadas à medida com precisão, arte e sofisticação cerimonial."
           </p>
         </div>
