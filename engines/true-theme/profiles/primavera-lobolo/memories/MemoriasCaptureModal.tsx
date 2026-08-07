@@ -222,12 +222,44 @@ export function MemoriasCaptureModal({
                       </button>
                     </div>
 
+                    {/* Campo de legenda/mensagem pessoal com emojis */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[10px] tracking-[0.2em] uppercase text-[#4A3020]/75">
+                        Mensagem / Legenda (opcional)
+                      </label>
+                      <textarea
+                        rows={2}
+                        maxLength={240}
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                        placeholder="Ex: Um brinde à felicidade do casal! 🥂❤️"
+                        className="w-full px-3 py-2 text-sm rounded border border-[#C9A227]/40 bg-[#F5EDE4] text-[#2A1810] focus:outline-none focus:ring-1 focus:ring-[#C45C26] resize-none"
+                      />
+                      {/* Picker rápido de Emojis */}
+                      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5">
+                        <span className="text-[9px] uppercase tracking-wider text-[#4A3020]/60 shrink-0 mr-1">
+                          Emojis:
+                        </span>
+                        {["🥂", "❤️", "🎉", "👏", "💍", "🍾", "✨", "🥳"].map((emoji) => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => setCaption((prev) => prev + emoji)}
+                            className="p-1 text-base hover:scale-125 transition-transform bg-[#F5EDE4] rounded border border-[#C9A227]/20 shrink-0"
+                            title={`Adicionar ${emoji}`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Campo discreto opcional de nome */}
                     {!showNameField ? (
                       <button
                         type="button"
                         onClick={() => setShowNameField(true)}
-                        className="text-xs text-[#C45C26] hover:underline font-body transition-all"
+                        className="text-xs text-[#C45C26] hover:underline font-body transition-all block"
                       >
                         + Quer assinar esta memória? (opcional)
                       </button>

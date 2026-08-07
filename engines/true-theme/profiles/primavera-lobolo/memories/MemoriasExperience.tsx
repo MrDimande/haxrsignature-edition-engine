@@ -14,6 +14,7 @@ import {
   markChallengeCompleted,
   type MemoryChallenge,
 } from "./memorias-challenges";
+import { MemoriasToast } from "./MemoriasToast";
 import { MemoriasFooter } from "./MemoriasFooter";
 
 interface MemoriasExperienceProps {
@@ -57,6 +58,9 @@ export function MemoriasExperience({
 
   return (
     <div className="memorias-container min-h-screen pb-16">
+      {/* Notificação Flutuante estilo iOS com Provocação Social */}
+      <MemoriasToast slug={config.slug} refreshTrigger={galleryRefreshTrigger} />
+
       <MemoriasIntro tableId={tableId} />
 
       <MemoriasChallengeGrid

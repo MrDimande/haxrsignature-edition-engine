@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Play, X, Filter, Camera, User } from "lucide-react";
+import { Play, X, Filter, Camera, User, Download, Share2, Check } from "lucide-react";
 import type { PublicMemoryItem } from "@lib/jessica-samuel-traditional/memories/gallery";
 import { MEMORY_CHALLENGES } from "./memorias-challenges";
 
@@ -16,6 +16,8 @@ export function MemoriasLiveGallery({ slug, refreshTrigger = 0 }: MemoriasLiveGa
   const [loading, setLoading] = useState(true);
   const [selectedChallengeFilter, setSelectedChallengeFilter] = useState<string | null>(null);
   const [activeLightboxItem, setActiveLightboxItem] = useState<PublicMemoryItem | null>(null);
+  const [downloading, setDownloading] = useState(false);
+  const [copiedShare, setCopiedShare] = useState(false);
 
   const fetchMemories = async () => {
     try {
@@ -34,6 +36,57 @@ export function MemoriasLiveGallery({ slug, refreshTrigger = 0 }: MemoriasLiveGa
   useEffect(() => {
     fetchMemories();
   }, [slug, refreshTrigger]);
+
+  const handleDownload = async (item: PublicMemoryItem) => {
+    try {
+      setDownloading(true);
+      const response = await fetch(item.signedUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const ext = item.kind === "video" ? "mp4" : "jpg";
+      const filename = `memoria-casamento-jessica-samuel-${item.tableId ? `mesa-${item.tableId}` : "evento"}.${ext}`;
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download error:", error);
+      // Fallback: abrir a foto/vídeo num novo separador para o utilizador guardar manualmente
+      window.open(item.signedUrl, "_blank");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleShare = async (item: PublicMemoryItem) => {
+    const title = "Memórias · Jessica Muege & Samuel Govene";
+    const text = item.caption
+      ? `"${item.caption}" — Memória do Casamento Tradicional`
+      : "Veja esta memória do Casamento Tradicional de Jessica Muege & Samuel Govene";
+    const url = item.signedUrl;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url,
+        });
+        return;
+      } catch (err) {
+        // Ignora se o utilizador cancelou a janela de partilha nativa
+      }
+    }
+
+    // Fallback: Partilhar via WhatsApp Web/App
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${text}\n${url}`)}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   const filteredMemories = selectedChallengeFilter
     ? memories.filter((m) => m.challengeId === selectedChallengeFilter)
@@ -238,11 +291,34 @@ export function MemoriasLiveGallery({ slug, refreshTrigger = 0 }: MemoriasLiveGa
                   )}
                 </div>
 
-                {activeLightboxItem.tableId && (
-                  <span className="text-xs font-display tracking-widest uppercase px-3 py-1 bg-[#C45C26] text-white rounded-full font-medium shrink-0">
-                    Mesa {activeLightboxItem.tableId}
-                  </span>
-                )}
+                <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0">
+                  {activeLightboxItem.tableId && (
+                    <span className="text-xs font-display tracking-widest uppercase px-3 py-1.5 bg-[#C45C26]/90 text-white rounded-full font-medium shadow-xs">
+                      Mesa {activeLightboxItem.tableId}
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(activeLightboxItem)}
+                    disabled={downloading}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white text-xs font-display tracking-wider uppercase transition-all backdrop-blur-xs disabled:opacity-50 border border-white/20"
+                    title="Guardar fotografia ou vídeo no telemóvel"
+                  >
+                    <Download className="w-3.5 h-3.5 text-[#C9A227]" />
+                    <span>{downloading ? "A guardar..." : "Guardar"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleShare(activeLightboxItem)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C45C26] hover:bg-[#9E4218] text-white text-xs font-display tracking-wider uppercase transition-all shadow-sm"
+                    title="Partilhar fotografia no WhatsApp"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>Partilhar</span>
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
