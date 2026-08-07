@@ -2,7 +2,8 @@
 
 import React from "react";
 import { motion } from "motion/react";
-import { PlusCircle, Sparkles } from "lucide-react";
+import { PlusCircle } from "lucide-react";
+import { LoboloCrest } from "../primavera-motifs";
 
 interface MemoriasProgressProps {
   completedCount: number;
@@ -42,7 +43,7 @@ export function MemoriasProgress({
 
       {/* Outro Momento Especial */}
       <div className="p-8 rounded-lg bg-[#F3DFD0] border border-[#C45C26]/30 text-center relative overflow-hidden">
-        <Sparkles className="w-6 h-6 text-[#C9A227] mx-auto mb-3" />
+        <LoboloCrest className="w-9 h-9 mx-auto mb-3" stroke="#C9A227" fill="#C45C26" />
 
         <h3 className="font-display text-xl sm:text-2xl text-[#2A1810] font-light mb-2">
           Outro momento especial?
