@@ -6,6 +6,7 @@ import type { TrueTheme } from "@theme/true-types";
 import { MemoriasIntro } from "./MemoriasIntro";
 import { MemoriasChallengeGrid } from "./MemoriasChallengeGrid";
 import { MemoriasProgress } from "./MemoriasProgress";
+import { MemoriasLiveGallery } from "./MemoriasLiveGallery";
 import { MemoriasCaptureModal } from "./MemoriasCaptureModal";
 import {
   MEMORY_CHALLENGES,
@@ -29,6 +30,7 @@ export function MemoriasExperience({
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [selectedChallenge, setSelectedChallenge] = useState<MemoryChallenge | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [galleryRefreshTrigger, setGalleryRefreshTrigger] = useState(0);
 
   useEffect(() => {
     setCompletedIds(getCompletedChallenges());
@@ -49,6 +51,8 @@ export function MemoriasExperience({
       const updated = markChallengeCompleted(challengeId);
       setCompletedIds(updated);
     }
+    // Dispara refresh da galeria ao guardar memória com sucesso
+    setGalleryRefreshTrigger((prev) => prev + 1);
   };
 
   return (
@@ -64,6 +68,12 @@ export function MemoriasExperience({
         completedCount={completedIds.length}
         totalCount={MEMORY_CHALLENGES.length}
         onOpenFreeMoment={handleOpenFreeMoment}
+      />
+
+      {/* Galeria Viva / Álbum Colectivo */}
+      <MemoriasLiveGallery
+        slug={config.slug}
+        refreshTrigger={galleryRefreshTrigger}
       />
 
       <MemoriasCaptureModal
