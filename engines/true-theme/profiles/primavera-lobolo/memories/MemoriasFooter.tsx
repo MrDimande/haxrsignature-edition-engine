@@ -1,7 +1,7 @@
-"use client";
-
 import React from "react";
-import { Globe, Mail, Phone } from "lucide-react";
+import Image from "next/image";
+import { Globe, Mail } from "lucide-react";
+import { HAXR_AUTH } from "@lib/brand/authorship";
 import { LoboloCrest, WovenDivider } from "../primavera-motifs";
 
 export function MemoriasFooter() {
@@ -10,16 +10,33 @@ export function MemoriasFooter() {
   return (
     <footer className="mt-16 pt-12 pb-10 px-6 border-t border-[#C9A227]/30 bg-[#F5EDE4] text-center">
       <div className="max-w-3xl mx-auto space-y-6">
-        {/* Brasão Cerimonial HAXR */}
-        <div className="flex flex-col items-center justify-center space-y-2">
-          <LoboloCrest className="w-10 h-10" stroke="#C9A227" fill="#C45C26" />
+        {/* Logótipo Oficial HAXR Signature & Brasão Cerimonial */}
+        <div className="flex flex-col items-center justify-center space-y-3">
+          <a
+            href={HAXR_AUTH.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block transition-transform hover:scale-[1.02]"
+            aria-label={`${HAXR_AUTH.brand} — site oficial`}
+          >
+            <div className="relative w-44 h-12 sm:w-56 sm:h-14 mx-auto">
+              <Image
+                src={HAXR_AUTH.assets.logoHorizontal}
+                alt={HAXR_AUTH.brand}
+                fill
+                sizes="224px"
+                className="object-contain object-center"
+              />
+            </div>
+          </a>
+
           <WovenDivider className="w-44 h-3 opacity-70" color="#C9A227" />
         </div>
 
         {/* Marca & Assinatura de Alta-Costura */}
         <div className="space-y-1">
           <p className="font-display text-[10px] sm:text-[11px] font-medium tracking-[0.45em] uppercase text-[#C45C26]">
-            HAXR SIGNATURE
+            ALTA-COSTURA DIGITAL
           </p>
           <h4 className="font-display text-lg sm:text-xl font-light text-[#2A1810] tracking-wide">
             Alta-Costura Digital
