@@ -4,7 +4,11 @@ import {
   STAN_GIFT_GROUPS,
   getStanGiftGroupById,
 } from "./gifts-catalog";
-import { getStanPublicGifts, reserveStanGift } from "./gifts";
+import {
+  getStanPublicGifts,
+  parseStanGiftReservationRpcResponse,
+  reserveStanGift,
+} from "./gifts";
 import fs from "fs";
 import path from "path";
 
@@ -15,7 +19,7 @@ const RESERVATIONS_FILE = path.join(
   "stan-reservations.json"
 );
 
-describe("Stan Slot-Based Gift Engine & Distributed Retry", () => {
+describe("Stan Slot-Based Gift Engine", () => {
   beforeEach(async () => {
     if (fs.existsSync(RESERVATIONS_FILE)) {
       await fs.promises.unlink(RESERVATIONS_FILE);
@@ -104,14 +108,11 @@ describe("Stan Slot-Based Gift Engine & Distributed Retry", () => {
     assert.equal(r6.error, "Este presente já se encontra esgotado.");
   });
 
-  it("Concorrência: Réplica de unique conflict com retry automático no próximo slot", async () => {
+  it("Armazenamento local: reserva posterior escolhe o próximo slot livre", async () => {
     // Reservar 1ª unidade de Blocos de Montar
     await reserveStanGift("stan-blocos-montar", "Convidado 1");
 
-    // Em file storage, o slot 01 (stan-blocos-montar) já está reservado.
-    // O próximo pedido para 'stan-blocos-montar' vai encontrar candidatos:
-    // ['stan-blocos-montar-02', 'stan-blocos-montar-03']
-    // Ele tenta 'stan-blocos-montar-02' e consegue com sucesso!
+    // No armazenamento local, o próximo pedido encontra os slots 02 e 03 livres.
     const r2 = await reserveStanGift("stan-blocos-montar", "Convidado 2");
     assert.equal(r2.success, true);
 
@@ -119,6 +120,34 @@ describe("Stan Slot-Based Gift Engine & Distributed Retry", () => {
     const blocos = publicGifts.find((g) => g.id === "stan-blocos-montar");
     assert.equal(blocos?.reservedCount, 2);
     assert.equal(blocos?.availableQuantity, 1);
+  });
+
+  it("RPC só classifica already_reserved explícito como conflito de slot", () => {
+    assert.deepEqual(parseStanGiftReservationRpcResponse({ ok: true }), {
+      success: true,
+    });
+    assert.deepEqual(
+      parseStanGiftReservationRpcResponse({
+        ok: false,
+        error: "already_reserved",
+      }),
+      { success: false, error: "already_reserved" }
+    );
+    assert.deepEqual(parseStanGiftReservationRpcResponse(null), {
+      success: false,
+      error: "Ocorreu um erro interno ao processar a reserva.",
+    });
+    assert.deepEqual(parseStanGiftReservationRpcResponse({ ok: false }), {
+      success: false,
+      error: "Ocorreu um erro interno ao processar a reserva.",
+    });
+    assert.deepEqual(
+      parseStanGiftReservationRpcResponse({
+        ok: false,
+        error: "permission_denied",
+      }),
+      { success: false, error: "permission_denied" }
+    );
   });
 
   it("Concorrência na última unidade: exatamente uma sucede e outra recebe Esgotado", async () => {

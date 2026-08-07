@@ -24,6 +24,41 @@ type Reservation = {
   timestamp: string;
 };
 
+type ReservationAttempt = {
+  success: boolean;
+  error?: string;
+};
+
+const RESERVATION_INTERNAL_ERROR =
+  "Ocorreu um erro interno ao processar a reserva.";
+
+/**
+ * Interpreta exclusivamente o contrato público da RPC de reserva. Só um
+ * conflito explícito pode activar a tentativa do próximo slot.
+ */
+export function parseStanGiftReservationRpcResponse(
+  data: unknown
+): ReservationAttempt {
+  if (typeof data !== "object" || data === null) {
+    return { success: false, error: RESERVATION_INTERNAL_ERROR };
+  }
+
+  const payload = data as { ok?: unknown; error?: unknown };
+  if (payload.ok === true) {
+    return { success: true };
+  }
+
+  if (payload.error === "already_reserved") {
+    return { success: false, error: "already_reserved" };
+  }
+
+  if (typeof payload.error === "string" && payload.error.trim().length > 0) {
+    return { success: false, error: payload.error };
+  }
+
+  return { success: false, error: RESERVATION_INTERNAL_ERROR };
+}
+
 function mergeCatalog(reservations: Reservation[]): StanPublicGift[] {
   const reservedSet = new Set(reservations.map((r) => r.giftId));
 
@@ -106,7 +141,7 @@ let localFileMutexChain = Promise.resolve();
 async function reserveSlotInFile(
   slotId: string,
   reservedBy: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<ReservationAttempt> {
   return new Promise((resolve) => {
     localFileMutexChain = localFileMutexChain
       .then(async () => {
@@ -124,7 +159,7 @@ async function reserveSlotInFile(
         resolve({ success: true });
       })
       .catch(() => {
-        resolve({ success: false, error: "already_reserved" });
+        resolve({ success: false, error: RESERVATION_INTERNAL_ERROR });
       });
   });
 }
@@ -133,7 +168,7 @@ async function reserveSlotInSupabase(
   slotId: string,
   reservedBy: string,
   giftName: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<ReservationAttempt> {
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("reserve_edition_gift", {
     p_registry_key: STAN_GIFTS_REGISTRY_KEY,
@@ -146,18 +181,11 @@ async function reserveSlotInSupabase(
     console.error("[Stan gifts] reserve RPC failed:", error.message);
     return {
       success: false,
-      error: "Ocorreu um erro interno ao processar a reserva.",
+      error: RESERVATION_INTERNAL_ERROR,
     };
   }
 
-  const payload = data as { ok?: boolean; error?: string } | null;
-  if (!payload?.ok) {
-    return {
-      success: false,
-      error: payload?.error || "already_reserved",
-    };
-  }
-  return { success: true };
+  return parseStanGiftReservationRpcResponse(data);
 }
 
 export async function getStanPublicGifts(): Promise<StanPublicGift[]> {
@@ -225,7 +253,7 @@ export async function reserveStanGift(
     const updatedGifts = await getStanPublicGifts();
     return {
       success: false,
-      error: result.error || "Ocorreu um erro interno ao processar a reserva.",
+      error: result.error || RESERVATION_INTERNAL_ERROR,
       gifts: updatedGifts,
     };
   }
@@ -233,7 +261,7 @@ export async function reserveStanGift(
   const updatedGifts = await getStanPublicGifts();
   return {
     success: false,
-    error: lastConflict ? "Este presente já se encontra esgotado." : "Ocorreu um erro interno ao processar a reserva.",
+    error: lastConflict ? "Este presente já se encontra esgotado." : RESERVATION_INTERNAL_ERROR,
     gifts: updatedGifts,
   };
 }
