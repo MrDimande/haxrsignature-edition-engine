@@ -10,7 +10,10 @@ import {
   readNianAudioPreference,
 } from "@lib/nian/event-details";
 import { NIAN_EASE } from "./nian-motion";
-import { NianSoundtrackCredits } from "./NianSoundtrackCredits";
+import {
+  NianSoundtrackCredits,
+  type NianCreditsController,
+} from "./NianSoundtrackCredits";
 
 function AudioGlyph({
   mode,
@@ -36,7 +39,11 @@ function AudioGlyph({
  * Mute / unmute / replay — visível após o ritual.
  * Isolado a nian-night-of-the-web.
  */
-export function NianAudioControl() {
+export function NianAudioControl({
+  credits,
+}: {
+  credits: NianCreditsController;
+}) {
   const { introComplete, audioEnabled, setAudioEnabled, theme, audioPlayer } =
     useExperience();
   const reduceMotion = useReducedMotion();
@@ -117,7 +124,7 @@ export function NianAudioControl() {
           bottom: "max(1rem, env(safe-area-inset-bottom))",
         }}
       >
-        <NianSoundtrackCredits />
+        <NianSoundtrackCredits credits={credits} />
         <button
           type="button"
           onClick={() => void toggle()}

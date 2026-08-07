@@ -1,5 +1,6 @@
 "use client";
 
+import { useId, useRef, useState } from "react";
 import { NianRitualGate } from "./NianRitualGate";
 import { NianHeroSection } from "./NianHero";
 import { NianAudioControl } from "./NianAudioControl";
@@ -12,13 +13,26 @@ import { NianSquadModeSection } from "./NianSquadMode";
 import { NianLocationSection } from "./NianLocation";
 import { NianClosingSection } from "./NianClosing";
 import { NianRsvpSection } from "./NianRsvp";
+import { NianExperienceSignature } from "./NianExperienceSignature";
+import type { NianCreditsController } from "./NianSoundtrackCredits";
 
 /**
- * Nian · NIGHT OF THE WEB — Fase 2C:
- * … → Squad Mode → Localização → Closing → RSVP.
+ * Nian · NIGHT OF THE WEB — Fase final:
+ * … → Closing → RSVP → Assinatura HAXR.
  * Isolado a renderProfile "nian-night-of-the-web".
  */
 export function NianNightOfTheWebExperience() {
+  const [creditsOpen, setCreditsOpen] = useState(false);
+  const panelId = useId();
+  const lastTriggerRef = useRef<HTMLElement | null>(null);
+
+  const credits: NianCreditsController = {
+    open: creditsOpen,
+    onOpenChange: setCreditsOpen,
+    panelId,
+    lastTriggerRef,
+  };
+
   return (
     <div
       className="w-full min-h-screen text-[#F4F6FB]"
@@ -31,7 +45,7 @@ export function NianNightOfTheWebExperience() {
     >
       <NianRitualGate />
       <NianHeroSection />
-      <NianAudioControl />
+      <NianAudioControl credits={credits} />
       <NianOriginSection />
       <NianMissionBriefSection />
       <NianActionBeatSection />
@@ -41,6 +55,7 @@ export function NianNightOfTheWebExperience() {
       <NianLocationSection />
       <NianClosingSection />
       <NianRsvpSection />
+      <NianExperienceSignature credits={credits} />
     </div>
   );
 }
