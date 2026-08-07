@@ -1,14 +1,9 @@
-/**
- * Reservas de presentes — Stan
- * File local + Supabase (registry_key = stan-real-madrid) quando configurado.
- */
-
 import fs from "fs";
 import path from "path";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import {
-  STAN_GIFTS_CATALOG,
-  getStanGiftById,
+  STAN_GIFT_GROUPS,
+  getStanGiftGroupById,
   type StanPublicGift,
 } from "./gifts-catalog";
 
@@ -30,13 +25,25 @@ type Reservation = {
 };
 
 function mergeCatalog(reservations: Reservation[]): StanPublicGift[] {
-  return STAN_GIFTS_CATALOG.map((gift) => {
-    const reserved = reservations.some((r) => r.giftId === gift.id);
+  const reservedSet = new Set(reservations.map((r) => r.giftId));
+
+  return STAN_GIFT_GROUPS.map((group) => {
+    const reservedCount = group.slots.filter((slotId) =>
+      reservedSet.has(slotId)
+    ).length;
+    const totalQuantity = group.slots.length;
+    const availableQuantity = Math.max(0, totalQuantity - reservedCount);
+    const isExhausted = availableQuantity === 0;
+
     return {
-      id: gift.id,
-      name: gift.name,
-      category: gift.category,
-      status: reserved ? ("reserved" as const) : ("available" as const),
+      id: group.baseId,
+      name: group.name,
+      category: group.category,
+      totalQuantity,
+      reservedCount,
+      availableQuantity,
+      isExhausted,
+      status: isExhausted ? ("reserved" as const) : ("available" as const),
     };
   });
 }
@@ -94,32 +101,43 @@ async function getReservations(): Promise<Reservation[]> {
   return getReservationsFromFile();
 }
 
-async function reserveInFile(
-  giftId: string,
+let localFileMutexChain = Promise.resolve();
+
+async function reserveSlotInFile(
+  slotId: string,
   reservedBy: string
 ): Promise<{ success: boolean; error?: string }> {
-  const reservations = await getReservationsFromFile();
-  if (reservations.some((r) => r.giftId === giftId)) {
-    return { success: false, error: "Este presente já foi reservado." };
-  }
-  reservations.push({
-    giftId,
-    reservedBy: reservedBy.trim(),
-    timestamp: new Date().toISOString(),
+  return new Promise((resolve) => {
+    localFileMutexChain = localFileMutexChain
+      .then(async () => {
+        const reservations = await getReservationsFromFile();
+        if (reservations.some((r) => r.giftId === slotId)) {
+          resolve({ success: false, error: "already_reserved" });
+          return;
+        }
+        reservations.push({
+          giftId: slotId,
+          reservedBy: reservedBy.trim(),
+          timestamp: new Date().toISOString(),
+        });
+        await writeReservationsToFile(reservations);
+        resolve({ success: true });
+      })
+      .catch(() => {
+        resolve({ success: false, error: "already_reserved" });
+      });
   });
-  await writeReservationsToFile(reservations);
-  return { success: true };
 }
 
-async function reserveInSupabase(
-  giftId: string,
+async function reserveSlotInSupabase(
+  slotId: string,
   reservedBy: string,
   giftName: string
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = createAdminClient();
   const { data, error } = await supabase.rpc("reserve_edition_gift", {
     p_registry_key: STAN_GIFTS_REGISTRY_KEY,
-    p_gift_id: giftId,
+    p_gift_id: slotId,
     p_reserved_by: reservedBy.trim(),
     p_gift_name: giftName,
   });
@@ -136,7 +154,7 @@ async function reserveInSupabase(
   if (!payload?.ok) {
     return {
       success: false,
-      error: payload?.error || "Este presente já foi reservado.",
+      error: payload?.error || "already_reserved",
     };
   }
   return { success: true };
@@ -147,10 +165,8 @@ export async function getStanPublicGifts(): Promise<StanPublicGift[]> {
   return mergeCatalog(reservations);
 }
 
-let reserveChain = Promise.resolve();
-
 export async function reserveStanGift(
-  giftId: string,
+  giftIdOrBaseId: string,
   reservedBy: string
 ): Promise<{
   success: boolean;
@@ -158,43 +174,66 @@ export async function reserveStanGift(
   gifts?: StanPublicGift[];
   giftName?: string;
 }> {
-  return new Promise((resolve) => {
-    reserveChain = reserveChain
-      .then(async () => {
-        const gift = getStanGiftById(giftId);
-        if (!gift) {
-          resolve({ success: false, error: "Presente não encontrado." });
-          return;
-        }
+  const group = getStanGiftGroupById(giftIdOrBaseId);
+  if (!group) {
+    return { success: false, error: "Presente não encontrado." };
+  }
 
-        const name = reservedBy.trim();
-        if (name.length < 2) {
-          resolve({
-            success: false,
-            error: "Indique o seu nome para reservar o presente.",
-          });
-          return;
-        }
+  const name = reservedBy.trim();
+  if (name.length < 2) {
+    return {
+      success: false,
+      error: "Indique o seu nome para reservar o presente.",
+    };
+  }
 
-        const result = isSupabaseConfigured()
-          ? await reserveInSupabase(giftId, name, gift.name)
-          : await reserveInFile(giftId, name);
+  const reservations = await getReservations();
+  const reservedSet = new Set(reservations.map((r) => r.giftId));
 
-        if (!result.success) {
-          const gifts = await getStanPublicGifts();
-          resolve({ success: false, error: result.error, gifts });
-          return;
-        }
+  const freeSlots = group.slots.filter((slotId) => !reservedSet.has(slotId));
+  if (freeSlots.length === 0) {
+    const gifts = mergeCatalog(reservations);
+    return {
+      success: false,
+      error: "Este presente já se encontra esgotado.",
+      gifts,
+    };
+  }
 
-        const gifts = await getStanPublicGifts();
-        resolve({ success: true, gifts, giftName: gift.name });
-      })
-      .catch((err) => {
-        console.error("[Stan gifts] reserve queue error:", err);
-        resolve({
-          success: false,
-          error: "Ocorreu um erro interno ao processar a reserva.",
-        });
-      });
-  });
+  let lastConflict = false;
+  for (const slotCandidate of freeSlots) {
+    const result = isSupabaseConfigured()
+      ? await reserveSlotInSupabase(slotCandidate, name, group.name)
+      : await reserveSlotInFile(slotCandidate, name);
+
+    if (result.success) {
+      const updatedGifts = await getStanPublicGifts();
+      return {
+        success: true,
+        gifts: updatedGifts,
+        giftName: group.name,
+      };
+    }
+
+    // Se o erro for conflito de reserva (concorrência), tenta o próximo slot do grupo
+    if (result.error === "already_reserved") {
+      lastConflict = true;
+      continue;
+    }
+
+    // Para qualquer outro erro (DB/auth/network), aborta imediatamente e devolve o erro real
+    const updatedGifts = await getStanPublicGifts();
+    return {
+      success: false,
+      error: result.error || "Ocorreu um erro interno ao processar a reserva.",
+      gifts: updatedGifts,
+    };
+  }
+
+  const updatedGifts = await getStanPublicGifts();
+  return {
+    success: false,
+    error: lastConflict ? "Este presente já se encontra esgotado." : "Ocorreu um erro interno ao processar a reserva.",
+    gifts: updatedGifts,
+  };
 }

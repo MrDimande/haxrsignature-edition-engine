@@ -131,8 +131,8 @@ export const STAN_RSVP = {
     "Você está na lista de convocados do S5. Confirme a sua presença na estreia do pequeno campeão.",
   deadlineIso: "2026-08-28",
   deadlineLabel: "28 de Agosto de 2026",
-  /** Máximo de acompanhantes além do convidado principal */
-  maxCompanions: 4,
+  /** Máximo de acompanhantes além do convidado principal — sem acompanhantes para o Stan */
+  maxCompanions: 0,
   /** Exige nomes dos acompanhantes quando companions > 0 */
   requireCompanionNames: false,
 } as const;

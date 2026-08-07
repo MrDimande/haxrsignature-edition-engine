@@ -12,7 +12,6 @@ import {
 import {
   STAN_EVENT,
   STAN_RSVP,
-  buildCompanionNote,
   formatStanDisplayDate,
   getStanWhatsAppUrl,
 } from "@lib/stan/event-details";
@@ -28,8 +27,6 @@ type FormState = {
   phone: string;
   email: string;
   attending: "" | "yes" | "no";
-  companions: number;
-  companionNames: string[];
   message: string;
   honeypot: string;
 };
@@ -39,8 +36,6 @@ const initialForm: FormState = {
   phone: "",
   email: "",
   attending: "",
-  companions: 0,
-  companionNames: [],
   message: "",
   honeypot: "",
 };
@@ -62,7 +57,6 @@ export function StanRSVPSection() {
   );
   const [errorMessage, setErrorMessage] = useState("");
 
-  const maxCompanions = STAN_RSVP.maxCompanions;
   const whatsappUrl = getStanWhatsAppUrl(theme.copy.rsvp?.whatsappNumber);
   const deadlineLabel =
     theme.copy.rsvp?.deadlineLabel || STAN_RSVP.deadlineLabel;
@@ -89,33 +83,12 @@ export function StanRSVPSection() {
       return;
     }
 
-    if (
-      STAN_RSVP.requireCompanionNames &&
-      form.attending === "yes" &&
-      form.companions > 0
-    ) {
-      const filled = form.companionNames
-        .slice(0, form.companions)
-        .filter((n) => n.trim().length > 0);
-      if (filled.length < form.companions) {
-        setErrorMessage("Indique o nome de cada acompanhante.");
-        setStatus("error");
-        return;
-      }
-    }
-
     setStatus("sending");
     setErrorMessage("");
 
     const isAttending = form.attending === "yes";
-    const companions = isAttending ? form.companions : 0;
-    const guests = isAttending ? 1 + companions : 0;
-    const companionNote = isAttending
-      ? buildCompanionNote(companions, form.companionNames)
-      : undefined;
-    const messageParts = [companionNote, form.message.trim()].filter(Boolean);
-    const messageForBride =
-      messageParts.length > 0 ? messageParts.join(" · ") : undefined;
+    const guests = isAttending ? 1 : 0;
+    const messageForBride = form.message.trim() || undefined;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), RSVP_FETCH_TIMEOUT_MS);
@@ -416,8 +389,6 @@ export function StanRSVPSection() {
                         setForm((p) => ({
                           ...p,
                           attending: "no",
-                          companions: 0,
-                          companionNames: [],
                         }))
                       }
                       className={`min-h-12 border px-4 py-3.5 font-body text-[11px] font-bold uppercase tracking-[0.18em] transition ${
@@ -430,74 +401,6 @@ export function StanRSVPSection() {
                     </button>
                   </div>
                 </fieldset>
-
-                {form.attending === "yes" ? (
-                  <div className="space-y-4 border-t border-[#C9A86A]/20 pt-5">
-                    <fieldset>
-                      <legend className="mb-2 block font-body text-[10px] font-semibold uppercase tracking-[0.28em] text-[#C9A86A]">
-                        Acompanhantes na bancada
-                      </legend>
-                      <div className="flex flex-wrap gap-2">
-                        {Array.from({ length: maxCompanions + 1 }, (_, n) => (
-                          <button
-                            key={n}
-                            type="button"
-                            aria-pressed={form.companions === n}
-                            onClick={() =>
-                              setForm((p) => ({
-                                ...p,
-                                companions: n,
-                                companionNames: p.companionNames.slice(0, n),
-                              }))
-                            }
-                            className={`min-h-11 min-w-11 border px-3 py-2 font-body text-xs transition ${
-                              form.companions === n
-                                ? "border-[#C9A86A] bg-[#C9A86A] font-bold text-[#07101C]"
-                                : "border-[#C9A86A]/25 text-[#F7F4EF]/70"
-                            }`}
-                          >
-                            {n}
-                          </button>
-                        ))}
-                      </div>
-                      <p className="mt-2 font-body text-[10px] uppercase tracking-[0.2em] text-[#F7F4EF]/40">
-                        Plantel no evento: {1 + form.companions}{" "}
-                        {1 + form.companions === 1 ? "pessoa" : "pessoas"}
-                      </p>
-                    </fieldset>
-
-                    {form.companions > 0
-                      ? Array.from({ length: form.companions }, (_, index) => (
-                          <div key={index}>
-                            <label
-                              htmlFor={`stan-companion-${index}`}
-                              className="mb-2 block font-body text-[10px] font-semibold uppercase tracking-[0.28em] text-[#C9A86A]"
-                            >
-                              Nome do acompanhante {index + 1}
-                              {!STAN_RSVP.requireCompanionNames
-                                ? " (opcional)"
-                                : ""}
-                            </label>
-                            <input
-                              id={`stan-companion-${index}`}
-                              type="text"
-                              value={form.companionNames[index] ?? ""}
-                              onChange={(e) => {
-                                const next = [...form.companionNames];
-                                next[index] = e.target.value;
-                                setForm((p) => ({
-                                  ...p,
-                                  companionNames: next,
-                                }));
-                              }}
-                              placeholder={`Acompanhante ${index + 1}`}
-                              className={fieldClass}
-                            />
-                          </div>
-                        ))
-                      : null}
-                  </div>
-                ) : null}
 
                 <div>
                   <label
