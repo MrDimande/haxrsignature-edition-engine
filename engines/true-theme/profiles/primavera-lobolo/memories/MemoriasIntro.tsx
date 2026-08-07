@@ -16,11 +16,11 @@ export function MemoriasIntro({ tableId }: MemoriasIntroProps) {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="font-display text-[10px] sm:text-[11px] font-medium tracking-[0.38em] uppercase text-[#C45C26] mb-3">
-          {tableId ? `Mesa ${tableId} · N’we` : "Memórias do Nosso Dia"}
+          {tableId ? `Mesa ${tableId} · N’we · Casamento Tradicional` : "Casamento Tradicional · Memórias do Nosso Dia"}
         </p>
 
-        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-light tracking-[0.04em] text-[#2A1810] leading-tight mb-4">
-          Jessica &amp; Samuel
+        <h1 className="font-display text-2xl sm:text-4xl md:text-[2.75rem] font-light tracking-[0.03em] text-[#2A1810] leading-tight mb-4">
+          Jessica Muege &amp; Samuel Govene
         </h1>
 
         <p className="font-display text-base sm:text-lg font-light leading-relaxed text-[#4A3020] italic max-w-lg mx-auto">
