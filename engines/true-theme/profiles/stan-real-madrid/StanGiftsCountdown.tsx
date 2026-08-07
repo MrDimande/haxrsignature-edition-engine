@@ -388,8 +388,8 @@ export function StanGiftsSection() {
                 </button>
               </div>
 
-              {/* Categorias */}
-              <div className="flex gap-2 overflow-x-auto border-b border-[#E8DCC8] px-4 py-3 sm:px-6">
+              {/* Categorias — hide scrollbar (Windows paints a thick dark track under overflow-x) */}
+              <div className="flex gap-2 overflow-x-auto overscroll-x-contain border-b border-[#E8DCC8] px-4 py-3 [-ms-overflow-style:none] [scrollbar-width:none] sm:px-6 [&::-webkit-scrollbar]:hidden">
                 {STAN_GIFT_CATEGORIES.map((cat) => {
                   const active = activeCategory === cat.id;
                   return (
