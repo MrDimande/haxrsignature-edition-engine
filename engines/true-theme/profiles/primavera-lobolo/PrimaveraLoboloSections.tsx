@@ -25,23 +25,6 @@ import {
   Navigation,
   Shirt,
 } from "lucide-react";
-import {
-  formatCopyright,
-  formatStudioCredit,
-  HAXR_AUTH,
-} from "@lib/brand/authorship";
-import {
-  buildTraditionalGoogleCalendarUrl,
-  downloadTraditionalIcsFile,
-  TRADITIONAL_COPY,
-  TRADITIONAL_ASSETS,
-  TRADITIONAL_COUPLE,
-  TRADITIONAL_EVENT,
-  TRADITIONAL_PARENTS,
-  TRADITIONAL_VENUE,
-  formatTraditionalEventDate,
-  formatTraditionalHeroDateDots,
-} from "@lib/jessica-samuel-traditional/event-details";
 import { JESSICA_SAMUEL_GIFT_QUOTATION } from "@lib/jessica-samuel-wedding/gifts/quotation-meta";
 import { motion } from "motion/react";
 import Image from "next/image";
