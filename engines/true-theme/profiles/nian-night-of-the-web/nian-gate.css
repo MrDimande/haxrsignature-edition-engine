@@ -1,0 +1,45 @@
+@keyframes nian-gate-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-nian-gate] [data-gate-step] {
+  opacity: 0;
+  animation: nian-gate-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+[data-nian-gate][data-nian-reduce="true"] [data-gate-step] {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+[data-nian-gate] [data-gate-step="1"] {
+  animation-delay: 200ms;
+}
+[data-nian-gate] [data-gate-step="2"] {
+  animation-delay: 380ms;
+}
+[data-nian-gate] [data-gate-step="3"] {
+  animation-delay: 580ms;
+}
+[data-nian-gate] [data-gate-step="4"] {
+  animation-delay: 850ms;
+}
+[data-nian-gate] [data-gate-step="5"] {
+  animation-delay: 1100ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-nian-gate] [data-gate-step] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

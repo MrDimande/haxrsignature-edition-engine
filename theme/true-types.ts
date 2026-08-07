@@ -27,9 +27,17 @@ export type RenderProfile =
   | "rose-elegance"
   | "primavera-lobolo"
   | "jessica-samuel-wedding"
-  | "stan-real-madrid";
+  | "stan-real-madrid"
+  | "nian-night-of-the-web";
 
 export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
+
+/**
+ * When to start experience audio.
+ * Default / omitted = "intro-complete" (legacy behaviour for existing profiles).
+ * "explicit-user-choice" = only start from a user gesture in the profile gate (Nian).
+ */
+export type AudioStartMode = "intro-complete" | "explicit-user-choice";
 
 /** Atribuição de faixa de ambiente — obrigatória quando `src` é obra de terceiros */
 export interface AudioCredit {
@@ -74,6 +82,16 @@ export interface TrueTheme {
     /** Resolved asset path — experience-driven, never per-slug */
     src: string | null;
     fadeOut?: number;
+    /**
+     * Default / omitted: start when introComplete (existing profiles).
+     * explicit-user-choice: TrueThemeEngine must never auto-start.
+     */
+    audioStartMode?: AudioStartMode;
+    /**
+     * Default / omitted: true (existing ambient loops).
+     * false: play once, fade out on end, allow manual replay.
+     */
+    loop?: boolean;
     /** Créditos legais quando a faixa não é propriedade HAXR */
     credit?: AudioCredit;
   };

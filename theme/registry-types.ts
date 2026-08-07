@@ -8,4 +8,5 @@ export type RegistryThemeKey =
   | "rose-elegance-farewell"
   | "primavera-lobolo"
   | "jessica-samuel-wedding"
-  | "stan-real-madrid";
+  | "stan-real-madrid"
+  | "nian-night-of-the-web";

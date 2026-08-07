@@ -31,5 +31,10 @@ export function AmbientLayer() {
     return null;
   }
 
+  /* Ambient próprio no hero Nian — sem AmbientBackground genérico */
+  if (theme.renderProfile === "nian-night-of-the-web") {
+    return null;
+  }
+
   return <AmbientBackground />;
 }

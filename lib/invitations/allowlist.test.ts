@@ -17,6 +17,7 @@ describe("invitation allowlist / slug resolution", () => {
       "jessicachadelingerie",
       "jessicasamuelwedding",
       "stanturns5",
+      "nianwebnight",
     ]) {
       assert.ok(ACTIVE_INVITATION_ALLOWLIST.includes(slug));
       assert.equal(isActiveInvitationSlug(slug), true);
@@ -92,5 +93,30 @@ describe("invitation allowlist / slug resolution", () => {
     assert.equal(resolveActiveInvitationSlug("stan"), "stanturns5");
     assert.equal(resolveActiveInvitationSlug("convite-stan"), "stanturns5");
     assert.equal(resolveActiveInvitationSlug("stan-5-anos"), "stanturns5");
+
+    assert.equal(resolveActiveInvitationSlug("nian"), "nianwebnight");
+    assert.equal(
+      resolveActiveInvitationSlug("nianwebnight"),
+      "nianwebnight"
+    );
+  });
+
+  it("mantém chaves de registry esperadas para convites Edition críticos", () => {
+    assert.equal(
+      INVITATIONS.jessicachadelingerie.admin?.expectedRegistryKey,
+      "rose-elegance"
+    );
+    assert.equal(
+      INVITATIONS.jessicaesamueltraditionalwedding.admin?.expectedRegistryKey,
+      "traditional-wedding"
+    );
+    assert.equal(
+      INVITATIONS.jessicasamuelwedding.admin?.expectedRegistryKey,
+      "jessica-samuel-wedding"
+    );
+    assert.equal(
+      INVITATIONS.nianwebnight.admin?.expectedRegistryKey,
+      "nian-night-of-the-web"
+    );
   });
 });

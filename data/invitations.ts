@@ -280,6 +280,42 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       expectedRegistryKey: "stan-real-madrid",
     },
   },
+  nianwebnight: {
+    slug: "nianwebnight",
+    aliases: [
+      "nian",
+      "nightoftheweb",
+      "convite-nian",
+      "nian-night-of-the-web",
+    ],
+    engine: "theme",
+    theme: "nian-night-of-the-web",
+    experienceType: "editorial",
+    sourcePath: "/nianwebnight",
+    legacyFolder: "nian",
+    status: "active",
+    metadata: {
+      title: "Nian — NIGHT OF THE WEB",
+      date: "2026-09-12",
+      /** Hora pendente — string vazia; UI pública omite */
+      time: "",
+      location: "Salão de Eventos Benerla · Marracuene, Maputo",
+      dressCode: "Uniforme da Noite · Azul Royal, Vermelho Vivo e Preto",
+      subtitle: "Uma cidade em movimento. Um pequeno herói. Uma celebração inesquecível.",
+      description:
+        "12 de Setembro de 2026 · Salão de Eventos Benerla, Marracuene. NIGHT OF THE WEB — aniversário do Nian.",
+      eventDate: "2026-09-12",
+      eventType: "Aniversário Infantil",
+      ogImage: "/images/nian/social/nian-og.png",
+    },
+    admin: {
+      clientName: "Nian",
+      eventTypeLabel: "Aniversário",
+      adminEventName: "Edition · Aniversário · Nian",
+      envVar: "EDITION_EVENT_NIAN_ID",
+      expectedRegistryKey: "nian-night-of-the-web",
+    },
+  },
 };
 
 /** @deprecated Use INVITATIONS */
@@ -317,6 +353,8 @@ export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
   "jessica-samuel": "jessicasamuelwedding",
   /** Stan — rota antiga → canónica /stanturns5 */
   stan: "stanturns5",
+  /** Nian — rota antiga → canónica /nianwebnight */
+  nian: "nianwebnight",
 };
 
 export const ALIAS_INDEX: Record<string, string> = {};

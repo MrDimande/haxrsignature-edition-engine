@@ -17,6 +17,7 @@ import { resolveSlug } from "@lib/engine";
 
 interface InvitationPageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export function generateStaticParams() {
@@ -76,11 +77,28 @@ export async function generateMetadata({
   };
 }
 
-export default async function InvitationPage({ params }: InvitationPageProps) {
+export default async function InvitationPage({
+  params,
+  searchParams,
+}: InvitationPageProps) {
   const { slug } = await params;
 
   if (LEGACY_SLUG_REDIRECTS[slug]) {
-    permanentRedirect(`/${LEGACY_SLUG_REDIRECTS[slug]}`);
+    const target = LEGACY_SLUG_REDIRECTS[slug];
+    const sp = searchParams ? await searchParams : undefined;
+    const query = new URLSearchParams();
+    if (sp) {
+      for (const [key, value] of Object.entries(sp)) {
+        if (typeof value === "string") query.set(key, value);
+        else if (Array.isArray(value)) {
+          for (const item of value) {
+            if (typeof item === "string") query.append(key, item);
+          }
+        }
+      }
+    }
+    const qs = query.toString();
+    permanentRedirect(qs ? `/${target}?${qs}` : `/${target}`);
   }
 
   const canonicalSlug = resolveSlug(slug);
