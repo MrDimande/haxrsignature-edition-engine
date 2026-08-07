@@ -25,11 +25,11 @@ describe("stan event-details", () => {
     assert.match(url, /ctz=Africa%2FMaputo/);
   });
 
-  it("ICS declara TZID Africa/Maputo e omite DTEND enquanto pendente", () => {
+  it("ICS declara TZID Africa/Maputo e inclui DTSTART e DTEND", () => {
     const ics = buildStanIcsContent();
     assert.match(ics, /TZID:Africa\/Maputo/);
     assert.match(ics, /DTSTART;TZID=Africa\/Maputo:20260912T110000/);
-    assert.doesNotMatch(ics, /DTEND/);
+    assert.match(ics, /DTEND;TZID=Africa\/Maputo:20260912T150000/);
     assert.match(ics, /SUMMARY:5º Aniversário do Stan — O Quinto Acto/);
   });
 

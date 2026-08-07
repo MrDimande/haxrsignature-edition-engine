@@ -388,8 +388,8 @@ export function StanGiftsSection() {
                 </button>
               </div>
 
-              {/* Categorias */}
-              <div className="flex gap-2 overflow-x-auto border-b border-[#E8DCC8] px-4 py-3 sm:px-6">
+              {/* Categorias — hide scrollbar (Windows paints a thick dark track under overflow-x) */}
+              <div className="flex gap-2 overflow-x-auto overscroll-x-contain border-b border-[#E8DCC8] px-4 py-3 [-ms-overflow-style:none] [scrollbar-width:none] sm:px-6 [&::-webkit-scrollbar]:hidden">
                 {STAN_GIFT_CATEGORIES.map((cat) => {
                   const active = activeCategory === cat.id;
                   return (
@@ -509,8 +509,14 @@ export function StanGiftsSection() {
                 ) : (
                   <ul className="space-y-2" aria-label="Plantel de presentes">
                     {filtered.map((gift, index) => {
-                      const reserved = gift.status === "reserved";
+                      const isSoldOut =
+                        gift.availableQuantity <= 0 || gift.status === "reserved";
                       const shirt = String(index + 1).padStart(2, "0");
+                      const qtyLabel =
+                        gift.availableQuantity === 1
+                          ? "1 disponível"
+                          : `${gift.availableQuantity} disponíveis`;
+
                       return (
                         <li
                           key={gift.id}
@@ -520,26 +526,33 @@ export function StanGiftsSection() {
                             <span
                               aria-hidden
                               className={`shrink-0 font-display text-sm font-light tabular-nums ${
-                                reserved
+                                isSoldOut
                                   ? "text-[#C9A86A]/45"
                                   : "text-[#C9A86A]"
                               }`}
                             >
                               {shirt}
                             </span>
-                            <span
-                              className={`font-body text-sm font-light leading-snug ${
-                                reserved
-                                  ? "text-[#5B6B7C] line-through decoration-[#C9A86A]/50"
-                                  : "text-[#0A1628]"
-                              }`}
-                            >
-                              {gift.name}
-                            </span>
+                            <div className="flex flex-col min-w-0">
+                              <span
+                                className={`font-body text-sm font-light leading-snug ${
+                                  isSoldOut
+                                    ? "text-[#5B6B7C] line-through decoration-[#C9A86A]/50"
+                                    : "text-[#0A1628]"
+                                }`}
+                              >
+                                {gift.name}
+                              </span>
+                              {!isSoldOut ? (
+                                <span className="font-body text-[10px] font-medium uppercase tracking-[0.16em] text-[#C9A86A]">
+                                  {qtyLabel}
+                                </span>
+                              ) : null}
+                            </div>
                           </div>
-                          {reserved ? (
-                            <span className="shrink-0 font-body text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A86A]">
-                              Fora · Reservado
+                          {isSoldOut ? (
+                            <span className="shrink-0 font-body text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C9A86A]/70">
+                              Esgotado
                             </span>
                           ) : (
                             <button
