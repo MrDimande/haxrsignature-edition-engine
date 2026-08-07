@@ -14,7 +14,7 @@ import {
   markChallengeCompleted,
   type MemoryChallenge,
 } from "./memorias-challenges";
-import "./memorias.css";
+import { MemoriasFooter } from "./MemoriasFooter";
 
 interface MemoriasExperienceProps {
   config: InvitationConfig;
@@ -85,9 +85,7 @@ export function MemoriasExperience({
         onSuccess={handleSuccess}
       />
 
-      <footer className="text-center pt-8 pb-4 text-[10px] tracking-[0.2em] uppercase text-[#4A3020]/50 border-t border-[#C9A227]/20 max-w-xl mx-auto px-4">
-        {config.metadata.title} · Memórias do Nosso Dia
-      </footer>
+      <MemoriasFooter />
     </div>
   );
 }

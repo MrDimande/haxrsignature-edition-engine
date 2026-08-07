@@ -1,8 +1,22 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { motion } from "motion/react";
+import {
+  HAXR_AUTH,
+  formatCopyright,
+  formatStudioCredit,
+} from "@lib/brand/authorship";
+import {
+  TRADITIONAL_ASSETS,
+  TRADITIONAL_COPY,
+  TRADITIONAL_COUPLE,
+  TRADITIONAL_EVENT,
+  TRADITIONAL_PARENTS,
+  TRADITIONAL_VENUE,
+  buildTraditionalGoogleCalendarUrl,
+  downloadTraditionalIcsFile,
+  formatTraditionalEventDate,
+  formatTraditionalHeroDateDots,
+} from "@lib/jessica-samuel-traditional/event-details";
 import {
   Calendar,
   Clock,
@@ -29,21 +43,24 @@ import {
   formatTraditionalHeroDateDots,
 } from "@lib/jessica-samuel-traditional/event-details";
 import { JESSICA_SAMUEL_GIFT_QUOTATION } from "@lib/jessica-samuel-wedding/gifts/quotation-meta";
+import { motion } from "motion/react";
+import Image from "next/image";
+import React from "react";
 import { useExperience } from "../../context";
-import { primaveraType } from "./primavera-typography";
+import { PrimaveraEditorialHeading } from "./primavera-editorial-heading";
+import {
+  LoboloCrest,
+  PrimaveraHeroWave,
+  SpringPetalCluster,
+  WovenDivider,
+} from "./primavera-motifs";
 import {
   primaveraReveal,
   primaveraStagger,
   primaveraViewport,
 } from "./primavera-motion";
-import {
-  PrimaveraHeroWave,
-  LoboloCrest,
-  SpringPetalCluster,
-  WovenDivider,
-} from "./primavera-motifs";
-import { PrimaveraEditorialHeading } from "./primavera-editorial-heading";
 import { PRIMAVERA_LAYOUT, PRIMAVERA_SURFACES } from "./primavera-surfaces";
+import { primaveraType } from "./primavera-typography";
 
 type DetailIconProps = {
   className?: string;
@@ -762,8 +779,36 @@ export function PrimaveraFooterSection() {
           </div>
         </a>
         <p className="text-[8px] tracking-[0.28em] uppercase opacity-45 max-w-xs leading-relaxed">
-          {HAXR_AUTH.tagline}
+          {HAXR_AUTH.tagline} · ALTA-COSTURA DIGITAL
         </p>
+
+        {/* Contactos & Redes HAXR */}
+        <div className="flex flex-wrap items-center justify-center gap-3 text-[10px] tracking-wider pt-2 opacity-85">
+          <a
+            href="https://www.haxrsignature.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#C45C26] transition-colors"
+          >
+            www.haxrsignature.com
+          </a>
+          <span>·</span>
+          <a
+            href="https://instagram.com/haxrsignature"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#C45C26] transition-colors"
+          >
+            @haxrsignature
+          </a>
+          <span>·</span>
+          <a
+            href="mailto:info@haxrsignature.com"
+            className="hover:text-[#C45C26] transition-colors"
+          >
+            info@haxrsignature.com
+          </a>
+        </div>
       </div>
 
       <p className="text-[10px] tracking-[0.28em] uppercase opacity-45 mb-2">
@@ -771,14 +816,6 @@ export function PrimaveraFooterSection() {
       </p>
       <p className="text-[10px] tracking-[0.2em] opacity-35">{formatCopyright()}</p>
       <p className="text-[9px] tracking-[0.18em] opacity-30 mt-2">{formatStudioCredit()}</p>
-      <a
-        href={HAXR_AUTH.website}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block text-[9px] tracking-[0.22em] uppercase opacity-35 mt-4 transition-opacity duration-300 hover:opacity-70"
-      >
-        {HAXR_AUTH.brand}
-      </a>
     </footer>
   );
 }
