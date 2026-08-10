@@ -16,9 +16,9 @@ export const NIAN_EVENT = {
   subtitle: "Uma cidade em movimento. Um pequeno herói. Uma celebração inesquecível.",
   conceptualTitle: "NIGHT OF THE WEB",
   calendarTitle: "Aniversário do Nian — NIGHT OF THE WEB",
-  dateIso: "2026-09-12",
-  dateDisplay: "12 · Setembro · 2026",
-  dateDisplayShort: "12 · SETEMBRO · 2026",
+  dateIso: "2026-09-19",
+  dateDisplay: "19 · Setembro · 2026",
+  dateDisplayShort: "19 · SETEMBRO · 2026",
   /** Pendente — não inventar; UI omite enquanto null */
   timeLabel: null as string | null,
   timeHour: null as number | null,
@@ -120,8 +120,10 @@ export const NIAN_RSVP = {
   subtitle: "Confirmação de missão",
   closing: "Missão confirmada. A cidade espera por ti.",
   declinedClosing: "Mensagem recebida. O Nian sentirá a tua falta.",
-  deadlineIso: null as string | null,
-  deadlineLabel: null as string | null,
+  /** Confirmar presença até este dia (inclusive), antes do evento. */
+  deadlineIso: "2026-09-05",
+  deadlineLabel: "05 · Setembro · 2026",
+  deadlineDisplay: "Confirma até 05 · SETEMBRO · 2026",
 } as const;
 
 export type NianRsvpLocalRecord = {

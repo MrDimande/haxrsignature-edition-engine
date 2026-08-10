@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   NIAN_AUDIO_AUTHORIZED,
   NIAN_EVENT,
+  NIAN_RSVP,
   NIAN_VENUE,
   getNianEventTimeLabel,
   getNianMapsUrl,
@@ -23,6 +24,17 @@ describe("nian event-details", () => {
     assert.equal(NIAN_EVENT.timeLabel, null);
     assert.equal(getNianEventTimeLabel(), null);
     assert.equal(shouldShowNianEventTime(), false);
+  });
+
+  it("keeps the authorised event date at 19 September 2026", () => {
+    assert.equal(NIAN_EVENT.dateIso, "2026-09-19");
+    assert.equal(NIAN_EVENT.dateDisplay, "19 · Setembro · 2026");
+    assert.equal(NIAN_EVENT.dateDisplayShort, "19 · SETEMBRO · 2026");
+  });
+
+  it("keeps the RSVP deadline at 5 September 2026", () => {
+    assert.equal(NIAN_RSVP.deadlineIso, "2026-09-05");
+    assert.equal(NIAN_RSVP.deadlineLabel, "05 · Setembro · 2026");
   });
 
   it("uses authorised sunflower track when flag is enabled", () => {

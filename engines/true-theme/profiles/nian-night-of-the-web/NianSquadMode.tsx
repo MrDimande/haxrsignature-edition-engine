@@ -15,6 +15,7 @@ import {
 } from "@lib/nian/assets-manifest";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 import { NianImageArtifactMask } from "./NianImageArtifactMask";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 /**
  * Squad Mode — alegria e brincadeira; painéis azul/vermelho da fotografia.
@@ -259,6 +260,7 @@ export function NianSquadModeSection() {
             já começou.
           </motion.h2>
         </div>
+        <NianSignalPulse active={inView} />
 
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}

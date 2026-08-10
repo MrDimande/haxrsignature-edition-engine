@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 const COLOUR_PLANES = [
   {
@@ -55,9 +56,29 @@ export function NianUniformeSection() {
         }}
       />
 
+      {/* Slow rim / haze breathe */}
+      {!reduceMotion ? (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          animate={{ opacity: [0.28, 0.55, 0.28] }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{
+            background: `
+              radial-gradient(ellipse 55% 40% at 18% 22%, rgba(65,105,225,0.16) 0%, transparent 60%),
+              radial-gradient(ellipse 45% 35% at 86% 72%, rgba(225,6,0,0.1) 0%, transparent 58%)
+            `,
+          }}
+        />
+      ) : null}
+
       <div className="relative z-10 mx-auto grid min-h-[100svh] w-full max-w-7xl items-center gap-10 px-5 pb-[calc(env(safe-area-inset-bottom,0px)+6.5rem)] pt-16 md:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] md:gap-14 md:px-10 md:py-24 lg:gap-20">
-        {/* Chromatic architecture */}
-        <div className="relative flex w-full flex-col gap-3 md:gap-4">
+        {/* Chromatic architecture — power-on sequential */}
+        <div className="relative order-2 flex w-full flex-col gap-3 md:order-1 md:gap-4">
           {COLOUR_PLANES.map((plane, index) => (
             <div
               key={plane.id}
@@ -67,22 +88,22 @@ export function NianUniformeSection() {
               }}
             >
               <motion.div
-                className="absolute inset-0"
+                className="absolute inset-0 origin-left"
                 initial={
                   reduceMotion
                     ? false
-                    : { x: index % 2 === 0 ? "-8%" : "8%", opacity: 0 }
+                    : { scaleX: 0.08, opacity: 0, filter: "brightness(1.35)" }
                 }
                 animate={
                   inView
-                    ? { x: "0%", opacity: 1 }
+                    ? { scaleX: 1, opacity: 1, filter: "brightness(1)" }
                     : reduceMotion
                       ? undefined
-                      : { x: index % 2 === 0 ? "-8%" : "8%", opacity: 0 }
+                      : { scaleX: 0.08, opacity: 0, filter: "brightness(1.35)" }
                 }
                 transition={{
-                  duration: reduceMotion ? 0.45 : 0.95,
-                  delay: reduceMotion ? 0.05 * index : 0.12 + index * 0.18,
+                  duration: reduceMotion ? 0.4 : 0.72,
+                  delay: reduceMotion ? 0.05 * index : 0.1 + index * 0.22,
                   ease: NIAN_EASE,
                 }}
                 style={{
@@ -108,7 +129,7 @@ export function NianUniformeSection() {
                   }
                   transition={{
                     duration: 2.6,
-                    delay: 0.35 + index * 0.2,
+                    delay: 0.45 + index * 0.22,
                     ease: NIAN_EASE,
                   }}
                   style={{
@@ -122,7 +143,7 @@ export function NianUniformeSection() {
                 animate={inView ? { opacity: 1, x: 0 } : undefined}
                 transition={{
                   duration: 0.65,
-                  delay: reduceMotion ? 0.08 * index : 0.28 + index * 0.18,
+                  delay: reduceMotion ? 0.08 * index : 0.32 + index * 0.22,
                   ease: NIAN_EASE,
                 }}
                 className="relative z-[1] flex h-full items-center px-5 text-[clamp(0.95rem,2.4vw,1.2rem)] font-semibold uppercase tracking-[0.28em] text-[#F4F6FB] md:px-7"
@@ -138,8 +159,8 @@ export function NianUniformeSection() {
           ))}
         </div>
 
-        {/* Copy — mask reveal headline */}
-        <div className="relative max-w-xl md:justify-self-end">
+        {/* Copy — first on mobile so dress code is immediately clear */}
+        <div className="relative order-1 max-w-xl md:order-2 md:justify-self-end">
           <motion.p
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             animate={inView ? { opacity: 1, y: 0 } : undefined}
@@ -172,6 +193,7 @@ export function NianUniformeSection() {
               da noite
             </motion.h2>
           </div>
+          <NianSignalPulse active={inView} />
 
           <motion.p
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
@@ -183,14 +205,6 @@ export function NianUniformeSection() {
             <br />
             Entra no universo do Nian.
           </motion.p>
-
-          <motion.div
-            aria-hidden
-            initial={reduceMotion ? false : { scaleX: 0 }}
-            animate={inView ? { scaleX: 1 } : undefined}
-            transition={{ duration: 0.85, delay: 0.4, ease: NIAN_EASE }}
-            className="mt-8 h-px origin-left bg-gradient-to-r from-[#4169E1] via-[#E10600]/55 to-transparent"
-          />
         </div>
       </div>
     </section>

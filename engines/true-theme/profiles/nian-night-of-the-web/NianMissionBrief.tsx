@@ -9,6 +9,7 @@ import {
   getNianEventTimeLabel,
 } from "@lib/nian/event-details";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 function BriefLine({
   label,
@@ -114,6 +115,7 @@ export function NianMissionBriefSection() {
           <br />
           tudo acontece.
         </motion.h2>
+        <NianSignalPulse active={inView} />
 
         <div className="mt-10 md:mt-14">
           <BriefLine

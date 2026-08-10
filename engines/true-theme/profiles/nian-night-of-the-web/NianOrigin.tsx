@@ -14,6 +14,7 @@ import {
   NIAN_CINEMATIC_SIZES,
 } from "@lib/nian/assets-manifest";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 /**
  * Origin Beat — o menino por trás do herói.
@@ -132,6 +133,7 @@ export function NianOriginSection() {
             <br />
             precisa de máscara.
           </motion.h2>
+          <NianSignalPulse active={inView} />
 
           <motion.div
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}

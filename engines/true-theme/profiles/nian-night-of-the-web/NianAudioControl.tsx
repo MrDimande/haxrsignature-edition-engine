@@ -10,10 +10,6 @@ import {
   readNianAudioPreference,
 } from "@lib/nian/event-details";
 import { NIAN_EASE } from "./nian-motion";
-import {
-  NianSoundtrackCredits,
-  type NianCreditsController,
-} from "./NianSoundtrackCredits";
 
 function AudioGlyph({
   mode,
@@ -37,13 +33,10 @@ function AudioGlyph({
 
 /**
  * Mute / unmute / replay — visível após o ritual.
+ * Créditos da banda sonora vivem só no footer (assinatura).
  * Isolado a nian-night-of-the-web.
  */
-export function NianAudioControl({
-  credits,
-}: {
-  credits: NianCreditsController;
-}) {
+export function NianAudioControl() {
   const { introComplete, audioEnabled, setAudioEnabled, theme, audioPlayer } =
     useExperience();
   const reduceMotion = useReducedMotion();
@@ -86,7 +79,6 @@ export function NianAudioControl({
         ? "Voltar a ouvir"
         : "Activar som";
 
-  // preference kept for future UX copy variants (with vs without music entry)
   void preference;
 
   const toggle = async () => {
@@ -118,31 +110,50 @@ export function NianAudioControl({
         }
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.4, ease: NIAN_EASE }}
-        className="pointer-events-none fixed z-[55] flex flex-col items-start gap-2"
+        className="pointer-events-none fixed z-[55]"
         style={{
           left: "max(0.75rem, env(safe-area-inset-left))",
           bottom: "max(1rem, env(safe-area-inset-bottom))",
         }}
       >
-        <NianSoundtrackCredits credits={credits} />
-        <button
-          type="button"
-          onClick={() => void toggle()}
-          aria-label={label}
-          aria-pressed={audioEnabled}
-          title={
-            isNianAuthorizedTrackActive()
-              ? label
-              : `${label} (placeholder silencioso)`
-          }
-          className={`pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4169E1] sm:h-[3.25rem] sm:w-[3.25rem] ${
-            audioEnabled
-              ? "border-[#4169E1] bg-[#4169E1] text-[#F4F6FB] shadow-[0_10px_28px_rgba(5,6,10,0.55)]"
-              : "border-[#4169E1]/45 bg-[#0A0A0C]/90 text-[#4169E1] shadow-[0_10px_28px_rgba(5,6,10,0.55)] hover:border-[#4169E1]"
-          }`}
-        >
-          <AudioGlyph mode={mode} />
-        </button>
+        <div className="relative flex h-12 w-12 items-center justify-center sm:h-[3.25rem] sm:w-[3.25rem]">
+          {/* Dock ring breathe — only while playing */}
+          {mode === "playing" && !reduceMotion ? (
+            <motion.span
+              aria-hidden
+              className="pointer-events-none absolute inset-[-5px] rounded-full border border-[#4169E1]/55"
+              animate={{ opacity: [0.22, 0.72, 0.22] }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              style={{
+                boxShadow: "0 0 18px rgba(65,105,225,0.28)",
+              }}
+            />
+          ) : null}
+          <button
+            type="button"
+            onClick={() => void toggle()}
+            aria-label={label}
+            aria-pressed={audioEnabled}
+            title={
+              isNianAuthorizedTrackActive()
+                ? label
+                : `${label} (placeholder silencioso)`
+            }
+            className={`pointer-events-auto relative z-[1] flex h-full w-full items-center justify-center rounded-full border transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4169E1] ${
+              mode === "ended"
+                ? "border-[#4169E1]/30 bg-[#0A0A0C]/75 text-[#8FA3D1] shadow-[0_10px_28px_rgba(5,6,10,0.45)] opacity-80"
+                : audioEnabled
+                  ? "border-[#4169E1] bg-[#4169E1] text-[#F4F6FB] shadow-[0_10px_28px_rgba(5,6,10,0.55)]"
+                  : "border-[#4169E1]/45 bg-[#0A0A0C]/90 text-[#4169E1] shadow-[0_10px_28px_rgba(5,6,10,0.55)] hover:border-[#4169E1]"
+            }`}
+          >
+            <AudioGlyph mode={mode} />
+          </button>
+        </div>
       </motion.div>
     </AnimatePresence>,
     document.body

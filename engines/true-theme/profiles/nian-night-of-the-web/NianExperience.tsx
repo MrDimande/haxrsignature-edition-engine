@@ -45,7 +45,7 @@ export function NianNightOfTheWebExperience() {
     >
       <NianRitualGate />
       <NianHeroSection />
-      <NianAudioControl credits={credits} />
+      <NianAudioControl />
       <NianOriginSection />
       <NianMissionBriefSection />
       <NianActionBeatSection />

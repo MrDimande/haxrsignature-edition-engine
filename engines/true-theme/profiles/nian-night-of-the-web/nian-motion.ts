@@ -1,6 +1,12 @@
 /** Motion tokens — Nian · NIGHT OF THE WEB */
 export const NIAN_EASE = [0.22, 1, 0.36, 1] as const;
 
+/** Shared section title entrance — slightly faster for transmission rhythm */
+export const NIAN_TITLE_IN = {
+  duration: 0.62,
+  ease: NIAN_EASE,
+} as const;
+
 export const NIAN_COLORS = {
   /** First-paint / SSR-aligned night ground (Nian only). */
   bg: "#03050b",
