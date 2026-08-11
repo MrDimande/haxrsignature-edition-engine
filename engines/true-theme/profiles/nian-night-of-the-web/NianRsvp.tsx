@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { CalendarPlus, Send, Share2 } from "lucide-react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import {
   resolveRsvpClientOutcome,
@@ -11,15 +12,25 @@ import { buildEditionRsvpStorageKey } from "@lib/rsvp/storage-keys";
 import {
   NIAN_SLUG,
   NIAN_RSVP,
+  downloadNianIcsFile,
+  getNianWhatsAppUrl,
   readNianRsvpLocalRecord,
+  shareNianInvite,
   type NianRsvpLocalRecord,
 } from "@lib/nian/event-details";
 import {
   NIAN_RSVP_NOT_PERSISTED_MESSAGE,
   shouldAcceptNianRsvpSuccess,
 } from "@lib/nian/rsvp-persist";
+import { useExperience } from "../../context";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 import { NianSignalPulse } from "./NianSignalPulse";
+
+const ctaClass =
+  "inline-flex min-h-11 items-center justify-center gap-2 border border-[#4169E1]/45 bg-[#070a14] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#F4F6FB] transition hover:border-[#4169E1] hover:bg-[#4169E1]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4169E1]";
+
+const whatsappCtaClass =
+  "inline-flex min-h-11 items-center justify-center gap-2 bg-[#25D366] px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]";
 
 const RSVP_FETCH_TIMEOUT_MS = 30_000;
 
@@ -84,15 +95,18 @@ function loadLocal(slug: string): NianRsvpLocalRecord | null {
  * Isolado a nian-night-of-the-web.
  */
 export function NianRsvpSection() {
+  const { theme } = useExperience();
   const reduceMotion = useReducedMotion();
   const slug = NIAN_SLUG;
   const formId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.28 });
+  const whatsappUrl = getNianWhatsAppUrl(theme.copy.rsvp?.whatsappNumber);
 
   const [form, setForm] = useState<FormState>(initialForm);
   const [status, setStatus] = useState<UiStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [shareHint, setShareHint] = useState("");
   const [submittedAttending, setSubmittedAttending] = useState<boolean | null>(
     null
   );
@@ -297,6 +311,48 @@ export function NianRsvpSection() {
                 <p className="mt-4 text-[1.05rem] leading-relaxed text-[#B0BED8]">
                   A cidade espera por ti.
                 </p>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  {whatsappUrl ? (
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={whatsappCtaClass}
+                    >
+                      <Send size={14} aria-hidden />
+                      Contactar por WhatsApp
+                    </a>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => downloadNianIcsFile()}
+                    className={ctaClass}
+                  >
+                    <CalendarPlus size={14} aria-hidden />
+                    Adicionar ao calendário
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void shareNianInvite().then((result) => {
+                        if (result === "copied") {
+                          setShareHint("Link copiado.");
+                        } else if (result === "shared" || result === "whatsapp") {
+                          setShareHint("");
+                        }
+                      });
+                    }}
+                    className={ctaClass}
+                  >
+                    <Share2 size={14} aria-hidden />
+                    Partilhar convite
+                  </button>
+                </div>
+                {shareHint ? (
+                  <p className="mt-3 text-[0.8rem] text-[#8FA3D1]" role="status">
+                    {shareHint}
+                  </p>
+                ) : null}
               </>
             ) : (
               <>
@@ -309,6 +365,29 @@ export function NianRsvpSection() {
                 <p className="mt-4 text-[1.05rem] leading-relaxed text-[#B0BED8]">
                   O Nian sentirá a tua falta.
                 </p>
+                <div className="mt-8">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void shareNianInvite().then((result) => {
+                        if (result === "copied") {
+                          setShareHint("Link copiado.");
+                        } else {
+                          setShareHint("");
+                        }
+                      });
+                    }}
+                    className={ctaClass}
+                  >
+                    <Share2 size={14} aria-hidden />
+                    Partilhar convite
+                  </button>
+                </div>
+                {shareHint ? (
+                  <p className="mt-3 text-[0.8rem] text-[#8FA3D1]" role="status">
+                    {shareHint}
+                  </p>
+                ) : null}
               </>
             )}
             {status === "already" ? (

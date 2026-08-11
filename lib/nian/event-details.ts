@@ -219,3 +219,155 @@ export function writeNianAudioPreference(pref: NianAudioPreference): void {
     /* private mode */
   }
 }
+
+/**
+ * WhatsApp anfitrião — só dígitos via NEXT_PUBLIC_EDITION_NIAN_WHATSAPP.
+ * Sem fallback: botão oculto até a família confirmar o número.
+ */
+export const NIAN_WHATSAPP_DEFAULT_MESSAGE =
+  "Olá! Acabei de confirmar presença no Aniversário do Nian — NIGHT OF THE WEB (19 de Setembro de 2026). Tenho uma dúvida:" as const;
+
+export function resolveNianWhatsAppDigits(override?: string): string {
+  const raw =
+    override?.trim() ||
+    process.env.NEXT_PUBLIC_EDITION_NIAN_WHATSAPP?.trim() ||
+    "";
+  return raw.replace(/\D/g, "");
+}
+
+export function getNianWhatsAppUrl(
+  phone?: string,
+  message?: string
+): string | null {
+  const digits = resolveNianWhatsAppDigits(phone);
+  if (!digits) return null;
+
+  const text = encodeURIComponent(
+    message ?? NIAN_WHATSAPP_DEFAULT_MESSAGE
+  );
+  return `https://wa.me/${digits}?text=${text}`;
+}
+
+export function getNianInvitePublicUrl(): string {
+  const base =
+    (typeof process !== "undefined" &&
+      process.env.NEXT_PUBLIC_SITE_URL?.trim()) ||
+    "https://edition.haxrsignature.com";
+  return `${base.replace(/\/$/, "")}/nianwebnight`;
+}
+
+export function getNianVenueCalendarLocation(): string {
+  const parts = [NIAN_VENUE.name, NIAN_VENUE.address].filter(Boolean);
+  return parts.join(" — ");
+}
+
+function escapeIcsText(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
+}
+
+function formatIcsStamp(date: Date = new Date()): string {
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+/**
+ * ICS dia inteiro enquanto a hora do evento não estiver confirmada.
+ * Não inventa horário — VALUE=DATE em Africa/Maputo.
+ */
+export function buildNianIcsContent(): string {
+  const day = NIAN_EVENT.dateIso.replace(/-/g, "");
+  const [y, m, d] = NIAN_EVENT.dateIso.split("-").map(Number);
+  const end = new Date(Date.UTC(y, m - 1, d + 1));
+  const next = [
+    end.getUTCFullYear(),
+    String(end.getUTCMonth() + 1).padStart(2, "0"),
+    String(end.getUTCDate()).padStart(2, "0"),
+  ].join("");
+  const description = `${NIAN_EVENT.subtitle} Local: ${getNianVenueCalendarLocation()}.`;
+
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//HAXR Signature//Nian Night of the Web//PT",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    "UID:nian-night-of-the-web-20260919@haxrsignature.com",
+    `DTSTAMP:${formatIcsStamp()}`,
+    `DTSTART;VALUE=DATE:${day}`,
+    `DTEND;VALUE=DATE:${next}`,
+    `SUMMARY:${escapeIcsText(NIAN_EVENT.calendarTitle)}`,
+    `DESCRIPTION:${escapeIcsText(description)}`,
+    `LOCATION:${escapeIcsText(getNianVenueCalendarLocation())}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+}
+
+export function downloadNianIcsFile(): void {
+  if (typeof document === "undefined") return;
+
+  const blob = new Blob([buildNianIcsContent()], {
+    type: "text/calendar;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "Nian_Night_of_the_Web.ics";
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+/** Google Calendar all-day (19 Set → 20 Set exclusivo). */
+export function buildNianGoogleCalendarUrl(): string {
+  return (
+    "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text=" +
+    encodeURIComponent(NIAN_EVENT.calendarTitle) +
+    "&dates=20260919/20260920" +
+    "&details=" +
+    encodeURIComponent(
+      `${NIAN_EVENT.subtitle} Local: ${getNianVenueCalendarLocation()}.`
+    ) +
+    "&location=" +
+    encodeURIComponent(getNianVenueCalendarLocation()) +
+    "&ctz=" +
+    encodeURIComponent(NIAN_TIMEZONE)
+  );
+}
+
+export async function shareNianInvite(): Promise<"shared" | "copied" | "whatsapp" | "aborted"> {
+  if (typeof window === "undefined") return "aborted";
+
+  const url = getNianInvitePublicUrl();
+  const title = NIAN_EVENT.title;
+  const text = `${NIAN_EVENT.conceptualTitle} — ${NIAN_EVENT.dateDisplay}. Junta-te à aventura.`;
+
+  if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+    try {
+      await navigator.share({ title, text, url });
+      return "shared";
+    } catch {
+      /* cancel or unsupported payload — fall through */
+    }
+  }
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      return "copied";
+    }
+  } catch {
+    /* fall through */
+  }
+
+  window.open(
+    `https://api.whatsapp.com/send?text=${encodeURIComponent(`${text}\n${url}`)}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+  return "whatsapp";
+}
