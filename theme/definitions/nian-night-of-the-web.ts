@@ -4,11 +4,14 @@ import {
   NIAN_EVENT,
   NIAN_RSVP,
   NIAN_VENUE,
+  NIAN_WHATSAPP_DEFAULT_MESSAGE,
   resolveNianAudioSrc,
+  resolveNianWhatsAppDigits,
 } from "@lib/nian/event-details";
 import { getNianHeroPhotoSrc } from "@lib/nian/assets-manifest";
 
 const heroImage = getNianHeroPhotoSrc() ?? undefined;
+const nianWhatsApp = resolveNianWhatsAppDigits();
 
 export const nianNightOfTheWebTheme: TrueTheme = {
   identity: "nian-night-of-the-web",
@@ -93,6 +96,12 @@ export const nianNightOfTheWebTheme: TrueTheme = {
       subtitle: NIAN_RSVP.subtitle,
       deadlineIso: NIAN_RSVP.deadlineIso ?? "",
       deadlineLabel: NIAN_RSVP.deadlineLabel ?? "",
+      ...(nianWhatsApp
+        ? {
+            whatsappNumber: nianWhatsApp,
+            whatsappDefaultMessage: NIAN_WHATSAPP_DEFAULT_MESSAGE,
+          }
+        : {}),
     },
   },
 };

@@ -37,6 +37,17 @@ describe("nian event-details", () => {
     assert.equal(NIAN_RSVP.deadlineLabel, "05 · Setembro · 2026");
   });
 
+  it("builds all-day ICS without inventing a clock time", async () => {
+    const { buildNianIcsContent, getNianWhatsAppUrl } = await import(
+      "./event-details"
+    );
+    const ics = buildNianIcsContent();
+    assert.match(ics, /DTSTART;VALUE=DATE:20260919/);
+    assert.match(ics, /DTEND;VALUE=DATE:20260920/);
+    assert.doesNotMatch(ics, /DTSTART;TZID=/);
+    assert.equal(getNianWhatsAppUrl(""), null);
+  });
+
   it("uses authorised sunflower track when flag is enabled", () => {
     assert.equal(NIAN_AUDIO_AUTHORIZED, true);
     assert.equal(
