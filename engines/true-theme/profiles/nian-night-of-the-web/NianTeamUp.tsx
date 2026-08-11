@@ -15,6 +15,7 @@ import {
 } from "@lib/nian/assets-manifest";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 import { NianImageArtifactMask } from "./NianImageArtifactMask";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 /**
  * Team-Up — afecto e vínculo; fotografia como protagonista.
@@ -211,6 +212,7 @@ export function NianTeamUpSection() {
           <br />
           sozinho.
         </motion.h2>
+        <NianSignalPulse active={inView} />
 
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useId, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import {
   resolveRsvpClientOutcome,
   resolveRsvpSubmitUiStateInFinally,
@@ -10,6 +10,7 @@ import {
 import { buildEditionRsvpStorageKey } from "@lib/rsvp/storage-keys";
 import {
   NIAN_SLUG,
+  NIAN_RSVP,
   readNianRsvpLocalRecord,
   type NianRsvpLocalRecord,
 } from "@lib/nian/event-details";
@@ -18,6 +19,7 @@ import {
   shouldAcceptNianRsvpSuccess,
 } from "@lib/nian/rsvp-persist";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 const RSVP_FETCH_TIMEOUT_MS = 30_000;
 
@@ -85,6 +87,8 @@ export function NianRsvpSection() {
   const reduceMotion = useReducedMotion();
   const slug = NIAN_SLUG;
   const formId = useId();
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, { once: true, amount: 0.28 });
 
   const [form, setForm] = useState<FormState>(initialForm);
   const [status, setStatus] = useState<UiStatus>("idle");
@@ -218,6 +222,7 @@ export function NianRsvpSection() {
 
   return (
     <section
+      ref={sectionRef}
       id="rsvp"
       aria-labelledby="nian-rsvp-title"
       className="relative w-full scroll-mt-24 overflow-hidden"
@@ -238,19 +243,17 @@ export function NianRsvpSection() {
       <div className="relative z-10 mx-auto max-w-xl px-5 pb-[calc(env(safe-area-inset-bottom,0px)+7rem)] pt-20 sm:px-6 sm:pt-28">
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
+          animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.5, ease: NIAN_EASE }}
           className="text-[10px] font-semibold uppercase tracking-[0.42em] text-[#4169E1]"
         >
-          Confirmação de missão
+          {NIAN_RSVP.subtitle}
         </motion.p>
 
         <motion.h2
           id="nian-rsvp-title"
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
+          animate={inView ? { opacity: 1, y: 0 } : undefined}
           transition={{ duration: 0.65, delay: 0.06, ease: NIAN_EASE }}
           className="mt-4 text-[clamp(1.85rem,5.5vw,2.85rem)] font-semibold uppercase leading-[1.05] tracking-[0.04em] text-[#F4F6FB]"
           style={{
@@ -261,6 +264,18 @@ export function NianRsvpSection() {
           <br />
           à aventura?
         </motion.h2>
+        <NianSignalPulse active={inView} />
+
+        {showForm ? (
+          <motion.p
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={inView ? { opacity: 1, y: 0 } : undefined}
+            transition={{ duration: 0.5, delay: 0.14, ease: NIAN_EASE }}
+            className="mt-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#8FA3D1]"
+          >
+            {NIAN_RSVP.deadlineDisplay}
+          </motion.p>
+        ) : null}
 
         {status === "already" || status === "success" || status === "declined" ? (
           <motion.div
@@ -273,7 +288,10 @@ export function NianRsvpSection() {
           >
             {(submittedAttending ?? status === "success") ? (
               <>
-                <p className="text-[clamp(1.35rem,4vw,1.75rem)] font-semibold uppercase tracking-[0.08em] text-[#F4F6FB]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.42em] text-[#4169E1]">
+                  Signal // Ack
+                </p>
+                <p className="mt-4 text-[clamp(1.35rem,4vw,1.75rem)] font-semibold uppercase tracking-[0.08em] text-[#F4F6FB]">
                   Missão confirmada.
                 </p>
                 <p className="mt-4 text-[1.05rem] leading-relaxed text-[#B0BED8]">
@@ -282,7 +300,10 @@ export function NianRsvpSection() {
               </>
             ) : (
               <>
-                <p className="text-[clamp(1.35rem,4vw,1.75rem)] font-semibold uppercase tracking-[0.08em] text-[#F4F6FB]">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.42em] text-[#4169E1]">
+                  Signal // Received
+                </p>
+                <p className="mt-4 text-[clamp(1.35rem,4vw,1.75rem)] font-semibold uppercase tracking-[0.08em] text-[#F4F6FB]">
                   Mensagem recebida.
                 </p>
                 <p className="mt-4 text-[1.05rem] leading-relaxed text-[#B0BED8]">

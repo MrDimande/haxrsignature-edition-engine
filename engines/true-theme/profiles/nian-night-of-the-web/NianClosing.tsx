@@ -15,6 +15,7 @@ import {
 } from "@lib/nian/assets-manifest";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 import { NianImageArtifactMask } from "./NianImageArtifactMask";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 /**
  * Closing — convocação final; CTA scrolla para #rsvp sem tocar no áudio.
@@ -238,6 +239,7 @@ export function NianClosingSection() {
             prestes a começar.
           </motion.h2>
         </div>
+        <NianSignalPulse active={inView} />
 
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}
@@ -249,6 +251,26 @@ export function NianClosingSection() {
           <br />
           sem ti.
         </motion.p>
+
+        {/* Existing crimson line — slow residual motion, no new copy */}
+        {!reduceMotion ? (
+          <motion.div
+            aria-hidden
+            className="mt-8 h-px origin-left bg-gradient-to-r from-[#E10600] via-[#4169E1]/45 to-transparent"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={
+              inView
+                ? { scaleX: 1, opacity: [0, 1, 0.55] }
+                : undefined
+            }
+            transition={{ duration: 1.35, delay: 0.28, ease: NIAN_EASE }}
+          />
+        ) : (
+          <div
+            aria-hidden
+            className="mt-8 h-px bg-gradient-to-r from-[#E10600] via-[#4169E1]/45 to-transparent"
+          />
+        )}
 
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 12 }}

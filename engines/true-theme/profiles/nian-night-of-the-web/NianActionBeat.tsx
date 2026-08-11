@@ -15,6 +15,7 @@ import {
 } from "@lib/nian/assets-manifest";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 import { NianImageArtifactMask } from "./NianImageArtifactMask";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 /**
  * Action Beat — full-bleed intensity (mobile) / dual-layer editorial (desktop).
@@ -177,6 +178,9 @@ export function NianActionBeatSection() {
           >
             A cidade acordou.
           </motion.h2>
+        </div>
+        <div className="mx-auto flex justify-center">
+          <NianSignalPulse active={inView} />
         </div>
 
         <motion.p

@@ -89,13 +89,71 @@ function NianHeroMounted() {
   );
 
   return (
-    <section
+    <motion.section
       ref={sectionRef}
       id="hero"
       aria-labelledby="nian-hero-title"
       className="relative flex min-h-[100svh] w-full scroll-mt-20 flex-col overflow-hidden"
       style={{ backgroundColor: NIAN_COLORS.bg }}
+      initial={reduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{
+        duration: reduceMotion ? 0.25 : 0.7,
+        ease: NIAN_EASE,
+      }}
     >
+      {/* Continuity haze — same royal vocabulary as gate handoff */}
+      {!reduceMotion ? (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[6]"
+          initial={{ opacity: 0.55 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.85, ease: NIAN_EASE }}
+          style={{
+            background: `
+              radial-gradient(ellipse 55% 40% at 50% 0%, rgba(65,105,225,0.34) 0%, transparent 58%),
+              radial-gradient(ellipse 58% 48% at 50% 48%, rgba(65,105,225,0.18) 0%, transparent 70%)
+            `,
+          }}
+        />
+      ) : null}
+
+      {/* Web line residual — gate→Hero, fades fast */}
+      {!reduceMotion ? (
+        <motion.svg
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[7] h-full w-full mix-blend-screen"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          initial={{ opacity: 0.55 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.55, ease: NIAN_EASE }}
+        >
+          <path
+            d="M5 5 L50 50 L95 5"
+            fill="none"
+            stroke="#4169E1"
+            strokeWidth="0.35"
+            opacity="0.85"
+          />
+          <path
+            d="M8 95 L50 48 L92 95"
+            fill="none"
+            stroke="#E10600"
+            strokeWidth="0.28"
+            opacity="0.55"
+          />
+          <path
+            d="M0 50 L100 46"
+            fill="none"
+            stroke="#F4F6FB"
+            strokeWidth="0.18"
+            opacity="0.35"
+          />
+        </motion.svg>
+      ) : null}
+
       {/* Skyline / atmosphere */}
       <motion.div className="absolute inset-0" style={{ y: bgY }}>
         <div
@@ -109,6 +167,25 @@ function NianHeroMounted() {
             `,
           }}
         />
+        {/* Slow rim / haze breathe — subliminal continuity */}
+        {!reduceMotion ? (
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            animate={{ opacity: [0.35, 0.62, 0.35] }}
+            transition={{
+              duration: 11,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            style={{
+              background: `
+                radial-gradient(ellipse 48% 36% at 50% 8%, rgba(65,105,225,0.22) 0%, transparent 62%),
+                radial-gradient(ellipse 38% 30% at 78% 40%, rgba(225,6,0,0.1) 0%, transparent 60%)
+              `,
+            }}
+          />
+        ) : null}
         {/* City silhouette blocks */}
         <div
           aria-hidden
@@ -229,7 +306,19 @@ function NianHeroMounted() {
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.22, ease: NIAN_EASE }}
+          transition={{ duration: 0.65, delay: 0.18, ease: NIAN_EASE }}
+          className="mt-3 text-[clamp(0.95rem,3.2vw,1.15rem)] font-medium uppercase tracking-[0.42em] text-[#8FA3D1] sm:mt-4 sm:tracking-[0.48em]"
+          style={{
+            fontFamily: "var(--font-jost), var(--font-montserrat), sans-serif",
+          }}
+        >
+          I&apos;M NIAN.
+        </motion.p>
+
+        <motion.p
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, delay: 0.26, ease: NIAN_EASE }}
           className="mt-4 text-[11px] font-medium uppercase tracking-[0.36em] text-[#F4F6FB]/85 sm:text-xs"
         >
           {NIAN_EVENT.dateDisplayShort}
@@ -238,7 +327,7 @@ function NianHeroMounted() {
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.32, ease: NIAN_EASE }}
+          transition={{ duration: 0.65, delay: 0.34, ease: NIAN_EASE }}
           className="mt-6 max-w-sm space-y-1.5 text-[0.95rem] leading-snug text-[#8FA3D1] sm:text-base"
         >
           <p>Uma cidade em movimento.</p>
@@ -265,6 +354,6 @@ function NianHeroMounted() {
           className="mt-2 block h-8 w-px bg-gradient-to-b from-[#4169E1] to-transparent"
         />
       </motion.div>
-    </section>
+    </motion.section>
   );
 }

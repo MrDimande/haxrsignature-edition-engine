@@ -9,6 +9,7 @@ import {
   hasNianMapsUrl,
 } from "@lib/nian/event-details";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
+import { NianSignalPulse } from "./NianSignalPulse";
 
 /**
  * Localização — ponto de encontro (sem mapa/iframe nesta fase).
@@ -61,7 +62,7 @@ export function NianLocationSection() {
           transition={{ duration: 0.5, ease: NIAN_EASE }}
           className="text-[10px] font-semibold uppercase tracking-[0.42em] text-[#4169E1]"
         >
-          Ponto de encontro
+          Ponto de encontro da missão
         </motion.p>
 
         <div className="mt-4 overflow-hidden">
@@ -85,6 +86,7 @@ export function NianLocationSection() {
             tem um destino.
           </motion.h2>
         </div>
+        <NianSignalPulse active={inView} />
 
         <div className="relative mt-12 space-y-8 md:mt-14">
           {/* Destination marker — subtle luminous point, not radar */}
@@ -151,9 +153,9 @@ export function NianLocationSection() {
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center justify-center border border-[#4169E1] bg-[#4169E1] px-7 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#F4F6FB] transition hover:bg-[#3558c7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4169E1]"
+              className="inline-flex min-h-12 items-center justify-center border border-[#4169E1]/70 bg-transparent px-7 text-[11px] font-semibold uppercase tracking-[0.32em] text-[#F4F6FB] transition hover:border-[#4169E1] hover:bg-[#4169E1]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4169E1]"
             >
-              Abrir localização
+              Abrir ponto de encontro
             </a>
           </motion.div>
         ) : null}
