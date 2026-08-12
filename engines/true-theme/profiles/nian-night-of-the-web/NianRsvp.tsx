@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CalendarPlus, Send, Share2 } from "lucide-react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import {
@@ -98,7 +98,8 @@ export function NianRsvpSection() {
   const { theme } = useExperience();
   const reduceMotion = useReducedMotion();
   const slug = NIAN_SLUG;
-  const formId = useId();
+  /** Stable across SSR/CSR — avoids useId drift under dynamic TrueThemeEngine. */
+  const formId = "nian-rsvp";
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.28 });
   const whatsappUrl = getNianWhatsAppUrl(theme.copy.rsvp?.whatsappNumber);

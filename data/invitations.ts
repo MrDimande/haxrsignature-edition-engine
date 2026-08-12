@@ -309,13 +309,12 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     metadata: {
       title: "Nian — NIGHT OF THE WEB",
       date: "2026-09-19",
-      /** Hora pendente — string vazia; UI pública omite */
-      time: "",
+      time: "13h00",
       location: "Salão de Eventos Benerla · Marracuene, Maputo",
-      dressCode: "Uniforme da Noite · Azul Royal, Vermelho Vivo e Preto",
+      dressCode: "Cores do Universo · Azul Royal, Vermelho Vivo e Preto",
       subtitle: "Uma cidade em movimento. Um pequeno herói. Uma celebração inesquecível.",
       description:
-        "19 de Setembro de 2026 · Salão de Eventos Benerla, Marracuene. NIGHT OF THE WEB — aniversário do Nian.",
+        "19 de Setembro de 2026 · 13h00 · Salão de Eventos Benerla, Marracuene. NIGHT OF THE WEB — aniversário do Nian.",
       eventDate: "2026-09-19",
       eventType: "Aniversário Infantil",
       ogImage: "/images/nian/social/nian-og.png",

@@ -272,7 +272,7 @@ export function NianSquadModeSection() {
           <br />
           Dois pequenos heróis.
           <br />
-          Uma noite inesquecível.
+          Uma aventura inesquecível.
         </motion.p>
       </div>
     </section>

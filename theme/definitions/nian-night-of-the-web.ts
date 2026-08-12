@@ -68,7 +68,7 @@ export const nianNightOfTheWebTheme: TrueTheme = {
     monogram: "N",
   },
   copy: {
-    enterCta: "Entrar na cidade",
+    enterCta: "Entrar no universo",
     heroEyebrow: NIAN_EVENT.conceptualTitle,
     detailsTitle: "Briefing",
     detailsQuote: NIAN_EVENT.subtitle,

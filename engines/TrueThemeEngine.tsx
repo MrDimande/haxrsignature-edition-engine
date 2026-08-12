@@ -117,6 +117,9 @@ export default function TrueThemeEngine({
     >
       <div
         className={`${fontClasses} min-h-full flex flex-col antialiased`}
+        // next/font class hashes can diverge under dynamic() SSR vs CSR;
+        // variables themselves are identical — suppress only this known attribute drift.
+        suppressHydrationWarning
         style={{
           backgroundColor: theme.colors.background,
           color: theme.colors.primary,
