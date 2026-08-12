@@ -142,7 +142,7 @@ export function NianOriginSection() {
             className="mt-6 space-y-4 text-[1.02rem] leading-relaxed text-[#8FA3D1] md:text-[1.08rem] md:text-[#B0BED8]"
           >
             <p>
-              Nesta noite, a cidade não pede salvação —
+              Neste universo, a cidade não pede salvação —
               <br className="hidden sm:block" />
               pede presença.
             </p>

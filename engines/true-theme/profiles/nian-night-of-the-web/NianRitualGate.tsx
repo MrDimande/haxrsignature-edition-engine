@@ -455,14 +455,14 @@ export function NianRitualGate() {
               data-gate-step="date"
               className="relative mt-5 text-[11px] font-medium uppercase tracking-[0.38em] text-[#A4B4D4] sm:text-[12px]"
             >
-              19.09.2026
+              19.09.2026 · 13H00
             </p>
 
             <div
               data-gate-step="support"
               className="relative mt-6 max-w-xs space-y-1 text-[0.95rem] leading-snug text-[#8FA3D1] sm:text-[1rem]"
             >
-              <p>Uma noite.</p>
+              <p>Uma aventura.</p>
               <p>Um pequeno herói.</p>
               <p className="text-[#F4F6FB]/88">Uma missão inesquecível.</p>
             </div>
@@ -485,7 +485,7 @@ export function NianRitualGate() {
               >
                 <span aria-hidden className="nian-gate-cta-glow" />
                 <span aria-hidden className="nian-gate-cta-sweep" />
-                <span className="relative z-[1]">Entrar na noite</span>
+                <span className="relative z-[1]">Entrar no universo</span>
               </button>
               <p
                 aria-hidden

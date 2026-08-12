@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { NianRitualGate } from "./NianRitualGate";
 import { NianHeroSection } from "./NianHero";
 import { NianAudioControl } from "./NianAudioControl";
@@ -23,7 +23,8 @@ import type { NianCreditsController } from "./NianSoundtrackCredits";
  */
 export function NianNightOfTheWebExperience() {
   const [creditsOpen, setCreditsOpen] = useState(false);
-  const panelId = useId();
+  /** Stable across SSR/CSR — avoids useId drift under dynamic TrueThemeEngine. */
+  const panelId = "nian-soundtrack-credits";
   const lastTriggerRef = useRef<HTMLElement | null>(null);
 
   const credits: NianCreditsController = {

@@ -9,7 +9,7 @@ import {
   useTransform,
 } from "motion/react";
 import { useExperience } from "../../context";
-import { NIAN_EVENT } from "@lib/nian/event-details";
+import { NIAN_EVENT, getNianEventTimeLabel } from "@lib/nian/event-details";
 import { getNianHeroPhotoSrc } from "@lib/nian/assets-manifest";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 
@@ -324,6 +324,17 @@ function NianHeroMounted() {
           {NIAN_EVENT.dateDisplayShort}
         </motion.p>
 
+        {getNianEventTimeLabel() ? (
+          <motion.p
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: NIAN_EASE }}
+            className="mt-2 text-[12px] font-semibold uppercase tracking-[0.42em] text-[#4169E1] sm:text-[13px]"
+          >
+            {getNianEventTimeLabel()?.toUpperCase()}
+          </motion.p>
+        ) : null}
+
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -341,7 +352,7 @@ function NianHeroMounted() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="mt-10 text-[9px] uppercase tracking-[0.4em] text-[#8FA3D1]"
         >
-          Desce pela noite
+          Continua a explorar
         </motion.p>
         <motion.span
           aria-hidden
