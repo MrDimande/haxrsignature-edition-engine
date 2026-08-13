@@ -12,6 +12,8 @@ import { useLenis } from "lenis/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useExperience } from "../../context";
 import {
+  NIAN_EVENT,
+  getNianEventTimeLabel,
   isNianAudioReady,
   writeNianAudioPreference,
 } from "@lib/nian/event-details";
@@ -455,7 +457,7 @@ export function NianRitualGate() {
               data-gate-step="date"
               className="relative mt-5 text-[11px] font-medium uppercase tracking-[0.38em] text-[#A4B4D4] sm:text-[12px]"
             >
-              19.09.2026 · 13H00
+              {`${NIAN_EVENT.dateIso.split("-").reverse().join(".")}${getNianEventTimeLabel() ? ` · ${getNianEventTimeLabel()?.toUpperCase()}` : ""}`}
             </p>
 
             <div
