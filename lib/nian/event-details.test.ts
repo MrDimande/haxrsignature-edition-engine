@@ -20,11 +20,11 @@ import { nianNightOfTheWebTheme } from "../../theme/definitions/nian-night-of-th
 import { ThemeRegistry } from "../../theme/registry";
 
 describe("nian event-details", () => {
-  it("publishes the confirmed 13h00 start time", () => {
-    assert.equal(NIAN_EVENT.timeLabel, "13h00");
-    assert.equal(NIAN_EVENT.timeHour, 13);
+  it("publishes the confirmed 12h00 start time", () => {
+    assert.equal(NIAN_EVENT.timeLabel, "12h00");
+    assert.equal(NIAN_EVENT.timeHour, 12);
     assert.equal(NIAN_EVENT.timeMinute, 0);
-    assert.equal(getNianEventTimeLabel(), "13h00");
+    assert.equal(getNianEventTimeLabel(), "12h00");
     assert.equal(shouldShowNianEventTime(), true);
   });
 
@@ -39,12 +39,12 @@ describe("nian event-details", () => {
     assert.equal(NIAN_RSVP.deadlineLabel, "05 · Setembro · 2026");
   });
 
-  it("builds timed ICS at 13:00 Africa/Maputo without inventing an end time", async () => {
+  it("builds timed ICS at 12:00 Africa/Maputo without inventing an end time", async () => {
     const { buildNianIcsContent, getNianWhatsAppUrl } = await import(
       "./event-details"
     );
     const ics = buildNianIcsContent();
-    assert.match(ics, /DTSTART;TZID=Africa\/Maputo:20260919T130000/);
+    assert.match(ics, /DTSTART;TZID=Africa\/Maputo:20260919T120000/);
     assert.doesNotMatch(ics, /DTEND/);
     assert.doesNotMatch(ics, /DTSTART;VALUE=DATE/);
     assert.equal(getNianWhatsAppUrl(""), null);

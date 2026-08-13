@@ -3,7 +3,7 @@
  * Fonte única de verdade do evento Edition.
  *
  * NIGHT OF THE WEB = universo criativo (não indicação de horário).
- * Celebração real: 19 Set 2026 · 13h00 (Africa/Maputo).
+ * Celebração real: 19 Set 2026 · 12h00 (Africa/Maputo).
  */
 
 export const NIAN_SLUG = "nian" as const;
@@ -19,9 +19,9 @@ export const NIAN_EVENT = {
   dateIso: "2026-09-19",
   dateDisplay: "19 · Setembro · 2026",
   dateDisplayShort: "19 · SETEMBRO · 2026",
-  /** Confirmed — 13h00 Africa/Maputo */
-  timeLabel: "13h00",
-  timeHour: 13,
+  /** Confirmed — 12h00 Africa/Maputo */
+  timeLabel: "12h00",
+  timeHour: 12,
   timeMinute: 0,
   /** Soft Google Calendar span when end time is unknown — not shown in UI. */
   googleSoftDurationHours: 3,
@@ -228,7 +228,7 @@ export function writeNianAudioPreference(pref: NianAudioPreference): void {
  * Sem fallback: botão oculto até a família confirmar o número.
  */
 export const NIAN_WHATSAPP_DEFAULT_MESSAGE =
-  "Olá! Acabei de confirmar presença no Aniversário do Nian — NIGHT OF THE WEB (19 de Setembro de 2026 · 13h00). Tenho uma dúvida:" as const;
+  "Olá! Acabei de confirmar presença no Aniversário do Nian — NIGHT OF THE WEB (19 de Setembro de 2026 · 12h00). Tenho uma dúvida:" as const;
 
 export function resolveNianWhatsAppDigits(override?: string): string {
   const raw =
@@ -307,7 +307,7 @@ export function getNianEventStartDate(): Date {
 }
 
 /**
- * ICS com TZID=Africa/Maputo às 13h00.
+ * ICS com TZID=Africa/Maputo às 12h00.
  * Sem DTEND — horário de término não confirmado.
  */
 export function buildNianIcsContent(): string {
@@ -356,7 +356,7 @@ export function downloadNianIcsFile(): void {
   URL.revokeObjectURL(url);
 }
 
-/** Google Calendar — 13h00 Maputo; soft end only for template span (not UI). */
+/** Google Calendar — 12h00 Maputo; soft end only for template span (not UI). */
 export function buildNianGoogleCalendarUrl(): string {
   const start = getNianEventStartDate();
   const end = new Date(
