@@ -21,8 +21,9 @@ export default function MemoriasLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${playfair.variable} ${inter.variable} min-h-screen bg-[#F5EDE4] text-[#2A1810]`}>
+    <div className={`${playfair.variable} ${inter.variable} min-h-screen`}>
       {children}
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createTraditionalMemoryUploadIntent } from "@lib/jessica-samuel-traditional/memories/upload";
+import { createMemoryUploadIntent } from "@lib/memories/upload";
 
 export async function POST(request: Request) {
   try {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Tamanho de ficheiro inválido." }, { status: 400 });
     }
 
-    const result = await createTraditionalMemoryUploadIntent(
+    const result = await createMemoryUploadIntent(
       {
         slug,
         fileName,
@@ -72,3 +72,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

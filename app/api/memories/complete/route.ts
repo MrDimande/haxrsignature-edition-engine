@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { completeTraditionalMemoryUpload } from "@lib/jessica-samuel-traditional/memories/upload";
+import { completeMemoryUpload } from "@lib/memories/upload";
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Pedido inválido." }, { status: 400 });
     }
 
-    const result = await completeTraditionalMemoryUpload(
+    const result = await completeMemoryUpload(
       body.slug ?? "",
       body.photoId ?? "",
       request,
@@ -56,3 +56,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

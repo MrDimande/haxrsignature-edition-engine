@@ -4,6 +4,7 @@ import { getInvitation, getActiveInvitations } from "@data/invitations";
 import { getTheme } from "@theme/resolver";
 import { resolveSlug } from "@lib/engine";
 import { MemoriasExperience } from "@engines/true-theme/profiles/primavera-lobolo/memories/MemoriasExperience";
+import { PlusMemoriasExperience } from "@engines/true-theme/profiles/jessica-samuel-wedding/memories/PlusMemoriasExperience";
 
 interface MemoriasPageProps {
   params: Promise<{ slug: string }>;
@@ -39,9 +40,14 @@ export async function generateMetadata({
     };
   }
 
+  const variant = invitation.features.memories.variant;
+  const title = variant === "plus-memories"
+    ? `Plus Memories — ${invitation.metadata.title}`
+    : `Memórias do Nosso Dia — ${invitation.metadata.title}`;
+
   return {
-    title: `Memórias do Nosso Dia — ${invitation.metadata.title}`,
-    description: "Partilhe fotos e vídeos do nosso casamento tradicional. Um álbum de memórias colectivo.",
+    title,
+    description: "Partilhe fotos e vídeos do nosso casamento. Um álbum de memórias colectivo.",
     robots: { index: false, follow: false },
   };
 }
@@ -73,6 +79,20 @@ export default async function MemoriasPage({
   const mesaRaw = sp?.mesa;
   const mesa = typeof mesaRaw === "string" ? mesaRaw.trim() : undefined;
 
+  // Variant determina o perfil funcional — theme é apenas apresentação
+  const variant = invitation.features.memories.variant;
+
+  if (variant === "plus-memories") {
+    return (
+      <PlusMemoriasExperience
+        config={invitation}
+        theme={theme}
+        tableId={mesa}
+      />
+    );
+  }
+
+  // Default: traditional-memories
   return (
     <MemoriasExperience
       config={invitation}
@@ -81,3 +101,4 @@ export default async function MemoriasPage({
     />
   );
 }
+
