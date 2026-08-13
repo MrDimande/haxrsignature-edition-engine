@@ -19,10 +19,10 @@ import { nianNightOfTheWebTheme } from "../../theme/definitions/nian-night-of-th
 import { ThemeRegistry } from "../../theme/registry";
 
 describe("nian event-details", () => {
-  it("does not invent event time while pending", () => {
-    assert.equal(NIAN_EVENT.timeLabel, null);
-    assert.equal(getNianEventTimeLabel(), null);
-    assert.equal(shouldShowNianEventTime(), false);
+  it("configures event time to 12h00", () => {
+    assert.equal(NIAN_EVENT.timeLabel, "12h00");
+    assert.equal(getNianEventTimeLabel(), "12h00");
+    assert.equal(shouldShowNianEventTime(), true);
   });
 
   it("uses authorised sunflower track when flag is enabled", () => {

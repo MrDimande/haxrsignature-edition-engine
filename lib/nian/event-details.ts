@@ -2,8 +2,7 @@
  * Nian — NIGHT OF THE WEB
  * Fonte única de verdade do evento Edition.
  *
- * Hora ainda não fornecida — manter `timeLabel` null e NÃO inventar /
- * NÃO mostrar “hora a confirmar” na UI pública.
+ * Horário do evento: 12h00.
  */
 
 export const NIAN_SLUG = "nian" as const;
@@ -19,10 +18,10 @@ export const NIAN_EVENT = {
   dateIso: "2026-09-12",
   dateDisplay: "12 · Setembro · 2026",
   dateDisplayShort: "12 · SETEMBRO · 2026",
-  /** Pendente — não inventar; UI omite enquanto null */
-  timeLabel: null as string | null,
-  timeHour: null as number | null,
-  timeMinute: null as number | null,
+  /** Horário do evento: 12h00 */
+  timeLabel: "12h00" as string | null,
+  timeHour: 12 as number | null,
+  timeMinute: 0 as number | null,
   eventType: "Aniversário Infantil",
   city: "Marracuene, Maputo",
   country: "Moçambique",
