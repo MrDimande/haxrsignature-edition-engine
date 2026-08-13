@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   NIAN_AUDIO_AUTHORIZED,
   NIAN_EVENT,
+  NIAN_RSVP,
   NIAN_VENUE,
   getNianEventTimeLabel,
   getNianMapsUrl,
@@ -19,10 +20,34 @@ import { nianNightOfTheWebTheme } from "../../theme/definitions/nian-night-of-th
 import { ThemeRegistry } from "../../theme/registry";
 
 describe("nian event-details", () => {
-  it("configures event time to 12h00", () => {
+  it("publishes the confirmed 12h00 start time", () => {
     assert.equal(NIAN_EVENT.timeLabel, "12h00");
+    assert.equal(NIAN_EVENT.timeHour, 12);
+    assert.equal(NIAN_EVENT.timeMinute, 0);
     assert.equal(getNianEventTimeLabel(), "12h00");
     assert.equal(shouldShowNianEventTime(), true);
+  });
+
+  it("keeps the authorised event date at 19 September 2026", () => {
+    assert.equal(NIAN_EVENT.dateIso, "2026-09-19");
+    assert.equal(NIAN_EVENT.dateDisplay, "19 · Setembro · 2026");
+    assert.equal(NIAN_EVENT.dateDisplayShort, "19 · SETEMBRO · 2026");
+  });
+
+  it("keeps the RSVP deadline at 5 September 2026", () => {
+    assert.equal(NIAN_RSVP.deadlineIso, "2026-09-05");
+    assert.equal(NIAN_RSVP.deadlineLabel, "05 · Setembro · 2026");
+  });
+
+  it("builds timed ICS at 12:00 Africa/Maputo without inventing an end time", async () => {
+    const { buildNianIcsContent, getNianWhatsAppUrl } = await import(
+      "./event-details"
+    );
+    const ics = buildNianIcsContent();
+    assert.match(ics, /DTSTART;TZID=Africa\/Maputo:20260919T120000/);
+    assert.doesNotMatch(ics, /DTEND/);
+    assert.doesNotMatch(ics, /DTSTART;VALUE=DATE/);
+    assert.equal(getNianWhatsAppUrl(""), null);
   });
 
   it("uses authorised sunflower track when flag is enabled", () => {
