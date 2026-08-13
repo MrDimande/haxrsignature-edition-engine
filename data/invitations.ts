@@ -35,9 +35,17 @@ export interface InvitationAdminBinding {
   expectedRegistryKey?: string;
 }
 
+/**
+ * Variant identifica o perfil funcional da experiência de memórias.
+ * Não confundir com theme (apresentação visual) — variant determina comportamento.
+ */
+export type MemoriesVariant = "traditional-memories" | "plus-memories";
+
 export interface InvitationFeatures {
   memories?: {
     enabled: boolean;
+    /** Perfil funcional da experiência (determina componentes, desafios, etc.) */
+    variant: MemoriesVariant;
   };
 }
 
@@ -141,6 +149,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     features: {
       memories: {
         enabled: true,
+        variant: "traditional-memories",
       },
     },
   },
@@ -259,6 +268,12 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       adminEventName: "Edition · Casamento · Jessica & Samuel",
       envVar: "EDITION_EVENT_JESSICA_WEDDING_ID",
       expectedRegistryKey: "jessica-samuel-wedding",
+    },
+    features: {
+      memories: {
+        enabled: true,
+        variant: "plus-memories",
+      },
     },
   },
   stanturns5: {
