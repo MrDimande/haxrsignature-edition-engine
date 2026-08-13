@@ -14,8 +14,8 @@ const SLUG_ALIASES: Record<string, string> = {
 const INVITATION_FEATURES: Record<string, Omit<InvitationContext, "slug">> = {
   jessicasamuelwedding: {
     giftsRegistryKey: "jessica-samuel",
-    // Photo wall fica fora deste release de publicação.
-    photoWallEnabled: false,
+    photoWallEnabled: true,
+    photoWallBucket: "wedding-photos",
   },
   jessicachadelingerie: {
     giftsRegistryKey: "rose-elegance",

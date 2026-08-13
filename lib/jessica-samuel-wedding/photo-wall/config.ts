@@ -8,8 +8,7 @@ import { WEDDING_EVENT } from "../event-details";
  */
 export const JESSICA_SAMUEL_PHOTO_WALL = {
   /** Feature live — teaser + galeria montados no convite. */
-  /** Upload público adiado nesta release — Memórias em modo visual/read-only. */
-  enabled: false,
+  enabled: true,
   /** Início do dia do casamento (Maputo). */
   opensAt: `${WEDDING_EVENT.dateIso}T00:00:00+02:00` as string | null,
   /** null = álbum permanente (uploads continuam após o dia). */
