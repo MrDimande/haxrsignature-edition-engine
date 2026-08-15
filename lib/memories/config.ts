@@ -1,17 +1,18 @@
 import { resolveSlug } from "@lib/engine";
-import { getInvitation, type InvitationConfig, type MemoriesVariant } from "@data/invitations";
+import {
+  getInvitation,
+  type InvitationConfig,
+  type MemoriesVariant,
+  type InvitationCompetitionConfig,
+} from "@data/invitations";
 
 /**
- * Configuração genérica de Memórias — multi-evento.
- *
- * Resolve a config de memórias a partir de qualquer slug
- * com `features.memories.enabled = true`.
- *
- * O slug canónico serve como:
- *  - prefixo de storage path
- *  - filtro de `invitation_slug` na DB
- *  - scope de rate-limiting
+ * Whitelist oficial dos 12 desafios do Plus Memories no servidor.
  */
+export const PLUS_MEMORIES_CHALLENGE_WHITELIST = [
+  "01", "02", "03", "04", "05", "06",
+  "07", "08", "09", "10", "11", "12",
+] as const;
 
 export interface MemoriesEventConfig {
   enabled: true;
@@ -30,6 +31,8 @@ export interface MemoriesEventConfig {
   maxGuestNameLength: number;
   signedUrlTtlSeconds: number;
   uploadIntentTtlSeconds: number;
+  competition: InvitationCompetitionConfig | null;
+  challengeWhitelist: readonly string[];
 }
 
 /** Defaults partilhados por todos os eventos */
@@ -79,10 +82,15 @@ export function resolveMemoriesConfig(slug: string): MemoriesEventConfig | null 
   if (!invitation || invitation.status !== "active") return null;
   if (!invitation.features?.memories?.enabled) return null;
 
+  const memoriesFeature = invitation.features.memories;
+  const competition = memoriesFeature.competition ?? null;
+
   return {
     enabled: true,
-    variant: invitation.features.memories.variant,
+    variant: memoriesFeature.variant,
     invitationSlug: invitation.slug,
+    competition,
+    challengeWhitelist: PLUS_MEMORIES_CHALLENGE_WHITELIST,
     ...MEMORIES_DEFAULTS,
   };
 }

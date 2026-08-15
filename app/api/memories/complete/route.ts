@@ -10,6 +10,7 @@ export async function POST(request: Request) {
       caption?: string;
       challengeId?: string;
       tableId?: string;
+      participantId?: string;
     };
 
     if (!body || typeof body !== "object") {
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
         caption: typeof body.caption === "string" ? body.caption : undefined,
         challengeId: typeof body.challengeId === "string" ? body.challengeId : undefined,
         tableId: typeof body.tableId === "string" ? body.tableId : undefined,
+        participantId: typeof body.participantId === "string" ? body.participantId : undefined,
       }
     );
 

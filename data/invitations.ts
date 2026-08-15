@@ -41,11 +41,18 @@ export interface InvitationAdminBinding {
  */
 export type MemoriesVariant = "traditional-memories" | "plus-memories";
 
+export interface InvitationCompetitionConfig {
+  enabled: boolean;
+  mode: "unique-challenges";
+  totalChallenges: number;
+}
+
 export interface InvitationFeatures {
   memories?: {
     enabled: boolean;
     /** Perfil funcional da experiência (determina componentes, desafios, etc.) */
     variant: MemoriesVariant;
+    competition?: InvitationCompetitionConfig;
   };
 }
 
@@ -273,6 +280,11 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       memories: {
         enabled: true,
         variant: "plus-memories",
+        competition: {
+          enabled: true,
+          mode: "unique-challenges",
+          totalChallenges: 12,
+        },
       },
     },
   },

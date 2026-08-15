@@ -10,6 +10,7 @@ export type MemoryUploadOptions = {
   tableId?: string;
   guestName?: string;
   caption?: string;
+  participantId?: string;
   onProgress?: (progress: number) => void;
 };
 
@@ -24,6 +25,7 @@ export async function uploadPlusMemory({
   tableId,
   guestName,
   caption,
+  participantId,
 }: MemoryUploadOptions): Promise<MemoryUploadResult> {
   try {
     // 1. Request Intent
@@ -39,6 +41,7 @@ export async function uploadPlusMemory({
         caption,
         challengeId,
         tableId,
+        participantId,
       }),
     });
 
@@ -79,6 +82,7 @@ export async function uploadPlusMemory({
         caption,
         challengeId,
         tableId,
+        participantId,
       }),
     });
 

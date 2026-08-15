@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS } from "@lib/security/rate-limit";
-import { resolveMemoriesConfig, type MemoriesEventConfig } from "./config";
+import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST, type MemoriesEventConfig } from "./config";
 import {
   buildStoragePath,
   matchesMagicBytes,
@@ -29,6 +29,7 @@ export type MemoryUploadIntentInput = {
   caption?: string;
   challengeId?: string;
   tableId?: string;
+  participantId?: string;
 };
 
 export type MemoryUploadIntentResult =
@@ -48,6 +49,7 @@ export type MemoryCompleteInput = {
   caption?: string;
   challengeId?: string;
   tableId?: string;
+  participantId?: string;
 };
 
 // ──────────────────────────────────────────────
@@ -79,9 +81,23 @@ let signedUploadUrlImpl: SignedUploadUrlFn = async (
 // Validadores locais
 // ──────────────────────────────────────────────
 
+const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function validateParticipantId(participantId?: string): string | null {
+  if (!participantId?.trim()) return null;
+  const trimmed = participantId.trim();
+  if (trimmed.length > 36 || !UUID_V4_REGEX.test(trimmed)) {
+    return "ID de participante inválido.";
+  }
+  return null;
+}
+
 function validateChallengeId(challengeId?: string): string | null {
   if (!challengeId?.trim()) return null;
-  if (challengeId.trim().length > 20) return "ID de desafio inválido.";
+  const trimmed = challengeId.trim();
+  if (trimmed.length > 20 || !PLUS_MEMORIES_CHALLENGE_WHITELIST.includes(trimmed as any)) {
+    return "ID de desafio inválido.";
+  }
   return null;
 }
 
@@ -132,6 +148,9 @@ export async function createMemoryUploadIntent(
 
   const tableError = validateTableId(input.tableId);
   if (tableError) return { success: false, error: tableError };
+
+  const participantError = validateParticipantId(input.participantId);
+  if (participantError) return { success: false, error: participantError };
 
   const limit = await publicMutationRateLimit(
     {
@@ -220,6 +239,7 @@ export async function completeMemoryUpload(
     caption?: string;
     challengeId?: string;
     tableId?: string;
+    participantId?: string;
   } = {}
 ): Promise<{ success: boolean; error?: string; code?: string; retryAfterSeconds?: number }> {
   const config = resolveMemoriesConfig(slug);
@@ -241,6 +261,9 @@ export async function completeMemoryUpload(
 
   const tableError = validateTableId(metadata.tableId);
   if (tableError) return { success: false, error: tableError };
+
+  const participantError = validateParticipantId(metadata.participantId);
+  if (participantError) return { success: false, error: participantError };
 
   const limit = await publicMutationRateLimit(
     {
@@ -351,6 +374,7 @@ export async function completeMemoryUpload(
     caption: metadata.caption?.trim() || null,
     challenge_id: metadata.challengeId?.trim() || null,
     table_id: metadata.tableId?.trim() || null,
+    participant_id: metadata.participantId?.trim() || null,
     moderation_status: "pending",
   });
 

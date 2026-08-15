@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     const caption = typeof record.caption === "string" ? record.caption.trim() : undefined;
     const challengeId = typeof record.challengeId === "string" ? record.challengeId.trim() : undefined;
     const tableId = typeof record.tableId === "string" ? record.tableId.trim() : undefined;
+    const participantId = typeof record.participantId === "string" ? record.participantId.trim() : undefined;
 
     if (!slug) {
       return NextResponse.json({ success: false, error: "Convite inválido." }, { status: 400 });
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
         caption: caption || undefined,
         challengeId: challengeId || undefined,
         tableId: tableId || undefined,
+        participantId: participantId || undefined,
       },
       request
     );
