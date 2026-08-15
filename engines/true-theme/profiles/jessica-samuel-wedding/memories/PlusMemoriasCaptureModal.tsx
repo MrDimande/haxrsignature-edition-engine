@@ -14,6 +14,7 @@ interface PlusMemoriasCaptureModalProps {
   challenge: MemoryChallenge | null;
   slug: string;
   tableId?: string;
+  participantId?: string;
   onSuccess: (challengeId?: string) => void;
 }
 
@@ -23,6 +24,7 @@ export function PlusMemoriasCaptureModal({
   challenge,
   slug,
   tableId,
+  participantId,
   onSuccess,
 }: PlusMemoriasCaptureModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -98,6 +100,7 @@ export function PlusMemoriasCaptureModal({
         tableId,
         guestName: guestName.trim() || undefined,
         caption: caption.trim() || undefined,
+        participantId,
       });
 
       if (result.success) {
@@ -118,6 +121,7 @@ export function PlusMemoriasCaptureModal({
             caption: caption.trim() || undefined,
             challengeId: challenge?.id,
             tableId,
+            participantId,
           });
           setStatus("success");
           setErrorMessage("");
@@ -141,6 +145,7 @@ export function PlusMemoriasCaptureModal({
         caption: caption.trim() || undefined,
         challengeId: challenge?.id,
         tableId,
+        participantId,
       });
       setStatus("success");
       setTimeout(() => {

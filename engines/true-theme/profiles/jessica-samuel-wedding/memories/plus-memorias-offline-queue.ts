@@ -14,6 +14,7 @@ export interface QueuedMemoryItem {
   caption?: string;
   challengeId?: string;
   tableId?: string;
+  participantId?: string;
   timestamp: number;
 }
 
