@@ -14,6 +14,7 @@ import {
   PLUS_MEMORY_CHALLENGES,
   getCompletedChallenges,
   markChallengeCompleted,
+  replaceCompletedChallenges,
   type MemoryChallenge,
 } from "./plus-memorias-challenges";
 import {
@@ -70,11 +71,11 @@ export function PlusMemoriasExperience({
           .then((res) => res.json())
           .then((data) => {
             if (data.success && Array.isArray(data.completedChallengeIds)) {
-              let updated = localCompleted;
-              for (const chId of data.completedChallengeIds) {
-                updated = markChallengeCompleted(config.slug, chId);
-              }
-              setCompletedIds(updated);
+              const serverCompleted = replaceCompletedChallenges(
+                config.slug,
+                data.completedChallengeIds
+              );
+              setCompletedIds(serverCompleted);
             }
           })
           .catch((err) => {

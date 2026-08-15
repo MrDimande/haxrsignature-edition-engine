@@ -145,6 +145,26 @@ export function getCompletedChallenges(slug: string): string[] {
   }
 }
 
+export function replaceCompletedChallenges(
+  slug: string,
+  challengeIds: readonly unknown[]
+): string[] {
+  const allowedIds = new Set(PLUS_MEMORY_CHALLENGES.map((challenge) => challenge.id));
+  const completedIds = Array.from(
+    new Set(challengeIds.map(String).filter((challengeId) => allowedIds.has(challengeId)))
+  );
+
+  if (typeof window === "undefined") return completedIds;
+
+  try {
+    localStorage.setItem(storageKey(slug), JSON.stringify(completedIds));
+  } catch {
+    // O estado React continua a usar o snapshot autoritativo mesmo sem persistência local.
+  }
+
+  return completedIds;
+}
+
 export function markChallengeCompleted(slug: string, challengeId: string): string[] {
   if (typeof window === "undefined") return [];
   try {
