@@ -11,11 +11,12 @@ export type MemoryUploadOptions = {
   guestName?: string;
   caption?: string;
   participantId?: string;
+  phaseId?: string;
   onProgress?: (progress: number) => void;
 };
 
 export type MemoryUploadResult =
-  | { success: true; message: string }
+  | { success: true; message: string; photoId: string }
   | { success: false; error: string };
 
 export async function uploadPlusMemory({
@@ -26,6 +27,7 @@ export async function uploadPlusMemory({
   guestName,
   caption,
   participantId,
+  phaseId,
 }: MemoryUploadOptions): Promise<MemoryUploadResult> {
   try {
     // 1. Request Intent
@@ -42,6 +44,7 @@ export async function uploadPlusMemory({
         challengeId,
         tableId,
         participantId,
+        phaseId,
       }),
     });
 
@@ -83,6 +86,7 @@ export async function uploadPlusMemory({
         challengeId,
         tableId,
         participantId,
+        phaseId,
       }),
     });
 
@@ -97,6 +101,7 @@ export async function uploadPlusMemory({
     return {
       success: true,
       message: completeData.message || "MOMENTO GUARDADO",
+      photoId,
     };
   } catch (error) {
     console.error("uploadPlusMemory client error:", error);

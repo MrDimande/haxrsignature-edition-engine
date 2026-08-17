@@ -47,12 +47,31 @@ export interface InvitationCompetitionConfig {
   totalChallenges: number;
 }
 
+export type PlusMemoriesPackage = "collection" | "couture" | "signature";
+
+export interface InvitationMemoriesVoiceConfig {
+  enabled: boolean;
+  maxDurationSeconds: number;
+  visibility: "hosts-only";
+}
+
+export interface InvitationMemoriesPhasesConfig {
+  enabled: boolean;
+  profile: "jessica-samuel-2026";
+}
+
 export interface InvitationFeatures {
   memories?: {
     enabled: boolean;
     /** Perfil funcional da experiência (determina componentes, desafios, etc.) */
     variant: MemoriesVariant;
+    /** Nome editorial apresentado no motor Plus Memories. */
+    displayName?: string;
+    /** Enquadramento comercial; não bloqueia features automaticamente. */
+    package?: PlusMemoriesPackage;
     competition?: InvitationCompetitionConfig;
+    phases?: InvitationMemoriesPhasesConfig;
+    voiceMessages?: InvitationMemoriesVoiceConfig;
   };
 }
 
@@ -280,10 +299,21 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       memories: {
         enabled: true,
         variant: "plus-memories",
+        displayName: "Jessica Muege & Samuel Govene",
+        package: "signature",
         competition: {
           enabled: true,
           mode: "unique-challenges",
           totalChallenges: 12,
+        },
+        phases: {
+          enabled: true,
+          profile: "jessica-samuel-2026",
+        },
+        voiceMessages: {
+          enabled: true,
+          maxDurationSeconds: 45,
+          visibility: "hosts-only",
         },
       },
     },

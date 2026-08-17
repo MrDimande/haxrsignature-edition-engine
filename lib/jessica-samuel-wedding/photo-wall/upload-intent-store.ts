@@ -4,6 +4,7 @@ export type PhotoUploadIntentStatus = "pending" | "consumed" | "expired";
 
 export type PhotoUploadIntentRecord = {
   photoId: string;
+  experienceId?: string | null;
   slug: string;
   bucketName: string;
   storagePath: string;
@@ -17,6 +18,7 @@ export type PhotoUploadIntentRecord = {
 
 export type CreatePhotoUploadIntentRecordInput = {
   photoId: string;
+  experienceId?: string | null;
   slug: string;
   bucketName: string;
   storagePath: string;
@@ -41,6 +43,7 @@ export interface PhotoUploadIntentRepository {
 
 type PhotoUploadIntentRow = {
   id: string;
+  experience_id: string | null;
   invitation_slug: string;
   bucket_name: string;
   storage_path: string;
@@ -55,6 +58,7 @@ type PhotoUploadIntentRow = {
 function mapRow(row: PhotoUploadIntentRow): PhotoUploadIntentRecord {
   return {
     photoId: row.id,
+    experienceId: row.experience_id,
     slug: row.invitation_slug,
     bucketName: row.bucket_name,
     storagePath: row.storage_path,
@@ -74,6 +78,7 @@ export class SupabasePhotoUploadIntentRepository
     const supabase = createAdminClient();
     const { error } = await supabase.from("photo_upload_intents").insert({
       id: input.photoId,
+      experience_id: input.experienceId ?? null,
       invitation_slug: input.slug,
       bucket_name: input.bucketName,
       storage_path: input.storagePath,
@@ -104,7 +109,7 @@ export class SupabasePhotoUploadIntentRepository
       .eq("status", "pending")
       .gt("expires_at", input.nowIso)
       .select(
-        "id, invitation_slug, bucket_name, storage_path, content_type, declared_file_size_bytes, status, created_at, expires_at, consumed_at"
+        "id, experience_id, invitation_slug, bucket_name, storage_path, content_type, declared_file_size_bytes, status, created_at, expires_at, consumed_at"
       )
       .maybeSingle();
 

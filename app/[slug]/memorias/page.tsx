@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getInvitation, getActiveInvitations } from "@data/invitations";
 import { getTheme } from "@theme/resolver";
 import { resolveSlug } from "@lib/engine";
+import { resolveMemoriesConfig } from "@lib/memories/config";
 import { MemoriasExperience } from "@engines/true-theme/profiles/primavera-lobolo/memories/MemoriasExperience";
 import { PlusMemoriasExperience } from "@engines/true-theme/profiles/jessica-samuel-wedding/memories/PlusMemoriasExperience";
 
@@ -83,13 +84,10 @@ export default async function MemoriasPage({
   const variant = invitation.features.memories.variant;
 
   if (variant === "plus-memories") {
-    return (
-      <PlusMemoriasExperience
-        config={invitation}
-        theme={theme}
-        tableId={mesa}
-      />
-    );
+    const memoriesConfig = resolveMemoriesConfig(canonicalSlug);
+    if (!memoriesConfig) notFound();
+
+    return <PlusMemoriasExperience config={memoriesConfig} tableId={mesa} />;
   }
 
   // Default: traditional-memories

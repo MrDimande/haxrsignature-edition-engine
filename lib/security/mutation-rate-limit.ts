@@ -5,7 +5,7 @@ import {
 } from "@lib/security/persistent-rate-limit";
 import { getRequestIp, type RateLimitConfig, type RateLimitResult } from "./rate-limit";
 
-export type PublicMutationScope = "gifts" | "photo-wall" | "memories";
+export type PublicMutationScope = "gifts" | "photo-wall" | "memories" | "memory-voice";
 
 let rateLimitImpl: PersistentRateLimitFn = persistentRateLimit;
 

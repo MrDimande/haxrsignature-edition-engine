@@ -5,12 +5,13 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get("slug")?.trim();
+    const phaseId = searchParams.get("phase")?.trim();
 
     if (!slug) {
       return NextResponse.json({ success: false, error: "Slug em falta." }, { status: 400 });
     }
 
-    const zipBuffer = await generateMemoriesZip(slug);
+    const zipBuffer = await generateMemoriesZip(slug, phaseId);
 
     if (!zipBuffer) {
       return NextResponse.json(

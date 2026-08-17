@@ -7,12 +7,14 @@ import { uploadPlusMemory } from "./plus-memorias-upload";
 import { optimizePhoto, isEnhanceable } from "./plus-memorias-enhance";
 import { queueOfflineMemory } from "./plus-memorias-offline-queue";
 import type { MemoryChallenge } from "./plus-memorias-challenges";
+import type { MemoriesEventConfig } from "@lib/memories/config";
+import { PlusMemoriasVoiceRecorder } from "./PlusMemoriasVoiceRecorder";
 
 interface PlusMemoriasCaptureModalProps {
   isOpen: boolean;
   onClose: () => void;
   challenge: MemoryChallenge | null;
-  slug: string;
+  config: MemoriesEventConfig;
   tableId?: string;
   participantId?: string;
   onSuccess: (challengeId?: string) => void;
@@ -22,7 +24,7 @@ export function PlusMemoriasCaptureModal({
   isOpen,
   onClose,
   challenge,
-  slug,
+  config,
   tableId,
   participantId,
   onSuccess,
@@ -31,6 +33,8 @@ export function PlusMemoriasCaptureModal({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [guestName, setGuestName] = useState("");
   const [caption, setCaption] = useState("");
+  const [phaseId, setPhaseId] = useState("");
+  const [savedPhotoId, setSavedPhotoId] = useState<string | null>(null);
   const [showNameField, setShowNameField] = useState(false);
   const [enhanceEnabled, setEnhanceEnabled] = useState(true);
   const [status, setStatus] = useState<"idle" | "optimizing" | "uploading" | "success" | "error">("idle");
@@ -39,6 +43,7 @@ export function PlusMemoriasCaptureModal({
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const slug = config.eventSlug;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,6 +67,8 @@ export function PlusMemoriasCaptureModal({
     setPreviewUrl(null);
     setGuestName("");
     setCaption("");
+    setPhaseId("");
+    setSavedPhotoId(null);
     setShowNameField(false);
     setEnhanceEnabled(true);
     setStatus("idle");
@@ -101,14 +108,16 @@ export function PlusMemoriasCaptureModal({
         guestName: guestName.trim() || undefined,
         caption: caption.trim() || undefined,
         participantId,
+        phaseId: challenge ? undefined : phaseId || undefined,
       });
 
       if (result.success) {
         setStatus("success");
-        setTimeout(() => {
-          onSuccess(challenge?.id);
-          handleClose();
-        }, 1800);
+        setSavedPhotoId(result.photoId);
+        onSuccess(challenge?.id);
+        if (!config.voiceMessages.enabled) {
+          setTimeout(handleClose, 1800);
+        }
       } else {
         // Se a falha for de ligação (offline), guardar na fila offline do dispositivo
         if (!navigator.onLine || result.error.includes("ligação")) {
@@ -122,6 +131,7 @@ export function PlusMemoriasCaptureModal({
             challengeId: challenge?.id,
             tableId,
             participantId,
+            phaseId: challenge ? undefined : phaseId || undefined,
           });
           setStatus("success");
           setErrorMessage("");
@@ -146,6 +156,7 @@ export function PlusMemoriasCaptureModal({
         challengeId: challenge?.id,
         tableId,
         participantId,
+        phaseId: challenge ? undefined : phaseId || undefined,
       });
       setStatus("success");
       setTimeout(() => {
@@ -191,7 +202,7 @@ export function PlusMemoriasCaptureModal({
           {/* Body */}
           <div className="p-6 overflow-y-auto space-y-6">
             {status === "success" ? (
-              <div className="py-12 text-center space-y-3">
+              <div className="py-8 text-center space-y-4">
                 <div className="w-14 h-14 bg-[#7A2332] text-[#FFF9F2] rounded-full flex items-center justify-center mx-auto shadow-md">
                   <Check className="w-8 h-8" />
                 </div>
@@ -199,6 +210,24 @@ export function PlusMemoriasCaptureModal({
                 <p className="font-body text-sm text-[#171312]/60 italic">
                   Obrigado por nos ajudar a guardar este dia.
                 </p>
+                {config.voiceMessages.enabled && savedPhotoId && (
+                  <PlusMemoriasVoiceRecorder
+                    slug={slug}
+                    photoId={savedPhotoId}
+                    participantId={participantId}
+                    guestName={guestName.trim() || undefined}
+                    maxDurationSeconds={config.voiceMessages.maxDurationSeconds}
+                  />
+                )}
+                {config.voiceMessages.enabled && (
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="text-[10px] font-display tracking-[0.22em] uppercase text-[#7A2332] underline underline-offset-4"
+                  >
+                    Concluir
+                  </button>
+                )}
               </div>
             ) : (
               <>
@@ -308,6 +337,30 @@ export function PlusMemoriasCaptureModal({
                           </p>
                         </div>
                       </button>
+                    )}
+
+                    {!challenge && config.phases.length > 0 && (
+                      <fieldset className="space-y-2">
+                        <legend className="text-[10px] tracking-[0.2em] uppercase text-[#171312]/55">
+                          Em que momento aconteceu? (opcional)
+                        </legend>
+                        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                          {config.phases.map((phase) => (
+                            <button
+                              key={phase.id}
+                              type="button"
+                              onClick={() => setPhaseId((current) => current === phase.id ? "" : phase.id)}
+                              className={`shrink-0 rounded-full border px-3 py-1.5 text-[10px] font-display tracking-wider uppercase transition-colors ${
+                                phaseId === phase.id
+                                  ? "border-[#7A2332] bg-[#7A2332] text-[#FFF9F2]"
+                                  : "border-[#C9939B]/35 bg-[#F1E3CF] text-[#171312]/70"
+                              }`}
+                            >
+                              {phase.label}
+                            </button>
+                          ))}
+                        </div>
+                      </fieldset>
                     )}
 
                     {/* Campo de legenda/mensagem pessoal com emojis */}

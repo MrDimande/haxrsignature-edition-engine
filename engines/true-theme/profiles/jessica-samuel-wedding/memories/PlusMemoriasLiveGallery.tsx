@@ -1,26 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Play, X, Camera, User, Download, Share2 } from "lucide-react";
-import type { PublicMemoryItem } from "@lib/memories/gallery";
+import {
+  filterMemoriesByPhase,
+  type PublicMemoryItem,
+} from "@lib/memories/gallery";
+import type { MemoriesEventConfig } from "@lib/memories/config";
 import { PLUS_MEMORY_CHALLENGES, getTableLabel } from "./plus-memorias-challenges";
 
 interface PlusMemoriasLiveGalleryProps {
-  slug: string;
+  config: MemoriesEventConfig;
   refreshTrigger?: number;
 }
 
-export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemoriasLiveGalleryProps) {
+export function PlusMemoriasLiveGallery({ config, refreshTrigger = 0 }: PlusMemoriasLiveGalleryProps) {
   const [memories, setMemories] = useState<PublicMemoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedChallengeFilter, setSelectedChallengeFilter] = useState<string | null>(null);
+  const [selectedPhaseFilter, setSelectedPhaseFilter] = useState<string | null>(null);
   const [activeLightboxItem, setActiveLightboxItem] = useState<PublicMemoryItem | null>(null);
   const [downloading, setDownloading] = useState(false);
 
-  const fetchMemories = async () => {
+  const fetchMemories = useCallback(async () => {
     try {
-      const res = await fetch(`/api/memories?slug=${encodeURIComponent(slug)}`);
+      const res = await fetch(`/api/memories?slug=${encodeURIComponent(config.eventSlug)}`);
       const data = await res.json();
       if (data.success && Array.isArray(data.memories)) {
         setMemories(data.memories);
@@ -30,11 +34,11 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
     } finally {
       setLoading(false);
     }
-  };
+  }, [config.eventSlug]);
 
   useEffect(() => {
     fetchMemories();
-  }, [slug, refreshTrigger]);
+  }, [fetchMemories, refreshTrigger]);
 
   const handleDownload = async (item: PublicMemoryItem) => {
     try {
@@ -45,7 +49,7 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
 
       const ext = item.kind === "video" ? "mp4" : "jpg";
       const tableStr = item.tableId ? `mesa-${item.tableId}` : "evento";
-      const filename = `plus-memories-jessica-samuel-${tableStr}.${ext}`;
+      const filename = `plus-memories-${config.eventSlug}-${tableStr}.${ext}`;
 
       const link = document.createElement("a");
       link.href = blobUrl;
@@ -63,10 +67,10 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
   };
 
   const handleShare = async (item: PublicMemoryItem) => {
-    const title = "Plus Memories · Jessica Muege & Samuel Govene";
+    const title = `Plus Memories · ${config.displayName}`;
     const text = item.caption
       ? `"${item.caption}" — Plus Memories`
-      : "Veja esta memória do Casamento de Jessica Muege & Samuel Govene";
+      : `Veja esta memória de ${config.displayName}`;
     const url = item.signedUrl;
 
     if (navigator.share) {
@@ -82,9 +86,10 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
     window.open(whatsappUrl, "_blank");
   };
 
-  const filteredMemories = selectedChallengeFilter
-    ? memories.filter((m) => m.challengeId === selectedChallengeFilter)
-    : memories;
+  const filteredMemories = useMemo(
+    () => filterMemoriesByPhase(memories, selectedPhaseFilter),
+    [memories, selectedPhaseFilter]
+  );
 
   return (
     <section className="px-4 sm:px-6 max-w-5xl mx-auto my-12">
@@ -107,35 +112,36 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
         </div>
       </div>
 
-      {/* Filtros por Desafio */}
-      {memories.length > 0 && (
+      {/* Filtros editoriais por capítulo da celebração */}
+      {memories.length > 0 && config.phases.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
           <button
-            onClick={() => setSelectedChallengeFilter(null)}
+            type="button"
+            onClick={() => setSelectedPhaseFilter(null)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-display tracking-wider uppercase shrink-0 transition-all ${
-              selectedChallengeFilter === null
+              selectedPhaseFilter === null
                 ? "bg-[#7A2332] text-[#FFF9F2] shadow-xs"
                 : "bg-[#FFF9F2] text-[#171312]/60 border border-[#C9939B]/25 hover:border-[#7A2332]"
             }`}
           >
-            Todas ({memories.length})
+            Todos ({memories.length})
           </button>
 
-          {PLUS_MEMORY_CHALLENGES.map((ch) => {
-            const count = memories.filter((m) => m.challengeId === ch.id).length;
-            if (count === 0) return null;
+          {config.phases.map((phase) => {
+            const count = memories.filter((memory) => memory.phaseId === phase.id).length;
 
             return (
               <button
-                key={ch.id}
-                onClick={() => setSelectedChallengeFilter(ch.id)}
+                type="button"
+                key={phase.id}
+                onClick={() => setSelectedPhaseFilter(phase.id)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-display tracking-wider uppercase shrink-0 transition-all flex items-center gap-1.5 ${
-                  selectedChallengeFilter === ch.id
+                  selectedPhaseFilter === phase.id
                     ? "bg-[#7A2332] text-[#FFF9F2] shadow-xs"
                     : "bg-[#FFF9F2] text-[#171312]/60 border border-[#C9939B]/25 hover:border-[#7A2332]"
                 }`}
               >
-                <span>#{ch.number}</span>
+                <span>{phase.label}</span>
                 <span className="opacity-60">({count})</span>
               </button>
             );
@@ -165,7 +171,7 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
             <Camera className="w-5 h-5 text-[#7A2332] opacity-70" />
           </div>
           <p className="font-display text-base text-[#171312] font-medium mb-1 tracking-wide">
-            O álbum ainda não tem fotos neste desafio
+            O álbum ainda não tem memórias neste capítulo
           </p>
           <p className="font-body text-xs text-[#171312]/60 max-w-sm mx-auto">
             Seja o primeiro a registar um momento e a inaugurar esta secção!
@@ -176,6 +182,7 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
           {filteredMemories.map((item, idx) => {
             const challenge = PLUS_MEMORY_CHALLENGES.find((c) => c.id === item.challengeId);
             const tableLbl = getTableLabel(item.tableId);
+            const phase = config.phases.find((entry) => entry.id === item.phaseId);
 
             // Ritmo Editorial: Alternar proporção natural (Portrait 3:4, Landscape 4:3, Square 1:1)
             const aspectClass = idx % 5 === 0 || idx % 5 === 3
@@ -233,6 +240,11 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
                   </div>
 
                   <div className="space-y-0.5">
+                    {phase && (
+                      <p className="text-[9px] font-display uppercase tracking-widest text-white/80 font-medium truncate">
+                        {phase.label}
+                      </p>
+                    )}
                     {challenge && (
                       <p className="text-[9px] font-display uppercase tracking-widest text-[#C9939B] font-medium truncate">
                         #{challenge.number} {challenge.title}
