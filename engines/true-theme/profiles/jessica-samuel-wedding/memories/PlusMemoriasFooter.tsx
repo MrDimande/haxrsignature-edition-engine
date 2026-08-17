@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Globe, Mail } from "lucide-react";
 import { HAXR_AUTH } from "@lib/brand/authorship";
 
-export function PlusMemoriasFooter() {
+export function PlusMemoriasFooter({ displayName }: { displayName: string }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -81,7 +81,7 @@ export function PlusMemoriasFooter() {
         <div className="pt-4 border-t border-[#C9939B]/15 text-[10px] tracking-[0.2em] uppercase text-[#171312]/45 space-y-1">
           <p>© {currentYear} HAXR Signature · Todos os direitos reservados.</p>
           <p className="text-[9px] text-[#7A2332] font-medium tracking-[0.25em]">
-            EDITION · CASAMENTO JESSICA MUEGE &amp; SAMUEL GOVENE
+            EDITION · PLUS MEMORIES · {displayName}
           </p>
         </div>
       </div>

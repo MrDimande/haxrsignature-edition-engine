@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import type { InvitationConfig } from "@data/invitations";
-import type { TrueTheme } from "@theme/true-types";
+import type { MemoriesEventConfig } from "@lib/memories/config";
 import { PlusMemoriasIntro } from "./PlusMemoriasIntro";
 import { PlusMemoriasChallengeGrid } from "./PlusMemoriasChallengeGrid";
 import { PlusMemoriasProgress } from "./PlusMemoriasProgress";
@@ -29,14 +28,12 @@ import { Trophy, Edit3 } from "lucide-react";
 import "./plus-memorias.css";
 
 interface PlusMemoriasExperienceProps {
-  config: InvitationConfig;
-  theme: TrueTheme;
+  config: MemoriesEventConfig;
   tableId?: string;
 }
 
 export function PlusMemoriasExperience({
   config,
-  theme,
   tableId,
 }: PlusMemoriasExperienceProps) {
   const [completedIds, setCompletedIds] = useState<string[]>([]);
@@ -45,7 +42,9 @@ export function PlusMemoriasExperience({
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
   const [galleryRefreshTrigger, setGalleryRefreshTrigger] = useState(0);
 
-  const competitionEnabled = Boolean(config.features?.memories?.competition?.enabled);
+  const challengesEnabled = config.features.challenges;
+  const competitionEnabled =
+    challengesEnabled && Boolean(config.competition?.enabled);
 
   const [participantId, setParticipantId] = useState<string>("");
   const [optInStatus, setOptInStatus] = useState<OptInStatus>("undecided");
@@ -54,25 +53,25 @@ export function PlusMemoriasExperience({
 
   useEffect(() => {
     // 1. Inicializar IDs concluídos do localStorage
-    const localCompleted = getCompletedChallenges(config.slug);
+    const localCompleted = getCompletedChallenges(config.eventSlug);
     setCompletedIds(localCompleted);
 
     // 2. Inicializar participante & opt-in status se competição activa
     if (competitionEnabled) {
-      const pId = getOrCreateParticipantId(config.slug);
+      const pId = getOrCreateParticipantId(config.eventSlug);
       setParticipantId(pId);
-      const status = getCompetitionOptInStatus(config.slug);
+      const status = getCompetitionOptInStatus(config.eventSlug);
       setOptInStatus(status);
-      setParticipantNameState(getParticipantName(config.slug) || "");
+      setParticipantNameState(getParticipantName(config.eventSlug) || "");
 
       // Directiva #6: Reconciliar progresso do servidor com o localStorage no arranque
       if (pId) {
-        fetch(`/api/memories/progress?slug=${encodeURIComponent(config.slug)}&participantId=${encodeURIComponent(pId)}`)
+        fetch(`/api/memories/progress?slug=${encodeURIComponent(config.eventSlug)}&participantId=${encodeURIComponent(pId)}`)
           .then((res) => res.json())
           .then((data) => {
             if (data.success && Array.isArray(data.completedChallengeIds)) {
               const serverCompleted = replaceCompletedChallenges(
-                config.slug,
+                config.eventSlug,
                 data.completedChallengeIds
               );
               setCompletedIds(serverCompleted);
@@ -86,6 +85,7 @@ export function PlusMemoriasExperience({
 
     // 3. Processar fila offline
     const handleRetry = async () => {
+      if (!config.features.offline) return;
       const { processOfflineQueue } = await import("./plus-memorias-offline-queue");
       const { uploadPlusMemory } = await import("./plus-memorias-upload");
       const count = await processOfflineQueue(async (item) => {
@@ -98,6 +98,7 @@ export function PlusMemoriasExperience({
           guestName: item.guestName,
           caption: item.caption,
           participantId: item.participantId,
+          phaseId: item.phaseId,
         });
         return { success: res.success };
       });
@@ -109,7 +110,7 @@ export function PlusMemoriasExperience({
     handleRetry();
     window.addEventListener("online", handleRetry);
     return () => window.removeEventListener("online", handleRetry);
-  }, [config.slug, competitionEnabled]);
+  }, [config.eventSlug, config.features.offline, competitionEnabled]);
 
   const handleSelectChallenge = (challenge: MemoryChallenge) => {
     setSelectedChallenge(challenge);
@@ -123,7 +124,7 @@ export function PlusMemoriasExperience({
 
   const handleSuccess = (challengeId?: string) => {
     if (challengeId) {
-      const updated = markChallengeCompleted(config.slug, challengeId);
+      const updated = markChallengeCompleted(config.eventSlug, challengeId);
       setCompletedIds(updated);
 
       // Directiva 21 & 34: Ao completar todos os 12 desafios, apresentar modal emocional
@@ -142,14 +143,14 @@ export function PlusMemoriasExperience({
   return (
     <div className="plus-memorias-container min-h-screen pb-16">
       {/* Notificação Flutuante estilo iOS com Provocação Social */}
-      <PlusMemoriasToast slug={config.slug} refreshTrigger={galleryRefreshTrigger} />
+      <PlusMemoriasToast slug={config.eventSlug} refreshTrigger={galleryRefreshTrigger} />
 
-      <PlusMemoriasIntro tableId={tableId} />
+      <PlusMemoriasIntro config={config} tableId={tableId} />
 
       {/* UX Gate: O convidado vê a tela de decisão IMEDIATAMENTE após o scan do QR Code */}
       {showOptInScreen ? (
         <PlusMemoriasCompetitionOptIn
-          slug={config.slug}
+          slug={config.eventSlug}
           onOptInSuccess={(name) => {
             setOptInStatus("opted_in");
             setParticipantNameState(name);
@@ -185,22 +186,27 @@ export function PlusMemoriasExperience({
           )}
 
           {/* Grelha dos 12 Desafios revelada após a escolha */}
-          <PlusMemoriasChallengeGrid
-            completedIds={completedIds}
-            onSelectChallenge={handleSelectChallenge}
-          />
+          {challengesEnabled ? (
+            <PlusMemoriasChallengeGrid
+              completedIds={completedIds}
+              onSelectChallenge={handleSelectChallenge}
+            />
+          ) : null}
 
           <PlusMemoriasProgress
             completedCount={completedIds.length}
             totalCount={PLUS_MEMORY_CHALLENGES.length}
+            showChallengeProgress={challengesEnabled}
             onOpenFreeMoment={handleOpenFreeMoment}
           />
 
           {/* Galeria Viva / Álbum Colectivo */}
-          <PlusMemoriasLiveGallery
-            slug={config.slug}
-            refreshTrigger={galleryRefreshTrigger}
-          />
+          {config.features.gallery && (
+            <PlusMemoriasLiveGallery
+              config={config}
+              refreshTrigger={galleryRefreshTrigger}
+            />
+          )}
         </>
       )}
 
@@ -208,7 +214,7 @@ export function PlusMemoriasExperience({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         challenge={selectedChallenge}
-        slug={config.slug}
+        config={config}
         tableId={tableId}
         participantId={optInStatus === "opted_in" ? participantId : undefined}
         onSuccess={handleSuccess}
@@ -220,7 +226,7 @@ export function PlusMemoriasExperience({
         onClose={() => setIsCompletionModalOpen(false)}
       />
 
-      <PlusMemoriasFooter />
+      <PlusMemoriasFooter displayName={config.displayName} />
     </div>
   );
 }

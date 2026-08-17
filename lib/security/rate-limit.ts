@@ -31,6 +31,10 @@ export const RATE_LIMITS = {
   memoriesIntent: { max: 10, windowMs: 15 * 60 * 1000 },
   /** Traditional wedding memories — upload completion */
   memoriesComplete: { max: 15, windowMs: 15 * 60 * 1000 },
+  /** Plus Memories private voice message intent. */
+  memoriesVoiceIntent: { max: 6, windowMs: 15 * 60 * 1000 },
+  /** Plus Memories private voice message completion. */
+  memoriesVoiceComplete: { max: 8, windowMs: 15 * 60 * 1000 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 function pruneExpiredBuckets(now: number): void {
