@@ -203,11 +203,16 @@ export async function getMemoriesLeaderboard(
   }
 
   const supabase = createAdminClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("wedding_photos")
     .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
     .eq("invitation_slug", config.storageSlug)
     .not("participant_id", "is", null);
+
+  if (config.sourceType === "standalone" && config.experienceId) {
+    query = query.eq("experience_id", config.experienceId);
+  }
+  const { data, error } = await query;
 
   if (error) {
     console.error("[Leaderboard] Error fetching photos:", error.message);
@@ -257,11 +262,16 @@ export async function getParticipantProgress(
   }
 
   const supabase = createAdminClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("wedding_photos")
     .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
     .eq("invitation_slug", config.storageSlug)
     .eq("participant_id", participantId);
+
+  if (config.sourceType === "standalone" && config.experienceId) {
+    query = query.eq("experience_id", config.experienceId);
+  }
+  const { data, error } = await query;
 
   if (error) {
     console.error("[ParticipantProgress] Error fetching photos:", error.message);

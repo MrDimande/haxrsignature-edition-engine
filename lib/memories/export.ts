@@ -43,6 +43,9 @@ export async function generateMemoriesZip(
     .neq("moderation_status", "rejected")
     .order("created_at", { ascending: true });
 
+  if (config.sourceType === "standalone" && config.experienceId) {
+    query = query.eq("experience_id", config.experienceId);
+  }
   if (phaseId) query = query.eq("phase_id", phaseId);
   const { data: rows, error } = await query;
 

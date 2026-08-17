@@ -48,6 +48,9 @@ export async function listMemories(
     .neq("moderation_status", "rejected")
     .order("created_at", { ascending: false });
 
+  if (config.sourceType === "standalone" && config.experienceId) {
+    query = query.eq("experience_id", config.experienceId);
+  }
   if (phaseId) query = query.eq("phase_id", phaseId);
   const { data, error } = await query.limit(100);
 

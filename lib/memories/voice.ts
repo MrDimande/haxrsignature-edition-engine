@@ -78,9 +78,17 @@ export function validateVoiceFileSize(
 
 export function photoBelongsToMemoriesExperience(
   photo: { invitation_slug?: string | null; experience_id?: string | null },
-  config: Pick<MemoriesEventConfig, "storageSlug" | "experienceId">
+  config: Pick<
+    MemoriesEventConfig,
+    "storageSlug" | "experienceId" | "sourceType"
+  >
 ): boolean {
   if (photo.invitation_slug !== config.storageSlug) return false;
+  if (config.sourceType === "standalone") {
+    return Boolean(
+      config.experienceId && photo.experience_id === config.experienceId
+    );
+  }
   return !photo.experience_id || photo.experience_id === config.experienceId;
 }
 

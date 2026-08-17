@@ -1,31 +1,32 @@
 import { NextResponse } from "next/server";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
-import { resolveMemoriesConfig } from "@lib/memories/config";
+import { resolveMemoriesConfigAsync } from "@lib/memories/config";
+import { requireMemoriesAdmin } from "@lib/memories/admin-auth";
 
 export async function POST(request: Request) {
+  const auth = requireMemoriesAdmin(request);
+  if (!auth.ok) return auth.response;
+
   try {
     const body = (await request.json()) as {
       slug?: string;
       photoId?: string;
       action?: "approve" | "reject";
-      secretKey?: string;
     };
 
-    const { slug, photoId, action, secretKey } = body;
+    const { slug, photoId, action } = body;
 
-    if (!slug || !photoId || !action) {
+    if (
+      !slug ||
+      !photoId ||
+      (action !== "approve" && action !== "reject")
+    ) {
       return NextResponse.json({ success: false, error: "Parâmetros em falta." }, { status: 400 });
     }
 
-    const config = resolveMemoriesConfig(slug);
+    const config = await resolveMemoriesConfigAsync(slug);
     if (!config) {
       return NextResponse.json({ success: false, error: "Convite não encontrado." }, { status: 404 });
-    }
-
-    // Validação básica de segredo se configurado no ambiente
-    const expectedKey = process.env.ADMIN_MODERATION_SECRET || "haxr-secret-2026";
-    if (secretKey && secretKey !== expectedKey) {
-      return NextResponse.json({ success: false, error: "Não autorizado." }, { status: 401 });
     }
 
     if (!isSupabaseConfigured()) {
@@ -35,14 +36,24 @@ export async function POST(request: Request) {
     const supabase = createAdminClient();
     const newStatus = action === "approve" ? "approved" : "rejected";
 
-    const { error } = await supabase
+    let query = supabase
       .from("wedding_photos")
       .update({ moderation_status: newStatus })
       .eq("id", photoId)
-      .eq("invitation_slug", config.invitationSlug);
+      .eq("invitation_slug", config.storageSlug);
+
+    if (config.sourceType === "standalone" && config.experienceId) {
+      query = query.eq("experience_id", config.experienceId);
+    }
+    const { data, error } = await query
+      .select("id")
+      .maybeSingle();
 
     if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      return NextResponse.json({ success: false, error: "Não foi possível moderar a memória." }, { status: 500 });
+    }
+    if (!data) {
+      return NextResponse.json({ success: false, error: "Memória não encontrada." }, { status: 404 });
     }
 
     return NextResponse.json({
