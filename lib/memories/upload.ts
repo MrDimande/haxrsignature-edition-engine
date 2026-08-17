@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS } from "@lib/security/rate-limit";
-import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST, type MemoriesEventConfig } from "./config";
+import { resolveMemoriesConfigAsync, PLUS_MEMORIES_CHALLENGE_WHITELIST } from "./config";
+import { isValidPhaseId, resolvePhaseForChallenge } from "./phases";
 import {
   buildStoragePath,
   matchesMagicBytes,
@@ -30,6 +31,7 @@ export type MemoryUploadIntentInput = {
   challengeId?: string;
   tableId?: string;
   participantId?: string;
+  phaseId?: string;
 };
 
 export type MemoryUploadIntentResult =
@@ -50,6 +52,7 @@ export type MemoryCompleteInput = {
   challengeId?: string;
   tableId?: string;
   participantId?: string;
+  phaseId?: string;
 };
 
 // ──────────────────────────────────────────────
@@ -115,12 +118,12 @@ export async function createMemoryUploadIntent(
   input: MemoryUploadIntentInput,
   request: Request
 ): Promise<MemoryUploadIntentResult> {
-  const config = resolveMemoriesConfig(input.slug);
+  const config = await resolveMemoriesConfigAsync(input.slug);
   if (!config) {
     return { success: false, error: "Convite não encontrado.", code: "NOT_FOUND" };
   }
 
-  const storageSlug = config.invitationSlug;
+  const storageSlug = config.storageSlug;
   const bucketName = config.bucket;
   const safeFileName = normalizeUploadFileName(input.fileName);
   const resolvedType = resolveContentType(input.contentType, safeFileName);
@@ -191,6 +194,7 @@ export async function createMemoryUploadIntent(
   try {
     await getPhotoUploadIntentRepository().create({
       photoId,
+      experienceId: config.experienceId,
       slug: storageSlug,
       bucketName,
       storagePath,
@@ -240,14 +244,15 @@ export async function completeMemoryUpload(
     challengeId?: string;
     tableId?: string;
     participantId?: string;
+    phaseId?: string;
   } = {}
 ): Promise<{ success: boolean; error?: string; code?: string; retryAfterSeconds?: number }> {
-  const config = resolveMemoriesConfig(slug);
+  const config = await resolveMemoriesConfigAsync(slug);
   if (!config) {
     return { success: false, error: "Convite não encontrado.", code: "NOT_FOUND" };
   }
 
-  const storageSlug = config.invitationSlug;
+  const storageSlug = config.storageSlug;
   const bucketName = config.bucket;
 
   const nameError = validateGuestName(metadata.guestName);
@@ -264,6 +269,21 @@ export async function completeMemoryUpload(
 
   const participantError = validateParticipantId(metadata.participantId);
   if (participantError) return { success: false, error: participantError };
+
+  const requestedPhaseId = metadata.phaseId?.trim() || undefined;
+  const derivedPhaseId = resolvePhaseForChallenge(
+    metadata.challengeId?.trim(),
+    config.phases,
+    config.challengePhaseMapping
+  );
+  if (
+    !metadata.challengeId &&
+    requestedPhaseId &&
+    !isValidPhaseId(requestedPhaseId, config.phases)
+  ) {
+    return { success: false, error: "Fase da celebração inválida." };
+  }
+  const phaseId = metadata.challengeId ? derivedPhaseId : requestedPhaseId ?? null;
 
   const limit = await publicMutationRateLimit(
     {
@@ -366,6 +386,7 @@ export async function completeMemoryUpload(
   const { error: insertError } = await supabase.from("wedding_photos").insert({
     id: photoId,
     invitation_slug: storageSlug,
+    experience_id: config.experienceId,
     storage_path: intent.storagePath,
     original_filename: originalFilename,
     content_type: intent.contentType,
@@ -375,6 +396,7 @@ export async function completeMemoryUpload(
     challenge_id: metadata.challengeId?.trim() || null,
     table_id: metadata.tableId?.trim() || null,
     participant_id: metadata.participantId?.trim() || null,
+    phase_id: phaseId,
     moderation_status: "pending",
   });
 

@@ -1,6 +1,7 @@
 import JSZip from "jszip";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
-import { resolveMemoriesConfig } from "./config";
+import { resolveMemoriesConfigAsync } from "./config";
+import { isValidPhaseId } from "./phases";
 import { PLUS_MEMORY_CHALLENGES, WEDDING_TABLES } from "@engines/true-theme/profiles/jessica-samuel-wedding/memories/plus-memorias-challenges";
 import { MEMORY_CHALLENGES as TRADITIONAL_CHALLENGES } from "@engines/true-theme/profiles/primavera-lobolo/memories/memorias-challenges";
 
@@ -21,22 +22,29 @@ function sanitizeFileName(str: string): string {
     .slice(0, 60);
 }
 
-export async function generateMemoriesZip(slug: string): Promise<Buffer | null> {
-  const config = resolveMemoriesConfig(slug);
+export async function generateMemoriesZip(
+  slug: string,
+  phaseId?: string
+): Promise<Buffer | null> {
+  const config = await resolveMemoriesConfigAsync(slug);
   if (!config) return null;
+  if (phaseId && !isValidPhaseId(phaseId, config.phases)) return null;
   if (!isSupabaseConfigured()) return null;
 
   const supabase = createAdminClient();
   const bucketName = config.bucket;
-  const storageSlug = config.invitationSlug;
+  const storageSlug = config.storageSlug;
 
   // Buscar todas as memórias aprovadas/pendentes do evento
-  const { data: rows, error } = await supabase
+  let query = supabase
     .from("wedding_photos")
-    .select("id, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type, moderation_status")
+    .select("id, caption, guest_name, challenge_id, table_id, phase_id, created_at, storage_path, content_type, moderation_status")
     .eq("invitation_slug", storageSlug)
     .neq("moderation_status", "rejected")
     .order("created_at", { ascending: true });
+
+  if (phaseId) query = query.eq("phase_id", phaseId);
+  const { data: rows, error } = await query;
 
   if (error || !rows?.length) return null;
 
@@ -63,7 +71,12 @@ export async function generateMemoriesZip(slug: string): Promise<Buffer | null> 
     // Determinar pasta de destino no ZIP
     let folderPath = "Momentos_Espontaneos";
 
-    if (row.table_id) {
+    if (row.phase_id) {
+      const phase = config.phases.find((item) => item.id === row.phase_id);
+      folderPath = phase
+        ? `Por_Fase/${sanitizeFolderName(phase.label)}`
+        : `Por_Fase/${sanitizeFolderName(row.phase_id)}`;
+    } else if (row.table_id) {
       const tableInfo = WEDDING_TABLES.find((t) => t.id === row.table_id);
       if (tableInfo) {
         folderPath = `Por_Mesa/${tableInfo.id}_Mesa_${sanitizeFolderName(tableInfo.frenchName)}`;

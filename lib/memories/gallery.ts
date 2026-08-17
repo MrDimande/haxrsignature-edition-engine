@@ -1,5 +1,6 @@
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
-import { resolveMemoriesConfig } from "./config";
+import { resolveMemoriesConfigAsync } from "./config";
+import { isValidPhaseId } from "./phases";
 
 export type PublicMemoryItem = {
   id: string;
@@ -11,29 +12,44 @@ export type PublicMemoryItem = {
   guestName: string | null;
   challengeId: string | null;
   tableId: string | null;
+  phaseId: string | null;
 };
+
+export function filterMemoriesByPhase(
+  memories: readonly PublicMemoryItem[],
+  phaseId: string | null
+): PublicMemoryItem[] {
+  if (!phaseId) return [...memories];
+  return memories.filter((memory) => memory.phaseId === phaseId);
+}
 
 /**
  * Lista memórias públicas para qualquer convite com memories activadas.
  * O `invitation_slug` na DB isola cada evento automaticamente.
  */
-export async function listMemories(slug: string): Promise<PublicMemoryItem[]> {
-  const config = resolveMemoriesConfig(slug);
+export async function listMemories(
+  slug: string,
+  phaseId?: string
+): Promise<PublicMemoryItem[]> {
+  const config = await resolveMemoriesConfigAsync(slug);
   if (!config) return [];
+  if (phaseId && !isValidPhaseId(phaseId, config.phases)) return [];
 
   if (!isSupabaseConfigured()) return [];
 
   const supabase = createAdminClient();
   const bucketName = config.bucket;
-  const storageSlug = config.invitationSlug;
+  const storageSlug = config.storageSlug;
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("wedding_photos")
-    .select("id, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type")
+    .select("id, caption, guest_name, challenge_id, table_id, phase_id, created_at, storage_path, content_type")
     .eq("invitation_slug", storageSlug)
     .neq("moderation_status", "rejected")
-    .order("created_at", { ascending: false })
-    .limit(100);
+    .order("created_at", { ascending: false });
+
+  if (phaseId) query = query.eq("phase_id", phaseId);
+  const { data, error } = await query.limit(100);
 
   if (error || !data?.length) return [];
 
@@ -59,6 +75,7 @@ export async function listMemories(slug: string): Promise<PublicMemoryItem[]> {
       guestName: row.guest_name,
       challengeId: row.challenge_id,
       tableId: row.table_id,
+      phaseId: row.phase_id,
     });
   }
 

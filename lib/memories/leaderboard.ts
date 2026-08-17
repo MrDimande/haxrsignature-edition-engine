@@ -1,5 +1,5 @@
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
-import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST } from "./config";
+import { resolveMemoriesConfigAsync, PLUS_MEMORIES_CHALLENGE_WHITELIST } from "./config";
 
 export interface RawMemoryPhotoRow {
   id: string;
@@ -193,7 +193,7 @@ export async function getMemoriesLeaderboard(
   slug: string,
   mode: "provisional" | "final" = "provisional"
 ): Promise<LeaderboardResult> {
-  const config = resolveMemoriesConfig(slug);
+  const config = await resolveMemoriesConfigAsync(slug);
   if (!config) {
     return { success: false, error: "Convite não encontrado." };
   }
@@ -206,7 +206,7 @@ export async function getMemoriesLeaderboard(
   const { data, error } = await supabase
     .from("wedding_photos")
     .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
-    .eq("invitation_slug", config.invitationSlug)
+    .eq("invitation_slug", config.storageSlug)
     .not("participant_id", "is", null);
 
   if (error) {
@@ -218,9 +218,9 @@ export async function getMemoriesLeaderboard(
 
   return {
     success: true,
-    slug: config.invitationSlug,
+    slug: config.eventSlug,
     mode,
-    totalChallenges: 12,
+    totalChallenges: config.competition?.totalChallenges ?? 12,
     leaderboard,
   };
 }
@@ -234,7 +234,7 @@ export async function getParticipantProgress(
   slug: string,
   participantId: string
 ): Promise<ParticipantProgressResult> {
-  const config = resolveMemoriesConfig(slug);
+  const config = await resolveMemoriesConfigAsync(slug);
   if (!config) {
     return { success: false, error: "Convite não encontrado." };
   }
@@ -260,7 +260,7 @@ export async function getParticipantProgress(
   const { data, error } = await supabase
     .from("wedding_photos")
     .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
-    .eq("invitation_slug", config.invitationSlug)
+    .eq("invitation_slug", config.storageSlug)
     .eq("participant_id", participantId);
 
   if (error) {
@@ -275,10 +275,10 @@ export async function getParticipantProgress(
 
   return {
     success: true,
-    slug: config.invitationSlug,
+    slug: config.eventSlug,
     participantId,
     completedChallengeIds,
     completedCount: completedChallengeIds.length,
-    totalChallenges: 12,
+    totalChallenges: config.competition.totalChallenges,
   };
 }
