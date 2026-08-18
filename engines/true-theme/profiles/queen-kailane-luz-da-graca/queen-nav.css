@@ -1,0 +1,121 @@
+/* Queen Kailane — floating nav editorial */
+
+.queen-nav {
+  position: fixed;
+  top: max(0.75rem, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 60;
+  transform: translateX(-50%);
+  width: min(94vw, 42rem);
+  pointer-events: none;
+}
+
+.queen-nav__inner {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem 0.55rem 0.85rem;
+  border: 1px solid rgba(185, 151, 91, 0.28);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 252, 0.92),
+    rgba(246, 241, 232, 0.88)
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 32px rgba(115, 107, 98, 0.08);
+}
+
+.queen-nav__mono {
+  flex: 0 0 auto;
+  font-family: var(--font-jost), var(--font-montserrat), system-ui, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  color: #736b62;
+  padding-right: 0.55rem;
+  border-right: 1px solid rgba(231, 215, 193, 0.9);
+}
+
+.queen-nav__items {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.queen-nav__item-wrap {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.queen-nav__sep {
+  display: none;
+  margin: 0 0.15rem;
+  color: rgba(185, 151, 91, 0.55);
+  font-size: 0.7rem;
+}
+
+.queen-nav__item {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.35rem 0.4rem;
+  font-family: var(--font-jost), var(--font-montserrat), system-ui, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #736b62;
+  transition: color 0.35s ease;
+  white-space: nowrap;
+}
+
+.queen-nav__item:hover,
+.queen-nav__item:focus-visible {
+  color: #3f3832;
+}
+
+.queen-nav__item:focus-visible {
+  outline: 1px solid #b9975b;
+  outline-offset: 2px;
+}
+
+.queen-nav__item.is-active {
+  color: #b9975b;
+}
+
+.queen-nav__label {
+  display: none;
+}
+
+.queen-nav__short {
+  display: inline;
+}
+
+@media (min-width: 640px) {
+  .queen-nav__sep {
+    display: inline;
+  }
+
+  .queen-nav__items {
+    justify-content: flex-start;
+    gap: 0.1rem;
+  }
+
+  .queen-nav__label {
+    display: inline;
+  }
+
+  .queen-nav__short {
+    display: none;
+  }
+
+  .queen-nav__item {
+    letter-spacing: 0.2em;
+    padding: 0.35rem 0.55rem;
+  }
+}

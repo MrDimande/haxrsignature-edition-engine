@@ -37,5 +37,10 @@ export function ExperienceFlowRouter() {
     return null;
   }
 
+  /* Gate próprio QueenKailaneGate — evita o StandardExperienceFlow */
+  if (theme.renderProfile === "queen-kailane-luz-da-graca") {
+    return null;
+  }
+
   return <StandardExperienceFlow />;
 }

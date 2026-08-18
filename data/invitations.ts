@@ -328,6 +328,36 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       expectedRegistryKey: "nian-night-of-the-web",
     },
   },
+  queenkailanecrisma: {
+    slug: "queenkailanecrisma",
+    aliases: ["queen-kailane", "queenkailane", "crisma-queen"],
+    engine: "theme",
+    theme: "queen-kailane-luz-da-graca",
+    experienceType: "editorial",
+    sourcePath: "/queenkailanecrisma",
+    legacyFolder: "queen-kailane",
+    status: "active",
+    metadata: {
+      title: "Sacramento do Crisma — Queen Kailane Cande",
+      date: "2026-08-30",
+      /** Hora da celebração religiosa pendente — string vazia; UI pública omite */
+      time: "",
+      location: "Igreja Anglicana — Paróquia de São Estêvão e Lourenço",
+      subtitle: "LUZ DA GRAÇA · Confirmada na fé. Guiada pela luz.",
+      description:
+        "30 de Agosto de 2026 · Sacramento do Crisma de Queen Kailane Cande — Igreja Anglicana, Paróquia de São Estêvão e Lourenço. Almoço às 13h00 em São Dâmaso.",
+      eventDate: "2026-08-30",
+      eventType: "Sacramento do Crisma",
+      ogImage: "/images/queen-kailane/social/queen-kailane-og.png",
+    },
+    admin: {
+      clientName: "Queen Kailane Cande",
+      eventTypeLabel: "Crisma",
+      adminEventName: "Edition · Crisma · Queen Kailane Cande",
+      envVar: "EDITION_EVENT_QUEEN_KAILANE_ID",
+      expectedRegistryKey: "queen-kailane-luz-da-graca",
+    },
+  },
 };
 
 /** @deprecated Use INVITATIONS */

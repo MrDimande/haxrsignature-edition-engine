@@ -172,7 +172,13 @@ export function resolveExperienceTokens(theme: TrueTheme): ExperienceTokens {
                 'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
               body: 'var(--font-inter), "Inter", system-ui, sans-serif',
             }
-          : baseTypography;
+          : theme.renderProfile === "queen-kailane-luz-da-graca"
+            ? {
+                display:
+                  'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+                body: 'var(--font-jost), "Jost", system-ui, sans-serif',
+              }
+            : baseTypography;
 
   return {
     motion,

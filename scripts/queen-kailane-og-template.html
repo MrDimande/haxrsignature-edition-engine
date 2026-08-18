@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="utf-8" />
+    <title>Queen Kailane — OG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Jost:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #fffdfc;
+      }
+      .card {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        background:
+          radial-gradient(
+            ellipse 55% 60% at 50% 42%,
+            rgba(255, 253, 252, 0.98) 0%,
+            rgba(231, 215, 193, 0.45) 38%,
+            rgba(239, 230, 216, 0.55) 70%,
+            #f6f1e8 100%
+          ),
+          linear-gradient(180deg, #fffdfc 0%, #efe6d8 100%);
+        color: #3f3832;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Jost, system-ui, sans-serif;
+      }
+      .grain {
+        position: absolute;
+        inset: 0;
+        opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        pointer-events: none;
+      }
+      .arch {
+        position: absolute;
+        left: 50%;
+        top: 4%;
+        transform: translateX(-50%);
+        width: 340px;
+        height: 560px;
+        opacity: 0.72;
+        pointer-events: none;
+      }
+      .content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 48px;
+      }
+      .mono {
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        border: 1px solid rgba(185, 151, 91, 0.55);
+        box-shadow: inset 0 0 0 5px rgba(231, 215, 193, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.32em;
+        font-size: 15px;
+        font-weight: 500;
+        color: #5a524a;
+        padding-left: 0.32em;
+      }
+      .eyebrow {
+        margin-top: 28px;
+        font-size: 13px;
+        letter-spacing: 0.42em;
+        color: #736b62;
+        font-weight: 400;
+      }
+      .concept {
+        margin-top: 18px;
+        font-family: "Cormorant Garamond", Georgia, serif;
+        font-weight: 300;
+        font-size: 64px;
+        letter-spacing: 0.12em;
+        line-height: 1;
+        color: #3f3832;
+      }
+      .name {
+        margin-top: 22px;
+        font-size: 18px;
+        letter-spacing: 0.28em;
+        color: #5a524a;
+        font-weight: 400;
+      }
+      .rule {
+        margin-top: 26px;
+        width: 56px;
+        height: 1px;
+        background: rgba(185, 151, 91, 0.75);
+      }
+      .date {
+        margin-top: 24px;
+        font-size: 20px;
+        letter-spacing: 0.34em;
+        color: #3f3832;
+        font-weight: 400;
+      }
+      .sig {
+        position: absolute;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        letter-spacing: 0.3em;
+        color: rgba(115, 107, 98, 0.7);
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="grain"></div>
+      <svg class="arch" viewBox="0 0 240 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="stroke" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#D8BE87" stop-opacity="0.95" />
+            <stop offset="55%" stop-color="#B9975B" stop-opacity="0.78" />
+            <stop offset="100%" stop-color="#E7D7C1" stop-opacity="0.35" />
+          </linearGradient>
+          <linearGradient id="beam" x1="0.5" y1="0" x2="0.5" y2="1">
+            <stop offset="0%" stop-color="#FFFDFC" stop-opacity="0.95" />
+            <stop offset="40%" stop-color="#E7D7C1" stop-opacity="0.42" />
+            <stop offset="100%" stop-color="#D8BE87" stop-opacity="0" />
+          </linearGradient>
+          <radialGradient id="glow" cx="50%" cy="18%" r="55%">
+            <stop offset="0%" stop-color="#D8BE87" stop-opacity="0.5" />
+            <stop offset="100%" stop-color="#FFFDFC" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <ellipse cx="120" cy="70" rx="78" ry="52" fill="url(#glow)" />
+        <path
+          d="M48 340 V128 C48 68 78 36 120 36 C162 36 192 68 192 128 V340"
+          fill="url(#beam)"
+          opacity="0.9"
+        />
+        <path
+          d="M52 340 V130 C52 72 80 40 120 40 C160 40 188 72 188 130 V340"
+          stroke="url(#stroke)"
+          stroke-width="1.35"
+          stroke-linecap="round"
+          fill="none"
+        />
+        <line
+          x1="120"
+          y1="42"
+          x2="120"
+          y2="310"
+          stroke="#D8BE87"
+          stroke-width="0.7"
+          stroke-opacity="0.45"
+        />
+      </svg>
+
+      <div class="content">
+        <div class="mono">QKC</div>
+        <p class="eyebrow">SACRAMENTO DO CRISMA</p>
+        <h1 class="concept">LUZ DA GRAÇA</h1>
+        <p class="name">QUEEN KAILANE CANDE</p>
+        <div class="rule"></div>
+        <p class="date">30 · AGOSTO · 2026</p>
+      </div>
+
+      <p class="sig">HAXR SIGNATURE</p>
+    </div>
+  </body>
+</html>

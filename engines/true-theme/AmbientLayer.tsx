@@ -36,5 +36,10 @@ export function AmbientLayer() {
     return null;
   }
 
+  /* Ambient próprio Queen — sem AmbientBackground genérico */
+  if (theme.renderProfile === "queen-kailane-luz-da-graca") {
+    return null;
+  }
+
   return <AmbientBackground />;
 }

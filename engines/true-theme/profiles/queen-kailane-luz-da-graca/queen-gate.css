@@ -1,0 +1,464 @@
+/* Queen Kailane — Gate · As Portas da Luz */
+
+.queen-gate {
+  font-synthesis: none;
+  --queen-pearl: #fffdfc;
+  --queen-ivory: #f6f1e8;
+  --queen-champagne: #e7d7c1;
+  --queen-gold: #b9975b;
+  --queen-gold-light: #d8be87;
+  --queen-taupe: #736b62;
+  --queen-warm-beige: #efe6d8;
+}
+
+.queen-gate__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.queen-gate__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 58% 48% at 50% 42%, rgba(231, 215, 193, 0.42), transparent 72%),
+    radial-gradient(ellipse 90% 70% at 50% 100%, rgba(239, 230, 216, 0.55), transparent 55%),
+    linear-gradient(180deg, #fffdfc 0%, #f6f1e8 55%, #efe6d8 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.queen-gate__haze {
+  position: absolute;
+  inset: -10%;
+  background: radial-gradient(
+    ellipse 40% 35% at 50% 45%,
+    rgba(216, 190, 135, 0.22),
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(28px);
+  opacity: 0.85;
+}
+
+.queen-gate__portal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.queen-gate__portal-inner {
+  position: relative;
+  width: min(92vw, 420px);
+  height: min(78vh, 640px);
+}
+
+/* —— Doors —— */
+
+.queen-doors {
+  position: absolute;
+  inset: 0;
+}
+
+.queen-doors__inner-light {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  width: 62%;
+  height: 72%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 42% 42%;
+  background:
+    radial-gradient(
+      ellipse at 50% 28%,
+      rgba(255, 253, 252, 1) 0%,
+      rgba(231, 215, 193, 0.62) 32%,
+      rgba(216, 190, 135, 0.32) 55%,
+      transparent 78%
+    );
+  filter: blur(3px);
+  z-index: 0;
+}
+
+.queen-doors__perspective {
+  position: absolute;
+  inset: 4% 8% 2%;
+  perspective: 1600px;
+  perspective-origin: 50% 42%;
+  z-index: 1;
+}
+
+.queen-doors__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.queen-doors__leafs {
+  position: absolute;
+  left: 13.5%;
+  right: 13.5%;
+  top: 10%;
+  bottom: 3%;
+  display: flex;
+  transform-style: preserve-3d;
+  z-index: 2;
+}
+
+.queen-doors__leaf {
+  flex: 1 1 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.queen-doors__face {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      168deg,
+      rgba(255, 253, 252, 0.88) 0%,
+      rgba(246, 241, 232, 0.97) 38%,
+      rgba(239, 230, 216, 0.99) 100%
+    );
+  border: 1px solid rgba(185, 151, 91, 0.42);
+  box-shadow:
+    inset 0 0 48px rgba(231, 215, 193, 0.4),
+    0 18px 48px rgba(115, 107, 98, 0.1);
+  overflow: hidden;
+}
+
+.queen-doors__face--left {
+  border-right: 1px solid rgba(185, 151, 91, 0.18);
+  box-shadow:
+    inset -14px 0 32px rgba(115, 107, 98, 0.07),
+    inset 0 0 48px rgba(231, 215, 193, 0.35),
+    -10px 14px 36px rgba(115, 107, 98, 0.1);
+}
+
+.queen-doors__face--right {
+  border-left: 1px solid rgba(185, 151, 91, 0.18);
+  box-shadow:
+    inset 14px 0 32px rgba(115, 107, 98, 0.07),
+    inset 0 0 48px rgba(231, 215, 193, 0.35),
+    10px 14px 36px rgba(115, 107, 98, 0.1);
+}
+
+.queen-doors__face-shine {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 253, 252, 0.55) 0%,
+    transparent 42%,
+    transparent 58%,
+    rgba(216, 190, 135, 0.12) 100%
+  );
+  pointer-events: none;
+}
+
+.queen-doors__panel {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  border: 1px solid rgba(185, 151, 91, 0.28);
+  border-radius: 1px;
+  background: rgba(255, 253, 252, 0.25);
+}
+
+.queen-doors__panel--upper {
+  top: 10%;
+  height: 34%;
+  border-radius: 40% 40% 2px 2px / 18% 18% 2px 2px;
+}
+
+.queen-doors__panel--lower {
+  top: 50%;
+  height: 38%;
+}
+
+.queen-doors__cross {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  width: 18px;
+  height: 28px;
+  transform: translateX(-50%);
+  opacity: 0.45;
+}
+
+.queen-doors__cross-v {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: rgba(185, 151, 91, 0.7);
+  transform: translateX(-50%);
+}
+
+.queen-doors__cross-h {
+  position: absolute;
+  left: 50%;
+  top: 32%;
+  width: 12px;
+  height: 1px;
+  background: rgba(185, 151, 91, 0.7);
+  transform: translateX(-50%);
+}
+
+.queen-doors__edge {
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(185, 151, 91, 0.35),
+    transparent
+  );
+}
+
+.queen-doors__face--left .queen-doors__edge {
+  right: 0;
+}
+
+.queen-doors__face--right .queen-doors__edge {
+  left: 0;
+}
+
+.queen-doors__axis {
+  position: absolute;
+  left: 50%;
+  top: 11%;
+  width: 2px;
+  height: 74%;
+  transform: translateX(-50%);
+  transform-origin: top center;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 252, 0.95) 0%,
+    rgba(216, 190, 135, 0.75) 18%,
+    rgba(185, 151, 91, 0.35) 48%,
+    transparent 100%
+  );
+  box-shadow: 0 0 18px rgba(216, 190, 135, 0.45);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.queen-doors__motes {
+  position: absolute;
+  inset: 18% 22% 20%;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.queen-doors__motes span {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(216, 190, 135, 0.55);
+  opacity: 0;
+  animation: queen-mote 7s ease-in-out infinite;
+}
+
+.queen-doors__motes span:nth-child(1) {
+  left: 18%;
+  top: 30%;
+  animation-delay: 0s;
+}
+.queen-doors__motes span:nth-child(2) {
+  left: 72%;
+  top: 22%;
+  animation-delay: 1.4s;
+  width: 1.5px;
+  height: 1.5px;
+}
+.queen-doors__motes span:nth-child(3) {
+  left: 48%;
+  top: 55%;
+  animation-delay: 2.6s;
+}
+.queen-doors__motes span:nth-child(4) {
+  left: 32%;
+  top: 70%;
+  animation-delay: 3.8s;
+  width: 1px;
+  height: 1px;
+}
+.queen-doors__motes span:nth-child(5) {
+  left: 62%;
+  top: 48%;
+  animation-delay: 5s;
+}
+
+@keyframes queen-mote {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  40%,
+  60% {
+    opacity: 0.55;
+    transform: translateY(-6px);
+  }
+}
+
+/* —— Content & CTA —— */
+
+.queen-gate__content {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  width: 100%;
+  max-width: 28rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.queen-gate__eyebrow {
+  margin-top: 1.25rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.38em;
+  color: var(--queen-taupe);
+  opacity: 0.75;
+}
+
+.queen-gate__cta {
+  position: relative;
+  margin-top: 1.75rem;
+  min-height: 2.75rem;
+  padding: 0.75rem 2rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.32em;
+  color: #3f3832;
+  border: 1px solid rgba(185, 151, 91, 0.55);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 253, 252, 0.95) 0%,
+    rgba(246, 241, 232, 0.78) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(231, 215, 193, 0.35),
+    0 8px 28px rgba(185, 151, 91, 0.12),
+    inset 0 1px 0 rgba(255, 253, 252, 0.9);
+  transition:
+    border-color 0.45s ease,
+    box-shadow 0.45s ease,
+    background 0.45s ease;
+}
+
+.queen-gate__cta::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(216, 190, 135, 0.22),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.queen-gate__cta:hover:not(:disabled) {
+  border-color: #b9975b;
+  box-shadow:
+    0 0 0 1px rgba(185, 151, 91, 0.25),
+    0 10px 32px rgba(185, 151, 91, 0.18),
+    inset 0 1px 0 rgba(255, 253, 252, 0.95);
+}
+
+.queen-gate__cta:hover:not(:disabled)::before {
+  opacity: 1;
+}
+
+.queen-gate__cta:focus-visible {
+  outline: 2px solid #b9975b;
+  outline-offset: 4px;
+}
+
+.queen-gate__cta:disabled {
+  opacity: 0.4;
+}
+
+.queen-gate__bloom {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    rgba(255, 253, 252, 0.98) 0%,
+    rgba(231, 215, 193, 0.72) 28%,
+    rgba(246, 241, 232, 0.9) 55%,
+    #fffdfc 100%
+  );
+}
+
+/* Ambient life on the experience shell */
+.queen-luz-da-graca {
+  background-image:
+    radial-gradient(
+      ellipse 80% 40% at 50% 0%,
+      rgba(231, 215, 193, 0.22),
+      transparent 60%
+    );
+}
+
+.queen-luz-da-graca .queen-section-haze {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 55% 40% at 50% 30%,
+    rgba(231, 215, 193, 0.18),
+    transparent 70%
+  );
+}
+
+@media (max-width: 480px) {
+  .queen-gate__portal-inner {
+    width: min(96vw, 360px);
+    height: min(72vh, 560px);
+  }
+
+  .queen-doors__panel--upper {
+    border-radius: 36% 36% 2px 2px / 14% 14% 2px 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .queen-doors__motes span {
+    animation: none;
+    opacity: 0.25;
+  }
+
+  .queen-doors__leaf {
+    will-change: auto;
+  }
+}

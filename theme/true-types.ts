@@ -28,7 +28,8 @@ export type RenderProfile =
   | "primavera-lobolo"
   | "jessica-samuel-wedding"
   | "stan-real-madrid"
-  | "nian-night-of-the-web";
+  | "nian-night-of-the-web"
+  | "queen-kailane-luz-da-graca";
 
 export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
 
