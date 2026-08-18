@@ -109,12 +109,11 @@ export const NIAN_DRESS_CODE = {
   status: "confirmed" as NianFieldStatus,
   eyebrow: "PROTOCOLO DE ENTRADA",
   title: "CORES DO UNIVERSO",
-  label: "Azul Royal · Vermelho Vivo · Preto",
+  label: "Azul Royal · Vermelho Vivo",
   lead: "Veste as cores. Entra no universo do Nian.",
   colors: [
     { name: "Azul Royal", hex: "#4169E1" },
     { name: "Vermelho Vivo", hex: "#E10600" },
-    { name: "Preto", hex: "#0A0A0C" },
   ],
 } as const;
 

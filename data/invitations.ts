@@ -338,7 +338,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       date: "2026-09-19",
       time: "13h00",
       location: "Salão de Eventos Benerla · Marracuene, Maputo",
-      dressCode: "Cores do Universo · Azul Royal, Vermelho Vivo e Preto",
+      dressCode: "Cores do Universo · Azul Royal e Vermelho Vivo",
       subtitle: "Uma cidade em movimento. Um pequeno herói. Uma celebração inesquecível.",
       description:
         "19 de Setembro de 2026 · 13h00 · Salão de Eventos Benerla, Marracuene. NIGHT OF THE WEB — aniversário do Nian.",

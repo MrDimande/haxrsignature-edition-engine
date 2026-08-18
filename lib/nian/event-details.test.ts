@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   NIAN_AUDIO_AUTHORIZED,
+  NIAN_DRESS_CODE,
   NIAN_EVENT,
   NIAN_RSVP,
   NIAN_VENUE,
@@ -37,6 +38,14 @@ describe("nian event-details", () => {
   it("keeps the RSVP deadline at 5 September 2026", () => {
     assert.equal(NIAN_RSVP.deadlineIso, "2026-09-05");
     assert.equal(NIAN_RSVP.deadlineLabel, "05 · Setembro · 2026");
+  });
+
+  it("publishes dress code as royal and crimson only", () => {
+    assert.equal(NIAN_DRESS_CODE.label, "Azul Royal · Vermelho Vivo");
+    assert.deepEqual(
+      NIAN_DRESS_CODE.colors.map((color) => color.name),
+      ["Azul Royal", "Vermelho Vivo"]
+    );
   });
 
   it("builds timed ICS at 12:00 Africa/Maputo without inventing an end time", async () => {

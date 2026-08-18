@@ -19,12 +19,6 @@ const COLOUR_PLANES = [
     fill: NIAN_COLORS.crimson,
     glow: "rgba(225,6,0,0.4)",
   },
-  {
-    id: "ink",
-    label: "PRETO",
-    fill: "#05060c",
-    glow: "rgba(244,246,251,0.08)",
-  },
 ] as const;
 
 /**
@@ -85,7 +79,7 @@ export function NianUniformeSection() {
               key={plane.id}
               className="relative overflow-hidden"
               style={{
-                height: "clamp(4.75rem, 14vw, 7.5rem)",
+                height: "clamp(6.5rem, 18vw, 10.5rem)",
               }}
             >
               <motion.div
