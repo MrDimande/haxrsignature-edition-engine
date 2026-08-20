@@ -11,17 +11,17 @@ import { QUEEN_EASE } from "./queen-motion";
 import "./queen-nav.css";
 
 const NAV_ITEMS = [
-  { id: "queen-celebracao", label: "Celebração", shortLabel: "Celebração" },
-  { id: "queen-versiculo", label: "Versículo", shortLabel: "Versículo" },
-  { id: "queen-almoco", label: "À Mesa", shortLabel: "À Mesa" },
-  { id: "queen-rsvp", label: "Confirmar", shortLabel: "Confirmar" },
+  { id: "queen-celebracao", label: "Celebração", shortLabel: "Missa" },
+  { id: "queen-versiculo", label: "Versículo", shortLabel: "Palavra" },
+  { id: "queen-almoco", label: "À Mesa", shortLabel: "Mesa" },
+  { id: "queen-rsvp", label: "Confirmar", shortLabel: "RSVP" },
   { id: "queen-bencaos", label: "Bênçãos", shortLabel: "Bênçãos" },
 ] as const;
 
 type NavSectionId = (typeof NAV_ITEMS)[number]["id"];
 
 function getScrollOffset(): number {
-  return window.matchMedia("(min-width: 768px)").matches ? -72 : -16;
+  return window.matchMedia("(min-width: 768px)").matches ? -32 : -20;
 }
 
 /**
@@ -139,11 +139,11 @@ export function QueenKailaneFloatingNav() {
           className="queen-nav"
           aria-label="Navegação do convite"
           initial={
-            reduceMotion ? { opacity: 1 } : { opacity: 0, y: -12 }
+            reduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }
           }
           animate={{ opacity: 1, y: 0 }}
-          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
-          transition={{ duration: 0.55, ease: QUEEN_EASE }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+          transition={{ duration: 0.45, ease: QUEEN_EASE }}
         >
           <div className="queen-nav__inner">
             <span className="queen-nav__mono" aria-hidden="true">
