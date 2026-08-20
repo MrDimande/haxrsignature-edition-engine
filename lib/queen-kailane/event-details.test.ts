@@ -215,4 +215,22 @@ describe("queen-kailane rsvp persist rules", () => {
       true
     );
   });
+
+  it("binds queenkailanecrisma exclusively to EDITION_EVENT_QUEEN_KAILANE_ID", async () => {
+    const { getEditionEventBinding, isEditionPersistenceConfigured } = await import(
+      "../rsvp/events"
+    );
+    process.env.EDITION_EVENT_QUEEN_KAILANE_ID = "test-queen-uuid";
+
+    try {
+      const binding = getEditionEventBinding(QUEEN_KAILANE_SLUG);
+      assert.ok(binding, "Binding for queenkailanecrisma should exist");
+      assert.equal(binding.slug, QUEEN_KAILANE_SLUG);
+      assert.equal(binding.envVar, "EDITION_EVENT_QUEEN_KAILANE_ID");
+      assert.equal(binding.eventId, "test-queen-uuid");
+      assert.equal(isEditionPersistenceConfigured(QUEEN_KAILANE_SLUG), true);
+    } finally {
+      delete process.env.EDITION_EVENT_QUEEN_KAILANE_ID;
+    }
+  });
 });
