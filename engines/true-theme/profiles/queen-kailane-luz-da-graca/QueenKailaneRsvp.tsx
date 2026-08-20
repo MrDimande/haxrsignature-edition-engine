@@ -6,7 +6,7 @@ import {
   QUEEN_KAILANE_COPY,
   QUEEN_KAILANE_RSVP,
   QUEEN_KAILANE_SLUG,
-  downloadQueenKailaneIcsFile,
+  getQueenKailaneBlessingForGuest,
   readQueenKailaneRsvpLocalRecord,
   type QueenKailaneRsvpLocalRecord,
 } from "@lib/queen-kailane/event-details";
@@ -19,6 +19,7 @@ import {
   type RsvpApiPayload,
 } from "@lib/rsvp/client-outcome";
 import { buildEditionRsvpStorageKey } from "@lib/rsvp/storage-keys";
+import { QueenKailaneAccessPass } from "./QueenKailaneAccessPass";
 import { QUEEN_COLORS, QUEEN_EASE } from "./queen-motion";
 
 type AttendingChoice = "" | "yes" | "no";
@@ -81,11 +82,13 @@ export function QueenKailaneRsvp() {
   const [submittedAttending, setSubmittedAttending] = useState<boolean | null>(
     null
   );
+  const [confirmedGuestName, setConfirmedGuestName] = useState("");
 
   useEffect(() => {
     const existing = loadLocal(slug);
     if (!existing) return;
     setSubmittedAttending(existing.attending);
+    setConfirmedGuestName(existing.name);
     setStatus("already");
   }, [slug]);
 
@@ -150,6 +153,7 @@ export function QueenKailaneRsvp() {
           persistLocal(slug, record);
         }
         setSubmittedAttending(isAttending);
+        setConfirmedGuestName(form.name.trim());
         setStatus(isAttending ? "success" : "declined");
         return;
       }
@@ -167,6 +171,7 @@ export function QueenKailaneRsvp() {
         };
         persistLocal(slug, record);
         setSubmittedAttending(isAttending);
+        setConfirmedGuestName(form.name.trim());
         setStatus(isAttending ? "success" : "declined");
         return;
       }
@@ -249,7 +254,7 @@ export function QueenKailaneRsvp() {
 
         {confirmed ? (
           <motion.div
-            className="mt-14 text-center"
+            className="mt-12 text-center"
             initial={reduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: QUEEN_EASE }}
@@ -268,23 +273,16 @@ export function QueenKailaneRsvp() {
                 ? QUEEN_KAILANE_COPY.rsvpClosing
                 : QUEEN_KAILANE_COPY.rsvpDeclined}
             </p>
+
             {submittedAttending ? (
-              <button
-                type="button"
-                onClick={() => downloadQueenKailaneIcsFile()}
-                className="mt-8 inline-flex min-h-11 items-center justify-center border px-6 py-3 text-[0.65rem] tracking-[0.24em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-                style={{
-                  fontFamily:
-                    "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
-                  color: QUEEN_COLORS.ink,
-                  borderColor: QUEEN_COLORS.goldMatte,
-                  background:
-                    "linear-gradient(180deg, rgba(255,253,252,0.95), rgba(246,241,232,0.7))",
-                  outlineColor: QUEEN_COLORS.goldMatte,
-                }}
-              >
-                ADICIONAR AO CALENDÁRIO
-              </button>
+              <QueenKailaneAccessPass
+                guestName={
+                  confirmedGuestName || form.name.trim() || "Convidado"
+                }
+                blessing={getQueenKailaneBlessingForGuest(
+                  confirmedGuestName || form.name.trim() || "Convidado"
+                )}
+              />
             ) : null}
           </motion.div>
         ) : (

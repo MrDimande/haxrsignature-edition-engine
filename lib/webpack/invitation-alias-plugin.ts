@@ -55,14 +55,19 @@ export class InvitationAliasPlugin {
     resolver.getHook("resolve").tapAsync(
       "InvitationAliasPlugin",
       (request, resolveContext, callback) => {
-        if (!request.request?.startsWith("@/")) {
+        if (
+          !request ||
+          !request.request ||
+          typeof request.request !== "string" ||
+          !request.request.startsWith("@/")
+        ) {
           callback();
           return;
         }
 
         const issuer =
-          request.context.issuer ??
-          request.context.path ??
+          (request.context &&
+            (request.context.issuer ?? request.context.path)) ??
           request.path ??
           "";
 

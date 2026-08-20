@@ -109,7 +109,81 @@ export type QueenKailaneRsvpLocalRecord = {
   attending: boolean;
   name: string;
   submittedAt: string;
+  blessingId?: number;
 };
+
+export type QueenKailaneBlessing = {
+  id: number;
+  theme: string;
+  verse: string;
+  reference: string;
+};
+
+export const QUEEN_KAILANE_BLESSINGS: readonly QueenKailaneBlessing[] = [
+  {
+    id: 1,
+    theme: "Bênção Sacerdotal",
+    verse:
+      "O Senhor te abençoe e te guarde; o Senhor faça resplandecer o Seu rosto sobre ti e tenha misericórdia de ti; o Senhor sobre ti levante o Seu rosto e te dê a paz.",
+    reference: "Números 6:24-26",
+  },
+  {
+    id: 2,
+    theme: "Luz e Salvação",
+    verse:
+      "O Senhor é a minha luz e a minha salvação; a quem temerei? O Senhor é a força da minha vida; de quem me recearei?",
+    reference: "Salmos 27:1",
+  },
+  {
+    id: 3,
+    theme: "Caminho Iluminado",
+    verse:
+      "Lâmpada para os meus pés é a tua palavra, e luz para o meu caminho.",
+    reference: "Salmos 119:105",
+  },
+  {
+    id: 4,
+    theme: "Luz do Mundo",
+    verse:
+      "Vós sois a luz do mundo; não se pode esconder uma cidade edificada sobre um monte. Assim resplandeça a vossa luz.",
+    reference: "Mateus 5:14-16",
+  },
+  {
+    id: 5,
+    theme: "Fruto do Espírito",
+    verse:
+      "Mas o fruto do Espírito é: amor, alegria, paz, longanimidade, benignidade, bondade, fidelidade, mansidão e domínio próprio.",
+    reference: "Gálatas 5:22-23",
+  },
+  {
+    id: 6,
+    theme: "Força e Escudo",
+    verse:
+      "O Senhor é a minha força e o meu escudo; nele confiou o meu coração, e fui socorrido; pelo que o meu coração salta de prazer.",
+    reference: "Salmos 28:7",
+  },
+  {
+    id: 7,
+    theme: "Filhos da Luz",
+    verse:
+      "Porque noutro tempo éreis trevas, mas agora sois luz no Senhor; andai como filhos da luz, pois o fruto da luz está em toda a bondade, justiça e verdade.",
+    reference: "Efésios 5:8-9",
+  },
+] as const;
+
+export function getQueenKailaneBlessingForGuest(
+  name: string
+): QueenKailaneBlessing {
+  const normalized = name.trim().toLowerCase();
+  if (!normalized) return QUEEN_KAILANE_BLESSINGS[0];
+  let hash = 0;
+  for (let i = 0; i < normalized.length; i++) {
+    hash = (hash * 31 + normalized.charCodeAt(i)) % QUEEN_KAILANE_BLESSINGS.length;
+  }
+  return (
+    QUEEN_KAILANE_BLESSINGS[Math.abs(hash)] ?? QUEEN_KAILANE_BLESSINGS[0]
+  );
+}
 
 export function readQueenKailaneRsvpLocalRecord(
   raw: string | null
@@ -126,6 +200,9 @@ export function readQueenKailaneRsvpLocalRecord(
         typeof data.submittedAt === "string"
           ? data.submittedAt
           : new Date().toISOString(),
+      ...(typeof data.blessingId === "number"
+        ? { blessingId: data.blessingId }
+        : {}),
     };
   } catch {
     return null;

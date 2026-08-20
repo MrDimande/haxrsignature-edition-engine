@@ -109,6 +109,25 @@ describe("queen-kailane event-details", () => {
     assert.equal(ok.attending, true);
     assert.equal(ok.name, "Maria");
   });
+
+  it("configures exactly 7 sacred blessings of light with valid references", async () => {
+    const { QUEEN_KAILANE_BLESSINGS, getQueenKailaneBlessingForGuest } =
+      await import("./event-details");
+    assert.equal(QUEEN_KAILANE_BLESSINGS.length, 7);
+    for (const b of QUEEN_KAILANE_BLESSINGS) {
+      assert.ok(b.id >= 1 && b.id <= 7);
+      assert.ok(b.theme.length > 0);
+      assert.ok(b.verse.length > 10);
+      assert.ok(b.reference.length > 3);
+    }
+
+    const b1 = getQueenKailaneBlessingForGuest("Carlos Cande");
+    const b2 = getQueenKailaneBlessingForGuest("Carlos Cande");
+    assert.equal(b1.id, b2.id, "Blessing assignment should be deterministic for the same name");
+
+    const defaultBlessing = getQueenKailaneBlessingForGuest("");
+    assert.equal(defaultBlessing.id, 1);
+  });
 });
 
 describe("queen-kailane registry wiring", () => {
