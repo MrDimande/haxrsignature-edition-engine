@@ -2,11 +2,8 @@
 
 import React, { useEffect, useId, useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "motion/react";
-import { Sparkles, Heart, CheckCircle2, MessageSquareQuote } from "lucide-react";
-import {
-  INITIAL_QUEEN_KAILANE_BLESSINGS_MESSAGES,
-  type QueenKailaneGuestbookEntry,
-} from "@lib/queen-kailane/event-details";
+import { Feather, CheckCircle2, MessageSquareQuote } from "lucide-react";
+import { type QueenKailaneGuestbookEntry } from "@lib/queen-kailane/event-details";
 import { buildEditionRsvpStorageKey } from "@lib/rsvp/storage-keys";
 import { QUEEN_COLORS, QUEEN_EASE } from "./queen-motion";
 import { QUEEN_GRACE_ARC } from "./queen-constants";
@@ -76,11 +73,6 @@ export function QueenKailaneLivroDasBencaos() {
     }
   }, []);
 
-  const allEntries: QueenKailaneGuestbookEntry[] = [
-    ...userEntries,
-    ...INITIAL_QUEEN_KAILANE_BLESSINGS_MESSAGES,
-  ];
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (submitting) return;
@@ -108,7 +100,7 @@ export function QueenKailaneLivroDasBencaos() {
       name: name.trim(),
       relation: relation || "Familiar / Amigo",
       message: message.trim(),
-      dateDisplay: "Hoje",
+      dateDisplay: "Agosto de 2026",
       isInitial: false,
     };
 
@@ -331,7 +323,7 @@ export function QueenKailaneLivroDasBencaos() {
             </div>
           ) : null}
 
-          {/* Botão Submeter */}
+          {/* Botão Submeter com Ícone de Pena/Caligrafia Solene */}
           <button
             type="submit"
             disabled={submitting}
@@ -346,7 +338,7 @@ export function QueenKailaneLivroDasBencaos() {
               outlineColor: QUEEN_COLORS.goldMatte,
             }}
           >
-            <Sparkles size={13} strokeWidth={1.5} className="text-[#B9975B]" />
+            <Feather size={14} strokeWidth={1.5} className="text-[#B9975B]" />
             <span>{submitting ? "A GRAVAR..." : "GRAVAR NO LIVRO DAS BÊNÇÃOS"}</span>
           </button>
         </form>
@@ -354,85 +346,109 @@ export function QueenKailaneLivroDasBencaos() {
 
       {/* Mural dos Fólios / Mensagens */}
       <div className="mx-auto mt-16 max-w-4xl">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <AnimatePresence>
-            {allEntries.map((entry, index) => (
-              <motion.article
-                key={entry.id}
-                className="relative flex flex-col justify-between rounded-sm p-6 text-left transition-all"
-                style={{
-                  backgroundColor: "#FFFDFC",
-                  border: `1px solid ${
-                    entry.isInitial
-                      ? "rgba(185, 151, 91, 0.25)"
-                      : "rgba(185, 151, 91, 0.4)"
-                  }`,
-                  boxShadow: "0 6px 20px rgba(115, 107, 98, 0.04)",
-                }}
-                initial={
-                  reduceMotion
-                    ? false
-                    : { opacity: 0, y: 12, scale: 0.98 }
-                }
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.8,
-                  delay: Math.min(index * 0.08, 0.4),
-                  ease: QUEEN_EASE,
-                }}
-              >
-                {/* Ícone editorial */}
-                <div className="flex items-center justify-between pb-3">
-                  <span
-                    className="text-[0.56rem] font-semibold uppercase tracking-[0.24em]"
+        {userEntries.length === 0 ? (
+          <motion.div
+            className="mx-auto max-w-md rounded-sm p-8 text-center"
+            style={{
+              border: "1px dashed rgba(185, 151, 91, 0.35)",
+              backgroundColor: "rgba(255, 253, 252, 0.6)",
+            }}
+            initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: QUEEN_EASE }}
+          >
+            <div className="mx-auto flex h-10 w-10 items-center justify-center text-[#B9975B]">
+              <Feather size={20} strokeWidth={1.3} aria-hidden />
+            </div>
+            <p
+              className="mt-3 text-[0.95rem] italic leading-relaxed text-[#736B62]"
+              style={{
+                fontFamily:
+                  'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+              }}
+            >
+              As páginas deste Livro de Fé aguardam as primeiras orações e bênçãos.
+              <br />
+              Seja o primeiro a deixar uma dedicatória para a Queen Kailane.
+            </p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <AnimatePresence>
+              {userEntries.map((entry, index) => (
+                <motion.article
+                  key={entry.id}
+                  className="relative flex flex-col justify-between rounded-sm p-6 text-left transition-all"
+                  style={{
+                    backgroundColor: "#FFFDFC",
+                    border: "1px solid rgba(185, 151, 91, 0.4)",
+                    boxShadow: "0 6px 20px rgba(115, 107, 98, 0.04)",
+                  }}
+                  initial={
+                    reduceMotion
+                      ? false
+                      : { opacity: 0, y: 12, scale: 0.98 }
+                  }
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: Math.min(index * 0.08, 0.4),
+                    ease: QUEEN_EASE,
+                  }}
+                >
+                  {/* Ícone editorial */}
+                  <div className="flex items-center justify-between pb-3">
+                    <span
+                      className="text-[0.56rem] font-semibold uppercase tracking-[0.24em]"
+                      style={{
+                        fontFamily:
+                          "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+                        color: QUEEN_COLORS.goldMatte,
+                      }}
+                    >
+                      {entry.relation || "BÊNÇÃO"}
+                    </span>
+                    <MessageSquareQuote
+                      size={16}
+                      strokeWidth={1.2}
+                      className="text-[#D8BE87] opacity-60"
+                      aria-hidden
+                    />
+                  </div>
+
+                  {/* Texto da Bênção */}
+                  <blockquote
+                    className="my-3 text-[1.05rem] italic leading-relaxed text-[#3F3832]"
                     style={{
                       fontFamily:
-                        "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
-                      color: QUEEN_COLORS.goldMatte,
+                        'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
                     }}
                   >
-                    {entry.relation || "BÊNÇÃO"}
-                  </span>
-                  <MessageSquareQuote
-                    size={16}
-                    strokeWidth={1.2}
-                    className="text-[#D8BE87] opacity-60"
-                    aria-hidden
-                  />
-                </div>
+                    «{entry.message}»
+                  </blockquote>
 
-                {/* Texto da Bênção */}
-                <blockquote
-                  className="my-3 text-[1.05rem] italic leading-relaxed text-[#3F3832]"
-                  style={{
-                    fontFamily:
-                      'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
-                  }}
-                >
-                  «{entry.message}»
-                </blockquote>
-
-                {/* Assinatura */}
-                <div
-                  className="mt-4 pt-3 flex items-center justify-between border-t text-[0.6rem] tracking-widest text-[#736B62]"
-                  style={{
-                    borderColor: "rgba(231, 215, 193, 0.6)",
-                    fontFamily:
-                      "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
-                  }}
-                >
-                  <span className="font-medium text-[#3F3832]">
-                    {entry.name}
-                  </span>
-                  <span className="text-[0.54rem] uppercase opacity-75">
-                    {entry.dateDisplay}
-                  </span>
-                </div>
-              </motion.article>
-            ))}
-          </AnimatePresence>
-        </div>
+                  {/* Assinatura */}
+                  <div
+                    className="mt-4 pt-3 flex items-center justify-between border-t text-[0.6rem] tracking-widest text-[#736B62]"
+                    style={{
+                      borderColor: "rgba(231, 215, 193, 0.6)",
+                      fontFamily:
+                        "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+                    }}
+                  >
+                    <span className="font-medium text-[#3F3832]">
+                      {entry.name}
+                    </span>
+                    <span className="text-[0.54rem] uppercase opacity-75">
+                      {entry.dateDisplay}
+                    </span>
+                  </div>
+                </motion.article>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </section>
   );
