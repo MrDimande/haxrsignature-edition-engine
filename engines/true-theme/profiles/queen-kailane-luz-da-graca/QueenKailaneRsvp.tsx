@@ -436,19 +436,18 @@ export function QueenKailaneRsvp() {
               })}
             </fieldset>
 
-            {/* Honeypot */}
-            <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-              <label htmlFor={`${formId}-company`}>Empresa</label>
+            {/* Honeypot anti-bot — sem label 'Empresa' para evitar falsos positivos por autofill do browser */}
+            <div className="hidden" aria-hidden="true">
               <input
-                id={`${formId}-company`}
-                name="company"
                 type="text"
+                name="qk_rsvp_hp"
                 tabIndex={-1}
                 autoComplete="off"
                 value={form.honeypot}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, honeypot: e.target.value }))
                 }
+                className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
               />
             </div>
 
