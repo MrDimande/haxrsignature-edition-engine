@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { id: "queen-versiculo", label: "Versículo", shortLabel: "Versículo" },
   { id: "queen-almoco", label: "À Mesa", shortLabel: "À Mesa" },
   { id: "queen-rsvp", label: "Confirmar", shortLabel: "Confirmar" },
+  { id: "queen-bencaos", label: "Bênçãos", shortLabel: "Bênçãos" },
 ] as const;
 
 type NavSectionId = (typeof NAV_ITEMS)[number]["id"];

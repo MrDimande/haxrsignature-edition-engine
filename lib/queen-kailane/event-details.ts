@@ -310,3 +310,43 @@ export function buildQueenKailaneGoogleCalendarUrl(): string {
     encodeURIComponent(QUEEN_KAILANE_TIMEZONE)
   );
 }
+
+export type QueenKailaneGuestbookEntry = {
+  id: string;
+  name: string;
+  relation?: string;
+  message: string;
+  dateDisplay: string;
+  isInitial?: boolean;
+};
+
+export const INITIAL_QUEEN_KAILANE_BLESSINGS_MESSAGES: readonly QueenKailaneGuestbookEntry[] = [
+  {
+    id: "blessing-parents",
+    name: "Os teus Pais",
+    relation: "Pais",
+    message:
+      "Que a luz do Espírito Santo seja sempre a tua bússola, nossa filha. Caminha sempre na retidão, no amor e na fé. Estamos infinitamente orgulhosos de ti.",
+    dateDisplay: "Agosto de 2026",
+    isInitial: true,
+  },
+  {
+    id: "blessing-godparents",
+    name: "Os teus Padrinhos",
+    relation: "Padrinhos de Crisma",
+    message:
+      "Que o óleo sagrado do Crisma confirme no teu coração a coragem de ser luz onde quer que vás. Estaremos sempre ao teu lado nesta caminhada de fé.",
+    dateDisplay: "Agosto de 2026",
+    isInitial: true,
+  },
+  {
+    id: "blessing-family",
+    name: "Família Cande",
+    relation: "Família",
+    message:
+      "«O Senhor te guarde de todo o mal; Ele guardará a tua alma.» Que esta nova etapa espiritual seja repleta de graça e sabedoria divina.",
+    dateDisplay: "Agosto de 2026",
+    isInitial: true,
+  },
+] as const;
+

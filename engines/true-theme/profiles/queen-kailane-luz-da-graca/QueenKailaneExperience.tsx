@@ -9,6 +9,7 @@ import { QueenKailaneCelebracao } from "./QueenKailaneCelebracao";
 import { QueenKailaneAlmoco } from "./QueenKailaneAlmoco";
 import { QueenKailaneVersiculo } from "./QueenKailaneVersiculo";
 import { QueenKailaneRsvp } from "./QueenKailaneRsvp";
+import { QueenKailaneLivroDasBencaos } from "./QueenKailaneLivroDasBencaos";
 import { QueenKailaneClosing } from "./QueenKailaneSignature";
 import { QueenKailaneHaxrSignature } from "./QueenKailaneHaxrSignature";
 import { QUEEN_COLORS } from "./queen-motion";
@@ -24,6 +25,7 @@ import { QUEEN_COLORS } from "./queen-motion";
  * CAPÍTULO III · A Palavra (Ápice Espiritual)
  * CAPÍTULO IV · À Mesa
  * CAPÍTULO V · Faz Parte Desta Página
+ * FÓLIO SAGRADO · O Livro das Bênçãos
  * EPÍLOGOS · Uma Página de Fé / HAXR Signature
  */
 export function QueenKailaneLuzDaGracaExperience() {
@@ -70,6 +72,7 @@ export function QueenKailaneLuzDaGracaExperience() {
         <QueenKailaneVersiculo />
         <QueenKailaneAlmoco />
         <QueenKailaneRsvp />
+        <QueenKailaneLivroDasBencaos />
         <QueenKailaneClosing />
         <QueenKailaneHaxrSignature />
       </div>
