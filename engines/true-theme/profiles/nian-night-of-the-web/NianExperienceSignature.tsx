@@ -220,7 +220,7 @@ export function NianExperienceSignature({ credits }: Props) {
               className="h-px w-14 bg-gradient-to-r from-transparent via-[#E10600]/45 to-transparent"
             />
             <p className="text-[8px] font-semibold uppercase tracking-[0.36em] text-[#8FA3D1]/80">
-              Banda sonora da noite
+              Banda sonora do universo
             </p>
             <NianSoundtrackCreditsTrigger
               credits={credits}

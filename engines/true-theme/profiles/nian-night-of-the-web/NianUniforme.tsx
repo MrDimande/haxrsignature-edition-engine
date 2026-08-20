@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
+import { NIAN_DRESS_CODE } from "@lib/nian/event-details";
 import { NIAN_COLORS, NIAN_EASE } from "./nian-motion";
 import { NianSignalPulse } from "./NianSignalPulse";
 
@@ -18,16 +19,10 @@ const COLOUR_PLANES = [
     fill: NIAN_COLORS.crimson,
     glow: "rgba(225,6,0,0.4)",
   },
-  {
-    id: "ink",
-    label: "PRETO",
-    fill: "#05060c",
-    glow: "rgba(244,246,251,0.08)",
-  },
 ] as const;
 
 /**
- * Uniforme da Noite — editorial cromático (sem fotografia).
+ * Cores do Universo — editorial cromático (sem fotografia).
  * Isolado a nian-night-of-the-web.
  */
 export function NianUniformeSection() {
@@ -84,7 +79,7 @@ export function NianUniformeSection() {
               key={plane.id}
               className="relative overflow-hidden"
               style={{
-                height: "clamp(4.75rem, 14vw, 7.5rem)",
+                height: "clamp(6.5rem, 18vw, 10.5rem)",
               }}
             >
               <motion.div
@@ -167,7 +162,7 @@ export function NianUniformeSection() {
             transition={{ duration: 0.55, ease: NIAN_EASE }}
             className="text-[10px] font-semibold uppercase tracking-[0.42em] text-[#4169E1]"
           >
-            Protocolo de entrada
+            {NIAN_DRESS_CODE.eyebrow}
           </motion.p>
 
           <div className="mt-4 overflow-hidden">
@@ -188,9 +183,9 @@ export function NianUniformeSection() {
                   "var(--font-jost), var(--font-montserrat), sans-serif",
               }}
             >
-              Uniforme
+              Cores
               <br />
-              da noite
+              do universo
             </motion.h2>
           </div>
           <NianSignalPulse active={inView} />

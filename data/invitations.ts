@@ -35,9 +35,24 @@ export interface InvitationAdminBinding {
   expectedRegistryKey?: string;
 }
 
+/**
+ * Variant identifica o perfil funcional da experiência de memórias.
+ * Não confundir com theme (apresentação visual) — variant determina comportamento.
+ */
+export type MemoriesVariant = "traditional-memories" | "plus-memories";
+
+export interface InvitationCompetitionConfig {
+  enabled: boolean;
+  mode: "unique-challenges";
+  totalChallenges: number;
+}
+
 export interface InvitationFeatures {
   memories?: {
     enabled: boolean;
+    /** Perfil funcional da experiência (determina componentes, desafios, etc.) */
+    variant: MemoriesVariant;
+    competition?: InvitationCompetitionConfig;
   };
 }
 
@@ -141,6 +156,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     features: {
       memories: {
         enabled: true,
+        variant: "traditional-memories",
       },
     },
   },
@@ -260,6 +276,17 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       envVar: "EDITION_EVENT_JESSICA_WEDDING_ID",
       expectedRegistryKey: "jessica-samuel-wedding",
     },
+    features: {
+      memories: {
+        enabled: true,
+        variant: "plus-memories",
+        competition: {
+          enabled: true,
+          mode: "unique-challenges",
+          totalChallenges: 12,
+        },
+      },
+    },
   },
   stanturns5: {
     slug: "stanturns5",
@@ -309,13 +336,12 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     metadata: {
       title: "Nian — NIGHT OF THE WEB",
       date: "2026-09-19",
-      /** Hora pendente — string vazia; UI pública omite */
-      time: "",
+      time: "13h00",
       location: "Salão de Eventos Benerla · Marracuene, Maputo",
-      dressCode: "Uniforme da Noite · Azul Royal, Vermelho Vivo e Preto",
+      dressCode: "Cores do Universo · Azul Royal e Vermelho Vivo",
       subtitle: "Uma cidade em movimento. Um pequeno herói. Uma celebração inesquecível.",
       description:
-        "19 de Setembro de 2026 · Salão de Eventos Benerla, Marracuene. NIGHT OF THE WEB — aniversário do Nian.",
+        "19 de Setembro de 2026 · 13h00 · Salão de Eventos Benerla, Marracuene. NIGHT OF THE WEB — aniversário do Nian.",
       eventDate: "2026-09-19",
       eventType: "Aniversário Infantil",
       ogImage: "/images/nian/social/nian-og.png",

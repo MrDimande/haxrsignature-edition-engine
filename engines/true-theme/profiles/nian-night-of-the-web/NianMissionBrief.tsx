@@ -42,8 +42,8 @@ function BriefLine({
 }
 
 /**
- * Mission Brief — fixture editorial da noite.
- * Hora omitida enquanto pendente. Isolado a nian-night-of-the-web.
+ * Mission Brief — fixture editorial da celebração.
+ * Isolado a nian-night-of-the-web.
  */
 export function NianMissionBriefSection() {
   const reduceMotion = useReducedMotion();
@@ -111,7 +111,7 @@ export function NianMissionBriefSection() {
             fontFamily: "var(--font-jost), var(--font-montserrat), sans-serif",
           }}
         >
-          A noite em que
+          A missão em que
           <br />
           tudo acontece.
         </motion.h2>

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { completeTraditionalMemoryUpload } from "@lib/jessica-samuel-traditional/memories/upload";
+import { completeMemoryUpload } from "@lib/memories/upload";
 
 export async function POST(request: Request) {
   try {
@@ -10,13 +10,14 @@ export async function POST(request: Request) {
       caption?: string;
       challengeId?: string;
       tableId?: string;
+      participantId?: string;
     };
 
     if (!body || typeof body !== "object") {
       return NextResponse.json({ success: false, error: "Pedido inválido." }, { status: 400 });
     }
 
-    const result = await completeTraditionalMemoryUpload(
+    const result = await completeMemoryUpload(
       body.slug ?? "",
       body.photoId ?? "",
       request,
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
         caption: typeof body.caption === "string" ? body.caption : undefined,
         challengeId: typeof body.challengeId === "string" ? body.challengeId : undefined,
         tableId: typeof body.tableId === "string" ? body.tableId : undefined,
+        participantId: typeof body.participantId === "string" ? body.participantId : undefined,
       }
     );
 
@@ -56,3 +58,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

@@ -56,12 +56,14 @@ export const MEMORY_CHALLENGES: MemoryChallenge[] = [
   },
 ];
 
-const STORAGE_KEY = "haxr_memorias_completed_challenges";
+function storageKey(slug: string): string {
+  return `haxr_memorias_${slug}_completed`;
+}
 
-export function getCompletedChallenges(): string[] {
-  if (typeof window === "undefined") return [];
+export function getCompletedChallenges(slug?: string): string[] {
+  if (typeof window === "undefined" || !slug) return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey(slug));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.map(String) : [];
@@ -70,13 +72,13 @@ export function getCompletedChallenges(): string[] {
   }
 }
 
-export function markChallengeCompleted(challengeId: string): string[] {
-  if (typeof window === "undefined") return [];
+export function markChallengeCompleted(slug: string, challengeId: string): string[] {
+  if (typeof window === "undefined" || !slug) return [];
   try {
-    const current = getCompletedChallenges();
+    const current = getCompletedChallenges(slug);
     if (!current.includes(challengeId)) {
       const updated = [...current, challengeId];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      localStorage.setItem(storageKey(slug), JSON.stringify(updated));
       return updated;
     }
     return current;

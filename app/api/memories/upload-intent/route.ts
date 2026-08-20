@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createTraditionalMemoryUploadIntent } from "@lib/jessica-samuel-traditional/memories/upload";
+import { createMemoryUploadIntent } from "@lib/memories/upload";
 
 export async function POST(request: Request) {
   try {
@@ -19,6 +19,7 @@ export async function POST(request: Request) {
     const caption = typeof record.caption === "string" ? record.caption.trim() : undefined;
     const challengeId = typeof record.challengeId === "string" ? record.challengeId.trim() : undefined;
     const tableId = typeof record.tableId === "string" ? record.tableId.trim() : undefined;
+    const participantId = typeof record.participantId === "string" ? record.participantId.trim() : undefined;
 
     if (!slug) {
       return NextResponse.json({ success: false, error: "Convite inválido." }, { status: 400 });
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Tamanho de ficheiro inválido." }, { status: 400 });
     }
 
-    const result = await createTraditionalMemoryUploadIntent(
+    const result = await createMemoryUploadIntent(
       {
         slug,
         fileName,
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
         caption: caption || undefined,
         challengeId: challengeId || undefined,
         tableId: tableId || undefined,
+        participantId: participantId || undefined,
       },
       request
     );
@@ -72,3 +74,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

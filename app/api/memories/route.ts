@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
-import { listTraditionalMemories } from "@lib/jessica-samuel-traditional/memories/gallery";
+import { listMemories } from "@lib/memories/gallery";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const slug = searchParams.get("slug")?.trim() || "jessicaesamueltraditionalwedding";
+    const slug = searchParams.get("slug")?.trim();
 
-    const memories = await listTraditionalMemories(slug);
+    if (!slug) {
+      return NextResponse.json(
+        { success: false, error: "Slug em falta." },
+        { status: 400 }
+      );
+    }
+
+    const memories = await listMemories(slug);
 
     return NextResponse.json(
       {

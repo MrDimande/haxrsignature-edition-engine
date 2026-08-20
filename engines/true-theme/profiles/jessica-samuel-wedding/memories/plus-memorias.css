@@ -1,0 +1,79 @@
+/* Plus Memories — Casamento Principal Jessica & Samuel */
+/* Paleta editorial: champagne / marfim / vinho / rosa antigo */
+
+.plus-memorias-container {
+  background-color: #F1E3CF;
+  color: #171312;
+  min-height: 100vh;
+}
+
+.plus-memorias-card {
+  background-color: #FFF9F2;
+  border: 1px solid rgba(201, 147, 155, 0.30);
+  box-shadow: 0 4px 20px rgba(23, 19, 18, 0.04);
+}
+
+.plus-memorias-card-completed {
+  background-color: rgba(201, 147, 155, 0.12);
+  border-color: rgba(122, 35, 50, 0.3);
+}
+
+.plus-memorias-badge-pending {
+  border: 1px solid rgba(201, 147, 155, 0.45);
+  color: #7A2332;
+  background-color: rgba(201, 147, 155, 0.08);
+}
+
+.plus-memorias-badge-completed {
+  background-color: #7A2332;
+  color: #FFF9F2;
+}
+
+.plus-memorias-button-primary {
+  background-color: #7A2332;
+  color: #FFF9F2;
+  box-shadow: 0 4px 16px rgba(122, 35, 50, 0.25);
+  transition: all 0.3s ease;
+}
+
+.plus-memorias-button-primary:hover {
+  background-color: #5A1825;
+}
+
+.plus-memorias-button-outline {
+  border: 1px solid rgba(201, 147, 155, 0.5);
+  color: #171312;
+  background-color: rgba(255, 249, 242, 0.6);
+  transition: all 0.3s ease;
+}
+
+.plus-memorias-button-outline:hover {
+  background-color: rgba(201, 147, 155, 0.12);
+}
+
+/* Enhance toggle */
+.plus-memorias-enhance-toggle {
+  background-color: rgba(201, 147, 155, 0.08);
+  border: 1px solid rgba(201, 147, 155, 0.3);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.25s ease;
+}
+
+.plus-memorias-enhance-toggle[data-active="true"] {
+  background-color: rgba(122, 35, 50, 0.08);
+  border-color: rgba(122, 35, 50, 0.35);
+}
+
+/* Otimizações de Acessibilidade & Performance Mobile (Safari iOS) */
+@media (prefers-reduced-motion: reduce) {
+  .plus-memorias-container *,
+  .plus-memorias-container *::before,
+  .plus-memorias-container *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

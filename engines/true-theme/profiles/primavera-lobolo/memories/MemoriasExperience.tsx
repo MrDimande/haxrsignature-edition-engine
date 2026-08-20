@@ -34,8 +34,8 @@ export function MemoriasExperience({
   const [galleryRefreshTrigger, setGalleryRefreshTrigger] = useState(0);
 
   useEffect(() => {
-    setCompletedIds(getCompletedChallenges());
-  }, []);
+    setCompletedIds(getCompletedChallenges(config.slug));
+  }, [config.slug]);
 
   const handleSelectChallenge = (challenge: MemoryChallenge) => {
     setSelectedChallenge(challenge);
@@ -49,7 +49,7 @@ export function MemoriasExperience({
 
   const handleSuccess = (challengeId?: string) => {
     if (challengeId) {
-      const updated = markChallengeCompleted(challengeId);
+      const updated = markChallengeCompleted(config.slug, challengeId);
       setCompletedIds(updated);
     }
     // Dispara refresh da galeria ao guardar memória com sucesso

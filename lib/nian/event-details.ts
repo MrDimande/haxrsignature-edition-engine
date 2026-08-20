@@ -2,8 +2,8 @@
  * Nian — NIGHT OF THE WEB
  * Fonte única de verdade do evento Edition.
  *
- * Hora ainda não fornecida — manter `timeLabel` null e NÃO inventar /
- * NÃO mostrar “hora a confirmar” na UI pública.
+ * NIGHT OF THE WEB = universo criativo (não indicação de horário).
+ * Celebração real: 19 Set 2026 · 12h00 (Africa/Maputo).
  */
 
 export const NIAN_SLUG = "nian" as const;
@@ -19,10 +19,12 @@ export const NIAN_EVENT = {
   dateIso: "2026-09-19",
   dateDisplay: "19 · Setembro · 2026",
   dateDisplayShort: "19 · SETEMBRO · 2026",
-  /** Pendente — não inventar; UI omite enquanto null */
-  timeLabel: null as string | null,
-  timeHour: null as number | null,
-  timeMinute: null as number | null,
+  /** Confirmed — 12h00 Africa/Maputo */
+  timeLabel: "12h00",
+  timeHour: 12,
+  timeMinute: 0,
+  /** Soft Google Calendar span when end time is unknown — not shown in UI. */
+  googleSoftDurationHours: 3,
   eventType: "Aniversário Infantil",
   city: "Marracuene, Maputo",
   country: "Moçambique",
@@ -105,13 +107,13 @@ export function isNianRemotePersistConfigured(): boolean {
 
 export const NIAN_DRESS_CODE = {
   status: "confirmed" as NianFieldStatus,
-  title: "UNIFORME DA NOITE",
-  label: "Azul Royal · Vermelho Vivo · Preto",
+  eyebrow: "PROTOCOLO DE ENTRADA",
+  title: "CORES DO UNIVERSO",
+  label: "Azul Royal · Vermelho Vivo",
   lead: "Veste as cores. Entra no universo do Nian.",
   colors: [
     { name: "Azul Royal", hex: "#4169E1" },
     { name: "Vermelho Vivo", hex: "#E10600" },
-    { name: "Preto", hex: "#0A0A0C" },
   ],
 } as const;
 
@@ -225,7 +227,7 @@ export function writeNianAudioPreference(pref: NianAudioPreference): void {
  * Sem fallback: botão oculto até a família confirmar o número.
  */
 export const NIAN_WHATSAPP_DEFAULT_MESSAGE =
-  "Olá! Acabei de confirmar presença no Aniversário do Nian — NIGHT OF THE WEB (19 de Setembro de 2026). Tenho uma dúvida:" as const;
+  "Olá! Acabei de confirmar presença no Aniversário do Nian — NIGHT OF THE WEB (19 de Setembro de 2026 · 12h00). Tenho uma dúvida:" as const;
 
 export function resolveNianWhatsAppDigits(override?: string): string {
   const raw =
@@ -273,20 +275,43 @@ function formatIcsStamp(date: Date = new Date()): string {
   return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
+function formatGoogleCalendarUtc(date: Date): string {
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+/** Componentes de data/hora locais Maputo para DTSTART;TZID=… */
+function formatIcsLocalParts(date: Date): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: NIAN_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "00";
+
+  return `${get("year")}${get("month")}${get("day")}T${get("hour")}${get("minute")}${get("second")}`;
+}
+
+/** Início do evento em instante absoluto (CAT → Date) */
+export function getNianEventStartDate(): Date {
+  const hh = String(NIAN_EVENT.timeHour).padStart(2, "0");
+  const mm = String(NIAN_EVENT.timeMinute).padStart(2, "0");
+  return new Date(`${NIAN_EVENT.dateIso}T${hh}:${mm}:00${NIAN_UTC_OFFSET}`);
+}
+
 /**
- * ICS dia inteiro enquanto a hora do evento não estiver confirmada.
- * Não inventa horário — VALUE=DATE em Africa/Maputo.
+ * ICS com TZID=Africa/Maputo às 12h00.
+ * Sem DTEND — horário de término não confirmado.
  */
 export function buildNianIcsContent(): string {
-  const day = NIAN_EVENT.dateIso.replace(/-/g, "");
-  const [y, m, d] = NIAN_EVENT.dateIso.split("-").map(Number);
-  const end = new Date(Date.UTC(y, m - 1, d + 1));
-  const next = [
-    end.getUTCFullYear(),
-    String(end.getUTCMonth() + 1).padStart(2, "0"),
-    String(end.getUTCDate()).padStart(2, "0"),
-  ].join("");
-  const description = `${NIAN_EVENT.subtitle} Local: ${getNianVenueCalendarLocation()}.`;
+  const start = getNianEventStartDate();
+  const description = `${NIAN_EVENT.subtitle} Local: ${getNianVenueCalendarLocation()}. Início ${NIAN_EVENT.timeLabel}.`;
 
   return [
     "BEGIN:VCALENDAR",
@@ -294,11 +319,20 @@ export function buildNianIcsContent(): string {
     "PRODID:-//HAXR Signature//Nian Night of the Web//PT",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
+    "BEGIN:VTIMEZONE",
+    `TZID:${NIAN_TIMEZONE}`,
+    "X-LIC-LOCATION:Africa/Maputo",
+    "BEGIN:STANDARD",
+    "TZOFFSETFROM:+0200",
+    "TZOFFSETTO:+0200",
+    "TZNAME:CAT",
+    "DTSTART:19700101T000000",
+    "END:STANDARD",
+    "END:VTIMEZONE",
     "BEGIN:VEVENT",
     "UID:nian-night-of-the-web-20260919@haxrsignature.com",
     `DTSTAMP:${formatIcsStamp()}`,
-    `DTSTART;VALUE=DATE:${day}`,
-    `DTEND;VALUE=DATE:${next}`,
+    `DTSTART;TZID=${NIAN_TIMEZONE}:${formatIcsLocalParts(start)}`,
     `SUMMARY:${escapeIcsText(NIAN_EVENT.calendarTitle)}`,
     `DESCRIPTION:${escapeIcsText(description)}`,
     `LOCATION:${escapeIcsText(getNianVenueCalendarLocation())}`,
@@ -321,16 +355,22 @@ export function downloadNianIcsFile(): void {
   URL.revokeObjectURL(url);
 }
 
-/** Google Calendar all-day (19 Set → 20 Set exclusivo). */
+/** Google Calendar — 12h00 Maputo; soft end only for template span (not UI). */
 export function buildNianGoogleCalendarUrl(): string {
+  const start = getNianEventStartDate();
+  const end = new Date(
+    start.getTime() + NIAN_EVENT.googleSoftDurationHours * 60 * 60 * 1000
+  );
+
   return (
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     "&text=" +
     encodeURIComponent(NIAN_EVENT.calendarTitle) +
-    "&dates=20260919/20260920" +
+    "&dates=" +
+    `${formatGoogleCalendarUtc(start)}/${formatGoogleCalendarUtc(end)}` +
     "&details=" +
     encodeURIComponent(
-      `${NIAN_EVENT.subtitle} Local: ${getNianVenueCalendarLocation()}.`
+      `${NIAN_EVENT.subtitle} Local: ${getNianVenueCalendarLocation()}. Início ${NIAN_EVENT.timeLabel}.`
     ) +
     "&location=" +
     encodeURIComponent(getNianVenueCalendarLocation()) +
@@ -344,7 +384,7 @@ export async function shareNianInvite(): Promise<"shared" | "copied" | "whatsapp
 
   const url = getNianInvitePublicUrl();
   const title = NIAN_EVENT.title;
-  const text = `${NIAN_EVENT.conceptualTitle} — ${NIAN_EVENT.dateDisplay}. Junta-te à aventura.`;
+  const text = `${NIAN_EVENT.conceptualTitle} — ${NIAN_EVENT.dateDisplay} · ${NIAN_EVENT.timeLabel}. Junta-te à aventura.`;
 
   if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
     try {

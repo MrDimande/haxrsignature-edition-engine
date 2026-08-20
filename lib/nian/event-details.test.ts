@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   NIAN_AUDIO_AUTHORIZED,
+  NIAN_DRESS_CODE,
   NIAN_EVENT,
   NIAN_RSVP,
   NIAN_VENUE,
@@ -20,10 +21,12 @@ import { nianNightOfTheWebTheme } from "../../theme/definitions/nian-night-of-th
 import { ThemeRegistry } from "../../theme/registry";
 
 describe("nian event-details", () => {
-  it("does not invent event time while pending", () => {
-    assert.equal(NIAN_EVENT.timeLabel, null);
-    assert.equal(getNianEventTimeLabel(), null);
-    assert.equal(shouldShowNianEventTime(), false);
+  it("publishes the confirmed 12h00 start time", () => {
+    assert.equal(NIAN_EVENT.timeLabel, "12h00");
+    assert.equal(NIAN_EVENT.timeHour, 12);
+    assert.equal(NIAN_EVENT.timeMinute, 0);
+    assert.equal(getNianEventTimeLabel(), "12h00");
+    assert.equal(shouldShowNianEventTime(), true);
   });
 
   it("keeps the authorised event date at 19 September 2026", () => {
@@ -37,14 +40,22 @@ describe("nian event-details", () => {
     assert.equal(NIAN_RSVP.deadlineLabel, "05 · Setembro · 2026");
   });
 
-  it("builds all-day ICS without inventing a clock time", async () => {
+  it("publishes dress code as royal and crimson only", () => {
+    assert.equal(NIAN_DRESS_CODE.label, "Azul Royal · Vermelho Vivo");
+    assert.deepEqual(
+      NIAN_DRESS_CODE.colors.map((color) => color.name),
+      ["Azul Royal", "Vermelho Vivo"]
+    );
+  });
+
+  it("builds timed ICS at 12:00 Africa/Maputo without inventing an end time", async () => {
     const { buildNianIcsContent, getNianWhatsAppUrl } = await import(
       "./event-details"
     );
     const ics = buildNianIcsContent();
-    assert.match(ics, /DTSTART;VALUE=DATE:20260919/);
-    assert.match(ics, /DTEND;VALUE=DATE:20260920/);
-    assert.doesNotMatch(ics, /DTSTART;TZID=/);
+    assert.match(ics, /DTSTART;TZID=Africa\/Maputo:20260919T120000/);
+    assert.doesNotMatch(ics, /DTEND/);
+    assert.doesNotMatch(ics, /DTSTART;VALUE=DATE/);
     assert.equal(getNianWhatsAppUrl(""), null);
   });
 
