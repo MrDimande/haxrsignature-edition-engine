@@ -2,45 +2,45 @@
 
 .queen-nav {
   position: fixed;
-  top: max(0.85rem, env(safe-area-inset-top));
+  top: max(0.75rem, env(safe-area-inset-top, 0.75rem));
   left: 0;
   right: 0;
   z-index: 60;
   display: flex;
   justify-content: center;
   pointer-events: none;
-  padding: 0 0.75rem;
+  padding: 0 0.5rem;
 }
 
 .queen-nav__inner {
   pointer-events: auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.4rem 0.65rem 0.4rem 0.75rem;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.65rem;
   border: 1px solid rgba(185, 151, 91, 0.32);
   border-radius: 9999px;
   background: linear-gradient(
     180deg,
-    rgba(255, 253, 252, 0.95),
-    rgba(246, 241, 232, 0.92)
+    rgba(255, 253, 252, 0.96),
+    rgba(246, 241, 232, 0.94)
   );
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 8px 28px rgba(115, 107, 98, 0.12),
+  box-shadow: 0 8px 26px rgba(115, 107, 98, 0.12),
     0 1px 2px rgba(185, 151, 91, 0.1);
-  max-width: min(94vw, 36rem);
+  max-width: 100%;
 }
 
 .queen-nav__mono {
   flex: 0 0 auto;
   font-family: var(--font-jost), var(--font-montserrat), system-ui, sans-serif;
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: 0.24em;
+  font-size: 0.54rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   color: #b9975b;
-  padding-right: 0.5rem;
-  border-right: 1px solid rgba(231, 215, 193, 0.9);
+  padding-right: 0.4rem;
+  border-right: 1px solid rgba(231, 215, 193, 0.95);
 }
 
 .queen-nav__items {
@@ -49,7 +49,7 @@
   align-items: center;
   justify-content: center;
   min-width: 0;
-  gap: 0.1rem;
+  gap: 0.08rem;
 }
 
 .queen-nav__item-wrap {
@@ -70,14 +70,14 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 0.3rem 0.45rem;
+  padding: 0.28rem 0.36rem;
   border-radius: 9999px;
   font-family: var(--font-jost), var(--font-montserrat), system-ui, sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.14em;
+  font-size: 0.54rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #736b62;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   white-space: nowrap;
 }
 
@@ -93,16 +93,36 @@
 
 .queen-nav__item.is-active {
   color: #b9975b;
-  font-weight: 500;
-  background-color: rgba(185, 151, 91, 0.08);
+  font-weight: 600;
+  background-color: rgba(185, 151, 91, 0.1);
 }
 
 .queen-nav__label {
-  display: none;
+  display: inline;
 }
 
 .queen-nav__short {
-  display: inline;
+  display: none;
+}
+
+/* Telas medianas e superiores (iPhone Plus, Pro Max, Desktop) */
+@media (min-width: 400px) {
+  .queen-nav__inner {
+    gap: 0.45rem;
+    padding: 0.38rem 0.65rem 0.38rem 0.75rem;
+  }
+
+  .queen-nav__mono {
+    font-size: 0.58rem;
+    letter-spacing: 0.24em;
+    padding-right: 0.5rem;
+  }
+
+  .queen-nav__item {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    padding: 0.3rem 0.45rem;
+  }
 }
 
 @media (min-width: 640px) {
@@ -119,17 +139,10 @@
     gap: 0.15rem;
   }
 
-  .queen-nav__label {
-    display: inline;
-  }
-
-  .queen-nav__short {
-    display: none;
-  }
-
   .queen-nav__item {
     letter-spacing: 0.18em;
     padding: 0.35rem 0.6rem;
+    font-size: 0.62rem;
   }
 }
 
@@ -138,15 +151,15 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 0.35rem;
-  margin-left: 0.2rem;
-  padding-left: 0.5rem;
-  border-left: 1px solid rgba(231, 215, 193, 0.9);
+  padding: 0.3rem;
+  margin-left: 0.15rem;
+  padding-left: 0.4rem;
+  border-left: 1px solid rgba(231, 215, 193, 0.95);
   color: #736b62;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.35s ease, transform 0.25s ease;
+  transition: color 0.3s ease, transform 0.2s ease;
   flex: 0 0 auto;
 }
 
