@@ -12,19 +12,19 @@ import "./queen-nav.css";
 
 const NAV_ITEMS = [
   { id: "queen-celebracao", label: "Celebração", shortLabel: "Celebração" },
-  { id: "queen-almoco", label: "À Mesa", shortLabel: "À Mesa" },
   { id: "queen-versiculo", label: "Versículo", shortLabel: "Versículo" },
+  { id: "queen-almoco", label: "À Mesa", shortLabel: "À Mesa" },
   { id: "queen-rsvp", label: "Confirmar", shortLabel: "Confirmar" },
 ] as const;
 
 type NavSectionId = (typeof NAV_ITEMS)[number]["id"];
 
 function getScrollOffset(): number {
-  return window.matchMedia("(min-width: 768px)").matches ? -72 : -12;
+  return window.matchMedia("(min-width: 768px)").matches ? -72 : -16;
 }
 
 /**
- * Nav flutuante editorial — texto apenas, champagne/dourado fosco.
+ * Nav flutuante editorial — centralizada, discreta, surge após passar do hero.
  * Isolada a queen-kailane-luz-da-graca.
  */
 export function QueenKailaneFloatingNav() {
@@ -57,11 +57,15 @@ export function QueenKailaneFloatingNav() {
 
   const syncNavigation = useCallback(() => {
     const hero = document.getElementById("queen-hero");
-    const heroBottom =
-      hero?.getBoundingClientRect().bottom ?? window.innerHeight;
-    setVisible(heroBottom <= 24);
+    if (hero) {
+      const heroBottom = hero.getBoundingClientRect().bottom;
+      // Surge estritamente após o utilizador passar do Hero (fundo do hero atinge o topo)
+      setVisible(heroBottom <= 0);
+    } else {
+      setVisible(window.scrollY > 450);
+    }
 
-    const activationLine = Math.min(window.innerHeight * 0.36, 260);
+    const activationLine = Math.min(window.innerHeight * 0.38, 280);
     let current: NavSectionId = NAV_ITEMS[0].id;
 
     for (const item of NAV_ITEMS) {
