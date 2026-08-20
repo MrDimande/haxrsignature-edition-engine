@@ -34,17 +34,23 @@ type UiStatus =
 
 type FormState = {
   name: string;
+  contact: string;
   attending: AttendingChoice;
   honeypot: string;
 };
 
 const initialForm: FormState = {
   name: "",
+  contact: "",
   attending: "",
   honeypot: "",
 };
 
 const RSVP_FETCH_TIMEOUT_MS = 15000;
+
+function looksLikeEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
 
 function loadLocal(slug: string): QueenKailaneRsvpLocalRecord | null {
   if (typeof window === "undefined") return null;
@@ -69,7 +75,7 @@ function persistLocal(slug: string, record: QueenKailaneRsvpLocalRecord) {
 }
 
 /**
- * RSVP — nome + presença.
+ * RSVP — nome + contacto + presença.
  * Sem acompanhantes inventados. Persist remota exige EDITION_EVENT_QUEEN_KAILANE_ID.
  */
 export function QueenKailaneRsvp() {
@@ -97,20 +103,31 @@ export function QueenKailaneRsvp() {
     if (status === "sending") return;
 
     if (!form.attending) {
-      setErrorMessage("Indica se estará presente.");
+      setErrorMessage("Indique se estará presente.");
       setStatus("validation");
       return;
     }
 
     if (!form.name.trim()) {
-      setErrorMessage("Indica o seu nome.");
+      setErrorMessage("Indique o seu nome.");
       setStatus("validation");
       return;
     }
 
     const isAttending = form.attending === "yes";
+    const contact = form.contact.trim();
+
+    if (isAttending && !contact) {
+      setErrorMessage("Indique email ou telefone para contacto.");
+      setStatus("validation");
+      return;
+    }
+
     setStatus("sending");
     setErrorMessage("");
+
+    const email = contact && looksLikeEmail(contact) ? contact : undefined;
+    const phone = contact && !looksLikeEmail(contact) ? contact : undefined;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), RSVP_FETCH_TIMEOUT_MS);
@@ -122,6 +139,8 @@ export function QueenKailaneRsvp() {
         signal: controller.signal,
         body: JSON.stringify({
           name: form.name.trim(),
+          email,
+          phone,
           attending: isAttending,
           guests: isAttending ? 1 : 0,
           honeypot: form.honeypot,
@@ -325,6 +344,39 @@ export function QueenKailaneRsvp() {
                 }}
                 maxLength={120}
                 required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor={`${formId}-contact`}
+                className="mb-2 block text-[0.65rem] tracking-[0.28em]"
+                style={{
+                  fontFamily:
+                    "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+                  color: QUEEN_COLORS.taupe,
+                }}
+              >
+                CONTACTO (TELEFONE / WHATSAPP OU EMAIL)
+              </label>
+              <input
+                id={`${formId}-contact`}
+                name="contact"
+                type="text"
+                autoComplete="tel email"
+                value={form.contact}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, contact: e.target.value }))
+                }
+                placeholder="+258 ... ou email@exemplo.com"
+                className="w-full border-b bg-transparent py-3 text-[0.95rem] outline-none transition-colors placeholder:text-[#C5B7A5]/60 focus-visible:border-[#B9975B]"
+                style={{
+                  fontFamily:
+                    "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+                  color: QUEEN_COLORS.ink,
+                  borderColor: QUEEN_COLORS.champagne,
+                }}
+                maxLength={160}
               />
             </div>
 
