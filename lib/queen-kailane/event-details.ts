@@ -30,10 +30,12 @@ export const QUEEN_KAILANE_EVENT = {
   dateDisplay: "30 · Agosto · 2026",
   dateDisplayShort: "30 · AGOSTO · 2026",
   /** Pendente — não inventar; UI omite enquanto null */
-  ceremonyTime: null as string | null,
+  ceremonyTime: "08h00" as string | null,
   ceremonyVenue: "Igreja Anglicana — Paróquia de São Estêvão e Lourenço",
   ceremonyVenueShort: "Igreja Anglicana",
   ceremonyParish: "Paróquia de São Estêvão e Lourenço",
+  mapPlusCode: "3FG8+97Q Paróquia Santo Estêvão da, Matola",
+  mapUrl: "https://www.google.com/maps/search/?api=1&query=3FG8%2B97Q+Matola",
   lunchTime: "13h00",
   lunchLocation: "São Dâmaso",
   lunchVenue: "Residência dos seus Pais",
@@ -99,9 +101,8 @@ export const QUEEN_KAILANE_RSVP = {
   subtitle: "Confirmação de presença",
   closing: QUEEN_KAILANE_COPY.rsvpClosing,
   declinedClosing: QUEEN_KAILANE_COPY.rsvpDeclined,
-  /** Não inventar deadline */
-  deadlineIso: null as string | null,
-  deadlineLabel: null as string | null,
+  deadlineIso: "2026-08-28",
+  deadlineLabel: "28 de Agosto de 2026",
 } as const;
 
 export type QueenKailaneRsvpLocalRecord = {
@@ -148,8 +149,7 @@ export function getQueenKailaneCalendarLocation(): string {
 }
 
 /**
- * ICS dia inteiro enquanto a hora da celebração religiosa não estiver confirmada.
- * Não inventa horário — VALUE=DATE.
+ * ICS com horário oficial (08h00 Maputo) e almoço às 13h00.
  */
 export function buildQueenKailaneIcsContent(): string {
   const day = QUEEN_KAILANE_EVENT.dateIso.replace(/-/g, "");
@@ -161,12 +161,20 @@ export function buildQueenKailaneIcsContent(): string {
     String(end.getUTCDate()).padStart(2, "0"),
   ].join("");
 
+  const hasTime = Boolean(QUEEN_KAILANE_EVENT.ceremonyTime?.trim());
+  const dtStart = hasTime
+    ? `DTSTART;TZID=${QUEEN_KAILANE_TIMEZONE}:20260830T080000`
+    : `DTSTART;VALUE=DATE:${day}`;
+  const dtEnd = hasTime
+    ? `DTEND;TZID=${QUEEN_KAILANE_TIMEZONE}:20260830T170000`
+    : `DTEND;VALUE=DATE:${next}`;
+
   const description = [
     QUEEN_KAILANE_EVENT.conceptualTitle,
     QUEEN_KAILANE_SIGNATURE.line1,
     QUEEN_KAILANE_SIGNATURE.line2,
-    `Celebração: ${QUEEN_KAILANE_EVENT.ceremonyVenue}.`,
-    `Almoço ${QUEEN_KAILANE_EVENT.lunchTime}: ${QUEEN_KAILANE_EVENT.lunchLocation} — ${QUEEN_KAILANE_EVENT.lunchVenue}.`,
+    `Celebração ${QUEEN_KAILANE_EVENT.ceremonyTime ? `às ${QUEEN_KAILANE_EVENT.ceremonyTime}` : ""}: ${QUEEN_KAILANE_EVENT.ceremonyVenue}.`,
+    `Almoço às ${QUEEN_KAILANE_EVENT.lunchTime}: ${QUEEN_KAILANE_EVENT.lunchLocation} — ${QUEEN_KAILANE_EVENT.lunchVenue}.`,
   ].join(" ");
 
   return [
@@ -178,8 +186,8 @@ export function buildQueenKailaneIcsContent(): string {
     "BEGIN:VEVENT",
     "UID:queen-kailane-luz-da-graca-20260830@haxrsignature.com",
     `DTSTAMP:${formatIcsStamp()}`,
-    `DTSTART;VALUE=DATE:${day}`,
-    `DTEND;VALUE=DATE:${next}`,
+    dtStart,
+    dtEnd,
     `SUMMARY:${escapeIcsText(QUEEN_KAILANE_EVENT.calendarTitle)}`,
     `DESCRIPTION:${escapeIcsText(description)}`,
     `LOCATION:${escapeIcsText(QUEEN_KAILANE_EVENT.ceremonyVenue)}`,
@@ -202,13 +210,19 @@ export function downloadQueenKailaneIcsFile(): void {
   URL.revokeObjectURL(url);
 }
 
-/** Google Calendar all-day (30 Ago → 31 Ago exclusivo). */
+/** Google Calendar (08h00 Maputo = 06h00 UTC até 17h00 Maputo = 15h00 UTC). */
 export function buildQueenKailaneGoogleCalendarUrl(): string {
+  const hasTime = Boolean(QUEEN_KAILANE_EVENT.ceremonyTime?.trim());
+  const dates = hasTime
+    ? "20260830T060000Z/20260830T150000Z"
+    : "20260830/20260831";
+
   return (
     "https://calendar.google.com/calendar/render?action=TEMPLATE" +
     "&text=" +
     encodeURIComponent(QUEEN_KAILANE_EVENT.calendarTitle) +
-    "&dates=20260830/20260831" +
+    "&dates=" +
+    dates +
     "&details=" +
     encodeURIComponent(
       `${QUEEN_KAILANE_EVENT.conceptualTitle}. ${getQueenKailaneCalendarLocation()}`

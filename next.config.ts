@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
     "framer-motion",
   ],
   webpack: (config) => {
+    config.output = config.output ?? {};
+    config.output.hashFunction = "xxhash64";
     config.resolve.plugins = config.resolve.plugins ?? [];
     config.resolve.plugins.push(new InvitationAliasPlugin());
 

@@ -36,6 +36,21 @@ export function QueenKailaneVersiculo() {
       </div>
 
       <div className="relative z-[1] mx-auto max-w-2xl text-center">
+        <motion.p
+          className="mb-4 text-center text-[0.65rem] tracking-[0.45em]"
+          style={{
+            fontFamily:
+              "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+            color: QUEEN_COLORS.goldMatte,
+          }}
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: QUEEN_EASE }}
+        >
+          CAPÍTULO III · A PALAVRA
+        </motion.p>
+
         <motion.div
           className="mx-auto mb-12 h-px w-10 origin-center"
           style={{ backgroundColor: QUEEN_COLORS.goldMatte }}

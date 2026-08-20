@@ -33,7 +33,7 @@ export function QueenKailaneCelebracao() {
           viewport={{ once: true }}
           transition={{ duration: 1, ease: QUEEN_EASE }}
         >
-          A CELEBRAÇÃO
+          CAPÍTULO II · O SACRAMENTO
         </motion.p>
 
         <motion.h2
@@ -174,22 +174,44 @@ export function QueenKailaneCelebracao() {
             SÃO ESTÊVÃO E LOURENÇO
           </p>
 
-          <button
-            type="button"
-            onClick={() => downloadQueenKailaneIcsFile()}
-            className="mt-10 inline-flex min-h-11 items-center justify-center border px-6 py-3 text-[0.65rem] tracking-[0.24em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-            style={{
-              fontFamily:
-                "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
-              color: QUEEN_COLORS.ink,
-              borderColor: "rgba(185,151,91,0.55)",
-              background:
-                "linear-gradient(180deg, rgba(255,253,252,0.95), rgba(246,241,232,0.7))",
-              outlineColor: QUEEN_COLORS.goldMatte,
-            }}
-          >
-            ADICIONAR AO CALENDÁRIO
-          </button>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => downloadQueenKailaneIcsFile()}
+              className="inline-flex min-h-11 items-center justify-center border px-6 py-3 text-[0.65rem] tracking-[0.24em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+              style={{
+                fontFamily:
+                  "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+                color: QUEEN_COLORS.ink,
+                borderColor: "rgba(185,151,91,0.55)",
+                background:
+                  "linear-gradient(180deg, rgba(255,253,252,0.95), rgba(246,241,232,0.7))",
+                outlineColor: QUEEN_COLORS.goldMatte,
+              }}
+            >
+              ADICIONAR AO CALENDÁRIO
+            </button>
+
+            {QUEEN_KAILANE_EVENT.mapUrl ? (
+              <a
+                href={QUEEN_KAILANE_EVENT.mapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center border px-6 py-3 text-[0.65rem] tracking-[0.24em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                style={{
+                  fontFamily:
+                    "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+                  color: QUEEN_COLORS.ink,
+                  borderColor: "rgba(185,151,91,0.55)",
+                  background:
+                    "linear-gradient(180deg, rgba(255,253,252,0.95), rgba(246,241,232,0.7))",
+                  outlineColor: QUEEN_COLORS.goldMatte,
+                }}
+              >
+                VER NO MAPA
+              </a>
+            ) : null}
+          </div>
         </motion.div>
       </div>
     </section>

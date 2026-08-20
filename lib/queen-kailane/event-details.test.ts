@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import {
   QUEEN_KAILANE_COPY,
   QUEEN_KAILANE_EVENT,
+  QUEEN_KAILANE_RSVP,
   QUEEN_KAILANE_SIGNATURE,
   QUEEN_KAILANE_SLUG,
   QUEEN_KAILANE_VERSE,
@@ -26,10 +27,10 @@ describe("queen-kailane event-details", () => {
     assert.equal(QUEEN_KAILANE_EVENT.dateDisplayShort, "30 · AGOSTO · 2026");
   });
 
-  it("does not invent ceremony time while pending", () => {
-    assert.equal(QUEEN_KAILANE_EVENT.ceremonyTime, null);
-    assert.equal(getQueenKailaneCeremonyTime(), null);
-    assert.equal(shouldShowQueenKailaneCeremonyTime(), false);
+  it("keeps the confirmed ceremony time at 08h00", () => {
+    assert.equal(QUEEN_KAILANE_EVENT.ceremonyTime, "08h00");
+    assert.equal(getQueenKailaneCeremonyTime(), "08h00");
+    assert.equal(shouldShowQueenKailaneCeremonyTime(), true);
   });
 
   it("keeps lunch at 13h00 in São Dâmaso", () => {
@@ -38,7 +39,7 @@ describe("queen-kailane event-details", () => {
     assert.equal(QUEEN_KAILANE_EVENT.lunchVenue, "Residência dos seus Pais");
   });
 
-  it("keeps the Anglican parish venue", () => {
+  it("keeps the Anglican parish venue and map plus code", () => {
     assert.match(
       QUEEN_KAILANE_EVENT.ceremonyVenue,
       /Igreja Anglicana/
@@ -46,6 +47,10 @@ describe("queen-kailane event-details", () => {
     assert.match(
       QUEEN_KAILANE_EVENT.ceremonyParish,
       /São Estêvão e Lourenço/
+    );
+    assert.equal(
+      QUEEN_KAILANE_EVENT.mapPlusCode,
+      "3FG8+97Q Paróquia Santo Estêvão da, Matola"
     );
   });
 
@@ -66,24 +71,28 @@ describe("queen-kailane event-details", () => {
     assert.equal(QUEEN_KAILANE_SLUG, "queenkailanecrisma");
   });
 
-  it("builds all-day ICS without inventing a clock time", async () => {
+  it("builds timed ICS and Google Calendar URLs for 08h00", async () => {
     const {
       buildQueenKailaneIcsContent,
       buildQueenKailaneGoogleCalendarUrl,
     } = await import("./event-details");
     const ics = buildQueenKailaneIcsContent();
-    assert.match(ics, /DTSTART;VALUE=DATE:20260830/);
-    assert.match(ics, /DTEND;VALUE=DATE:20260831/);
-    assert.doesNotMatch(ics, /DTSTART;TZID=/);
+    assert.match(ics, /DTSTART;TZID=Africa\/Maputo:20260830T080000/);
+    assert.match(ics, /DTEND;TZID=Africa\/Maputo:20260830T170000/);
     assert.match(
       buildQueenKailaneGoogleCalendarUrl(),
-      /dates=20260830%2F20260831|dates=20260830\/20260831/
+      /dates=20260830T060000Z%2F20260830T150000Z|dates=20260830T060000Z\/20260830T150000Z/
     );
   });
 
   it("does not invent a remote event id in the client module", () => {
     // Server env only — helper returns boolean without inventing UUID
     assert.equal(typeof isQueenKailaneRemotePersistConfigured(), "boolean");
+  });
+
+  it("sets the authorized RSVP deadline to 28 August 2026", () => {
+    assert.equal(QUEEN_KAILANE_RSVP.deadlineIso, "2026-08-28");
+    assert.equal(QUEEN_KAILANE_RSVP.deadlineLabel, "28 de Agosto de 2026");
   });
 
   it("parses local RSVP records safely", () => {
@@ -103,7 +112,7 @@ describe("queen-kailane event-details", () => {
 });
 
 describe("queen-kailane registry wiring", () => {
-  it("registers invitation metadata without inventing ceremony time", () => {
+  it("registers invitation metadata with confirmed ceremony time 08h00", () => {
     const invitation = getInvitation(QUEEN_KAILANE_SLUG);
     assert.ok(invitation);
     assert.equal(invitation.slug, QUEEN_KAILANE_SLUG);
@@ -111,7 +120,7 @@ describe("queen-kailane registry wiring", () => {
     assert.equal(invitation.metadata.date, "2026-08-30");
     assert.equal(invitation.metadata.eventDate, "2026-08-30");
     assert.equal(invitation.metadata.eventType, "Sacramento do Crisma");
-    assert.equal(invitation.metadata.time, "");
+    assert.equal(invitation.metadata.time, "08h00");
     assert.equal(
       invitation.metadata.ogImage,
       "/images/queen-kailane/social/queen-kailane-og.png"
@@ -130,7 +139,7 @@ describe("queen-kailane registry wiring", () => {
     );
   });
 
-  it("registers theme with luz-da-graca render profile", () => {
+  it("registers theme with luz-da-graca render profile and map coordinates", () => {
     assert.equal(
       queenKailaneLuzDaGracaTheme.renderProfile,
       "queen-kailane-luz-da-graca"
@@ -141,6 +150,10 @@ describe("queen-kailane registry wiring", () => {
     );
     assert.equal(queenKailaneLuzDaGracaTheme.assets.monogram, "QKC");
     assert.equal(queenKailaneLuzDaGracaTheme.copy.enterCta, "ENTRAR NA LUZ");
+    assert.equal(
+      queenKailaneLuzDaGracaTheme.copy.location.mapCoordinates,
+      "3FG8+97Q, Matola"
+    );
   });
 });
 

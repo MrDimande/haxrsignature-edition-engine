@@ -38,7 +38,7 @@ export function QueenKailaneAlmoco() {
           viewport={{ once: true }}
           transition={{ duration: 1, ease: QUEEN_EASE }}
         >
-          À MESA
+          CAPÍTULO IV · À MESA
         </motion.p>
 
         <motion.h2

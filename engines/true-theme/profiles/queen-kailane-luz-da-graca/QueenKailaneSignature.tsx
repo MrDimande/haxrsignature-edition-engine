@@ -28,6 +28,20 @@ export function QueenKailaneClosing() {
 
       <div className="relative z-[1] mx-auto max-w-2xl text-center">
         <motion.p
+          className="mb-4 text-center text-[0.65rem] tracking-[0.4em]"
+          style={{
+            fontFamily:
+              "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+            color: QUEEN_COLORS.goldMatte,
+          }}
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: QUEEN_EASE }}
+        >
+          EPÍLOGO · UMA PÁGINA DE FÉ
+        </motion.p>
+        <motion.p
           className="text-[0.72rem] tracking-[0.3em]"
           style={{
             fontFamily:

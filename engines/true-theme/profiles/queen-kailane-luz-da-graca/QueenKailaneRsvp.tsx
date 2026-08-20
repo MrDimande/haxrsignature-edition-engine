@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
   QUEEN_KAILANE_COPY,
+  QUEEN_KAILANE_RSVP,
   QUEEN_KAILANE_SLUG,
   downloadQueenKailaneIcsFile,
   readQueenKailaneRsvpLocalRecord,
@@ -210,7 +211,7 @@ export function QueenKailaneRsvp() {
           viewport={{ once: true }}
           transition={{ duration: 1, ease: QUEEN_EASE }}
         >
-          CONFIRMAÇÃO
+          CAPÍTULO V · FAZ PARTE DESTA PÁGINA
         </motion.p>
 
         <motion.h2
@@ -228,6 +229,23 @@ export function QueenKailaneRsvp() {
         >
           {QUEEN_KAILANE_COPY.rsvpTitle}
         </motion.h2>
+
+        {QUEEN_KAILANE_RSVP.deadlineLabel ? (
+          <motion.p
+            className="mt-4 text-center text-[0.72rem] tracking-[0.24em]"
+            style={{
+              fontFamily:
+                "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+              color: QUEEN_COLORS.taupe,
+            }}
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.1, ease: QUEEN_EASE }}
+          >
+            CONFIRMAÇÃO ATÉ {QUEEN_KAILANE_RSVP.deadlineLabel.toUpperCase()}
+          </motion.p>
+        ) : null}
 
         {confirmed ? (
           <motion.div

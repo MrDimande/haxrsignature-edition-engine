@@ -19,7 +19,7 @@ async function shot(page, name) {
 }
 
 async function waitGateReady(page) {
-  await page.getByRole("button", { name: /ENTRAR NA LUZ/i }).waitFor({
+  await page.getByRole("button", { name: /ABRIR/i }).waitFor({
     state: "visible",
     timeout: 15000,
   });
@@ -41,7 +41,7 @@ async function run() {
     await shot(page, "01-gate-desktop.png");
 
     // Capture mid-open: click and shoot during bloom
-    await page.getByRole("button", { name: /ENTRAR NA LUZ/i }).click();
+    await page.getByRole("button", { name: /ABRIR/i }).click();
     await page.waitForTimeout(900);
     await shot(page, "03-gate-opening-state.png");
     await page.waitForTimeout(2600);
@@ -72,7 +72,7 @@ async function run() {
     await page.goto(BASE, { waitUntil: "networkidle", timeout: 60000 });
     await waitGateReady(page);
     await shot(page, "02-gate-mobile.png");
-    await page.getByRole("button", { name: /ENTRAR NA LUZ/i }).click();
+    await page.getByRole("button", { name: /ABRIR/i }).click();
     await page.waitForTimeout(2200);
     await page.locator("#queen-hero").waitFor({ state: "visible", timeout: 10000 });
     await shot(page, "05-hero-mobile.png");

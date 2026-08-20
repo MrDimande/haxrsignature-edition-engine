@@ -28,6 +28,20 @@ export function QueenKailaneStory() {
       />
 
       <div className="relative mx-auto flex max-w-2xl flex-col gap-16 md:gap-24">
+        <motion.p
+          className="text-center text-[0.65rem] tracking-[0.4em]"
+          style={{
+            fontFamily:
+              "var(--font-jost), var(--font-montserrat), system-ui, sans-serif",
+            color: QUEEN_COLORS.goldMatte,
+          }}
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: QUEEN_EASE }}
+        >
+          CAPÍTULO I · A CAMINHADA
+        </motion.p>
         {lines.map((line, index) => {
           const isLead = index === 0;
           const isClose = index === lines.length - 1;

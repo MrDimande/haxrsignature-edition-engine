@@ -340,12 +340,12 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     metadata: {
       title: "Sacramento do Crisma — Queen Kailane Cande",
       date: "2026-08-30",
-      /** Hora da celebração religiosa pendente — string vazia; UI pública omite */
-      time: "",
+      /** Hora da celebração religiosa: 08h00 · Almoço às 13h00 */
+      time: "08h00",
       location: "Igreja Anglicana — Paróquia de São Estêvão e Lourenço",
       subtitle: "LUZ DA GRAÇA · Confirmada na fé. Guiada pela luz.",
       description:
-        "30 de Agosto de 2026 · Sacramento do Crisma de Queen Kailane Cande — Igreja Anglicana, Paróquia de São Estêvão e Lourenço. Almoço às 13h00 em São Dâmaso.",
+        "30 de Agosto de 2026 · Sacramento do Crisma de Queen Kailane Cande às 08h00 — Igreja Anglicana, Paróquia de São Estêvão e Lourenço. Almoço às 13h00 em São Dâmaso.",
       eventDate: "2026-08-30",
       eventType: "Sacramento do Crisma",
       ogImage: "/images/queen-kailane/social/queen-kailane-og.png",

@@ -212,7 +212,7 @@ export function QueenKailaneGate() {
               transition={{ duration: 0.95, delay: 1.1, ease: QUEEN_EASE }}
               whileTap={reduceMotion ? undefined : { scale: 0.985 }}
             >
-              {QUEEN_KAILANE_COPY.gateCta}
+              ABRIR
             </motion.button>
           </motion.div>
 
