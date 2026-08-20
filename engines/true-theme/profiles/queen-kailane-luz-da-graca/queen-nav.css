@@ -119,3 +119,35 @@
     padding: 0.35rem 0.55rem;
   }
 }
+
+.queen-nav__sound {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.35rem;
+  margin-left: 0.25rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid rgba(231, 215, 193, 0.9);
+  color: #736b62;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.35s ease, transform 0.25s ease;
+  flex: 0 0 auto;
+}
+
+.queen-nav__sound:hover,
+.queen-nav__sound:focus-visible {
+  color: #b9975b;
+}
+
+.queen-nav__sound.is-playing {
+  color: #b9975b;
+}
+
+.queen-nav__sound:focus-visible {
+  outline: 1px solid #b9975b;
+  outline-offset: 2px;
+}
+

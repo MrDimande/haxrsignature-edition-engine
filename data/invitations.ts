@@ -375,6 +375,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       eventDate: "2026-08-30",
       eventType: "Sacramento do Crisma",
       ogImage: "/images/queen-kailane/social/queen-kailane-og.png",
+      audio: "tatana-yamukela-mhamba",
     },
     admin: {
       clientName: "Queen Kailane Cande",

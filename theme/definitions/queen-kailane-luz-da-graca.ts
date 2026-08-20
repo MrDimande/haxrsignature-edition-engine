@@ -25,10 +25,19 @@ export const queenKailaneLuzDaGracaTheme: TrueTheme = {
     emotion: "ceremonial",
   },
   audio: {
-    type: "silent",
-    fadeIn: 0,
-    volume: 0,
-    src: null,
+    type: "ambient",
+    fadeIn: 2800,
+    fadeOut: 1500,
+    volume: 0.32,
+    src: "/audio/tatana-yamukela-mhamba.mp3",
+    credit: {
+      title: "Tatana Yamukela Mhamba",
+      artist: "Música Litúrgica / Cântico de Ofertório",
+      rightsHolder:
+        "Tradição Litúrgica Moçambicana · Paróquia de São Estêvão e Lourenço",
+      disclaimer:
+        "Música de ambiente no convite. Todos os direitos da obra pertencem aos respectivos autores e titulares. HAXR Signature não detém nem reivindica qualquer direito sobre este conteúdo musical.",
+    },
   },
   colors: {
     primary: "#3F3832",

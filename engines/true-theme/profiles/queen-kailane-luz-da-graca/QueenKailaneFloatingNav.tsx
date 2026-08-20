@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useLenis } from "lenis/react";
 import type Lenis from "lenis";
+import { Volume2, VolumeX } from "lucide-react";
 import { useExperience } from "../../context";
 import { QUEEN_EASE } from "./queen-motion";
 import "./queen-nav.css";
@@ -27,12 +28,32 @@ function getScrollOffset(): number {
  * Isolada a queen-kailane-luz-da-graca.
  */
 export function QueenKailaneFloatingNav() {
-  const { introComplete } = useExperience();
+  const { introComplete, audioPlayer, audioEnabled, setAudioEnabled, theme } =
+    useExperience();
   const lenis = useLenis();
   const reduceMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [activeId, setActiveId] = useState<NavSectionId>(NAV_ITEMS[0].id);
+
+  const toggleAudio = async () => {
+    if (!audioPlayer) return;
+    if (audioEnabled) {
+      audioPlayer.pause();
+      setAudioEnabled(false);
+      return;
+    }
+    try {
+      if (audioPlayer.hasLoadedTrack()) {
+        await audioPlayer.resume();
+      } else {
+        await audioPlayer.start();
+      }
+      setAudioEnabled(true);
+    } catch {
+      setAudioEnabled(false);
+    }
+  };
 
   const syncNavigation = useCallback(() => {
     const hero = document.getElementById("queen-hero");
@@ -146,6 +167,30 @@ export function QueenKailaneFloatingNav() {
                 );
               })}
             </div>
+
+            {theme.audio.src ? (
+              <button
+                type="button"
+                className={`queen-nav__sound${audioEnabled ? " is-playing" : ""}`}
+                onClick={toggleAudio}
+                aria-label={
+                  audioEnabled
+                    ? "Silenciar música de ambiente (Tatana Yamukela Mhamba)"
+                    : "Tocar música de ambiente (Tatana Yamukela Mhamba)"
+                }
+                title={
+                  audioEnabled
+                    ? "Silenciar música de fundo"
+                    : "Tocar música de fundo"
+                }
+              >
+                {audioEnabled ? (
+                  <Volume2 size={13} strokeWidth={1.5} aria-hidden />
+                ) : (
+                  <VolumeX size={13} strokeWidth={1.5} aria-hidden />
+                )}
+              </button>
+            ) : null}
           </div>
         </motion.nav>
       ) : null}

@@ -139,7 +139,7 @@ describe("queen-kailane registry wiring", () => {
     );
   });
 
-  it("registers theme with luz-da-graca render profile and map coordinates", () => {
+  it("registers theme with luz-da-graca render profile, map coordinates and ambient audio", () => {
     assert.equal(
       queenKailaneLuzDaGracaTheme.renderProfile,
       "queen-kailane-luz-da-graca"
@@ -153,6 +153,15 @@ describe("queen-kailane registry wiring", () => {
     assert.equal(
       queenKailaneLuzDaGracaTheme.copy.location.mapCoordinates,
       "3FG8+97Q, Matola"
+    );
+    assert.equal(queenKailaneLuzDaGracaTheme.audio.type, "ambient");
+    assert.equal(
+      queenKailaneLuzDaGracaTheme.audio.src,
+      "/audio/tatana-yamukela-mhamba.mp3"
+    );
+    assert.equal(
+      queenKailaneLuzDaGracaTheme.audio.credit?.title,
+      "Tatana Yamukela Mhamba"
     );
   });
 });

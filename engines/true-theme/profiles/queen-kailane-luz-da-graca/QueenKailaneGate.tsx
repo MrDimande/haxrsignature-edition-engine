@@ -30,7 +30,8 @@ type GatePhase = "idle" | "ready" | "opening" | "exit";
  * Portal solene: portas fechadas → luz interior → abertura → revelação.
  */
 export function QueenKailaneGate() {
-  const { introComplete, setIntroComplete } = useExperience();
+  const { introComplete, setIntroComplete, audioPlayer, theme } =
+    useExperience();
   const reduceMotion = useReducedMotion();
   const lenis = useLenis();
   const [phase, setPhase] = useState<GatePhase>("idle");
@@ -49,6 +50,12 @@ export function QueenKailaneGate() {
   useLayoutEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!introComplete && audioPlayer && theme.audio.src) {
+      audioPlayer.preload();
+    }
+  }, [introComplete, audioPlayer, theme.audio.src]);
 
   useEffect(() => {
     if (introComplete) return;
@@ -81,6 +88,10 @@ export function QueenKailaneGate() {
 
   const handleEnter = () => {
     if (!ctasReady || phase === "opening" || phase === "exit") return;
+
+    if (audioPlayer && theme.audio.type !== "silent" && theme.audio.src) {
+      void audioPlayer.start();
+    }
 
     if (reduceMotion) {
       setPhase("opening");
