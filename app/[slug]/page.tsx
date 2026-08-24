@@ -65,6 +65,11 @@ export async function generateMetadata({
           width: 1200,
           height: 630,
           alt: metadata.title,
+          type: ogImage.endsWith(".jpg") || ogImage.endsWith(".jpeg")
+            ? "image/jpeg"
+            : ogImage.endsWith(".png")
+              ? "image/png"
+              : undefined,
         },
       ],
     },

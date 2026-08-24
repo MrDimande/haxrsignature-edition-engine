@@ -410,7 +410,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       eventDate: "2026-12-05",
       eventType: "Casamento",
       dressCode: "Traje de Gala",
-      ogImage: "/neidyejosewedding/opengraph-image",
+      ogImage: "/images/neidy-jose/share-og.jpg",
     },
     admin: {
       clientName: "Neidy Marino e José Cabral",
