@@ -1,5 +1,6 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
-import { getEditionSiteUrl } from "@lib/brand/authorship";
 
 export const runtime = "nodejs";
 export const alt = "Neidy Marino e José Cabral — Convite de Casamento";
@@ -9,11 +10,21 @@ export const size = {
 };
 export const contentType = "image/png";
 
+async function assetDataUrl(
+  relativePublicPath: string,
+  mime: "image/jpeg" | "image/png"
+): Promise<string> {
+  const absolute = path.join(process.cwd(), "public", relativePublicPath);
+  const buffer = await readFile(absolute);
+  return `data:${mime};base64,${buffer.toString("base64")}`;
+}
+
 export default async function Image() {
-  const baseUrl = getEditionSiteUrl();
-  const hero = `${baseUrl}/images/neidy-jose/couple-hero-desktop.png`;
-  const monogram = `${baseUrl}/images/neidy-jose/monogram-nj-transparent.png`;
-  const haxr = `${baseUrl}/images/haxr-logo-horizontal-white.png`;
+  const [hero, monogram, haxr] = await Promise.all([
+    assetDataUrl("images/neidy-jose/couple-primary.jpg", "image/jpeg"),
+    assetDataUrl("images/neidy-jose/monogram-nj-transparent.png", "image/png"),
+    assetDataUrl("images/haxr-logo-horizontal-white.png", "image/png"),
+  ]);
 
   return new ImageResponse(
     (
@@ -30,9 +41,12 @@ export default async function Image() {
           fontFamily: "Georgia, serif",
         }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={hero}
           alt=""
+          width={1200}
+          height={630}
           style={{
             position: "absolute",
             inset: 0,
@@ -147,9 +161,12 @@ export default async function Image() {
                 boxShadow: "0 22px 46px rgba(0,0,0,0.22)",
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={monogram}
                 alt=""
+                width={92}
+                height={92}
                 style={{
                   width: 92,
                   height: 92,
@@ -203,9 +220,12 @@ export default async function Image() {
                 gap: 12,
               }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={haxr}
                 alt=""
+                width={180}
+                height={48}
                 style={{
                   width: 180,
                   height: 48,
