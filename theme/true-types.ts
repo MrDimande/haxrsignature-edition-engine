@@ -29,7 +29,8 @@ export type RenderProfile =
   | "jessica-samuel-wedding"
   | "stan-real-madrid"
   | "nian-night-of-the-web"
-  | "queen-kailane-luz-da-graca";
+  | "queen-kailane-luz-da-graca"
+  | "neidy-jose-o-vinculo-perfeito";
 
 export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
 

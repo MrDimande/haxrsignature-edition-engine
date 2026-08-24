@@ -42,5 +42,10 @@ export function ExperienceFlowRouter() {
     return null;
   }
 
+  /* Gate próprio NeidyJoseTecituraGate — evita o StandardExperienceFlow */
+  if (theme.renderProfile === "neidy-jose-o-vinculo-perfeito") {
+    return null;
+  }
+
   return <StandardExperienceFlow />;
 }

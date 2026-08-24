@@ -4,6 +4,10 @@ import { InvitationAliasPlugin } from "./lib/webpack/invitation-alias-plugin";
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.resolve(__dirname),
+  images: {
+    /** Convites / heróis: permitir quality={100}; default elevado */
+    qualities: [75, 90, 95, 100],
+  },
   transpilePackages: [
     "motion",
     "motion-dom",

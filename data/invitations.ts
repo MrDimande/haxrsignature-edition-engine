@@ -385,6 +385,41 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       expectedRegistryKey: "queen-kailane-luz-da-graca",
     },
   },
+  neidyejosewedding: {
+    slug: "neidyejosewedding",
+    aliases: [
+      "neidyejose",
+      "neidy-jose",
+      "neidy-e-jose",
+      "neidymarinoejosecabral",
+    ],
+    engine: "theme",
+    theme: "neidy-jose-vinculo",
+    experienceType: "ceremonial",
+    sourcePath: "/neidyejosewedding",
+    legacyFolder: "neidy-jose",
+    status: "active",
+    metadata: {
+      title: "Neidy Marino e José Cabral — Convite de Casamento",
+      date: "2026-12-05",
+      time: "13:00 · Civil · 15:00 · Copo de Água",
+      location: "Espaço Águia, Maputo",
+      subtitle: "O VÍNCULO DA PERFEIÇÃO · Colossenses 3:14",
+      description:
+        "Celebração do Matrimónio de Neidy Marino e José Cabral. 5 de Dezembro de 2026 — Civil 13:00 & Copo de Água 15:00 · Espaço Águia, Maputo. Fé · Vitória · Amor.",
+      eventDate: "2026-12-05",
+      eventType: "Casamento",
+      dressCode: "Traje de Gala",
+      ogImage: "/neidyejosewedding/opengraph-image",
+    },
+    admin: {
+      clientName: "Neidy Marino e José Cabral",
+      eventTypeLabel: "Casamento",
+      adminEventName: "Edition · Casamento · Neidy Marino e José Cabral",
+      envVar: "EDITION_EVENT_NEIDY_JOSE_ID",
+      expectedRegistryKey: "neidy-jose-vinculo",
+    },
+  },
 };
 
 /** @deprecated Use INVITATIONS */

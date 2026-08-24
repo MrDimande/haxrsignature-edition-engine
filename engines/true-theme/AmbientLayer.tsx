@@ -41,5 +41,10 @@ export function AmbientLayer() {
     return null;
   }
 
+  /* Ambient próprio Neidy & José — hero fotográfico full-bleed */
+  if (theme.renderProfile === "neidy-jose-o-vinculo-perfeito") {
+    return null;
+  }
+
   return <AmbientBackground />;
 }

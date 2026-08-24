@@ -45,7 +45,9 @@ export const HAXR_AUTH = {
   assets: {
     symbol: "/images/haxr-favicon.png",
     logoVertical: "/images/haxr-logo-vertical.png",
+    logoVerticalWhite: "/images/haxr-logo-vertical-white.png",
     logoHorizontal: "/images/haxr-logo-horizontal.png",
+    logoHorizontalWhite: "/images/haxr-logo-horizontal-white.png",
   },
 } as const;
 

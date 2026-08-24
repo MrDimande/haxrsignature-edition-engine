@@ -1,0 +1,956 @@
+/* Neidy Marino & José Cabral — O Vínculo Perfeito — HAXR Signature */
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Alex+Brush&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+:root {
+  --nj-emerald-dark: #0A211A;
+  --nj-emerald-medium: #2D5A4C;
+  --nj-emerald-muted: #3B6456;
+  --nj-gold-accent: #CBB994;
+  --nj-gold-light: #EBE4D5;
+  --nj-pearl-bg: #FCFDFC;
+  --nj-sand-bg: #FBFBFA;
+  --nj-surface-card: #F5F7F4;
+  --nj-border-subtle: rgba(10, 33, 26, 0.08);
+  --nj-border-gold: rgba(203, 185, 148, 0.35);
+}
+
+.nj-script-font {
+  font-family: 'Great Vibes', 'Alex Brush', var(--font-display), cursive;
+}
+
+.nj-glow-text {
+  text-shadow: 0 0 20px rgba(255, 240, 190, 0.95), 0 0 40px rgba(203, 185, 148, 0.75), 0 0 70px rgba(168, 143, 91, 0.5);
+}
+
+/* Hero editorial — luz suave de capa, sem glow “neon” */
+.nj-hero-editorial-glow {
+  text-shadow:
+    0 2px 24px rgba(0, 0, 0, 0.45),
+    0 0 48px rgba(203, 185, 148, 0.22);
+}
+
+.nj-hero-rule {
+  width: 3.5rem;
+  height: 1px;
+  transform-origin: center;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(203, 185, 148, 0.95),
+    transparent
+  );
+}
+
+/* Stack assimétrico / articulação tipográfica «e» */
+.nj-hero-and {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: #cbb994;
+  letter-spacing: 0.08em;
+}
+
+#nj-hero-heading .nj-hero-and {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: #cbb994;
+  letter-spacing: 0.08em;
+}
+
+/* Placas com profundidade editorial (calendário, ticket) */
+.nj-depth-card {
+  box-shadow:
+    0 20px 50px -28px rgba(10, 33, 26, 0.35),
+    0 1px 0 rgba(203, 185, 148, 0.25);
+  will-change: transform;
+}
+
+/* Monograma oficial — PNG transparente */
+.nj-hero-monogram {
+  filter: drop-shadow(0 2px 14px rgba(10, 33, 26, 0.28));
+}
+
+/* Revelação em cortina — borda suave no leading edge */
+.nj-hero-photo-curtain {
+  will-change: clip-path;
+}
+
+.nj-hero-reveal-veil {
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(10, 33, 26, 0.35) 0%, transparent 72%),
+    linear-gradient(180deg, rgba(5, 18, 14, 0.55) 0%, rgba(5, 18, 14, 0.2) 40%, rgba(5, 18, 14, 0.72) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nj-hero-photo-curtain {
+    will-change: auto;
+    clip-path: none !important;
+  }
+}
+
+/* Transição esmeralda → pérola (fim do Hero) */
+.nj-hero-exit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(4.5rem, 12vh, 7.5rem);
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(10, 33, 26, 0.18) 42%,
+    rgba(251, 251, 250, 0.55) 78%,
+    #FBFBFA 100%
+  );
+}
+
+.nj-hero-exit__curve {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 4.5rem;
+  color: #FBFBFA;
+}
+
+.nj-damask-pattern {
+  background-color: #FBFBFA;
+  background-image: radial-gradient(rgba(203, 185, 148, 0.15) 1.5px, transparent 1.5px), radial-gradient(rgba(10, 33, 26, 0.06) 1.5px, transparent 1.5px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+.nj-gate-container,
+.nj-rings-opening-container {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #071914;
+  color: #FCFDFC;
+  overflow: hidden;
+  user-select: none;
+  touch-action: manipulation;
+  padding: 1.5rem 1rem;
+}
+
+.nj-bg-ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: 
+    radial-gradient(ellipse 65% 55% at 50% 50%, #FFFFFF 0%, #F5F7F4 65%, #EBF0EC 100%),
+    radial-gradient(circle 500px at 50% 50%, rgba(141, 170, 157, 0.08) 0%, transparent 80%);
+}
+
+.nj-subtle-mesh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: radial-gradient(rgba(10, 33, 26, 0.12) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+}
+
+.nj-experience-root {
+  background-color: #FBFBFA;
+  color: #0A211A;
+  min-height: 100vh;
+  width: 100%;
+  max-width: none;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+/* Full-bleed sections — backgrounds span the entire viewport width */
+.nj-section-full {
+  width: 100%;
+  max-width: none;
+}
+
+/* Glassmorphism Luxury Surface */
+.nj-card-surface {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(203, 185, 148, 0.25);
+  box-shadow: 0 10px 30px -10px rgba(10, 33, 26, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.nj-card-surface-dark {
+  background: #0A211A;
+  color: #FCFDFC;
+  border: 1px solid rgba(203, 185, 148, 0.3);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.35);
+}
+
+/* Gold Gradient Text & Accents */
+.nj-gold-text {
+  background: linear-gradient(135deg, #A88F5B 0%, #D8C7A5 50%, #B89B65 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nj-gold-border {
+  border-color: rgba(203, 185, 148, 0.4);
+}
+
+.nj-gold-border-gradient {
+  border-image: linear-gradient(to right, transparent, #CBB994, transparent) 1;
+}
+
+/* Envelope dock — sempre centrado (mobile-first) */
+.nj-experience-main {
+  padding-bottom: 5.75rem;
+}
+
+.nj-envelope-dock-anchor {
+  position: fixed;
+  right: 0;
+  bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  left: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  /* Leave room for the ambient control without leaving the visual center */
+  padding-inline: 3.35rem;
+}
+
+.nj-envelope-dock-stage {
+  width: 100%;
+  max-width: 22.5rem;
+  pointer-events: auto;
+}
+
+.nj-envelope-dock {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  filter: drop-shadow(0 14px 28px rgba(10, 33, 26, 0.3));
+}
+
+.nj-envelope-flap {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transform-origin: top center;
+}
+
+.nj-envelope-flap__face {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  clip-path: polygon(0 100%, 50% 10%, 100% 100%);
+  background: linear-gradient(165deg, #214a3d 0%, #0a211a 72%);
+  border-bottom: 1px solid rgba(203, 185, 148, 0.4);
+  transition: min-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nj-envelope-dock.is-closed .nj-envelope-flap__face {
+  min-height: 2.4rem;
+}
+
+.nj-envelope-seal {
+  position: absolute;
+  bottom: 0.15rem;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  height: 1.55rem;
+  width: 1.55rem;
+  translate: -50% 42%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(203, 185, 148, 0.7);
+  background: radial-gradient(circle at 35% 30%, #e4d6b8, #cbb994 55%, #b8a57a);
+  font-family: "Great Vibes", "Alex Brush", cursive;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: #0a211a;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+.nj-envelope-dock.is-open .nj-envelope-seal {
+  transform: scale(0.82);
+  opacity: 0.8;
+}
+
+.nj-envelope-peek {
+  position: absolute;
+  bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(252, 253, 252, 0.88);
+}
+
+.nj-envelope-body {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border: 1px solid rgba(203, 185, 148, 0.42);
+  border-top: none;
+  border-radius: 0 0 1.15rem 1.15rem;
+  background: linear-gradient(180deg, #faf6ef 0%, #f3ebe0 55%, #ebe3d6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -8px 20px rgba(10, 33, 26, 0.04);
+}
+
+.nj-envelope-contents {
+  display: flex;
+  flex-direction: column;
+  padding: 0.55rem 0.4rem 0.55rem;
+}
+
+.nj-envelope-nav {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0.1rem;
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nj-envelope-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nj-envelope-nav__item {
+  display: inline-flex;
+  flex: 1 1 0;
+  min-width: 2.35rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.15rem;
+  color: rgba(10, 33, 26, 0.55);
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nj-envelope-nav__icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.nj-envelope-nav__label {
+  display: none;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.nj-envelope-nav__item:hover {
+  background: rgba(10, 33, 26, 0.05);
+  color: #0a211a;
+}
+
+.nj-envelope-nav__item.is-active {
+  background: #0a211a;
+  color: #fcfdfc;
+  box-shadow: 0 5px 12px rgba(10, 33, 26, 0.16);
+}
+
+.nj-ambient-corner {
+  position: fixed;
+  left: max(0.65rem, env(safe-area-inset-left, 0px));
+  bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  z-index: 49;
+  display: inline-flex;
+  height: 2.6rem;
+  min-width: 2.6rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(203, 185, 148, 0.45);
+  background: rgba(10, 33, 26, 0.92);
+  color: #fcfdfc;
+  box-shadow: 0 10px 24px rgba(10, 33, 26, 0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+}
+
+.nj-ambient-corner:hover {
+  transform: scale(1.04);
+}
+
+.nj-ambient-corner.is-playing {
+  border-color: transparent;
+  background: #cbb994;
+  color: #0a211a;
+}
+
+.nj-ambient-corner__bars {
+  display: flex;
+  height: 0.8rem;
+  align-items: flex-end;
+  gap: 0.12rem;
+}
+
+.nj-ambient-corner__bars span {
+  width: 0.14rem;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: nj-ambient-bar 0.85s ease-in-out infinite;
+}
+
+.nj-ambient-corner__bars span:nth-child(1) {
+  height: 45%;
+  animation-delay: 0s;
+}
+
+.nj-ambient-corner__bars span:nth-child(2) {
+  height: 100%;
+  animation-delay: 0.15s;
+}
+
+.nj-ambient-corner__bars span:nth-child(3) {
+  height: 65%;
+  animation-delay: 0.3s;
+}
+
+@keyframes nj-ambient-bar {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (min-width: 640px) {
+  .nj-experience-main {
+    padding-bottom: 6.5rem;
+  }
+
+  .nj-envelope-dock-anchor {
+    padding-inline: 0.75rem;
+  }
+
+  .nj-envelope-dock-stage {
+    max-width: 32rem;
+  }
+
+  .nj-envelope-contents {
+    padding: 0.65rem 0.55rem 0.7rem;
+  }
+
+  .nj-envelope-nav__label {
+    display: block;
+    font-size: 0.52rem;
+    letter-spacing: 0.08em;
+  }
+
+  .nj-ambient-corner {
+    left: max(1.25rem, env(safe-area-inset-left, 0px));
+    bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+    height: 2.85rem;
+    min-width: 2.85rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .nj-envelope-dock-stage {
+    max-width: 38rem;
+  }
+
+  .nj-envelope-nav__label {
+    font-size: 0.55rem;
+  }
+}
+
+.nj-floating-dock {
+  display: none;
+}
+
+/* Shimmer pulse for high-importance actions */
+@keyframes njShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.nj-shimmer-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.nj-shimmer-button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  animation: njShimmer 3.5s infinite;
+}
+
+/* Luxury Thread of Continuity */
+.nj-continuity-line {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, #CBB994, transparent);
+}
+
+/* Carta RSVP — envelope esmeralda + papel editorial */
+.nj-letter-frame {
+  position: relative;
+  border-radius: 1.75rem;
+  padding: 0.7rem;
+  background:
+    linear-gradient(145deg, #153b30 0%, #0a211a 42%, #1a3d32 100%);
+  box-shadow:
+    0 40px 90px -32px rgba(10, 33, 26, 0.55),
+    0 18px 40px -20px rgba(10, 33, 26, 0.35),
+    inset 0 1px 0 rgba(203, 185, 148, 0.35);
+  will-change: transform;
+}
+
+.nj-letter-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0.45rem;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(203, 185, 148, 0.45);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.nj-letter-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0.65rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(203, 185, 148, 0.18);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.nj-letter-paper {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 1.15rem;
+  background: #f7f3eb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.nj-letter-ornament {
+  width: 4.5rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #cbb994 20%,
+    #cbb994 80%,
+    transparent
+  );
+}
+
+.nj-companion-card {
+  border-radius: 1.1rem;
+  border: 1px solid rgba(203, 185, 148, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(247, 243, 235, 0.9) 100%);
+  box-shadow:
+    0 12px 28px -18px rgba(10, 33, 26, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Mural — pena & tinta mágica */
+.nj-quill-desk {
+  box-shadow:
+    0 28px 60px -28px rgba(10, 33, 26, 0.35),
+    0 2px 0 rgba(203, 185, 148, 0.3);
+}
+
+.nj-quill-field {
+  caret-color: #cbb994;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23CBB994' stroke-width='1.6'%3E%3Cpath d='M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z'/%3E%3Cline x1='16' y1='8' x2='2' y2='22'/%3E%3Cline x1='17.5' y1='15' x2='9' y2='15'/%3E%3C/svg%3E") 2 22, text;
+}
+
+.nj-quill-caret {
+  display: inline-block;
+  margin-left: 1px;
+  color: #cbb994;
+  animation: nj-quill-blink 0.75s steps(1) infinite;
+  font-style: normal;
+  font-size: 0.85em;
+  vertical-align: baseline;
+}
+
+@keyframes nj-quill-blink {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.nj-mural-wall {
+  box-shadow:
+    0 40px 90px -36px rgba(10, 33, 26, 0.55),
+    inset 0 1px 0 rgba(203, 185, 148, 0.2);
+}
+
+.nj-mural-note {
+  transform-origin: center center;
+  transition: box-shadow 0.35s ease;
+}
+
+.nj-mural-note--writing {
+  box-shadow:
+    0 0 0 1px rgba(203, 185, 148, 0.55),
+    0 24px 50px -18px rgba(203, 185, 148, 0.35),
+    0 0 40px rgba(203, 185, 148, 0.18);
+}
+
+.nj-mural-ink-glow {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    rgba(203, 185, 148, 0.35),
+    transparent 65%
+  );
+  animation: nj-ink-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes nj-ink-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
+@media (min-width: 640px) {
+  .nj-letter-frame {
+    border-radius: 2rem;
+    padding: 0.85rem;
+  }
+
+  .nj-letter-frame::before {
+    inset: 0.55rem;
+    border-radius: 1.55rem;
+  }
+
+  .nj-letter-frame::after {
+    inset: 0.75rem;
+    border-radius: 1.4rem;
+  }
+
+  .nj-letter-paper {
+    border-radius: 1.35rem;
+  }
+}
+
+/* ============================================================
+   3D DEPTH SCENE — sala profunda esmeralda
+   ============================================================ */
+
+/* Cena global: raiz de perspectiva sem mover o scroll */
+.nj-depth-scene {
+  position: relative;
+  perspective: 1200px;
+  perspective-origin: 50% 38%;
+  transform-style: preserve-3d;
+}
+
+/* Névoa atmosférica persistente — camada fixa sobre tudo */
+.nj-atmo-fog {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%,   rgba(10, 33, 26, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(10, 33, 26, 0.22) 0%, transparent 65%);
+  mix-blend-mode: multiply;
+}
+
+/* Véu dourado subtil — separador de planos */
+.nj-atmo-veil {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(203, 185, 148, 0.04) 0%, transparent 75%);
+}
+
+/* ---- Planos de profundidade ---- */
+
+/* Backplane: fundos, véus, detalhes distantes */
+.nj-backplane {
+  will-change: transform, opacity;
+  transform: translateZ(-40px) scale(1.034);
+}
+
+/* Midplane: fotografias, molduras, placas — plano principal */
+.nj-midplane {
+  will-change: transform, opacity;
+  transform: translateZ(0px);
+}
+
+/* Frontplane: tipografia hero, CTAs, nav — mais próximo */
+.nj-frontplane {
+  will-change: transform, opacity;
+  transform: translateZ(20px) scale(0.984);
+}
+
+/* ---- Entrada de secção (viewport reveal) ---- */
+/* Aplicar via Framer Motion whileInView ou data-attr com JS */
+
+/* Secção ao entrar no viewport: sobe do fundo */
+.nj-section-rise {
+  opacity: 0;
+  transform: translateY(3rem) translateZ(-20px) scale(0.98);
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nj-section-rise.is-visible {
+  opacity: 1;
+  transform: translateY(0) translateZ(0) scale(1);
+}
+
+/* Variante mais lenta para elementos de peso (fotografias, cartas) */
+.nj-section-rise--slow {
+  transition-duration: 1.15s;
+  transition-delay: 0.08s;
+}
+
+/* Variante adiada para elementos secundários */
+.nj-section-rise--delayed {
+  transition-delay: 0.22s;
+}
+
+/* ---- Rack focus — nitidez por proximidade ---- */
+
+/* Elemento fora do centro da "câmara" perde ligeiramente nitidez */
+.nj-rack-bg {
+  filter: blur(0.4px) brightness(0.96);
+  transition: filter 0.7s ease;
+}
+
+.nj-rack-bg.is-focused {
+  filter: blur(0px) brightness(1);
+}
+
+/* ---- Parallax helpers — ritmos por plano ---- */
+
+/* Usado em conjunto com JS scroll: var(--nj-scroll-ratio) 0→1 */
+.nj-parallax-back {
+  transform: translateY(calc(var(--nj-scroll-offset, 0px) * -0.35));
+  will-change: transform;
+}
+
+.nj-parallax-mid {
+  transform: translateY(calc(var(--nj-scroll-offset, 0px) * -0.18));
+  will-change: transform;
+}
+
+.nj-parallax-front {
+  transform: translateY(calc(var(--nj-scroll-offset, 0px) * 0.06));
+  will-change: transform;
+}
+
+/* ---- Hero afunda ao sair do viewport ---- */
+.nj-hero-depth-wrapper {
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
+}
+
+.nj-hero-depth-wrapper.is-sinking {
+  transform: translateZ(-60px) scale(0.97);
+  opacity: 0.72;
+}
+
+/* ---- Medalhão e selos como objecto mais próximo ---- */
+.nj-medallion-front {
+  transform: translateZ(28px) scale(0.978);
+  will-change: transform;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 12px 32px rgba(10, 33, 26, 0.38));
+}
+
+/* ---- Carta / RSVP emerge do fundo ---- */
+/* A opacidade é controlada pelo Framer Motion do wrapper pai;
+   aqui só gerimos a profundidade Z */
+.nj-letter-emerge {
+  transform: translateZ(-24px) scale(0.985);
+  transition: transform 1.05s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nj-letter-emerge.is-visible {
+  transform: translateZ(0) scale(1);
+}
+
+/* ---- Névoa intermédia entre secções ---- */
+.nj-section-fog {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 7rem;
+  z-index: 5;
+}
+
+.nj-section-fog--top {
+  top: 0;
+  background: linear-gradient(180deg, rgba(10, 33, 26, 0.12) 0%, transparent 100%);
+}
+
+.nj-section-fog--bottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(10, 33, 26, 0.12) 0%, transparent 100%);
+}
+
+/* ---- Scripture — pausa de foco (rack focus peak) ---- */
+#scripture {
+  position: relative;
+}
+
+#scripture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 50%, rgba(203, 185, 148, 0.07) 0%, transparent 68%);
+}
+
+/* Versículo: presença máxima no centro — sem blur próprio */
+#scripture .nj-section-rise.is-visible blockquote,
+#scripture .nj-section-rise.is-visible p {
+  filter: none;
+}
+
+/* ---- Separadores de névoa automáticos entre secções com fundo claro ---- */
+.nj-section-full + .nj-section-full::before,
+.nj-section-full + section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5rem;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(180deg, rgba(10, 33, 26, 0.06) 0%, transparent 100%);
+}
+
+/* Secção escura (closing) não precisa do separador superior claro */
+footer.nj-section-rise::before {
+  display: none;
+}
+
+/* ---- Ritmos escalonados nos beats de OurThread ---- */
+#our-thread li:nth-child(1) { transition-delay: 0.00s; }
+#our-thread li:nth-child(2) { transition-delay: 0.10s; }
+#our-thread li:nth-child(3) { transition-delay: 0.20s; }
+#our-thread li:nth-child(4) { transition-delay: 0.30s; }
+
+/* ---- Carta RSVP — emerge com delay ---- */
+.nj-letter-emerge {
+  transition-delay: 0.15s;
+}
+
+/* ---- Performance guards ---- */
+/* Limitar will-change a elementos activos; remover quando fora do viewport */
+.nj-perf-idle {
+  will-change: auto !important;
+  transform: none !important;
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  .nj-gate-container *,
+  .nj-experience-root * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Desactivar todos os efeitos de profundidade */
+  .nj-backplane,
+  .nj-midplane,
+  .nj-frontplane,
+  .nj-parallax-back,
+  .nj-parallax-mid,
+  .nj-parallax-front,
+  .nj-hero-depth-wrapper,
+  .nj-medallion-front,
+  .nj-letter-emerge,
+  .nj-section-rise,
+  .nj-rack-bg {
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+
+  .nj-atmo-fog,
+  .nj-atmo-veil {
+    display: none;
+  }
+}

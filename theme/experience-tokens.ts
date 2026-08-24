@@ -178,6 +178,12 @@ export function resolveExperienceTokens(theme: TrueTheme): ExperienceTokens {
                   'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
                 body: 'var(--font-jost), "Jost", system-ui, sans-serif',
               }
+          : theme.renderProfile === "neidy-jose-o-vinculo-perfeito"
+            ? {
+                display:
+                  'var(--font-cormorant), "Cormorant Garamond", Georgia, serif',
+                body: 'var(--font-inter), "Inter", system-ui, sans-serif',
+              }
             : baseTypography;
 
   return {

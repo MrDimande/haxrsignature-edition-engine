@@ -15,6 +15,7 @@ import { JessicaSamuelExperience } from "./profiles/jessica-samuel-wedding/Jessi
 import { StanRealMadridExperience } from "./profiles/stan-real-madrid/StanRealMadridExperience";
 import { NianNightOfTheWebExperience } from "./profiles/nian-night-of-the-web/NianExperience";
 import { QueenKailaneLuzDaGracaExperience } from "./profiles/queen-kailane-luz-da-graca/QueenKailaneExperience";
+import { NeidyJoseExperience } from "./profiles/neidy-jose-o-vinculo-perfeito/NeidyJoseExperience";
 
 function StandardEditorialExperience() {
   return (
@@ -49,6 +50,8 @@ export function ExperienceComposition() {
       return <NianNightOfTheWebExperience />;
     case "queen-kailane-luz-da-graca":
       return <QueenKailaneLuzDaGracaExperience />;
+    case "neidy-jose-o-vinculo-perfeito":
+      return <NeidyJoseExperience />;
     case "standard":
       return <StandardEditorialExperience />;
     default: {

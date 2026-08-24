@@ -10,4 +10,5 @@ export type RegistryThemeKey =
   | "jessica-samuel-wedding"
   | "stan-real-madrid"
   | "nian-night-of-the-web"
-  | "queen-kailane-luz-da-graca";
+  | "queen-kailane-luz-da-graca"
+  | "neidy-jose-vinculo";
