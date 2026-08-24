@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { motion } from "motion/react";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
+import { motion } from "motion/react";
+import Image from "next/image";
 
 interface NeidyJoseParentsProps {
   prefersReducedMotion?: boolean;
@@ -57,7 +56,7 @@ export function NeidyJoseParents({ prefersReducedMotion = false }: NeidyJosePare
             transition={{ duration, delay: 0.15 }}
             className="max-w-md font-serif text-sm italic leading-relaxed text-[#3B6456] sm:text-base"
           >
-            Duas casas. Um altar. A bênção que nos precede.
+            Duas famílias. Um altar. A bênção que nos precede.
           </motion.p>
         </header>
 
@@ -93,7 +92,7 @@ export function NeidyJoseParents({ prefersReducedMotion = false }: NeidyJosePare
           </svg>
 
           <div className="relative z-10 grid grid-cols-1 items-center gap-2 px-6 py-10 sm:px-8 sm:py-12 md:grid-cols-[1fr_auto_1fr] md:gap-6 md:px-10 md:py-14">
-            {/* Casa Marino */}
+            {/* Família Marino */}
             <motion.div
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : -16 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -151,7 +150,7 @@ export function NeidyJoseParents({ prefersReducedMotion = false }: NeidyJosePare
               </p>
             </motion.div>
 
-            {/* Casa Cabral */}
+            {/* Família Mateus */}
             <motion.div
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 16 }}
               whileInView={{ opacity: 1, x: 0 }}

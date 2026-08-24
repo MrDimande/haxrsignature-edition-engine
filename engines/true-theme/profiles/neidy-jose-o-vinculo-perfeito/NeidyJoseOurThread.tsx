@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
+import { motion, useInView } from "motion/react";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
 
 interface NeidyJoseOurThreadProps {
@@ -12,7 +12,7 @@ interface NeidyJoseOurThreadProps {
 const GOLD = "#CBB994";
 const EMERALD_SOFT = "#2D5A4C";
 
-/** Vinheta II — fios entrelaçados (único gesto abstracto do prólogo) */
+/** Fallback abstracto — só se um beat não tiver foto nem vídeo */
 function VignetteWeave() {
   return (
     <svg viewBox="0 0 160 200" className="h-full w-full" aria-hidden>
@@ -39,9 +39,53 @@ function VignetteWeave() {
   );
 }
 
+function ThreadVideo({
+  src,
+  objectPosition,
+  prefersReducedMotion,
+}: {
+  src: string;
+  objectPosition?: string;
+  prefersReducedMotion: boolean;
+}) {
+  const shellRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const inView = useInView(shellRef, { margin: "-10% 0px -10% 0px" });
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (prefersReducedMotion) {
+      el.pause();
+      return;
+    }
+    if (inView) {
+      void el.play().catch(() => {});
+    } else {
+      el.pause();
+    }
+  }, [inView, prefersReducedMotion]);
+
+  return (
+    <div ref={shellRef} className="absolute inset-0">
+      <video
+        ref={videoRef}
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ objectPosition: objectPosition || "center center" }}
+        src={src}
+        muted
+        playsInline
+        loop
+        preload="metadata"
+        aria-hidden
+      />
+    </div>
+  );
+}
+
 /**
  * O nosso fio — prólogo híbrido:
- * I / III / IV = fotografia editorial · II = tecitura em line art.
+ * I Fé = vídeo editorial · II Amor = foto · III Vitória = família · IV Aliança = foto.
  */
 export function NeidyJoseOurThread({ prefersReducedMotion = false }: NeidyJoseOurThreadProps) {
   const duration = prefersReducedMotion ? 0.01 : 0.95;
@@ -113,7 +157,12 @@ export function NeidyJoseOurThread({ prefersReducedMotion = false }: NeidyJoseOu
 
           <ol className="m-0 grid list-none grid-cols-1 gap-12 p-0 md:grid-cols-2 md:gap-10 lg:grid-cols-4 lg:gap-6">
             {ourThread.beats.map((beat, index) => {
-              const hasImage = "image" in beat && Boolean(beat.image);
+              const videoSrc =
+                "video" in beat && typeof beat.video === "string" ? beat.video : null;
+              const imageSrc =
+                "image" in beat && typeof beat.image === "string" ? beat.image : null;
+              const objectPosition =
+                ("imageObjectPosition" in beat && beat.imageObjectPosition) || "center center";
 
               return (
                 <motion.li
@@ -132,26 +181,27 @@ export function NeidyJoseOurThread({ prefersReducedMotion = false }: NeidyJoseOu
                     {beat.numeral}
                   </span>
 
-                  {/* Placa vertical editorial — foto HD ou tecitura SVG */}
                   <div
                     className="nj-midplane nj-depth-card relative mb-5 aspect-[3/4] w-full max-w-[13.5rem] overflow-hidden rounded-sm border border-[#CBB994]/40 bg-[#F5F7F4]"
                     style={{
                       boxShadow: "0 16px 36px -20px rgba(10,33,26,0.18)",
                     }}
                   >
-                    {hasImage ? (
+                    {videoSrc ? (
+                      <ThreadVideo
+                        src={videoSrc}
+                        objectPosition={objectPosition}
+                        prefersReducedMotion={prefersReducedMotion}
+                      />
+                    ) : imageSrc ? (
                       <Image
-                        src={beat.image}
+                        src={imageSrc}
                         alt=""
                         fill
                         unoptimized
                         quality={100}
                         className="object-cover"
-                        style={{
-                          objectPosition:
-                            ("imageObjectPosition" in beat && beat.imageObjectPosition) ||
-                            "center center",
-                        }}
+                        style={{ objectPosition }}
                         sizes="(max-width: 640px) 55vw, 220px"
                         aria-hidden
                       />

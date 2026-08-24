@@ -1,23 +1,23 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import Image from "next/image";
+import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
+import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
+import { toPng } from "html-to-image";
 import {
-  motion,
+  CheckCircle2,
+  Download,
+  MessageCircle,
+  XCircle,
+} from "lucide-react";
+import {
   AnimatePresence,
+  motion,
   useMotionValue,
   useSpring,
   useTransform,
 } from "motion/react";
-import { toPng } from "html-to-image";
-import {
-  CheckCircle2,
-  XCircle,
-  Download,
-  MessageCircle,
-} from "lucide-react";
-import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
-import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
+import Image from "next/image";
+import React, { useRef, useState } from "react";
 
 interface NeidyJoseRsvpProps {
   prefersReducedMotion?: boolean;
@@ -259,7 +259,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
           transition={{ duration, delay: 0.12 }}
           className="mb-10 max-w-md font-serif text-sm italic leading-relaxed text-[#3B6456] sm:mb-12 sm:text-base"
         >
-          Escreva-nos — como quem responde a um convite à mão.
+          Escreva-nos como quem responde a um convite à mão.
           <br className="hidden sm:block" />
           Até {NEIDY_JOSE_CONSTANTS.rsvpDeadlineFormatted}.
         </motion.p>
@@ -321,7 +321,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                         />
                       </div>
                       <p className="nj-script-font text-3xl text-[#CBB994] sm:text-4xl">
-                        Neidy & José
+                        Neidy Marino & José Cabral Mateus
                       </p>
                       <div className="nj-letter-ornament my-4" aria-hidden />
                       <p className="font-body text-[9px] uppercase tracking-[0.42em] text-[#3B6456]">

@@ -28,7 +28,7 @@ export const NEIDY_JOSE_CONSTANTS = {
         numeral: "I",
         title: "Fé",
         line: "A luz que nos guia quando o caminho ainda não se vê.",
-        image: "/images/neidy-jose/thread-fe.png",
+        video: "/videos/neidy-jose/thread-fe.mp4",
         imageObjectPosition: "center 38%",
       },
       {
@@ -44,7 +44,9 @@ export const NEIDY_JOSE_CONSTANTS = {
         numeral: "III",
         title: "Vitória",
         line: "Não a do triunfo fácil — a de permanecer, juntos.",
-        vignette: "weave" as const,
+        image: "/images/neidy-jose/thread-vitoria.jpg",
+        /** Enquadra a Vitória e o irmão no terço inferior da placa 3:4 */
+        imageObjectPosition: "center 58%",
       },
       {
         id: "alianca",
@@ -59,13 +61,13 @@ export const NEIDY_JOSE_CONSTANTS = {
   blessing: {
     eyebrow: "Com a bênção de Deus",
     title: "e de quem nos deu a vida",
-    brideHouse: "Casa Marino",
-    groomHouse: "Casa Cabral",
+    brideHouse: "Família Marino",
+    groomHouse: "Família Mateus",
   },
   scriptureReference: "Colossenses 3:14",
   scriptureTheme: "O Vínculo da Perfeição",
   scriptureFullVerse:
-    "E, sobre tudo isto, revesti-vos de amor, que é o vínculo da perfeição.",
+    "E, acima de tudo, tenham amor, pois o amor une perfeitamente todas as coisas.",
   scriptureContext:
     "A união de duas almas sob a graça divina. Tecida pela Fé inabalável, sustentada pela Vitória da perseverança e selada eternamente pelo Amor.",
   triad: [

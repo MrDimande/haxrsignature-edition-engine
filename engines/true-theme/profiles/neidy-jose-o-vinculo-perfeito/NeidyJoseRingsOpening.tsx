@@ -4,7 +4,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
-import { startNeidyJoseAmbient } from "@lib/neidy-jose/ambient-audio";
+import {
+  primeNeidyJoseAmbient,
+  startNeidyJoseAmbient,
+} from "@lib/neidy-jose/ambient-audio";
 
 interface NeidyJoseRingsOpeningProps {
   onComplete: () => void;
@@ -148,6 +151,7 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
 
   useEffect(() => {
     setMounted(true);
+    primeNeidyJoseAmbient();
     return () => {
       timersRef.current.forEach((id) => window.clearTimeout(id));
       timersRef.current = [];
@@ -168,13 +172,14 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
   const finish = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
-    void startNeidyJoseAmbient();
     setPhase("exiting");
     schedule(onComplete, prefersReducedMotion ? 280 : TIMING.exitFadeMs);
   }, [onComplete, prefersReducedMotion, schedule]);
 
   const unite = useCallback(() => {
     if (phase !== "awaiting") return;
+    // Unlock + fade no mesmo gesto do toque — senão o browser bloqueia o autoplay.
+    void startNeidyJoseAmbient();
 
     if (prefersReducedMotion) {
       playSealChime();
@@ -231,7 +236,7 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
       tabIndex={canInteract ? 0 : -1}
       aria-label="Toque para unir as alianças e abrir o convite de Neidy Marino e José Cabral."
       aria-disabled={!canInteract}
-      className={`fixed inset-0 z-[100] flex select-none flex-col items-center justify-between overflow-hidden bg-[#05120E] px-6 py-5 text-[#FCFDFC] max-[520px]:py-4 sm:px-10 sm:py-10 ${
+      className={`fixed inset-0 z-[100] flex select-none flex-col items-center overflow-hidden bg-[#05120E] px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 text-[#FCFDFC] max-[520px]:pt-4 sm:px-10 sm:pb-10 sm:pt-10 ${
         canInteract ? "cursor-pointer" : "cursor-default"
       }`}
     >
@@ -261,7 +266,7 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
         aria-hidden
       />
 
-      <header className="relative z-20 flex flex-col items-center pt-3 text-center">
+      <header className="relative z-20 flex shrink-0 flex-col items-center pt-3 text-center">
         <motion.p
           initial={{ opacity: 0, y: -8 }}
           animate={{
@@ -275,8 +280,8 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
         </motion.p>
       </header>
 
-      <main className="relative z-20 flex w-full max-w-3xl flex-1 flex-col items-center justify-center">
-        <div className="relative flex h-[min(18rem,42svh)] w-full max-w-[32rem] items-center justify-center overflow-visible sm:h-[23rem] sm:max-w-[38rem]">
+      <main className="relative z-20 flex min-h-0 w-full max-w-3xl flex-1 flex-col items-center justify-center">
+        <div className="relative flex h-[min(16.5rem,36svh)] w-full max-w-[32rem] items-center justify-center overflow-visible max-[380px]:h-[min(14.5rem,32svh)] sm:h-[23rem] sm:max-w-[38rem]">
           {/* Luz de sala */}
           <motion.div
             className="pointer-events-none absolute h-48 w-48 rounded-full bg-[radial-gradient(circle,rgba(255,248,225,0.3)_0%,rgba(203,185,148,0.15)_38%,transparent_72%)] blur-2xl sm:h-60 sm:w-60"
@@ -441,17 +446,17 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
           </AnimatePresence>
         </div>
 
-        {/* Tipografia por fase */}
-        <div className="relative mt-4 flex min-h-[5.5rem] flex-col items-center justify-start text-center max-[520px]:mt-2 max-[520px]:min-h-[4.75rem] sm:mt-7 sm:min-h-[7.25rem]">
-          <AnimatePresence mode="sync">
+        {/* Tipografia por fase — em fluxo (não absolute) para não colidir com o rodapé */}
+        <div className="relative mt-3 flex w-full flex-col items-center justify-start text-center max-[520px]:mt-1.5 sm:mt-7">
+          <AnimatePresence mode="wait">
             {phase === "entering" ? (
               <motion.div
                 key="entering"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.55 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.45 }}
-                className="flex flex-col items-center"
+                transition={{ duration: 0.35 }}
+                className="flex min-h-[4.5rem] flex-col items-center justify-start sm:min-h-[5.5rem]"
               >
                 <p className="font-body text-[9px] uppercase tracking-[0.4em] text-[#CBB994]/70">
                   A preparar o vínculo
@@ -464,13 +469,15 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.7, ease: EASE_CEREMONIAL }}
-                className="absolute flex flex-col items-center"
+                className="flex min-h-[4.5rem] flex-col items-center justify-start sm:min-h-[5.5rem]"
               >
                 <p className="font-body text-[10px] uppercase tracking-[0.44em] text-[#CBB994]">
                   Toque para unir
                 </p>
-                <p className="mt-3 max-w-[18rem] font-serif text-[0.95rem] italic leading-relaxed text-[#EBE4D5]/78 max-[520px]:mt-2 max-[520px]:text-[0.88rem]">
-                  Duas bandas. Um único vínculo.
+                <p className="mt-3 max-w-[17rem] font-serif text-[0.95rem] italic leading-snug text-[#EBE4D5]/78 max-[520px]:mt-2 max-[520px]:text-[0.88rem]">
+                  Duas bandas.
+                  <br />
+                  Um único vínculo.
                 </p>
               </motion.div>
             ) : phase === "uniting" ? (
@@ -479,8 +486,8 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="absolute flex flex-col items-center"
+                transition={{ duration: 0.35 }}
+                className="flex min-h-[4.5rem] flex-col items-center justify-start sm:min-h-[5.5rem]"
               >
                 <p className="font-body text-[10px] uppercase tracking-[0.42em] text-[#CBB994]/90">
                   A fechar o vínculo
@@ -493,7 +500,7 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.85, delay: 0.08, ease: EASE_CEREMONIAL }}
-                className="absolute flex flex-col items-center"
+                className="flex min-h-[4.5rem] flex-col items-center justify-start sm:min-h-[5.5rem]"
               >
                 <motion.p
                   initial={{ opacity: 0 }}
@@ -520,7 +527,7 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
         </div>
       </main>
 
-      <footer className="relative z-20 pb-1 text-center">
+      <footer className="relative z-20 mt-3 shrink-0 pb-1 text-center sm:mt-4">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: bandsAtRest || isSealed ? 0.5 : 0.25 }}

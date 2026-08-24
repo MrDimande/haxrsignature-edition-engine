@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
-import { NeidyJoseTecituraSvg, type TecituraPhase } from "./NeidyJoseTecituraSvg";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { NeidyJoseTecituraSvg, type TecituraPhase } from "./NeidyJoseTecituraSvg";
 import "./neidy-jose.css";
 
 interface NeidyJoseTecituraGateProps {

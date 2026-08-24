@@ -21,8 +21,20 @@ function getAmbient(): HTMLAudioElement {
     ambient.loop = true;
     ambient.volume = 0;
     ambient.preload = "auto";
+    // Helps iOS treat the element as inline media after a user gesture.
+    ambient.setAttribute("playsinline", "true");
+    ambient.setAttribute("webkit-playsinline", "true");
   }
   return ambient;
+}
+
+/** Preload so the first play() after the gate tap is instant. */
+export function primeNeidyJoseAmbient(): void {
+  try {
+    getAmbient().load();
+  } catch {
+    /* ignore */
+  }
 }
 
 function cancelFade(): void {
@@ -70,7 +82,10 @@ function fadeVolume(to: number, durationMs: number): Promise<void> {
   });
 }
 
-/** Starts ambient with a soft editorial fade-in. Safe to call more than once. */
+/**
+ * Starts ambient with a soft editorial fade-in.
+ * Must be called from a user gesture (gate tap) — browsers block delayed play().
+ */
 export async function startNeidyJoseAmbient(): Promise<boolean> {
   try {
     const audio = getAmbient();

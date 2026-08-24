@@ -15,7 +15,7 @@ interface NeidyJoseAmbientToggleProps {
 
 /**
  * Controlo de música — canto inferior esquerdo.
- * A música só arranca na abertura do convite (gate); aqui apenas se sincroniza / pausa / retoma.
+ * A música arranca no toque do gate (mesmo gesto); aqui sincroniza / pausa / retoma.
  */
 export function NeidyJoseAmbientToggle({
   prefersReducedMotion = false,
