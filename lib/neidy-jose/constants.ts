@@ -1,7 +1,7 @@
 export const NEIDY_JOSE_CONSTANTS = {
   brideName: "Neidy Marino",
-  groomName: "José Cabral",
-  coupleTitle: "Neidy Marino e José Cabral",
+  groomName: "José Mateus",
+  coupleTitle: "Neidy Marino e José Mateus",
   eventDateIso: "2026-12-05",
   eventDateFormatted: "5 de Dezembro de 2026",
   /** Civil ceremony start */
@@ -167,7 +167,7 @@ export const NEIDY_JOSE_CONSTANTS = {
 export function buildGoogleCalendarUrl(): string {
   const title = encodeURIComponent(`Casamento: ${NEIDY_JOSE_CONSTANTS.coupleTitle}`);
   const details = encodeURIComponent(
-    "Celebração do Matrimónio de Neidy Marino e José Cabral.\n\n" +
+    "Celebração do Matrimónio de Neidy Marino e José Mateus.\n\n" +
       "13:00 - Cerimónia Civil · Espaço Águia\n" +
       "Após o Civil - Sessão de Fotografias · Espaço Águia\n" +
       "15:00 - Copo de Água · Espaço Águia\n\n" +
@@ -193,8 +193,8 @@ export function downloadWeddingIcsFile(): void {
     "DTSTAMP:20261205T110000Z",
     "DTSTART:20261205T110000Z",
     "DTEND:20261205T200000Z",
-    "SUMMARY:Casamento: Neidy Marino e José Cabral",
-    "DESCRIPTION:Celebração do Matrimónio de Neidy Marino e José Cabral.\\n\\n13:00 - Cerimónia Civil · Espaço Águia\\nApós o Civil - Sessão de Fotografias · Espaço Águia\\n15:00 - Copo de Água · Espaço Águia\\n\\nDress Code: Traje de Gala\\nColossenses 3:14",
+    "SUMMARY:Casamento: Neidy Marino e José Mateus",
+    "DESCRIPTION:Celebração do Matrimónio de Neidy Marino e José Mateus.\\n\\n13:00 - Cerimónia Civil · Espaço Águia\\nApós o Civil - Sessão de Fotografias · Espaço Águia\\n15:00 - Copo de Água · Espaço Águia\\n\\nDress Code: Traje de Gala\\nColossenses 3:14",
     "LOCATION:Espaço Águia, Marracuene, Moçambique",
     "STATUS:CONFIRMED",
     "END:VEVENT",

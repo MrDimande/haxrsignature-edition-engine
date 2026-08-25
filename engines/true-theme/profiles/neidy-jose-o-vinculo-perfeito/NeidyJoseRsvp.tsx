@@ -321,7 +321,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                         />
                       </div>
                       <p className="nj-script-font text-3xl text-[#CBB994] sm:text-4xl">
-                        Neidy Marino & José Cabral Mateus
+                        Neidy Marino & José Mateus
                       </p>
                       <div className="nj-letter-ornament my-4" aria-hidden />
                       <p className="font-body text-[9px] uppercase tracking-[0.42em] text-[#3B6456]">

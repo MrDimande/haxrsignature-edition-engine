@@ -201,7 +201,7 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
       }}
       role="button"
       tabIndex={canInteract ? 0 : -1}
-      aria-label="Toque para unir as alianças e abrir o convite de Neidy Marino e José Cabral."
+      aria-label="Toque para unir as alianças e abrir o convite de Neidy Marino e José Mateus."
       aria-disabled={!canInteract}
       className={`fixed inset-0 z-[100] flex select-none flex-col items-center overflow-hidden bg-[#05120E] px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 text-[#FCFDFC] max-[520px]:pt-4 sm:px-10 sm:pb-10 sm:pt-10 ${
         canInteract ? "cursor-pointer" : "cursor-default"

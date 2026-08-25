@@ -39,8 +39,8 @@ export const neidyJoseVinculoTrueTheme: TrueTheme = {
     detailsQuote: "Fé · Vitória · Amor",
     intro: {
       headline: "A Tecitura do Vínculo",
-      surname: "Marino & Cabral",
-      subline: "5 de Dezembro de 2026 · Maputo",
+      surname: "Marino & Mateus",
+      subline: "5 de Dezembro de 2026 · Marracuene",
     },
     story: {
       title: "O Vínculo Perfeito",
