@@ -167,6 +167,11 @@ export function NeidyJoseParents({ prefersReducedMotion = false }: NeidyJosePare
               <p className="font-serif text-base tracking-wide text-[#FCFDFC] sm:text-lg md:text-xl">
                 {parents.groom.father}
               </p>
+              {parents.groom.fatherInMemoriam ? (
+                <p className="mt-1 font-body text-[9px] uppercase tracking-[0.28em] text-[#CBB994]/75 sm:text-[10px]">
+                  Em Memória
+                </p>
+              ) : null}
               <span className="nj-hero-and my-1.5 text-sm text-[#CBB994]/80">e</span>
               <p className="font-serif text-base tracking-wide text-[#FCFDFC] sm:text-lg md:text-xl">
                 {parents.groom.mother}

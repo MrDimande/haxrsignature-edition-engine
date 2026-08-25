@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Heart,
@@ -13,6 +14,7 @@ import {
   Feather,
   ChevronUp,
 } from "lucide-react";
+import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
 
 interface NeidyJoseFloatingNavProps {
   prefersReducedMotion?: boolean;
@@ -122,7 +124,7 @@ export function NeidyJoseFloatingNav({
     { id: "the-wedding-day", label: "O Dia", icon: CalendarDays },
     { id: "celebration", label: "Celebração", icon: MapPin },
     { id: "rsvp", label: "RSVP", icon: CheckCircle2 },
-    { id: "blessings", label: "Felicitações", icon: Feather },
+    { id: "blessings", label: "Desejos", icon: Feather },
   ];
 
   const activeLabel =
@@ -168,15 +170,23 @@ export function NeidyJoseFloatingNav({
                 aria-label={isOpen ? "Fechar envelope" : "Abrir envelope de navegação"}
               >
                 <span className="nj-envelope-flap__face">
-                  <span className="nj-envelope-seal" aria-hidden>
-                    NJ
-                  </span>
                   {!isOpen && (
                     <span className="nj-envelope-peek">
                       <ChevronUp className="h-3.5 w-3.5" />
                       <span>{activeLabel}</span>
                     </span>
                   )}
+                </span>
+                <span className="nj-envelope-seal" aria-hidden>
+                  <Image
+                    src={NEIDY_JOSE_CONSTANTS.hero.monogram}
+                    alt=""
+                    fill
+                    unoptimized
+                    quality={100}
+                    className="object-contain scale-[1.06] p-0.5"
+                    sizes="52px"
+                  />
                 </span>
               </button>
 

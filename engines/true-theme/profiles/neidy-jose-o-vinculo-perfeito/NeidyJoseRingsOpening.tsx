@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
-import Image from "next/image";
-import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
 import {
-  primeNeidyJoseAmbient,
-  startNeidyJoseAmbient,
+    primeNeidyJoseAmbient,
+    startNeidyJoseAmbient,
 } from "@lib/neidy-jose/ambient-audio";
+import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface NeidyJoseRingsOpeningProps {
   onComplete: () => void;
@@ -47,37 +47,6 @@ const BAND_X = {
   rest: "8.6rem",
   join: "1.55rem",
 } as const;
-
-/** Toque tátil quase imperceptível — sem ficheiro de áudio externo */
-function playSealChime(): void {
-  try {
-    const Ctx =
-      window.AudioContext ||
-      (window as unknown as { webkitAudioContext?: typeof AudioContext })
-        .webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const now = ctx.currentTime;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(523.25, now);
-    osc.frequency.exponentialRampToValueAtTime(392, now + 0.55);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.045, now + 0.04);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.75);
-    window.setTimeout(() => {
-      void ctx.close();
-    }, 900);
-  } catch {
-    /* ignore autoplay / AudioContext limits */
-  }
-}
 
 function MetallicBand({
   gradientId,
@@ -182,7 +151,6 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
     void startNeidyJoseAmbient();
 
     if (prefersReducedMotion) {
-      playSealChime();
       setPhase("sealed");
       schedule(finish, TIMING.reducedExitMs);
       return;
@@ -190,7 +158,6 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
 
     setPhase("uniting");
     schedule(() => {
-      playSealChime();
       setPhase("sealed");
     }, TIMING.sealAfterMs);
     schedule(() => setPhase("holding"), TIMING.holdAfterMs);

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { motion } from "motion/react";
+import { Pause, Play } from "lucide-react";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
 import {
   isNeidyJoseAmbientPlaying,
@@ -14,8 +14,8 @@ interface NeidyJoseAmbientToggleProps {
 }
 
 /**
- * Controlo de música — canto inferior esquerdo, monograma oficial.
- * A música arranca no toque do gate (mesmo gesto); aqui sincroniza / pausa / retoma.
+ * Controlo de música — canto inferior esquerdo, discreto (play / pause).
+ * A música arranca no toque do gate; aqui só pausa / retoma sem competir com o envelope.
  */
 export function NeidyJoseAmbientToggle({
   prefersReducedMotion = false,
@@ -66,25 +66,11 @@ export function NeidyJoseAmbientToggle({
       }
       aria-label={isPlaying ? "Pausar música ambiente" : "Tocar música ambiente"}
     >
-      <span className="nj-ambient-corner__monogram">
-        <Image
-          src={NEIDY_JOSE_CONSTANTS.hero.monogram}
-          alt=""
-          fill
-          unoptimized
-          quality={100}
-          className="object-contain"
-          sizes="48px"
-          aria-hidden
-        />
-      </span>
       {isPlaying ? (
-        <span className="nj-ambient-corner__bars" aria-hidden>
-          <span />
-          <span />
-          <span />
-        </span>
-      ) : null}
+        <Pause className="h-3.5 w-3.5" strokeWidth={1.75} fill="currentColor" />
+      ) : (
+        <Play className="h-3.5 w-3.5" strokeWidth={1.75} fill="currentColor" />
+      )}
     </motion.button>
   );
 }

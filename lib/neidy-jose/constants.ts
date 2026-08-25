@@ -94,6 +94,8 @@ export const NEIDY_JOSE_CONSTANTS = {
     },
     groom: {
       father: "José Manuel Mateus",
+      /** Pai falecido — nota tipográfica discreta junto ao nome */
+      fatherInMemoriam: true,
       mother: "Maria Angélica Cabral",
     },
   },
