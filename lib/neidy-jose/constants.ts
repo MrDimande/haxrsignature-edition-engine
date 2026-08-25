@@ -103,35 +103,39 @@ export const NEIDY_JOSE_CONSTANTS = {
       time: "13:00",
       title: "Cerimónia Civil",
       locationName: "Espaço Águia",
-      address: "Maputo, Moçambique",
+      address: "Marracuene, Moçambique",
       description: "Celebração civil do matrimónio perante família e amigos.",
-      mapsUrl: "https://share.google/r8PDE2od1Tgobk3b8",
+      mapsUrl:
+        "https://www.google.com/maps/place/Eventos+%26+Acomoda%C3%A7%C3%A3o+%C3%81guia/@-25.7417945,32.6487008,17z",
     },
     {
       step: "02",
       time: "A seguir",
       title: "Sessão de Fotografias",
       locationName: "Espaço Águia",
-      address: "Maputo, Moçambique",
+      address: "Marracuene, Moçambique",
       description: "Retratos do casal e da família — a memória do dia a ser tecida.",
-      mapsUrl: "https://share.google/r8PDE2od1Tgobk3b8",
+      mapsUrl:
+        "https://www.google.com/maps/place/Eventos+%26+Acomoda%C3%A7%C3%A3o+%C3%81guia/@-25.7417945,32.6487008,17z",
     },
     {
       step: "03",
       time: "15:00",
       title: "Copo de Água",
       locationName: "Espaço Águia",
-      address: "Maputo, Moçambique",
+      address: "Marracuene, Moçambique",
       description: "Brinde, mesa partilhada e celebração do nosso sim.",
-      mapsUrl: "https://share.google/r8PDE2od1Tgobk3b8",
+      mapsUrl:
+        "https://www.google.com/maps/place/Eventos+%26+Acomoda%C3%A7%C3%A3o+%C3%81guia/@-25.7417945,32.6487008,17z",
     },
   ],
   locations: {
     venue: {
       name: "Espaço Águia",
-      city: "Maputo",
+      city: "Marracuene",
       country: "Moçambique",
-      mapsUrl: "https://share.google/r8PDE2od1Tgobk3b8",
+      mapsUrl:
+        "https://www.google.com/maps/place/Eventos+%26+Acomoda%C3%A7%C3%A3o+%C3%81guia/@-25.7417945,32.6487008,17z",
     },
   },
   dressCode: {
@@ -148,10 +152,10 @@ export const NEIDY_JOSE_CONSTANTS = {
     ],
   },
   audio: {
-    title: "O Grande Amor da Minha Vida",
-    artist: "Roberto Carlos",
-    src: "/audio/roberto-carlos-o-rande-amor-da-minha-vida.mp3",
-    rightsHolder: "Sony Music Brasil · Roberto Carlos",
+    title: "Die With A Smile",
+    artist: "Lady Gaga & Bruno Mars",
+    src: "/audio/die-with-a-smile-lady-gaga-bruno-mars.mp3",
+    rightsHolder: "Interscope Records · Streamline · Lady Gaga & Bruno Mars",
     disclaimer:
       "Música de ambiente no convite digital. Todos os direitos da obra pertencem aos respectivos autores e titulares. HAXR Signature não detém nem reivindica qualquer direito sobre este conteúdo musical.",
   },
@@ -168,7 +172,7 @@ export function buildGoogleCalendarUrl(): string {
       "Dress Code: Traje de Gala\n" +
       "O Vínculo da Perfeição · Colossenses 3:14"
   );
-  const location = encodeURIComponent("Espaço Águia, Maputo, Moçambique");
+  const location = encodeURIComponent("Espaço Águia, Marracuene, Moçambique");
   /** 13:00 CAT = 11:00 UTC */
   const dates = "20261205T110000Z/20261205T200000Z";
 
@@ -189,7 +193,7 @@ export function downloadWeddingIcsFile(): void {
     "DTEND:20261205T200000Z",
     "SUMMARY:Casamento: Neidy Marino e José Cabral",
     "DESCRIPTION:Celebração do Matrimónio de Neidy Marino e José Cabral.\\n\\n13:00 - Cerimónia Civil · Espaço Águia\\nApós o Civil - Sessão de Fotografias · Espaço Águia\\n15:00 - Copo de Água · Espaço Águia\\n\\nDress Code: Traje de Gala\\nColossenses 3:14",
-    "LOCATION:Espaço Águia, Maputo, Moçambique",
+    "LOCATION:Espaço Águia, Marracuene, Moçambique",
     "STATUS:CONFIRMED",
     "END:VEVENT",
     "END:VCALENDAR",

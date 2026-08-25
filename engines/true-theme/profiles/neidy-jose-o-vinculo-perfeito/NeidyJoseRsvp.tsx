@@ -572,7 +572,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                               Civil 13:00 · Copo de Água 15:00
                             </p>
                             <p className="font-body text-[10px] text-[#EBE4D5]/70">
-                              Espaço Águia · Maputo
+                              Espaço Águia · Marracuene
                             </p>
                             <p className="mt-3 border border-[#CBB994]/40 px-3 py-1 font-mono text-[11px] tracking-widest text-[#CBB994]">
                               {ticketCode}

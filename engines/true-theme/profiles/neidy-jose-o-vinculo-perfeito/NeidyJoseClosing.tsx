@@ -115,7 +115,7 @@ export function NeidyJoseClosing({
         >
           <span>5 de Dezembro de 2026</span>
           <span className="text-[#CBB994]">•</span>
-          <span>Espaço Águia, Maputo, Moçambique</span>
+          <span>Espaço Águia, Marracuene, Moçambique</span>
         </motion.div>
 
         <div

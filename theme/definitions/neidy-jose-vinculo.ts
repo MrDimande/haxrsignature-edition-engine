@@ -53,10 +53,11 @@ export const neidyJoseVinculoTrueTheme: TrueTheme = {
     },
     location: {
       name: "Espaço Águia",
-      address: "Maputo, Moçambique",
+      address: "Marracuene, Moçambique",
       directions: "Casamento civil às 13:00 e Copo de Água às 15:00 no Espaço Águia.",
-      mapCoordinates: "-25.9692, 32.5732",
-      externalMapUrl: "https://share.google/r8PDE2od1Tgobk3b8",
+      mapCoordinates: "-25.7417945, 32.6487008",
+      externalMapUrl:
+        "https://www.google.com/maps/place/Eventos+%26+Acomoda%C3%A7%C3%A3o+%C3%81guia/@-25.7417945,32.6487008,17z",
       mapFilter: "",
     },
     rsvpClosing: "A vossa presença é a nossa maior bênção.",

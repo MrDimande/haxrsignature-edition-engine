@@ -403,10 +403,10 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       title: "Neidy Marino e José Cabral — Convite de Casamento",
       date: "2026-12-05",
       time: "13:00 · Civil · 15:00 · Copo de Água",
-      location: "Espaço Águia, Maputo",
+      location: "Espaço Águia, Marracuene",
       subtitle: "O VÍNCULO DA PERFEIÇÃO · Colossenses 3:14",
       description:
-        "Celebração do Matrimónio de Neidy Marino e José Cabral. 5 de Dezembro de 2026 — Civil 13:00 & Copo de Água 15:00 · Espaço Águia, Maputo. Fé · Vitória · Amor.",
+        "Celebração do Matrimónio de Neidy Marino e José Cabral. 5 de Dezembro de 2026 — Civil 13:00 & Copo de Água 15:00 · Espaço Águia, Marracuene. Fé · Vitória · Amor.",
       eventDate: "2026-12-05",
       eventType: "Casamento",
       dressCode: "Traje de Gala",

@@ -16,14 +16,30 @@ function getAmbient(): HTMLAudioElement {
   if (typeof window === "undefined") {
     throw new Error("Ambient audio is client-only");
   }
+  const src = NEIDY_JOSE_CONSTANTS.audio.src;
   if (!ambient) {
-    ambient = new Audio(NEIDY_JOSE_CONSTANTS.audio.src);
+    ambient = new Audio(src);
     ambient.loop = true;
     ambient.volume = 0;
     ambient.preload = "auto";
     // Helps iOS treat the element as inline media after a user gesture.
     ambient.setAttribute("playsinline", "true");
     ambient.setAttribute("webkit-playsinline", "true");
+  } else {
+    const currentPath = (() => {
+      try {
+        return new URL(ambient.src, window.location.href).pathname;
+      } catch {
+        return ambient.src;
+      }
+    })();
+    if (currentPath !== src) {
+      ambient.pause();
+      ambient.src = src;
+      ambient.loop = true;
+      ambient.volume = 0;
+      ambient.preload = "auto";
+    }
   }
   return ambient;
 }

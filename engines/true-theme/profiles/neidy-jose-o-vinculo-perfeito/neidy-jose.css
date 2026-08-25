@@ -394,37 +394,65 @@
   bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
   z-index: 49;
   display: inline-flex;
-  height: 2.6rem;
-  min-width: 2.6rem;
+  height: 3.15rem;
+  min-width: 3.15rem;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  padding: 0 0.75rem;
+  gap: 0.35rem;
+  padding: 0.28rem 0.4rem 0.28rem 0.28rem;
   border-radius: 9999px;
-  border: 1px solid rgba(203, 185, 148, 0.45);
-  background: rgba(10, 33, 26, 0.92);
-  color: #fcfdfc;
+  border: 1px solid rgba(203, 185, 148, 0.5);
+  background: rgba(10, 33, 26, 0.94);
+  color: #0a211a;
   box-shadow: 0 10px 24px rgba(10, 33, 26, 0.32);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease,
+    box-shadow 0.25s ease;
 }
 
 .nj-ambient-corner:hover {
   transform: scale(1.04);
 }
 
+.nj-ambient-corner.is-paused {
+  padding: 0.28rem;
+}
+
 .nj-ambient-corner.is-playing {
-  border-color: transparent;
-  background: #cbb994;
-  color: #0a211a;
+  border-color: rgba(203, 185, 148, 0.85);
+  background: rgba(10, 33, 26, 0.96);
+  box-shadow: 0 12px 28px rgba(10, 33, 26, 0.38), 0 0 0 1px rgba(203, 185, 148, 0.22);
+  color: #cbb994;
+}
+
+.nj-ambient-corner__monogram {
+  position: relative;
+  display: block;
+  height: 2.55rem;
+  width: 2.55rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: #050c09;
+}
+
+.nj-ambient-corner.is-paused .nj-ambient-corner__monogram {
+  opacity: 0.72;
+  filter: saturate(0.85);
+}
+
+.nj-ambient-corner.is-playing .nj-ambient-corner__monogram {
+  opacity: 1;
+  filter: none;
 }
 
 .nj-ambient-corner__bars {
   display: flex;
-  height: 0.8rem;
+  height: 0.85rem;
   align-items: flex-end;
   gap: 0.12rem;
+  margin-right: 0.2rem;
 }
 
 .nj-ambient-corner__bars span {
@@ -485,8 +513,13 @@
   .nj-ambient-corner {
     left: max(1.25rem, env(safe-area-inset-left, 0px));
     bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
-    height: 2.85rem;
-    min-width: 2.85rem;
+    height: 3.35rem;
+    min-width: 3.35rem;
+  }
+
+  .nj-ambient-corner__monogram {
+    height: 2.75rem;
+    width: 2.75rem;
   }
 }
 

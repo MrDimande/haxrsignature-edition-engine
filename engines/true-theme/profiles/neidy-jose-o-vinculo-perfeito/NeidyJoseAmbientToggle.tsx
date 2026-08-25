@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion } from "motion/react";
-import { Volume2, VolumeX } from "lucide-react";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
 import {
   isNeidyJoseAmbientPlaying,
@@ -14,7 +14,7 @@ interface NeidyJoseAmbientToggleProps {
 }
 
 /**
- * Controlo de música — canto inferior esquerdo.
+ * Controlo de música — canto inferior esquerdo, monograma oficial.
  * A música arranca no toque do gate (mesmo gesto); aqui sincroniza / pausa / retoma.
  */
 export function NeidyJoseAmbientToggle({
@@ -58,7 +58,7 @@ export function NeidyJoseAmbientToggle({
       }}
       onClick={toggleAudio}
       disabled={isBusy}
-      className={`nj-ambient-corner ${isPlaying ? "is-playing" : ""}`}
+      className={`nj-ambient-corner ${isPlaying ? "is-playing" : "is-paused"}`}
       title={
         isPlaying
           ? `Pausar: ${NEIDY_JOSE_CONSTANTS.audio.title} · ${NEIDY_JOSE_CONSTANTS.audio.artist}`
@@ -66,18 +66,25 @@ export function NeidyJoseAmbientToggle({
       }
       aria-label={isPlaying ? "Pausar música ambiente" : "Tocar música ambiente"}
     >
+      <span className="nj-ambient-corner__monogram">
+        <Image
+          src={NEIDY_JOSE_CONSTANTS.hero.monogram}
+          alt=""
+          fill
+          unoptimized
+          quality={100}
+          className="object-contain"
+          sizes="48px"
+          aria-hidden
+        />
+      </span>
       {isPlaying ? (
-        <>
-          <Volume2 className="h-4 w-4" strokeWidth={1.75} />
-          <span className="nj-ambient-corner__bars" aria-hidden>
-            <span />
-            <span />
-            <span />
-          </span>
-        </>
-      ) : (
-        <VolumeX className="h-4 w-4" strokeWidth={1.75} />
-      )}
+        <span className="nj-ambient-corner__bars" aria-hidden>
+          <span />
+          <span />
+          <span />
+        </span>
+      ) : null}
     </motion.button>
   );
 }

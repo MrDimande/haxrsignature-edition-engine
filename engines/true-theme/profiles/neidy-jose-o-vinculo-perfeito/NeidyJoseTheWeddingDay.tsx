@@ -267,7 +267,7 @@ export function NeidyJoseTheWeddingDay({
                   Civil 13:00 · Copo de Água 15:00
                 </p>
                 <p className="mt-2 font-serif text-[11px] italic text-[#CBB994]/65">
-                  Espaço Águia · Maputo
+                  Espaço Águia · Marracuene
                 </p>
               </div>
             </div>

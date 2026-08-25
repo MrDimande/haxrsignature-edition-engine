@@ -13,7 +13,7 @@ interface NeidyJoseCelebrationProps {
 }
 
 const MAP_EMBED =
-  "https://www.google.com/maps?q=Espa%C3%A7o+%C3%81guia+Maputo&hl=pt&z=15&output=embed";
+  "https://www.google.com/maps?q=-25.7417945,32.6487008&hl=pt&z=16&output=embed";
 
 /**
  * A Celebração — partitura do dia:
