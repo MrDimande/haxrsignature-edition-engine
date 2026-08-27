@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS } from "@lib/security/rate-limit";
 import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST } from "./config";
@@ -9,6 +8,12 @@ import {
   insertMemoryPhoto,
   isMemoriesDatabaseConfigured,
 } from "./database";
+import {
+  createMemorySignedUploadUrl,
+  downloadMemoryObject,
+  isMemoriesStorageConfigured,
+  removeMemoryObject,
+} from "./storage";
 import {
   buildStoragePath,
   matchesMagicBytes,
@@ -58,7 +63,7 @@ export type MemoryCompleteInput = {
 };
 
 // ──────────────────────────────────────────────
-// Signed URL (testable seam)
+// Signed URL test seam
 // ──────────────────────────────────────────────
 
 type SignedUploadUrlResult = {
@@ -71,16 +76,7 @@ type SignedUploadUrlFn = (
   storagePath: string
 ) => Promise<SignedUploadUrlResult>;
 
-let signedUploadUrlImpl: SignedUploadUrlFn = async (
-  bucketName,
-  storagePath
-) => {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase.storage
-    .from(bucketName)
-    .createSignedUploadUrl(storagePath);
-  return { signedUrl: data?.signedUrl ?? null, error: error?.message };
-};
+let signedUploadUrlOverride: SignedUploadUrlFn | null = null;
 
 // ──────────────────────────────────────────────
 // Validadores locais
@@ -183,9 +179,7 @@ export async function createMemoryUploadIntent(
     };
   }
 
-  // Nesta fase, os metadados seguem o backend DB seleccionado; os binários
-  // continuam temporariamente no Supabase Storage até à ronda de object storage.
-  if (!isMemoriesDatabaseConfigured() || !isSupabaseConfigured()) {
+  if (!isMemoriesDatabaseConfigured() || !isMemoriesStorageConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -221,9 +215,28 @@ export async function createMemoryUploadIntent(
     };
   }
 
-  const signed = await signedUploadUrlImpl(bucketName, storagePath);
-  if (!signed.signedUrl) {
-    console.error("[Memories] upload intent storage error");
+  let signedUrl: string | null = null;
+  try {
+    if (signedUploadUrlOverride) {
+      const signed = await signedUploadUrlOverride(bucketName, storagePath);
+      signedUrl = signed.signedUrl;
+    } else {
+      signedUrl = await createMemorySignedUploadUrl({
+        bucketName,
+        storagePath,
+        contentType: resolvedType,
+        maximumSizeInBytes: input.fileSizeBytes,
+        validUntil: expiresAt,
+      });
+    }
+  } catch (error) {
+    console.error(
+      "[Memories] upload intent storage error:",
+      error instanceof Error ? error.message : error
+    );
+  }
+
+  if (!signedUrl) {
     return {
       success: false,
       error: "Não foi possível preparar o envio.",
@@ -234,7 +247,7 @@ export async function createMemoryUploadIntent(
   return {
     success: true,
     photoId,
-    uploadUrl: signed.signedUrl,
+    uploadUrl: signedUrl,
     storagePath,
     expiresAt: expiresAtIso,
   };
@@ -314,7 +327,7 @@ export async function completeMemoryUpload(
     };
   }
 
-  if (!isMemoriesDatabaseConfigured() || !isSupabaseConfigured()) {
+  if (!isMemoriesDatabaseConfigured() || !isMemoriesStorageConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -359,13 +372,20 @@ export async function completeMemoryUpload(
     };
   }
 
-  const supabase = createAdminClient();
+  let buffer: Uint8Array | null = null;
+  try {
+    buffer = await downloadMemoryObject({
+      bucketName,
+      storagePath: intent.storagePath,
+    });
+  } catch (error) {
+    console.error(
+      "[Memories] object download error:",
+      error instanceof Error ? error.message : error
+    );
+  }
 
-  const { data: fileData, error: downloadError } = await supabase.storage
-    .from(bucketName)
-    .download(intent.storagePath);
-
-  if (downloadError || !fileData) {
+  if (!buffer) {
     return {
       success: false,
       error: "Não foi possível confirmar o envio.",
@@ -373,10 +393,12 @@ export async function completeMemoryUpload(
     };
   }
 
-  const buffer = new Uint8Array(await fileData.arrayBuffer());
   const sizeError = validateFileSize(buffer.byteLength, intent.contentType);
   if (sizeError || buffer.byteLength > intent.declaredFileSizeBytes) {
-    await supabase.storage.from(bucketName).remove([intent.storagePath]);
+    await removeMemoryObject({
+      bucketName,
+      storagePath: intent.storagePath,
+    });
     return {
       success: false,
       error:
@@ -388,7 +410,10 @@ export async function completeMemoryUpload(
   }
 
   if (!matchesMagicBytes(buffer, intent.contentType)) {
-    await supabase.storage.from(bucketName).remove([intent.storagePath]);
+    await removeMemoryObject({
+      bucketName,
+      storagePath: intent.storagePath,
+    });
     return {
       success: false,
       error: "Tipo de ficheiro inválido.",
@@ -435,13 +460,5 @@ export async function completeMemoryUpload(
 export function __setSignedUploadUrlForMemoriesTests(
   impl: SignedUploadUrlFn | null
 ): void {
-  signedUploadUrlImpl =
-    impl ??
-    (async (bucketName, storagePath) => {
-      const supabase = createAdminClient();
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .createSignedUploadUrl(storagePath);
-      return { signedUrl: data?.signedUrl ?? null, error: error?.message };
-    });
+  signedUploadUrlOverride = impl;
 }
