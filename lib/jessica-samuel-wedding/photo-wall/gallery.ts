@@ -1,10 +1,20 @@
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { resolveInvitationContext, type InvitationContext } from "@lib/context-resolver";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS } from "@lib/security/rate-limit";
 import { JESSICA_SAMUEL_PHOTO_WALL } from "./config";
 import type { PublicWeddingPhoto } from "./types";
 import { getPhotoUploadIntentRepository } from "./upload-intent-store";
+import { listApprovedPhotoWallRows } from "./database";
+import {
+  insertMemoryPhoto,
+  isMemoriesDatabaseConfigured,
+} from "@lib/memories/database";
+import {
+  createMemorySignedReadUrl,
+  downloadMemoryObject,
+  isMemoriesStorageConfigured,
+  removeMemoryObject,
+} from "@lib/memories/storage";
 import {
   isPhotoWallOpen,
   matchesMagicBytes,
@@ -35,7 +45,7 @@ type PhotoWallRuntime = {
   }): Promise<boolean>;
 };
 
-/** Contador de acessos reais a Supabase — só para regressão em testes. */
+/** Contador legado mantido apenas para os testes de gate disabled. */
 let supabaseAccessCountForTests = 0;
 
 export function __getPhotoWallSupabaseAccessCountForTests(): number {
@@ -46,37 +56,41 @@ export function __resetPhotoWallSupabaseAccessCountForTests(): void {
   supabaseAccessCountForTests = 0;
 }
 
-let runtime: PhotoWallRuntime = {
-  async download(bucketName, storagePath) {
-    supabaseAccessCountForTests += 1;
-    const supabase = createAdminClient();
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .download(storagePath);
-    return error || !data ? null : data;
-  },
-  async remove(bucketName, storagePaths) {
-    supabaseAccessCountForTests += 1;
-    const supabase = createAdminClient();
-    await supabase.storage.from(bucketName).remove(storagePaths);
-  },
-  async insertPendingPhoto(input) {
-    supabaseAccessCountForTests += 1;
-    const supabase = createAdminClient();
-    const { error } = await supabase.from("wedding_photos").insert({
-      id: input.id,
-      invitation_slug: input.invitationSlug,
-      storage_path: input.storagePath,
-      original_filename: input.originalFilename,
-      content_type: input.contentType,
-      file_size_bytes: input.fileSizeBytes,
-      guest_name: input.guestName,
-      caption: input.caption,
-      moderation_status: "pending",
-    });
-    return !error;
-  },
-};
+function createDefaultRuntime(): PhotoWallRuntime {
+  return {
+    async download(bucketName, storagePath) {
+      const bytes = await downloadMemoryObject({ bucketName, storagePath });
+      return bytes ? new Blob([Uint8Array.from(bytes)]) : null;
+    },
+    async remove(bucketName, storagePaths) {
+      for (const storagePath of storagePaths) {
+        await removeMemoryObject({ bucketName, storagePath });
+      }
+    },
+    async insertPendingPhoto(input) {
+      try {
+        await insertMemoryPhoto({
+          id: input.id,
+          invitationSlug: input.invitationSlug,
+          storagePath: input.storagePath,
+          originalFilename: input.originalFilename,
+          contentType: input.contentType,
+          fileSizeBytes: input.fileSizeBytes,
+          guestName: input.guestName,
+          caption: input.caption,
+          challengeId: null,
+          tableId: null,
+          participantId: null,
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+  };
+}
+
+let runtime: PhotoWallRuntime = createDefaultRuntime();
 
 function resolvePhotoWallContext(slug: string): InvitationContext | null {
   const ctx = resolveInvitationContext(slug);
@@ -93,7 +107,12 @@ export async function completePhotoUpload(
   photoId: string,
   request: Request,
   metadata: CompletePhotoUploadMetadata = {}
-): Promise<{ success: boolean; error?: string; code?: string; retryAfterSeconds?: number }> {
+): Promise<{
+  success: boolean;
+  error?: string;
+  code?: string;
+  retryAfterSeconds?: number;
+}> {
   const ctx = resolvePhotoWallContext(slug);
   if (!ctx) {
     return { success: false, error: "Convite não encontrado.", code: "NOT_FOUND" };
@@ -143,10 +162,14 @@ export async function completePhotoUpload(
   }
 
   if (!photoId.trim()) {
-    return { success: false, error: "Pedido de envio expirado.", code: "INTENT_EXPIRED" };
+    return {
+      success: false,
+      error: "Pedido de envio expirado.",
+      code: "INTENT_EXPIRED",
+    };
   }
 
-  if (!isSupabaseConfigured()) {
+  if (!isMemoriesDatabaseConfigured() || !isMemoriesStorageConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -172,7 +195,11 @@ export async function completePhotoUpload(
   }
 
   if (!intent) {
-    return { success: false, error: "Pedido de envio expirado.", code: "INTENT_EXPIRED" };
+    return {
+      success: false,
+      error: "Pedido de envio expirado.",
+      code: "INTENT_EXPIRED",
+    };
   }
 
   if (
@@ -180,7 +207,11 @@ export async function completePhotoUpload(
     intent.bucketName !== bucketName ||
     !isStoragePathIsolated(storageSlug, intent.storagePath)
   ) {
-    return { success: false, error: "Pedido de envio inválido.", code: "INVALID_INTENT" };
+    return {
+      success: false,
+      error: "Pedido de envio inválido.",
+      code: "INVALID_INTENT",
+    };
   }
 
   const fileData = await runtime.download(bucketName, intent.storagePath);
@@ -241,86 +272,78 @@ export async function completePhotoUpload(
   return { success: true };
 }
 
-export async function listApprovedPublicPhotos(slug = "jessica-samuel"): Promise<PublicWeddingPhoto[]> {
-  // Gate de feature: com upload/galeria desactivados, zero I/O a Supabase.
+export async function listApprovedPublicPhotos(
+  slug = "jessica-samuel"
+): Promise<PublicWeddingPhoto[]> {
+  // Gate de feature: com upload/galeria desactivados, zero I/O.
   if (!JESSICA_SAMUEL_PHOTO_WALL.enabled) {
     return [];
   }
 
   const ctx = resolveInvitationContext(slug);
   const galleryEnabled =
-    Boolean(ctx?.photoWallEnabled) && JESSICA_SAMUEL_PHOTO_WALL.publicGalleryEnabled;
+    Boolean(ctx?.photoWallEnabled) &&
+    JESSICA_SAMUEL_PHOTO_WALL.publicGalleryEnabled;
 
-  if (!galleryEnabled || !isSupabaseConfigured()) {
+  if (
+    !galleryEnabled ||
+    !isMemoriesDatabaseConfigured() ||
+    !isMemoriesStorageConfigured()
+  ) {
     return [];
   }
 
-  const bucketName = ctx?.photoWallBucket || JESSICA_SAMUEL_PHOTO_WALL.bucket;
+  const bucketName =
+    ctx?.photoWallBucket || JESSICA_SAMUEL_PHOTO_WALL.bucket;
   const invitationSlug = JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
 
-  supabaseAccessCountForTests += 1;
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("wedding_photos")
-    .select("id, caption, created_at, storage_path, content_type")
-    .eq("invitation_slug", invitationSlug)
-    .eq("moderation_status", "approved")
-    .order("created_at", { ascending: false })
-    .limit(60);
+  let rows;
+  try {
+    rows = await listApprovedPhotoWallRows(invitationSlug);
+  } catch (error) {
+    console.error(
+      "[PhotoWall] gallery database error:",
+      error instanceof Error ? error.message : error
+    );
+    return [];
+  }
 
-  if (error || !data?.length) return [];
+  if (!rows.length) return [];
 
   const results: PublicWeddingPhoto[] = [];
-  for (const row of data) {
-    const { data: signed } = await supabase.storage
-      .from(bucketName)
-      .createSignedUrl(
-        row.storage_path,
-        JESSICA_SAMUEL_PHOTO_WALL.signedUrlTtlSeconds
+  for (const row of rows) {
+    let signedUrl: string | null = null;
+    try {
+      signedUrl = await createMemorySignedReadUrl({
+        bucketName,
+        storagePath: row.storagePath,
+        ttlSeconds: JESSICA_SAMUEL_PHOTO_WALL.signedUrlTtlSeconds,
+      });
+    } catch (error) {
+      console.error(
+        "[PhotoWall] gallery storage error:",
+        error instanceof Error ? error.message : error
       );
-    if (!signed?.signedUrl) continue;
+    }
+
+    if (!signedUrl) continue;
+
     results.push(
       toPublicGalleryItem({
         id: row.id,
         caption: row.caption,
-        created_at: row.created_at,
-        signedUrl: signed.signedUrl,
-        content_type: row.content_type,
+        created_at: row.createdAt,
+        signedUrl,
+        content_type: row.contentType,
       })
     );
   }
+
   return results;
 }
 
-export function __setPhotoWallRuntimeForTests(next: PhotoWallRuntime | null): void {
-  runtime =
-    next ??
-    {
-      async download(bucketName, storagePath) {
-        const supabase = createAdminClient();
-        const { data, error } = await supabase.storage
-          .from(bucketName)
-          .download(storagePath);
-        return error || !data ? null : data;
-      },
-      async remove(bucketName, storagePaths) {
-        const supabase = createAdminClient();
-        await supabase.storage.from(bucketName).remove(storagePaths);
-      },
-      async insertPendingPhoto(input) {
-        const supabase = createAdminClient();
-        const { error } = await supabase.from("wedding_photos").insert({
-          id: input.id,
-          invitation_slug: input.invitationSlug,
-          storage_path: input.storagePath,
-          original_filename: input.originalFilename,
-          content_type: input.contentType,
-          file_size_bytes: input.fileSizeBytes,
-          guest_name: input.guestName,
-          caption: input.caption,
-          moderation_status: "pending",
-        });
-        return !error;
-      },
-    };
+export function __setPhotoWallRuntimeForTests(
+  next: PhotoWallRuntime | null
+): void {
+  runtime = next ?? createDefaultRuntime();
 }
