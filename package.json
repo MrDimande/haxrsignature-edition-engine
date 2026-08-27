@@ -8,7 +8,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
-    "build": "node --import tsx scripts/neon-preview-moderation-auth-canary.ts && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/queen-kailane/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts lib/jessica-samuel-traditional/memories/isolation.test.ts",
