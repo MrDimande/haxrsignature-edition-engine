@@ -1,4 +1,6 @@
 import { createAdminClient } from "@lib/supabase/server";
+import { getDatabaseBackend } from "@lib/database/backend";
+import { getNeonSql } from "@lib/neon/server";
 
 export type PhotoUploadIntentStatus = "pending" | "consumed" | "expired";
 
@@ -47,10 +49,15 @@ type PhotoUploadIntentRow = {
   content_type: string;
   declared_file_size_bytes: number;
   status: PhotoUploadIntentStatus;
-  created_at: string;
-  expires_at: string;
-  consumed_at: string | null;
+  created_at: string | Date;
+  expires_at: string | Date;
+  consumed_at: string | Date | null;
 };
+
+function toIso(value: string | Date | null): string | null {
+  if (value === null) return null;
+  return value instanceof Date ? value.toISOString() : String(value);
+}
 
 function mapRow(row: PhotoUploadIntentRow): PhotoUploadIntentRecord {
   return {
@@ -61,9 +68,9 @@ function mapRow(row: PhotoUploadIntentRow): PhotoUploadIntentRecord {
     contentType: row.content_type,
     declaredFileSizeBytes: Number(row.declared_file_size_bytes),
     status: row.status,
-    createdAt: row.created_at,
-    expiresAt: row.expires_at,
-    consumedAt: row.consumed_at,
+    createdAt: toIso(row.created_at)!,
+    expiresAt: toIso(row.expires_at)!,
+    consumedAt: toIso(row.consumed_at),
   };
 }
 
@@ -83,9 +90,7 @@ export class SupabasePhotoUploadIntentRepository
       expires_at: input.expiresAt,
     });
 
-    if (error) {
-      throw new Error(error.message);
-    }
+    if (error) throw new Error(error.message);
   }
 
   async consume(
@@ -108,23 +113,81 @@ export class SupabasePhotoUploadIntentRepository
       )
       .maybeSingle();
 
-    if (error) {
-      throw new Error(error.message);
-    }
-
+    if (error) throw new Error(error.message);
     return data ? mapRow(data as PhotoUploadIntentRow) : null;
   }
 }
 
-let repository: PhotoUploadIntentRepository =
-  new SupabasePhotoUploadIntentRepository();
+export class NeonPhotoUploadIntentRepository
+  implements PhotoUploadIntentRepository
+{
+  async create(input: CreatePhotoUploadIntentRecordInput): Promise<void> {
+    const sql = getNeonSql();
+    await sql`
+      INSERT INTO public.photo_upload_intents (
+        id,
+        invitation_slug,
+        bucket_name,
+        storage_path,
+        content_type,
+        declared_file_size_bytes,
+        status,
+        expires_at
+      ) VALUES (
+        ${input.photoId}::uuid,
+        ${input.slug},
+        ${input.bucketName},
+        ${input.storagePath},
+        ${input.contentType},
+        ${input.declaredFileSizeBytes},
+        'pending',
+        ${input.expiresAt}::timestamptz
+      )
+    `;
+  }
+
+  async consume(
+    input: ConsumePhotoUploadIntentInput
+  ): Promise<PhotoUploadIntentRecord | null> {
+    const sql = getNeonSql();
+    const rows = (await sql`
+      UPDATE public.photo_upload_intents
+      SET
+        status = 'consumed',
+        consumed_at = ${input.nowIso}::timestamptz
+      WHERE id = ${input.photoId}::uuid
+        AND invitation_slug = ${input.slug}
+        AND bucket_name = ${input.bucketName}
+        AND status = 'pending'
+        AND expires_at > ${input.nowIso}::timestamptz
+      RETURNING
+        id,
+        invitation_slug,
+        bucket_name,
+        storage_path,
+        content_type,
+        declared_file_size_bytes,
+        status,
+        created_at,
+        expires_at,
+        consumed_at
+    `) as PhotoUploadIntentRow[];
+
+    return rows[0] ? mapRow(rows[0]) : null;
+  }
+}
+
+const supabaseRepository = new SupabasePhotoUploadIntentRepository();
+const neonRepository = new NeonPhotoUploadIntentRepository();
+let repositoryOverride: PhotoUploadIntentRepository | null = null;
 
 export function getPhotoUploadIntentRepository(): PhotoUploadIntentRepository {
-  return repository;
+  if (repositoryOverride) return repositoryOverride;
+  return getDatabaseBackend() === "neon" ? neonRepository : supabaseRepository;
 }
 
 export function __setPhotoUploadIntentRepositoryForTests(
   next: PhotoUploadIntentRepository | null
 ): void {
-  repository = next ?? new SupabasePhotoUploadIntentRepository();
+  repositoryOverride = next;
 }
