@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS } from "@lib/security/rate-limit";
 import { resolveInvitationContext, type InvitationContext } from "@lib/context-resolver";
@@ -18,7 +17,14 @@ import {
   validateFileSize,
   validateGuestName,
 } from "./validation";
-import { getPhotoUploadIntentRepository } from "./upload-intent-store";
+import {
+  createMemoryUploadIntentRecord,
+  isMemoriesDatabaseConfigured,
+} from "@lib/memories/database";
+import {
+  createMemorySignedUploadUrl,
+  isMemoriesStorageConfigured,
+} from "@lib/memories/storage";
 
 type SignedUploadUrlResult = {
   signedUrl: string | null;
@@ -30,16 +36,7 @@ type SignedUploadUrlFn = (
   storagePath: string
 ) => Promise<SignedUploadUrlResult>;
 
-let signedUploadUrlImpl: SignedUploadUrlFn = async (
-  bucketName,
-  storagePath
-) => {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase.storage
-    .from(bucketName)
-    .createSignedUploadUrl(storagePath);
-  return { signedUrl: data?.signedUrl ?? null, error: error?.message };
-};
+let signedUploadUrlOverride: SignedUploadUrlFn | null = null;
 
 function resolvePhotoWallContext(slug: string): InvitationContext | null {
   const ctx = resolveInvitationContext(slug);
@@ -118,7 +115,7 @@ export async function createPhotoUploadIntent(
     };
   }
 
-  if (!isSupabaseConfigured()) {
+  if (!isMemoriesDatabaseConfigured() || !isMemoriesStorageConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -137,7 +134,7 @@ export async function createPhotoUploadIntent(
   const expiresAtIso = new Date(expiresAt).toISOString();
 
   try {
-    await getPhotoUploadIntentRepository().create({
+    await createMemoryUploadIntentRecord({
       photoId,
       slug: storageSlug,
       bucketName,
@@ -155,9 +152,28 @@ export async function createPhotoUploadIntent(
     };
   }
 
-  const signed = await signedUploadUrlImpl(bucketName, storagePath);
-  if (!signed.signedUrl) {
-    console.error("[PhotoWall] upload intent storage error");
+  let signedUrl: string | null = null;
+  try {
+    if (signedUploadUrlOverride) {
+      const signed = await signedUploadUrlOverride(bucketName, storagePath);
+      signedUrl = signed.signedUrl;
+    } else {
+      signedUrl = await createMemorySignedUploadUrl({
+        bucketName,
+        storagePath,
+        contentType: resolvedType,
+        maximumSizeInBytes: input.fileSizeBytes,
+        validUntil: expiresAt,
+      });
+    }
+  } catch (error) {
+    console.error(
+      "[PhotoWall] upload intent storage error:",
+      error instanceof Error ? error.message : error
+    );
+  }
+
+  if (!signedUrl) {
     return {
       success: false,
       error: "Não foi possível preparar o envio.",
@@ -168,20 +184,12 @@ export async function createPhotoUploadIntent(
   return {
     success: true,
     photoId,
-    uploadUrl: signed.signedUrl,
+    uploadUrl: signedUrl,
     storagePath,
     expiresAt: expiresAtIso,
   };
 }
 
 export function __setSignedUploadUrlForTests(impl: SignedUploadUrlFn | null): void {
-  signedUploadUrlImpl =
-    impl ??
-    (async (bucketName, storagePath) => {
-      const supabase = createAdminClient();
-      const { data, error } = await supabase.storage
-        .from(bucketName)
-        .createSignedUploadUrl(storagePath);
-      return { signedUrl: data?.signedUrl ?? null, error: error?.message };
-    });
+  signedUploadUrlOverride = impl;
 }
