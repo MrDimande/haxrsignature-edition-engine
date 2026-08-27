@@ -30,7 +30,15 @@ export async function generateMemoriesZip(slug: string): Promise<Buffer | null> 
   const challenges = config.variant === "plus-memories" ? PLUS_MEMORY_CHALLENGES : TRADITIONAL_CHALLENGES;
 
   for (const row of rows) {
-    const bytes = await downloadMemoryObject({ bucketName: config.bucket, storagePath: row.storagePath });
+    let bytes: Uint8Array | null = null;
+    try {
+      bytes = await downloadMemoryObject({
+        bucketName: config.bucket,
+        storagePath: row.storagePath,
+      });
+    } catch {
+      bytes = null;
+    }
     if (!bytes) continue;
 
     const contentType = row.contentType?.trim() || "image/jpeg";
