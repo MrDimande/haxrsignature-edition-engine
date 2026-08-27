@@ -1,3 +1,5 @@
+import { getDatabaseBackend } from "@lib/database/backend";
+import { getNeonSql, isNeonConfigured } from "@lib/neon/server";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import {
   rateLimit,
@@ -28,28 +30,55 @@ function parseRpcResult(data: unknown): RateLimitResult | null {
   };
 }
 
-/** Rate limit persistente via Supabase; fallback em memória se RPC indisponível. */
+async function neonPersistentRateLimit(
+  key: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult | null> {
+  if (!isNeonConfigured()) return null;
+
+  const windowSeconds = Math.max(1, Math.ceil(config.windowMs / 1000));
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT public.check_api_rate_limit(
+      ${key},
+      ${config.max},
+      ${windowSeconds}
+    ) AS result
+  `) as Array<{ result: unknown }>;
+
+  return parseRpcResult(rows[0]?.result);
+}
+
+async function supabasePersistentRateLimit(
+  key: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult | null> {
+  if (!isSupabaseConfigured()) return null;
+
+  const supabase = createAdminClient();
+  const windowSeconds = Math.max(1, Math.ceil(config.windowMs / 1000));
+  const { data, error } = await supabase.rpc("check_api_rate_limit", {
+    p_bucket_key: key,
+    p_max_requests: config.max,
+    p_window_seconds: windowSeconds,
+  });
+
+  if (error) throw new Error(error.message);
+  return parseRpcResult(data);
+}
+
+/** Persistent database rate limit; falls back to memory if the selected backend is unavailable. */
 export async function persistentRateLimit(
   key: string,
   config: RateLimitConfig
 ): Promise<RateLimitResult> {
-  if (!isSupabaseConfigured()) {
-    return rateLimit(key, config);
-  }
-
   try {
-    const supabase = createAdminClient();
-    const windowSeconds = Math.max(1, Math.ceil(config.windowMs / 1000));
-    const { data, error } = await supabase.rpc("check_api_rate_limit", {
-      p_bucket_key: key,
-      p_max_requests: config.max,
-      p_window_seconds: windowSeconds,
-    });
+    const persistentResult =
+      getDatabaseBackend() === "neon"
+        ? await neonPersistentRateLimit(key, config)
+        : await supabasePersistentRateLimit(key, config);
 
-    if (error) throw new Error(error.message);
-
-    const parsed = parseRpcResult(data);
-    if (parsed) return parsed;
+    if (persistentResult) return persistentResult;
   } catch (err) {
     console.warn("[rate-limit] fallback em memória:", err);
   }
