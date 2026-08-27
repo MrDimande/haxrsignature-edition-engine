@@ -4,6 +4,13 @@ import { getNeonSql, isNeonConfigured } from "../../../../lib/neon/server";
 
 const MIGRATION_BRANCH = "migration/supabase-to-neon";
 
+type CanaryRow = {
+  database_name?: unknown;
+  database_user?: unknown;
+  has_submit_edition_rsvp?: unknown;
+  has_check_api_rate_limit?: unknown;
+};
+
 export async function GET(): Promise<NextResponse> {
   if (
     process.env.VERCEL_ENV !== "preview" ||
@@ -31,7 +38,7 @@ export async function GET(): Promise<NextResponse> {
 
   try {
     const sql = getNeonSql();
-    const rows = await sql`
+    const result = await sql`
       select
         current_database() as database_name,
         current_user as database_user,
@@ -50,15 +57,18 @@ export async function GET(): Promise<NextResponse> {
             and p.proname = 'check_api_rate_limit'
         ) as has_check_api_rate_limit
     `;
-
+    const rows = result as unknown as CanaryRow[];
     const row = rows[0];
+
     return NextResponse.json({
       ...base,
       connected: true,
-      databaseName: row?.database_name ?? null,
-      databaseUser: row?.database_user ?? null,
-      hasSubmitEditionRsvp: Boolean(row?.has_submit_edition_rsvp),
-      hasCheckApiRateLimit: Boolean(row?.has_check_api_rate_limit),
+      databaseName:
+        typeof row?.database_name === "string" ? row.database_name : null,
+      databaseUser:
+        typeof row?.database_user === "string" ? row.database_user : null,
+      hasSubmitEditionRsvp: row?.has_submit_edition_rsvp === true,
+      hasCheckApiRateLimit: row?.has_check_api_rate_limit === true,
     });
   } catch (error) {
     return NextResponse.json(
