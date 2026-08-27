@@ -15,12 +15,22 @@
 -- clients, documents, or other administrative tables.
 
 DO $$
+DECLARE
+  runtime_role record;
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM pg_roles
-    WHERE rolname = 'haxr_edition_runtime'
-  ) THEN
+  SELECT
+    rolsuper,
+    rolinherit,
+    rolcreaterole,
+    rolcreatedb,
+    rolcanlogin,
+    rolreplication,
+    rolbypassrls
+  INTO runtime_role
+  FROM pg_roles
+  WHERE rolname = 'haxr_edition_runtime';
+
+  IF NOT FOUND THEN
     CREATE ROLE haxr_edition_runtime
       LOGIN
       NOINHERIT
@@ -29,15 +39,17 @@ BEGIN
       NOCREATEROLE
       NOREPLICATION
       NOBYPASSRLS;
-  ELSE
-    ALTER ROLE haxr_edition_runtime
-      LOGIN
-      NOINHERIT
-      NOSUPERUSER
-      NOCREATEDB
-      NOCREATEROLE
-      NOREPLICATION
-      NOBYPASSRLS;
+  ELSIF
+    runtime_role.rolsuper
+    OR runtime_role.rolinherit
+    OR runtime_role.rolcreaterole
+    OR runtime_role.rolcreatedb
+    OR NOT runtime_role.rolcanlogin
+    OR runtime_role.rolreplication
+    OR runtime_role.rolbypassrls
+  THEN
+    RAISE EXCEPTION
+      'haxr_edition_runtime exists with unsafe role attributes; refusing to continue';
   END IF;
 END
 $$;
