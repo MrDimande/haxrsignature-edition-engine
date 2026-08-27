@@ -1,3 +1,5 @@
+import { getDatabaseBackend } from "@lib/database/backend";
+import { getNeonSql, isNeonConfigured } from "@lib/neon/server";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST } from "./config";
 
@@ -56,7 +58,6 @@ export function calculateLeaderboardFromPhotos(
   photos: RawMemoryPhotoRow[],
   mode: "provisional" | "final" = "provisional"
 ): LeaderboardEntry[] {
-  // Agrupar por participant_id
   const participantMap = new Map<
     string,
     {
@@ -68,7 +69,6 @@ export function calculateLeaderboardFromPhotos(
   for (const photo of photos) {
     if (!photo.participant_id) continue;
 
-    // Filtragem por estado de moderação
     if (mode === "final") {
       if (photo.moderation_status !== "approved") continue;
     } else {
@@ -90,8 +90,7 @@ export function calculateLeaderboardFromPhotos(
 
   const entries: Array<Omit<LeaderboardEntry, "rank">> = [];
 
-  for (const [participantId, data] of participantMap.entries()) {
-    // 1. Obter o nome mais recente não vazio
+  for (const data of participantMap.values()) {
     const sortedByTimeDesc = [...data.photos].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
@@ -99,10 +98,10 @@ export function calculateLeaderboardFromPhotos(
       (p) => p.guest_name && p.guest_name.trim().length > 0
     );
 
-    const displayName = latestNamedPhoto?.guest_name?.trim() || "Participante sem nome";
+    const displayName =
+      latestNamedPhoto?.guest_name?.trim() || "Participante sem nome";
     const hasName = Boolean(latestNamedPhoto?.guest_name?.trim());
 
-    // 2. Mapear o menor criado_at por desafio único
     const earliestPerChallenge = new Map<string, number>();
     for (const photo of data.validChallengePhotos) {
       const chId = photo.challenge_id!;
@@ -118,11 +117,9 @@ export function calculateLeaderboardFromPhotos(
 
     let completedAtIso: string | null = null;
     if (completedCount > 0) {
-      // Ordenar os tempos das primeiras contribuições dos desafios únicos em ordem cronológica
       const sortedChallengeTimes = Array.from(earliestPerChallenge.values()).sort(
         (a, b) => a - b
       );
-      // O timestamp em que completou o N-ésimo desafio é o N-1 no array
       const nthTimeMs = sortedChallengeTimes[completedCount - 1];
       completedAtIso = new Date(nthTimeMs).toISOString();
     }
@@ -136,27 +133,21 @@ export function calculateLeaderboardFromPhotos(
     });
   }
 
-  // Ordenar a classificação
   entries.sort((a, b) => {
-    // 1º Critério: Número de desafios concluídos (DESC)
     if (b.completed !== a.completed) {
       return b.completed - a.completed;
     }
-    // 2º Critério: Quem atingiu esse número de desafios primeiro (ASC)
     if (a.completedAt && b.completedAt) {
       const timeA = new Date(a.completedAt).getTime();
       const timeB = new Date(b.completedAt).getTime();
       if (timeA !== timeB) return timeA - timeB;
     }
-    // 3º Critério: Total de uploads (DESC)
     if (b.totalUploads !== a.totalUploads) {
       return b.totalUploads - a.totalUploads;
     }
-    // 4º Critério: Nome (ASC)
     return a.displayName.localeCompare(b.displayName);
   });
 
-  // Atribuir ranks (1-indexed)
   return entries.map((item, index) => ({
     rank: index + 1,
     ...item,
@@ -186,6 +177,145 @@ export function getParticipantProgressFromPhotos(
   return Array.from(completedSet).sort();
 }
 
+function normalizeNeonPhotoRow(row: {
+  id: string;
+  invitation_slug: string;
+  participant_id: string | null;
+  guest_name: string | null;
+  challenge_id: string | null;
+  created_at: string | Date;
+  moderation_status: string;
+}): RawMemoryPhotoRow {
+  return {
+    ...row,
+    created_at:
+      row.created_at instanceof Date
+        ? row.created_at.toISOString()
+        : String(row.created_at),
+  };
+}
+
+function isSelectedMemoriesDatabaseConfigured(): boolean {
+  return getDatabaseBackend() === "neon"
+    ? isNeonConfigured()
+    : isSupabaseConfigured();
+}
+
+async function fetchLeaderboardRowsFromSupabase(
+  invitationSlug: string
+): Promise<RawMemoryPhotoRow[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("wedding_photos")
+    .select(
+      "id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status"
+    )
+    .eq("invitation_slug", invitationSlug)
+    .not("participant_id", "is", null);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as RawMemoryPhotoRow[];
+}
+
+async function fetchLeaderboardRowsFromNeon(
+  invitationSlug: string
+): Promise<RawMemoryPhotoRow[]> {
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT
+      id,
+      invitation_slug,
+      participant_id,
+      guest_name,
+      challenge_id,
+      created_at,
+      moderation_status
+    FROM public.wedding_photos
+    WHERE invitation_slug = ${invitationSlug}
+      AND participant_id IS NOT NULL
+  `) as Array<{
+    id: string;
+    invitation_slug: string;
+    participant_id: string | null;
+    guest_name: string | null;
+    challenge_id: string | null;
+    created_at: string | Date;
+    moderation_status: string;
+  }>;
+
+  return rows.map(normalizeNeonPhotoRow);
+}
+
+async function fetchParticipantRowsFromSupabase(
+  invitationSlug: string,
+  participantId: string
+): Promise<RawMemoryPhotoRow[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("wedding_photos")
+    .select(
+      "id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status"
+    )
+    .eq("invitation_slug", invitationSlug)
+    .eq("participant_id", participantId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []) as RawMemoryPhotoRow[];
+}
+
+async function fetchParticipantRowsFromNeon(
+  invitationSlug: string,
+  participantId: string
+): Promise<RawMemoryPhotoRow[]> {
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT
+      id,
+      invitation_slug,
+      participant_id,
+      guest_name,
+      challenge_id,
+      created_at,
+      moderation_status
+    FROM public.wedding_photos
+    WHERE invitation_slug = ${invitationSlug}
+      AND participant_id = ${participantId}::uuid
+  `) as Array<{
+    id: string;
+    invitation_slug: string;
+    participant_id: string | null;
+    guest_name: string | null;
+    challenge_id: string | null;
+    created_at: string | Date;
+    moderation_status: string;
+  }>;
+
+  return rows.map(normalizeNeonPhotoRow);
+}
+
+async function fetchLeaderboardRows(
+  invitationSlug: string
+): Promise<RawMemoryPhotoRow[]> {
+  return getDatabaseBackend() === "neon"
+    ? fetchLeaderboardRowsFromNeon(invitationSlug)
+    : fetchLeaderboardRowsFromSupabase(invitationSlug);
+}
+
+async function fetchParticipantRows(
+  invitationSlug: string,
+  participantId: string
+): Promise<RawMemoryPhotoRow[]> {
+  return getDatabaseBackend() === "neon"
+    ? fetchParticipantRowsFromNeon(invitationSlug, participantId)
+    : fetchParticipantRowsFromSupabase(invitationSlug, participantId);
+}
+
 /**
  * Procura na base de dados e gera o Leaderboard para um evento.
  */
@@ -198,37 +328,35 @@ export async function getMemoriesLeaderboard(
     return { success: false, error: "Convite não encontrado." };
   }
 
-  if (!isSupabaseConfigured()) {
+  if (!isSelectedMemoriesDatabaseConfigured()) {
     return { success: false, error: "Serviço temporariamente indisponível." };
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("wedding_photos")
-    .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
-    .eq("invitation_slug", config.invitationSlug)
-    .not("participant_id", "is", null);
+  try {
+    const data = await fetchLeaderboardRows(config.invitationSlug);
+    const leaderboard = calculateLeaderboardFromPhotos(data, mode);
 
-  if (error) {
-    console.error("[Leaderboard] Error fetching photos:", error.message);
+    return {
+      success: true,
+      slug: config.invitationSlug,
+      mode,
+      totalChallenges: 12,
+      leaderboard,
+    };
+  } catch (error) {
+    console.error(
+      "[Leaderboard] Error fetching photos:",
+      error instanceof Error ? error.message : error
+    );
     return { success: false, error: "Erro ao consultar a classificação." };
   }
-
-  const leaderboard = calculateLeaderboardFromPhotos(data as RawMemoryPhotoRow[], mode);
-
-  return {
-    success: true,
-    slug: config.invitationSlug,
-    mode,
-    totalChallenges: 12,
-    leaderboard,
-  };
 }
 
 /**
  * Reconcilia o progresso pessoal de um participante a partir da base de dados.
  */
-const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_V4_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function getParticipantProgress(
   slug: string,
@@ -252,33 +380,33 @@ export async function getParticipantProgress(
     return { success: false, error: "ID de participante inválido." };
   }
 
-  if (!isSupabaseConfigured()) {
+  if (!isSelectedMemoriesDatabaseConfigured()) {
     return { success: false, error: "Serviço temporariamente indisponível." };
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("wedding_photos")
-    .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
-    .eq("invitation_slug", config.invitationSlug)
-    .eq("participant_id", participantId);
+  try {
+    const data = await fetchParticipantRows(
+      config.invitationSlug,
+      participantId.trim()
+    );
+    const completedChallengeIds = getParticipantProgressFromPhotos(
+      data,
+      participantId.trim()
+    );
 
-  if (error) {
-    console.error("[ParticipantProgress] Error fetching photos:", error.message);
+    return {
+      success: true,
+      slug: config.invitationSlug,
+      participantId: participantId.trim(),
+      completedChallengeIds,
+      completedCount: completedChallengeIds.length,
+      totalChallenges: 12,
+    };
+  } catch (error) {
+    console.error(
+      "[ParticipantProgress] Error fetching photos:",
+      error instanceof Error ? error.message : error
+    );
     return { success: false, error: "Erro ao obter progresso pessoal." };
   }
-
-  const completedChallengeIds = getParticipantProgressFromPhotos(
-    data as RawMemoryPhotoRow[],
-    participantId
-  );
-
-  return {
-    success: true,
-    slug: config.invitationSlug,
-    participantId,
-    completedChallengeIds,
-    completedCount: completedChallengeIds.length,
-    totalChallenges: 12,
-  };
 }
