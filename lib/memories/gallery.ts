@@ -1,4 +1,8 @@
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import {
+  isMemoriesDatabaseConfigured,
+  listMemoryGalleryRows,
+} from "./database";
 import { resolveMemoriesConfig } from "./config";
 
 export type PublicMemoryItem = {
@@ -15,50 +19,54 @@ export type PublicMemoryItem = {
 
 /**
  * Lista memórias públicas para qualquer convite com memories activadas.
- * O `invitation_slug` na DB isola cada evento automaticamente.
+ * Metadados seguem o backend DB seleccionado; nesta fase os ficheiros continuam
+ * no Supabase Storage e recebem URLs assinadas de curta duração.
  */
 export async function listMemories(slug: string): Promise<PublicMemoryItem[]> {
   const config = resolveMemoriesConfig(slug);
   if (!config) return [];
 
-  if (!isSupabaseConfigured()) return [];
+  if (!isMemoriesDatabaseConfigured() || !isSupabaseConfigured()) return [];
 
   const supabase = createAdminClient();
   const bucketName = config.bucket;
   const storageSlug = config.invitationSlug;
 
-  const { data, error } = await supabase
-    .from("wedding_photos")
-    .select("id, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type")
-    .eq("invitation_slug", storageSlug)
-    .neq("moderation_status", "rejected")
-    .order("created_at", { ascending: false })
-    .limit(100);
+  let rows;
+  try {
+    rows = await listMemoryGalleryRows(storageSlug);
+  } catch (error) {
+    console.error(
+      "[Memories] gallery database error:",
+      error instanceof Error ? error.message : error
+    );
+    return [];
+  }
 
-  if (error || !data?.length) return [];
+  if (!rows.length) return [];
 
   const results: PublicMemoryItem[] = [];
 
-  for (const row of data) {
+  for (const row of rows) {
     const { data: signed } = await supabase.storage
       .from(bucketName)
-      .createSignedUrl(row.storage_path, config.signedUrlTtlSeconds);
+      .createSignedUrl(row.storagePath, config.signedUrlTtlSeconds);
 
     if (!signed?.signedUrl) continue;
 
-    const contentType = row.content_type?.trim() || "image/jpeg";
+    const contentType = row.contentType?.trim() || "image/jpeg";
     const kind = contentType.startsWith("video/") ? "video" : "image";
 
     results.push({
       id: row.id,
       signedUrl: signed.signedUrl,
-      createdAt: row.created_at,
+      createdAt: row.createdAt,
       contentType,
       kind,
       caption: row.caption,
-      guestName: row.guest_name,
-      challengeId: row.challenge_id,
-      tableId: row.table_id,
+      guestName: row.guestName,
+      challengeId: row.challengeId,
+      tableId: row.tableId,
     });
   }
 
