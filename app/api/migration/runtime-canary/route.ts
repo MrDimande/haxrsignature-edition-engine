@@ -4,6 +4,10 @@ import { getStorageBackend } from "@lib/storage/backend";
 import { getNeonSql } from "@lib/neon/server";
 
 const MIGRATION_BRANCH = "migration/supabase-to-neon";
+const EXPECTED_POOLED_HOST =
+  "ep-super-fire-ayj2jnyh-pooler.c-5.us-east-2.aws.neon.tech";
+const EXPECTED_DIRECT_HOST =
+  "ep-super-fire-ayj2jnyh.c-5.us-east-2.aws.neon.tech";
 
 function isMigrationPreview(): boolean {
   return (
@@ -12,23 +16,62 @@ function isMigrationPreview(): boolean {
   );
 }
 
-function getSafeDatabaseUrlIdentity(): {
+type SafeUrlIdentity = {
+  parseable: boolean;
   username: string | null;
   passwordPresent: boolean;
-  pooled: boolean;
-} {
+  expectedHost: boolean;
+  databaseName: string | null;
+};
+
+function getSafeUrlIdentity(
+  raw: string | undefined,
+  expectedHost: string
+): SafeUrlIdentity {
   try {
-    const raw = process.env.DATABASE_URL?.trim();
-    if (!raw) return { username: null, passwordPresent: false, pooled: false };
-    const url = new URL(raw);
+    const value = raw?.trim();
+    if (!value) {
+      return {
+        parseable: false,
+        username: null,
+        passwordPresent: false,
+        expectedHost: false,
+        databaseName: null,
+      };
+    }
+    const url = new URL(value);
     return {
+      parseable: url.protocol === "postgresql:" || url.protocol === "postgres:",
       username: url.username ? decodeURIComponent(url.username) : null,
       passwordPresent: Boolean(url.password),
-      pooled: url.hostname.includes("-pooler"),
+      expectedHost: url.hostname === expectedHost,
+      databaseName: url.pathname.replace(/^\//, "") || null,
     };
   } catch {
-    return { username: null, passwordPresent: false, pooled: false };
+    return {
+      parseable: false,
+      username: null,
+      passwordPresent: false,
+      expectedHost: false,
+      databaseName: null,
+    };
   }
+}
+
+const databaseUrlIdentity = getSafeUrlIdentity(
+  process.env.DATABASE_URL,
+  EXPECTED_POOLED_HOST
+);
+const databaseUrlUnpooledIdentity = getSafeUrlIdentity(
+  process.env.DATABASE_URL_UNPOOLED,
+  EXPECTED_DIRECT_HOST
+);
+
+if (isMigrationPreview()) {
+  console.info(
+    "[migration-runtime-canary] safe DB URL identity",
+    JSON.stringify({ databaseUrlIdentity, databaseUrlUnpooledIdentity })
+  );
 }
 
 export const dynamic = "force-dynamic";
@@ -56,7 +99,8 @@ export async function GET() {
     databaseUrlPresent,
     databaseUrlUnpooledPresent,
     moderationSecretPresent,
-    databaseUrlIdentity: getSafeDatabaseUrlIdentity(),
+    databaseUrlIdentity,
+    databaseUrlUnpooledIdentity,
     database: { connected: false },
   };
 
