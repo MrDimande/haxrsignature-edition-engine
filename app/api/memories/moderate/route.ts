@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getDatabaseBackend } from "@lib/database/backend";
 import { resolveMemoriesConfig } from "@lib/memories/config";
@@ -8,6 +9,22 @@ function isSelectedDatabaseConfigured(): boolean {
   return getDatabaseBackend() === "neon"
     ? isNeonConfigured()
     : isSupabaseConfigured();
+}
+
+function readBearerCredential(request: Request): string | null {
+  const authorization = request.headers.get("authorization")?.trim();
+  if (!authorization) return null;
+
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
+}
+
+function secretsMatch(candidate: string, expected: string): boolean {
+  const candidateBytes = Buffer.from(candidate, "utf8");
+  const expectedBytes = Buffer.from(expected, "utf8");
+
+  if (candidateBytes.length !== expectedBytes.length) return false;
+  return timingSafeEqual(candidateBytes, expectedBytes);
 }
 
 async function updateModerationStatus(
@@ -43,15 +60,19 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       slug?: string;
       photoId?: string;
-      action?: "approve" | "reject";
+      action?: string;
       secretKey?: string;
     };
 
     const { slug, photoId, action, secretKey } = body;
 
-    if (!slug || !photoId || !action) {
+    if (
+      !slug ||
+      !photoId ||
+      (action !== "approve" && action !== "reject")
+    ) {
       return NextResponse.json(
-        { success: false, error: "Parâmetros em falta." },
+        { success: false, error: "Parâmetros inválidos ou em falta." },
         { status: 400 }
       );
     }
@@ -64,9 +85,17 @@ export async function POST(request: Request) {
       );
     }
 
-    // Contrato de autorização mantido nesta ronda; endurecimento fica para Auth/RLS.
-    const expectedKey = process.env.ADMIN_MODERATION_SECRET || "haxr-secret-2026";
-    if (secretKey && secretKey !== expectedKey) {
+    const expectedKey = process.env.ADMIN_MODERATION_SECRET?.trim();
+    if (!expectedKey) {
+      console.error("[Memories moderation] ADMIN_MODERATION_SECRET is not configured");
+      return NextResponse.json(
+        { success: false, error: "Serviço de moderação indisponível." },
+        { status: 503 }
+      );
+    }
+
+    const suppliedKey = readBearerCredential(request) ?? secretKey?.trim() ?? "";
+    if (!suppliedKey || !secretsMatch(suppliedKey, expectedKey)) {
       return NextResponse.json(
         { success: false, error: "Não autorizado." },
         { status: 401 }
