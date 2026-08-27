@@ -1,8 +1,11 @@
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import {
   isMemoriesDatabaseConfigured,
   listMemoryGalleryRows,
 } from "./database";
+import {
+  createMemorySignedReadUrl,
+  isMemoriesStorageConfigured,
+} from "./storage";
 import { resolveMemoriesConfig } from "./config";
 
 export type PublicMemoryItem = {
@@ -19,16 +22,18 @@ export type PublicMemoryItem = {
 
 /**
  * Lista memórias públicas para qualquer convite com memories activadas.
- * Metadados seguem o backend DB seleccionado; nesta fase os ficheiros continuam
- * no Supabase Storage e recebem URLs assinadas de curta duração.
+ * Metadados e object storage seguem selectores independentes e seguros:
+ * Preview de migração usa Neon + Vercel Blob; os restantes ambientes mantêm
+ * Supabase por defeito.
  */
 export async function listMemories(slug: string): Promise<PublicMemoryItem[]> {
   const config = resolveMemoriesConfig(slug);
   if (!config) return [];
 
-  if (!isMemoriesDatabaseConfigured() || !isSupabaseConfigured()) return [];
+  if (!isMemoriesDatabaseConfigured() || !isMemoriesStorageConfigured()) {
+    return [];
+  }
 
-  const supabase = createAdminClient();
   const bucketName = config.bucket;
   const storageSlug = config.invitationSlug;
 
@@ -48,18 +53,28 @@ export async function listMemories(slug: string): Promise<PublicMemoryItem[]> {
   const results: PublicMemoryItem[] = [];
 
   for (const row of rows) {
-    const { data: signed } = await supabase.storage
-      .from(bucketName)
-      .createSignedUrl(row.storagePath, config.signedUrlTtlSeconds);
+    let signedUrl: string | null = null;
+    try {
+      signedUrl = await createMemorySignedReadUrl({
+        bucketName,
+        storagePath: row.storagePath,
+        ttlSeconds: config.signedUrlTtlSeconds,
+      });
+    } catch (error) {
+      console.error(
+        "[Memories] gallery storage error:",
+        error instanceof Error ? error.message : error
+      );
+    }
 
-    if (!signed?.signedUrl) continue;
+    if (!signedUrl) continue;
 
     const contentType = row.contentType?.trim() || "image/jpeg";
     const kind = contentType.startsWith("video/") ? "video" : "image";
 
     results.push({
       id: row.id,
-      signedUrl: signed.signedUrl,
+      signedUrl,
       createdAt: row.createdAt,
       contentType,
       kind,
