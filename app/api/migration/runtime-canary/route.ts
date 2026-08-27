@@ -53,8 +53,9 @@ export async function GET() {
       SELECT
         current_database() AS database_name,
         current_user AS role_name,
-        to_regprocedure('public.submit_edition_rsvp(text,text,text,text,text,text,text,text,text,text,text)') IS NOT NULL AS has_submit_edition_rsvp,
+        to_regprocedure('public.submit_edition_rsvp(uuid,text,text,boolean,integer,text,text,text,text,text,boolean)') IS NOT NULL AS has_submit_edition_rsvp,
         to_regprocedure('public.check_api_rate_limit(text,integer,integer)') IS NOT NULL AS has_check_api_rate_limit,
+        to_regprocedure('public.reserve_edition_gift(text,text,text,text)') IS NOT NULL AS has_reserve_edition_gift,
         to_regclass('public.edition_gift_reservations') IS NOT NULL AS has_gift_reservations,
         to_regclass('public.wedding_photos') IS NOT NULL AS has_wedding_photos,
         to_regclass('public.photo_upload_intents') IS NOT NULL AS has_photo_upload_intents
@@ -63,6 +64,7 @@ export async function GET() {
       role_name: string;
       has_submit_edition_rsvp: boolean;
       has_check_api_rate_limit: boolean;
+      has_reserve_edition_gift: boolean;
       has_gift_reservations: boolean;
       has_wedding_photos: boolean;
       has_photo_upload_intents: boolean;
@@ -77,6 +79,7 @@ export async function GET() {
           roleName: row.role_name,
           hasSubmitEditionRsvp: row.has_submit_edition_rsvp,
           hasCheckApiRateLimit: row.has_check_api_rate_limit,
+          hasReserveEditionGift: row.has_reserve_edition_gift,
           hasGiftReservations: row.has_gift_reservations,
           hasWeddingPhotos: row.has_wedding_photos,
           hasPhotoUploadIntents: row.has_photo_upload_intents,
@@ -88,9 +91,11 @@ export async function GET() {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
+    const dbError = error as { name?: unknown; code?: unknown };
     result.database = {
       connected: false,
-      error: error instanceof Error ? error.name : "UnknownError",
+      errorName: typeof dbError?.name === "string" ? dbError.name : "UnknownError",
+      errorCode: typeof dbError?.code === "string" ? dbError.code : null,
     };
     return NextResponse.json(result, {
       status: 503,
