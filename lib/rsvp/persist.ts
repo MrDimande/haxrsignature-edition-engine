@@ -1,3 +1,5 @@
+import { getDatabaseBackend } from "@lib/database/backend";
+import { getNeonSql, isNeonConfigured } from "@lib/neon/server";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { getEditionEventBinding } from "@lib/rsvp/events";
 import {
@@ -27,6 +29,16 @@ type ExistingEditionGuestIdentity = {
   name_normalized: string | null;
   email: string | null;
   phone: string | null;
+};
+
+type EditionRsvpPayload = {
+  ok?: boolean;
+  error?: string;
+  guestId?: string;
+  status?: "confirmed" | "declined";
+  created?: boolean;
+  partySize?: number;
+  plusOnes?: number;
 };
 
 export function resolveExistingRsvpIdentityKey(
@@ -60,7 +72,38 @@ export function resolveExistingRsvpIdentityKey(
   return buildRsvpIdentityKey(submission);
 }
 
-export async function persistEditionRsvp(
+function normalizePersistResult(
+  payload: EditionRsvpPayload | null,
+  partySize: number
+): EditionRsvpPersistResult {
+  if (!payload?.ok || !payload.guestId || !payload.status) {
+    return {
+      ok: false,
+      error: payload?.error ?? "persist_failed",
+    };
+  }
+
+  return {
+    ok: true,
+    guestId: payload.guestId,
+    status: payload.status,
+    created: Boolean(payload.created),
+    partySize: payload.partySize ?? partySize,
+    plusOnes: payload.plusOnes ?? Math.max(0, partySize - 1),
+  };
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+export function isEditionRsvpDatabaseConfigured(): boolean {
+  return getDatabaseBackend() === "neon"
+    ? isNeonConfigured()
+    : isSupabaseConfigured();
+}
+
+async function persistEditionRsvpWithSupabase(
   submission: RsvpSubmission
 ): Promise<EditionRsvpPersistResult> {
   if (!isSupabaseConfigured()) {
@@ -117,29 +160,74 @@ export async function persistEditionRsvp(
     return { ok: false, error: error.message };
   }
 
-  const payload = data as {
-    ok?: boolean;
-    error?: string;
-    guestId?: string;
-    status?: "confirmed" | "declined";
-    created?: boolean;
-    partySize?: number;
-    plusOnes?: number;
-  } | null;
+  return normalizePersistResult(data as EditionRsvpPayload | null, partySize);
+}
 
-  if (!payload?.ok || !payload.guestId || !payload.status) {
+async function persistEditionRsvpWithNeon(
+  submission: RsvpSubmission
+): Promise<EditionRsvpPersistResult> {
+  if (!isNeonConfigured()) {
+    return { ok: false, error: "neon_not_configured", skipped: "neon" };
+  }
+
+  const binding = getEditionEventBinding(submission.slug);
+  if (!binding) {
     return {
       ok: false,
-      error: payload?.error ?? "persist_failed",
+      error: "event_not_linked",
+      skipped: "missing_event_id",
     };
   }
 
-  return {
-    ok: true,
-    guestId: payload.guestId,
-    status: payload.status,
-    created: Boolean(payload.created),
-    partySize: payload.partySize ?? partySize,
-    plusOnes: payload.plusOnes ?? Math.max(0, partySize - 1),
-  };
+  const attending = submission.attending === true;
+  const partySize = attending ? submission.guests : 0;
+  const emailNormalized = normalizeRsvpEmail(submission.email);
+  const phoneNormalized = normalizeRsvpPhone(submission.phone);
+  const sql = getNeonSql();
+
+  try {
+    const existingGuests = (await sql`
+      SELECT name_normalized, email, phone
+      FROM public.guests
+      WHERE event_id = ${binding.eventId}::uuid
+        AND guest_source = 'edition_rsvp'
+    `) as ExistingEditionGuestIdentity[];
+
+    const identityKey = resolveExistingRsvpIdentityKey(
+      existingGuests,
+      submission
+    );
+
+    const rows = (await sql`
+      SELECT public.submit_edition_rsvp(
+        ${binding.eventId}::uuid,
+        ${submission.name.trim()},
+        ${identityKey},
+        ${attending},
+        ${partySize},
+        ${binding.slug},
+        ${emailNormalized},
+        ${phoneNormalized},
+        ${submission.messageForBride?.trim() ?? ""},
+        ${submission.size?.trim() ?? ""},
+        ${submission.dressCodeConfirmed ?? null}
+      ) AS payload
+    `) as Array<{ payload: EditionRsvpPayload | null }>;
+
+    return normalizePersistResult(rows[0]?.payload ?? null, partySize);
+  } catch (error) {
+    const message = getErrorMessage(error);
+    console.error("[RSVP] Neon persist failed:", message);
+    return { ok: false, error: message };
+  }
+}
+
+export async function persistEditionRsvp(
+  submission: RsvpSubmission
+): Promise<EditionRsvpPersistResult> {
+  if (getDatabaseBackend() === "neon") {
+    return persistEditionRsvpWithNeon(submission);
+  }
+
+  return persistEditionRsvpWithSupabase(submission);
 }
