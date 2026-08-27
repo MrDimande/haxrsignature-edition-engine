@@ -19,6 +19,7 @@
     "smoke:export": "node scripts/smoke-export.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "1.1.0",
     "@supabase/supabase-js": "^2.49.8",
     "@types/jszip": "^3.4.0",
     "@vercel/oidc": "^3.7.1",
