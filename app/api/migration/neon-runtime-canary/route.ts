@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getDatabaseBackend } from "@/lib/database/backend";
-import { getNeonSql, isNeonConfigured } from "@/lib/neon/server";
+import { getDatabaseBackend } from "../../../../lib/database/backend";
+import { getNeonSql, isNeonConfigured } from "../../../../lib/neon/server";
 
 const MIGRATION_BRANCH = "migration/supabase-to-neon";
 
