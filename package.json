@@ -8,7 +8,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "next dev",
-    "build": "node --import tsx scripts/neon-preview-blob-env-probe.ts && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/queen-kailane/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts lib/jessica-samuel-traditional/memories/isolation.test.ts",
@@ -22,6 +22,7 @@
     "@neondatabase/serverless": "1.1.0",
     "@supabase/supabase-js": "^2.49.8",
     "@types/jszip": "^3.4.0",
+    "@vercel/blob": "2.8.0",
     "@vercel/oidc": "^3.7.1",
     "framer-motion": "^12.40.0",
     "html-to-image": "^1.11.13",
