@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { ROSE_ELEGANCE_GIFTS, type GiftItem } from "@data/gifts/rose-elegance";
+import { getDatabaseBackend } from "@lib/database/backend";
+import { getNeonSql, isNeonConfigured } from "@lib/neon/server";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 
 const REGISTRY_KEY = "rose-elegance";
@@ -17,6 +19,12 @@ type Reservation = {
   reservedBy: string;
   timestamp: string;
 };
+
+type ReservationRpcPayload = {
+  ok?: boolean;
+  error?: string;
+  reservedBy?: string;
+} | null;
 
 /** Public gift payload — never includes reservation PII */
 export type PublicGiftItem = {
@@ -116,11 +124,64 @@ async function getReservationsFromSupabase(): Promise<Reservation[]> {
   }));
 }
 
+async function getReservationsFromNeon(): Promise<Reservation[]> {
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT gift_id, reserved_by, created_at
+    FROM public.edition_gift_reservations
+    WHERE registry_key = ${REGISTRY_KEY}
+    ORDER BY created_at ASC
+  `) as Array<{
+    gift_id: string;
+    reserved_by: string;
+    created_at: string | Date;
+  }>;
+
+  return rows.map((row) => ({
+    giftId: row.gift_id,
+    reservedBy: row.reserved_by,
+    timestamp:
+      row.created_at instanceof Date
+        ? row.created_at.toISOString()
+        : String(row.created_at),
+  }));
+}
+
 async function getReservations(): Promise<Reservation[]> {
+  if (getDatabaseBackend() === "neon") {
+    if (!isNeonConfigured()) {
+      if (process.env.VERCEL_ENV) {
+        throw new Error("Neon selected but DATABASE_URL is not configured.");
+      }
+      return getReservationsFromFile();
+    }
+    return getReservationsFromNeon();
+  }
+
   if (isSupabaseConfigured()) {
     return getReservationsFromSupabase();
   }
   return getReservationsFromFile();
+}
+
+function parseReservationRpcPayload(
+  payload: ReservationRpcPayload
+): { success: boolean; error?: string } {
+  if (payload?.ok) {
+    return { success: true };
+  }
+
+  if (payload?.error === "already_reserved") {
+    return {
+      success: false,
+      error: "Este presente já foi reservado por outra convidada.",
+    };
+  }
+
+  return {
+    success: false,
+    error: "Ocorreu um erro interno ao processar a reserva.",
+  };
 }
 
 async function reserveGiftInSupabase(
@@ -138,30 +199,31 @@ async function reserveGiftInSupabase(
 
   if (error) {
     console.error("Supabase reserve_edition_gift failed:", error.message);
-    return { success: false, error: "Ocorreu um erro interno ao processar a reserva." };
-  }
-
-  const payload = data as {
-    ok?: boolean;
-    error?: string;
-    reservedBy?: string;
-  } | null;
-
-  if (payload?.ok) {
-    return { success: true };
-  }
-
-  if (payload?.error === "already_reserved") {
     return {
       success: false,
-      error: "Este presente já foi reservado por outra convidada.",
+      error: "Ocorreu um erro interno ao processar a reserva.",
     };
   }
 
-  return {
-    success: false,
-    error: "Ocorreu um erro interno ao processar a reserva.",
-  };
+  return parseReservationRpcPayload(data as ReservationRpcPayload);
+}
+
+async function reserveGiftInNeon(
+  giftId: string,
+  reservedBy: string,
+  giftName: string
+): Promise<{ success: boolean; error?: string }> {
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT public.reserve_edition_gift(
+      ${REGISTRY_KEY},
+      ${giftId},
+      ${reservedBy.trim()},
+      ${giftName}
+    ) AS payload
+  `) as Array<{ payload: ReservationRpcPayload }>;
+
+  return parseReservationRpcPayload(rows[0]?.payload ?? null);
 }
 
 async function reserveGiftInFile(
@@ -185,6 +247,26 @@ async function reserveGiftInFile(
 
   await saveReservationsToFile([...reservations, newReservation]);
   return { success: true };
+}
+
+async function reserveGiftWithSelectedBackend(
+  giftId: string,
+  reservedBy: string,
+  giftName: string
+): Promise<{ success: boolean; error?: string }> {
+  if (getDatabaseBackend() === "neon") {
+    if (!isNeonConfigured()) {
+      if (process.env.VERCEL_ENV) {
+        throw new Error("Neon selected but DATABASE_URL is not configured.");
+      }
+      return reserveGiftInFile(giftId, reservedBy);
+    }
+    return reserveGiftInNeon(giftId, reservedBy, giftName);
+  }
+
+  return isSupabaseConfigured()
+    ? reserveGiftInSupabase(giftId, reservedBy, giftName)
+    : reserveGiftInFile(giftId, reservedBy);
 }
 
 /** Internal merge — may include reservedBy for email notifications only */
@@ -226,9 +308,11 @@ export async function reserveGift(
           return;
         }
 
-        const result = isSupabaseConfigured()
-          ? await reserveGiftInSupabase(giftId, reservedBy, staticGift.name)
-          : await reserveGiftInFile(giftId, reservedBy);
+        const result = await reserveGiftWithSelectedBackend(
+          giftId,
+          reservedBy,
+          staticGift.name
+        );
 
         if (!result.success) {
           const merged = await getPublicGifts();
