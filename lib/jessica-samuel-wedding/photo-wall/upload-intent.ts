@@ -17,10 +17,8 @@ import {
   validateFileSize,
   validateGuestName,
 } from "./validation";
-import {
-  createMemoryUploadIntentRecord,
-  isMemoriesDatabaseConfigured,
-} from "@lib/memories/database";
+import { getPhotoUploadIntentRepository } from "./upload-intent-store";
+import { isMemoriesDatabaseConfigured } from "@lib/memories/database";
 import {
   createMemorySignedUploadUrl,
   isMemoriesStorageConfigured,
@@ -134,7 +132,7 @@ export async function createPhotoUploadIntent(
   const expiresAtIso = new Date(expiresAt).toISOString();
 
   try {
-    await createMemoryUploadIntentRecord({
+    await getPhotoUploadIntentRepository().create({
       photoId,
       slug: storageSlug,
       bucketName,
