@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { getDatabaseBackend } from "@lib/database/backend";
+import { getNeonSql, isNeonConfigured } from "@lib/neon/server";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import {
   STAN_GIFT_GROUPS,
@@ -125,7 +127,40 @@ async function getReservationsFromSupabase(): Promise<Reservation[]> {
   }));
 }
 
+async function getReservationsFromNeon(): Promise<Reservation[]> {
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT gift_id, reserved_by, created_at
+    FROM public.edition_gift_reservations
+    WHERE registry_key = ${STAN_GIFTS_REGISTRY_KEY}
+    ORDER BY created_at ASC
+  `) as Array<{
+    gift_id: string;
+    reserved_by: string;
+    created_at: string | Date;
+  }>;
+
+  return rows.map((row) => ({
+    giftId: row.gift_id,
+    reservedBy: row.reserved_by,
+    timestamp:
+      row.created_at instanceof Date
+        ? row.created_at.toISOString()
+        : String(row.created_at),
+  }));
+}
+
 async function getReservations(): Promise<Reservation[]> {
+  if (getDatabaseBackend() === "neon") {
+    if (!isNeonConfigured()) {
+      if (process.env.VERCEL_ENV) {
+        throw new Error("Neon selected but DATABASE_URL is not configured.");
+      }
+      return getReservationsFromFile();
+    }
+    return getReservationsFromNeon();
+  }
+
   if (isSupabaseConfigured()) {
     try {
       return await getReservationsFromSupabase();
@@ -188,6 +223,44 @@ async function reserveSlotInSupabase(
   return parseStanGiftReservationRpcResponse(data);
 }
 
+async function reserveSlotInNeon(
+  slotId: string,
+  reservedBy: string,
+  giftName: string
+): Promise<ReservationAttempt> {
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT public.reserve_edition_gift(
+      ${STAN_GIFTS_REGISTRY_KEY},
+      ${slotId},
+      ${reservedBy.trim()},
+      ${giftName}
+    ) AS payload
+  `) as Array<{ payload: unknown }>;
+
+  return parseStanGiftReservationRpcResponse(rows[0]?.payload ?? null);
+}
+
+async function reserveSlotWithSelectedBackend(
+  slotId: string,
+  reservedBy: string,
+  giftName: string
+): Promise<ReservationAttempt> {
+  if (getDatabaseBackend() === "neon") {
+    if (!isNeonConfigured()) {
+      if (process.env.VERCEL_ENV) {
+        throw new Error("Neon selected but DATABASE_URL is not configured.");
+      }
+      return reserveSlotInFile(slotId, reservedBy);
+    }
+    return reserveSlotInNeon(slotId, reservedBy, giftName);
+  }
+
+  return isSupabaseConfigured()
+    ? reserveSlotInSupabase(slotId, reservedBy, giftName)
+    : reserveSlotInFile(slotId, reservedBy);
+}
+
 export async function getStanPublicGifts(): Promise<StanPublicGift[]> {
   const reservations = await getReservations();
   return mergeCatalog(reservations);
@@ -230,9 +303,11 @@ export async function reserveStanGift(
 
   let lastConflict = false;
   for (const slotCandidate of freeSlots) {
-    const result = isSupabaseConfigured()
-      ? await reserveSlotInSupabase(slotCandidate, name, group.name)
-      : await reserveSlotInFile(slotCandidate, name);
+    const result = await reserveSlotWithSelectedBackend(
+      slotCandidate,
+      name,
+      group.name
+    );
 
     if (result.success) {
       const updatedGifts = await getStanPublicGifts();
@@ -261,7 +336,9 @@ export async function reserveStanGift(
   const updatedGifts = await getStanPublicGifts();
   return {
     success: false,
-    error: lastConflict ? "Este presente já se encontra esgotado." : RESERVATION_INTERNAL_ERROR,
+    error: lastConflict
+      ? "Este presente já se encontra esgotado."
+      : RESERVATION_INTERNAL_ERROR,
     gifts: updatedGifts,
   };
 }
