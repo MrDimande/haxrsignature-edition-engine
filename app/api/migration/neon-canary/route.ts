@@ -11,6 +11,20 @@ function isDedicatedMigrationPreview(): boolean {
   );
 }
 
+function databaseEnvPresence() {
+  return {
+    DATABASE_URL: Boolean(process.env.DATABASE_URL?.trim()),
+    DATABASE_URL_UNPOOLED: Boolean(process.env.DATABASE_URL_UNPOOLED?.trim()),
+    POSTGRES_URL: Boolean(process.env.POSTGRES_URL?.trim()),
+    POSTGRES_URL_NON_POOLING: Boolean(process.env.POSTGRES_URL_NON_POOLING?.trim()),
+    POSTGRES_PRISMA_URL: Boolean(process.env.POSTGRES_PRISMA_URL?.trim()),
+    NEON_DATABASE_URL: Boolean(process.env.NEON_DATABASE_URL?.trim()),
+    PGHOST: Boolean(process.env.PGHOST?.trim()),
+    PGDATABASE: Boolean(process.env.PGDATABASE?.trim()),
+    PGUSER: Boolean(process.env.PGUSER?.trim()),
+  };
+}
+
 export async function GET(): Promise<NextResponse> {
   if (!isDedicatedMigrationPreview()) {
     return NextResponse.json({ ok: false }, { status: 404 });
@@ -21,7 +35,12 @@ export async function GET(): Promise<NextResponse> {
 
   if (backend !== "neon" || !databaseConfigured) {
     return NextResponse.json(
-      { ok: false, backend, databaseConfigured },
+      {
+        ok: false,
+        backend,
+        databaseConfigured,
+        databaseEnvPresence: databaseEnvPresence(),
+      },
       { status: 503 }
     );
   }
