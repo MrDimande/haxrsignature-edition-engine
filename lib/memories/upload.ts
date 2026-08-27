@@ -2,7 +2,13 @@ import { randomUUID } from "node:crypto";
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS } from "@lib/security/rate-limit";
-import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST, type MemoriesEventConfig } from "./config";
+import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST } from "./config";
+import {
+  createMemoryUploadIntentRecord,
+  consumeMemoryUploadIntentRecord,
+  insertMemoryPhoto,
+  isMemoriesDatabaseConfigured,
+} from "./database";
 import {
   buildStoragePath,
   matchesMagicBytes,
@@ -14,7 +20,6 @@ import {
   validateFileSize,
   validateGuestName,
 } from "@lib/jessica-samuel-wedding/photo-wall/validation";
-import { getPhotoUploadIntentRepository } from "@lib/jessica-samuel-wedding/photo-wall/upload-intent-store";
 
 // ──────────────────────────────────────────────
 // Types
@@ -95,7 +100,10 @@ function validateParticipantId(participantId?: string): string | null {
 function validateChallengeId(challengeId?: string): string | null {
   if (!challengeId?.trim()) return null;
   const trimmed = challengeId.trim();
-  if (trimmed.length > 20 || !PLUS_MEMORIES_CHALLENGE_WHITELIST.includes(trimmed as any)) {
+  if (
+    trimmed.length > 20 ||
+    !PLUS_MEMORIES_CHALLENGE_WHITELIST.includes(trimmed as never)
+  ) {
     return "ID de desafio inválido.";
   }
   return null;
@@ -117,7 +125,11 @@ export async function createMemoryUploadIntent(
 ): Promise<MemoryUploadIntentResult> {
   const config = resolveMemoriesConfig(input.slug);
   if (!config) {
-    return { success: false, error: "Convite não encontrado.", code: "NOT_FOUND" };
+    return {
+      success: false,
+      error: "Convite não encontrado.",
+      code: "NOT_FOUND",
+    };
   }
 
   const storageSlug = config.invitationSlug;
@@ -127,7 +139,8 @@ export async function createMemoryUploadIntent(
   if (!resolvedType) {
     return {
       success: false,
-      error: "Tipo não suportado. Use foto (JPEG, PNG, HEIC) ou vídeo (MP4, MOV).",
+      error:
+        "Tipo não suportado. Use foto (JPEG, PNG, HEIC) ou vídeo (MP4, MOV).",
     };
   }
 
@@ -170,7 +183,9 @@ export async function createMemoryUploadIntent(
     };
   }
 
-  if (!isSupabaseConfigured()) {
+  // Nesta fase, os metadados seguem o backend DB seleccionado; os binários
+  // continuam temporariamente no Supabase Storage até à ronda de object storage.
+  if (!isMemoriesDatabaseConfigured() || !isSupabaseConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -184,12 +199,11 @@ export async function createMemoryUploadIntent(
     return { success: false, error: "Tipo de ficheiro inválido." };
   }
 
-  const expiresAt =
-    Date.now() + config.uploadIntentTtlSeconds * 1000;
+  const expiresAt = Date.now() + config.uploadIntentTtlSeconds * 1000;
   const expiresAtIso = new Date(expiresAt).toISOString();
 
   try {
-    await getPhotoUploadIntentRepository().create({
+    await createMemoryUploadIntentRecord({
       photoId,
       slug: storageSlug,
       bucketName,
@@ -241,10 +255,19 @@ export async function completeMemoryUpload(
     tableId?: string;
     participantId?: string;
   } = {}
-): Promise<{ success: boolean; error?: string; code?: string; retryAfterSeconds?: number }> {
+): Promise<{
+  success: boolean;
+  error?: string;
+  code?: string;
+  retryAfterSeconds?: number;
+}> {
   const config = resolveMemoriesConfig(slug);
   if (!config) {
-    return { success: false, error: "Convite não encontrado.", code: "NOT_FOUND" };
+    return {
+      success: false,
+      error: "Convite não encontrado.",
+      code: "NOT_FOUND",
+    };
   }
 
   const storageSlug = config.invitationSlug;
@@ -284,10 +307,14 @@ export async function completeMemoryUpload(
   }
 
   if (!photoId.trim()) {
-    return { success: false, error: "Pedido de envio expirado.", code: "INTENT_EXPIRED" };
+    return {
+      success: false,
+      error: "Pedido de envio expirado.",
+      code: "INTENT_EXPIRED",
+    };
   }
 
-  if (!isSupabaseConfigured()) {
+  if (!isMemoriesDatabaseConfigured() || !isSupabaseConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -297,7 +324,7 @@ export async function completeMemoryUpload(
 
   let intent;
   try {
-    intent = await getPhotoUploadIntentRepository().consume({
+    intent = await consumeMemoryUploadIntentRecord({
       photoId,
       slug: storageSlug,
       bucketName,
@@ -313,7 +340,11 @@ export async function completeMemoryUpload(
   }
 
   if (!intent) {
-    return { success: false, error: "Pedido de envio expirado.", code: "INTENT_EXPIRED" };
+    return {
+      success: false,
+      error: "Pedido de envio expirado.",
+      code: "INTENT_EXPIRED",
+    };
   }
 
   if (
@@ -321,7 +352,11 @@ export async function completeMemoryUpload(
     intent.bucketName !== bucketName ||
     !intent.storagePath.startsWith(`${storageSlug}/`)
   ) {
-    return { success: false, error: "Pedido de envio inválido.", code: "INVALID_INTENT" };
+    return {
+      success: false,
+      error: "Pedido de envio inválido.",
+      code: "INVALID_INTENT",
+    };
   }
 
   const supabase = createAdminClient();
@@ -361,25 +396,28 @@ export async function completeMemoryUpload(
     };
   }
 
-  const originalFilename = intent.storagePath.split("/").pop() ?? "original.jpg";
+  const originalFilename =
+    intent.storagePath.split("/").pop() ?? "original.jpg";
 
-  const { error: insertError } = await supabase.from("wedding_photos").insert({
-    id: photoId,
-    invitation_slug: storageSlug,
-    storage_path: intent.storagePath,
-    original_filename: originalFilename,
-    content_type: intent.contentType,
-    file_size_bytes: buffer.byteLength,
-    guest_name: metadata.guestName?.trim() || null,
-    caption: metadata.caption?.trim() || null,
-    challenge_id: metadata.challengeId?.trim() || null,
-    table_id: metadata.tableId?.trim() || null,
-    participant_id: metadata.participantId?.trim() || null,
-    moderation_status: "pending",
-  });
-
-  if (insertError) {
-    console.error("[Memories] insert error:", insertError.message);
+  try {
+    await insertMemoryPhoto({
+      id: photoId,
+      invitationSlug: storageSlug,
+      storagePath: intent.storagePath,
+      originalFilename,
+      contentType: intent.contentType,
+      fileSizeBytes: buffer.byteLength,
+      guestName: metadata.guestName?.trim() || null,
+      caption: metadata.caption?.trim() || null,
+      challengeId: metadata.challengeId?.trim() || null,
+      tableId: metadata.tableId?.trim() || null,
+      participantId: metadata.participantId?.trim() || null,
+    });
+  } catch (error) {
+    console.error(
+      "[Memories] insert error:",
+      error instanceof Error ? error.message : error
+    );
     return {
       success: false,
       error: "Não foi possível registar a memória.",
@@ -394,7 +432,9 @@ export async function completeMemoryUpload(
 // Test seam
 // ──────────────────────────────────────────────
 
-export function __setSignedUploadUrlForMemoriesTests(impl: SignedUploadUrlFn | null): void {
+export function __setSignedUploadUrlForMemoriesTests(
+  impl: SignedUploadUrlFn | null
+): void {
   signedUploadUrlImpl =
     impl ??
     (async (bucketName, storagePath) => {
