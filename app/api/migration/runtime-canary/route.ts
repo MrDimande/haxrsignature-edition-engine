@@ -12,6 +12,25 @@ function isMigrationPreview(): boolean {
   );
 }
 
+function getSafeDatabaseUrlIdentity(): {
+  username: string | null;
+  passwordPresent: boolean;
+  pooled: boolean;
+} {
+  try {
+    const raw = process.env.DATABASE_URL?.trim();
+    if (!raw) return { username: null, passwordPresent: false, pooled: false };
+    const url = new URL(raw);
+    return {
+      username: url.username ? decodeURIComponent(url.username) : null,
+      passwordPresent: Boolean(url.password),
+      pooled: url.hostname.includes("-pooler"),
+    };
+  } catch {
+    return { username: null, passwordPresent: false, pooled: false };
+  }
+}
+
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
@@ -37,6 +56,7 @@ export async function GET() {
     databaseUrlPresent,
     databaseUrlUnpooledPresent,
     moderationSecretPresent,
+    databaseUrlIdentity: getSafeDatabaseUrlIdentity(),
     database: { connected: false },
   };
 
