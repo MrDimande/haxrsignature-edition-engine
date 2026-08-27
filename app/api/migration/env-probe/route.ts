@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-// Disposable probe for a brand-new Vercel/Neon Preview branch after env resync.
+// Disposable probe retriggered after freeing Neon branch capacity.
 export async function GET(): Promise<NextResponse> {
   if (process.env.VERCEL_ENV !== "preview") {
     return NextResponse.json({ ok: false }, { status: 404 });
