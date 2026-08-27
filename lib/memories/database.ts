@@ -58,6 +58,8 @@ export type MemoryGalleryRow = {
   contentType: string;
 };
 
+export type MemoryExportRow = MemoryGalleryRow;
+
 type NeonIntentRow = {
   id: string;
   invitation_slug: string;
@@ -69,6 +71,17 @@ type NeonIntentRow = {
   created_at: string | Date;
   expires_at: string | Date;
   consumed_at: string | Date | null;
+};
+
+type MemoryRow = {
+  id: string;
+  caption: string | null;
+  guest_name: string | null;
+  challenge_id: string | null;
+  table_id: string | null;
+  created_at: string | Date;
+  storage_path: string;
+  content_type: string;
 };
 
 function toIso(value: string | Date): string {
@@ -87,6 +100,19 @@ function mapNeonIntent(row: NeonIntentRow): MemoryUploadIntentRecord {
     createdAt: toIso(row.created_at),
     expiresAt: toIso(row.expires_at),
     consumedAt: row.consumed_at ? toIso(row.consumed_at) : null,
+  };
+}
+
+function mapMemoryRow(row: MemoryRow): MemoryGalleryRow {
+  return {
+    id: row.id,
+    caption: row.caption,
+    guestName: row.guest_name,
+    challengeId: row.challenge_id,
+    tableId: row.table_id,
+    createdAt: toIso(row.created_at),
+    storagePath: row.storage_path,
+    contentType: row.content_type,
   };
 }
 
@@ -235,16 +261,7 @@ export async function listMemoryGalleryRows(
 
     if (error) throw new Error(error.message);
 
-    return (data ?? []).map((row) => ({
-      id: row.id,
-      caption: row.caption,
-      guestName: row.guest_name,
-      challengeId: row.challenge_id,
-      tableId: row.table_id,
-      createdAt: row.created_at,
-      storagePath: row.storage_path,
-      contentType: row.content_type,
-    }));
+    return (data ?? []).map((row) => mapMemoryRow(row as MemoryRow));
   }
 
   const sql = getNeonSql();
@@ -263,25 +280,45 @@ export async function listMemoryGalleryRows(
       AND moderation_status <> 'rejected'
     ORDER BY created_at DESC
     LIMIT 100
-  `) as Array<{
-    id: string;
-    caption: string | null;
-    guest_name: string | null;
-    challenge_id: string | null;
-    table_id: string | null;
-    created_at: string | Date;
-    storage_path: string;
-    content_type: string;
-  }>;
+  `) as MemoryRow[];
 
-  return rows.map((row) => ({
-    id: row.id,
-    caption: row.caption,
-    guestName: row.guest_name,
-    challengeId: row.challenge_id,
-    tableId: row.table_id,
-    createdAt: toIso(row.created_at),
-    storagePath: row.storage_path,
-    contentType: row.content_type,
-  }));
+  return rows.map(mapMemoryRow);
+}
+
+export async function listMemoryExportRows(
+  invitationSlug: string
+): Promise<MemoryExportRow[]> {
+  if (getDatabaseBackend() !== "neon") {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("wedding_photos")
+      .select(
+        "id, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type"
+      )
+      .eq("invitation_slug", invitationSlug)
+      .neq("moderation_status", "rejected")
+      .order("created_at", { ascending: true });
+
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => mapMemoryRow(row as MemoryRow));
+  }
+
+  const sql = getNeonSql();
+  const rows = (await sql`
+    SELECT
+      id,
+      caption,
+      guest_name,
+      challenge_id,
+      table_id,
+      created_at,
+      storage_path,
+      content_type
+    FROM public.wedding_photos
+    WHERE invitation_slug = ${invitationSlug}
+      AND moderation_status <> 'rejected'
+    ORDER BY created_at ASC
+  `) as MemoryRow[];
+
+  return rows.map(mapMemoryRow);
 }
