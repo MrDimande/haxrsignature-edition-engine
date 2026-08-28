@@ -27,7 +27,15 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function canonicalTimestamp(value) {
+  if (value == null) return null;
+  const parsed = value instanceof Date ? value : new Date(value);
+  assert(!Number.isNaN(parsed.getTime()), `Invalid timestamp value: ${String(value)}`);
+  return parsed.toISOString();
+}
+
 function stable(value) {
+  if (value instanceof Date) return value.toISOString();
   if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === "object") {
     return Object.fromEntries(
@@ -119,8 +127,8 @@ function projectGuest(row) {
     seat_id: row.seat_id,
     qr_token: row.qr_token,
     status: row.status,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
+    created_at: canonicalTimestamp(row.created_at),
+    updated_at: canonicalTimestamp(row.updated_at),
     plus_ones: row.plus_ones,
     dietary_notes: row.dietary_notes,
     guest_notes: row.guest_notes,
@@ -129,11 +137,11 @@ function projectGuest(row) {
     group_id: row.group_id,
     name_normalized: row.name_normalized,
     import_batch_id: row.import_batch_id,
-    archived_at: row.archived_at,
+    archived_at: canonicalTimestamp(row.archived_at),
     archive_reason: row.archive_reason,
     is_incorrect: row.is_incorrect,
-    deleted_at: row.deleted_at,
-    invite_sent_at: row.invite_sent_at,
+    deleted_at: canonicalTimestamp(row.deleted_at),
+    invite_sent_at: canonicalTimestamp(row.invite_sent_at),
   };
 }
 
@@ -145,7 +153,7 @@ function projectAudit(row) {
     guest_name: row.guest_name,
     action: row.action,
     details: row.details,
-    changed_at: row.changed_at,
+    changed_at: canonicalTimestamp(row.changed_at),
   };
 }
 
@@ -156,7 +164,7 @@ function projectSeat(row) {
     table_name: row.table_name,
     seat_number: row.seat_number,
     label: row.label,
-    created_at: row.created_at,
+    created_at: canonicalTimestamp(row.created_at),
   };
 }
 
