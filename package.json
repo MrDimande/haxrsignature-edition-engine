@@ -11,14 +11,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/queen-kailane/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts lib/jessica-samuel-traditional/memories/isolation.test.ts",
+    "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/queen-kailane/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts lib/jessica-samuel-traditional/memories/isolation.test.ts lib/memories/storage/*.test.ts lib/memories/upload-integration.test.ts",
     "typecheck": "tsc --noEmit",
     "secret-scan": "node scripts/secret-scan.mjs",
     "smoke:rsvp-reminders": "node scripts/smoke-rsvp-reminders.mjs",
     "smoke:farewell-ops": "node scripts/smoke-farewell-ops.mjs",
-    "smoke:export": "node scripts/smoke-export.mjs"
+    "smoke:export": "node scripts/smoke-export.mjs",
+    "test:memories-storage": "node --import tsx --test lib/memories/storage/*.test.ts lib/memories/upload-integration.test.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1127.0",
+    "@aws-sdk/s3-request-presigner": "^3.1127.0",
     "@supabase/supabase-js": "^2.49.8",
     "@types/jszip": "^3.4.0",
     "@vercel/oidc": "^3.7.1",
