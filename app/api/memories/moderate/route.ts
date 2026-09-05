@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
 import { resolveMemoriesConfig } from "@lib/memories/config";
 
 export async function POST(request: Request) {
@@ -28,21 +28,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Não autorizado." }, { status: 401 });
     }
 
-    if (!isSupabaseConfigured()) {
+    const db = getEditionDatabaseProvider();
+    if (!db.isConfigured()) {
       return NextResponse.json({ success: false, error: "Serviço indisponível." }, { status: 503 });
     }
 
-    const supabase = createAdminClient();
     const newStatus = action === "approve" ? "approved" : "rejected";
+    const ok = await db.updateModerationStatus(photoId, config.invitationSlug, newStatus);
 
-    const { error } = await supabase
-      .from("wedding_photos")
-      .update({ moderation_status: newStatus })
-      .eq("id", photoId)
-      .eq("invitation_slug", config.invitationSlug);
-
-    if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    if (!ok) {
+      return NextResponse.json({ success: false, error: "Não foi possível actualizar o estado da memória." }, { status: 500 });
     }
 
     return NextResponse.json({

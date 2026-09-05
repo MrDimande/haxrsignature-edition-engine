@@ -1,4 +1,4 @@
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
 import { resolveMemoriesConfig } from "./config";
 import { getMemoriesStorageProvider } from "./storage";
 
@@ -22,20 +22,20 @@ export async function listMemories(slug: string): Promise<PublicMemoryItem[]> {
   const config = resolveMemoriesConfig(slug);
   if (!config) return [];
 
-  if (!isSupabaseConfigured()) return [];
+  const db = getEditionDatabaseProvider();
+  if (!db.isConfigured()) return [];
 
-  const supabase = createAdminClient();
   const storageSlug = config.invitationSlug;
 
-  const { data, error } = await supabase
-    .from("wedding_photos")
-    .select("id, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type")
-    .eq("invitation_slug", storageSlug)
-    .neq("moderation_status", "rejected")
-    .order("created_at", { ascending: false })
-    .limit(100);
+  let data: any[];
+  try {
+    data = await db.listMemoriesPhotos(storageSlug, 100);
+  } catch (err) {
+    console.error("[listMemories] Erro ao consultar fotos da base de dados:", err);
+    return [];
+  }
 
-  if (error || !data?.length) return [];
+  if (!data?.length) return [];
 
   const results: PublicMemoryItem[] = [];
   const provider = getMemoriesStorageProvider();

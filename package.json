@@ -11,13 +11,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/queen-kailane/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts lib/jessica-samuel-traditional/memories/isolation.test.ts lib/memories/storage/*.test.ts lib/memories/upload-integration.test.ts",
+    "test": "node --import tsx --test lib/control-plane/*.test.ts lib/rsvp/*.test.ts lib/email/*.test.ts lib/invitations/*.test.ts lib/gifts/*.test.ts lib/nian/*.test.ts lib/queen-kailane/*.test.ts lib/jessica-samuel-wedding/*.test.ts lib/jessica-samuel-traditional/*.test.ts lib/jessica-samuel-traditional/memories/isolation.test.ts lib/memories/storage/*.test.ts lib/memories/upload-integration.test.ts lib/db/*.test.ts",
     "typecheck": "tsc --noEmit",
     "secret-scan": "node scripts/secret-scan.mjs",
     "smoke:rsvp-reminders": "node scripts/smoke-rsvp-reminders.mjs",
     "smoke:farewell-ops": "node scripts/smoke-farewell-ops.mjs",
     "smoke:export": "node scripts/smoke-export.mjs",
-    "test:memories-storage": "node --import tsx --test lib/memories/storage/*.test.ts lib/memories/upload-integration.test.ts"
+    "test:memories-storage": "node --import tsx --test lib/memories/storage/*.test.ts lib/memories/upload-integration.test.ts",
+    "test:memories-db": "node --import tsx --test lib/db/*.test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1127.0",
@@ -34,6 +35,7 @@
     "motion-dom": "^12.40.0",
     "motion-utils": "^12.39.0",
     "next": "15.5.19",
+    "pg": "^8.23.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "resend": "^6.12.4"
@@ -41,6 +43,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

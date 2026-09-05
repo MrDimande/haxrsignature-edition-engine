@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS } from "@lib/security/rate-limit";
 import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST, type MemoriesEventConfig } from "./config";
@@ -177,7 +177,8 @@ export async function createMemoryUploadIntent(
     };
   }
 
-  if (!isSupabaseConfigured()) {
+  const db = getEditionDatabaseProvider();
+  if (!db.isConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -321,7 +322,8 @@ export async function completeMemoryUpload(
     return { success: false, error: "Pedido de envio expirado.", code: "INTENT_EXPIRED" };
   }
 
-  if (!isSupabaseConfigured()) {
+  const db = getEditionDatabaseProvider();
+  if (!db.isConfigured()) {
     return {
       success: false,
       error: "Serviço temporariamente indisponível.",
@@ -409,25 +411,23 @@ export async function completeMemoryUpload(
   }
 
   const originalFilename = intent.storagePath.split("/").pop() ?? "original.jpg";
-  const supabase = createAdminClient();
 
-  const { error: insertError } = await supabase.from("wedding_photos").insert({
+  const inserted = await db.insertPendingPhoto({
     id: photoId,
-    invitation_slug: storageSlug,
-    storage_path: intent.storagePath,
-    original_filename: originalFilename,
-    content_type: intent.contentType,
-    file_size_bytes: actualSizeBytes,
-    guest_name: metadata.guestName?.trim() || null,
+    invitationSlug: storageSlug,
+    storagePath: intent.storagePath,
+    originalFilename,
+    contentType: intent.contentType,
+    fileSizeBytes: actualSizeBytes,
+    guestName: metadata.guestName?.trim() || null,
     caption: metadata.caption?.trim() || null,
-    challenge_id: metadata.challengeId?.trim() || null,
-    table_id: metadata.tableId?.trim() || null,
-    participant_id: metadata.participantId?.trim() || null,
-    moderation_status: "pending",
+    challengeId: metadata.challengeId?.trim() || null,
+    tableId: metadata.tableId?.trim() || null,
+    participantId: metadata.participantId?.trim() || null,
   });
 
-  if (insertError) {
-    console.error("[Memories] insert error:", insertError.message);
+  if (!inserted) {
+    console.error("[Memories] insert error");
     return {
       success: false,
       error: "Não foi possível registar a memória.",
