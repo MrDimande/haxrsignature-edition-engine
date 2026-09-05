@@ -1,35 +1,17 @@
 import { createAdminClient } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
+import type {
+  PhotoUploadIntentRecord,
+  CreatePhotoUploadIntentRecordInput,
+  ConsumePhotoUploadIntentInput,
+} from "@lib/db/types";
 
 export type PhotoUploadIntentStatus = "pending" | "consumed" | "expired";
 
-export type PhotoUploadIntentRecord = {
-  photoId: string;
-  slug: string;
-  bucketName: string;
-  storagePath: string;
-  contentType: string;
-  declaredFileSizeBytes: number;
-  status: PhotoUploadIntentStatus;
-  createdAt: string;
-  expiresAt: string;
-  consumedAt: string | null;
-};
-
-export type CreatePhotoUploadIntentRecordInput = {
-  photoId: string;
-  slug: string;
-  bucketName: string;
-  storagePath: string;
-  contentType: string;
-  declaredFileSizeBytes: number;
-  expiresAt: string;
-};
-
-export type ConsumePhotoUploadIntentInput = {
-  photoId: string;
-  slug: string;
-  bucketName: string;
-  nowIso: string;
+export type {
+  PhotoUploadIntentRecord,
+  CreatePhotoUploadIntentRecordInput,
+  ConsumePhotoUploadIntentInput,
 };
 
 export interface PhotoUploadIntentRepository {
@@ -116,8 +98,24 @@ export class SupabasePhotoUploadIntentRepository
   }
 }
 
+export class EditionPhotoUploadIntentRepository
+  implements PhotoUploadIntentRepository
+{
+  async create(input: CreatePhotoUploadIntentRecordInput): Promise<void> {
+    const db = getEditionDatabaseProvider();
+    await db.createUploadIntent(input);
+  }
+
+  async consume(
+    input: ConsumePhotoUploadIntentInput
+  ): Promise<PhotoUploadIntentRecord | null> {
+    const db = getEditionDatabaseProvider();
+    return await db.consumeUploadIntent(input);
+  }
+}
+
 let repository: PhotoUploadIntentRepository =
-  new SupabasePhotoUploadIntentRepository();
+  new EditionPhotoUploadIntentRepository();
 
 export function getPhotoUploadIntentRepository(): PhotoUploadIntentRepository {
   return repository;
@@ -126,5 +124,5 @@ export function getPhotoUploadIntentRepository(): PhotoUploadIntentRepository {
 export function __setPhotoUploadIntentRepositoryForTests(
   next: PhotoUploadIntentRepository | null
 ): void {
-  repository = next ?? new SupabasePhotoUploadIntentRepository();
+  repository = next ?? new EditionPhotoUploadIntentRepository();
 }

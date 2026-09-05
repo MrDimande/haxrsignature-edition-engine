@@ -1,4 +1,4 @@
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
 import { resolveMemoriesConfig, PLUS_MEMORIES_CHALLENGE_WHITELIST } from "./config";
 
 export interface RawMemoryPhotoRow {
@@ -198,19 +198,16 @@ export async function getMemoriesLeaderboard(
     return { success: false, error: "Convite não encontrado." };
   }
 
-  if (!isSupabaseConfigured()) {
+  const db = getEditionDatabaseProvider();
+  if (!db.isConfigured()) {
     return { success: false, error: "Serviço temporariamente indisponível." };
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("wedding_photos")
-    .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
-    .eq("invitation_slug", config.invitationSlug)
-    .not("participant_id", "is", null);
-
-  if (error) {
-    console.error("[Leaderboard] Error fetching photos:", error.message);
+  let data: any[];
+  try {
+    data = await db.getLeaderboardPhotos(config.invitationSlug);
+  } catch (err: any) {
+    console.error("[Leaderboard] Error fetching photos:", err?.message || err);
     return { success: false, error: "Erro ao consultar a classificação." };
   }
 
@@ -252,19 +249,16 @@ export async function getParticipantProgress(
     return { success: false, error: "ID de participante inválido." };
   }
 
-  if (!isSupabaseConfigured()) {
+  const db = getEditionDatabaseProvider();
+  if (!db.isConfigured()) {
     return { success: false, error: "Serviço temporariamente indisponível." };
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("wedding_photos")
-    .select("id, invitation_slug, participant_id, guest_name, challenge_id, created_at, moderation_status")
-    .eq("invitation_slug", config.invitationSlug)
-    .eq("participant_id", participantId);
-
-  if (error) {
-    console.error("[ParticipantProgress] Error fetching photos:", error.message);
+  let data: any[];
+  try {
+    data = await db.getParticipantPhotos(config.invitationSlug, participantId);
+  } catch (err: any) {
+    console.error("[ParticipantProgress] Error fetching photos:", err?.message || err);
     return { success: false, error: "Erro ao obter progresso pessoal." };
   }
 
