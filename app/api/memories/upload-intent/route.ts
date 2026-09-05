@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createMemoryUploadIntent } from "@lib/memories/upload";
+import { STORAGE_WRITE_FROZEN_CODE } from "@lib/memories/storage";
 
 export async function POST(request: Request) {
   try {
@@ -51,11 +52,14 @@ export async function POST(request: Request) {
 
     if (!result.success) {
       const status =
-        result.code === "RATE_LIMITED"
-          ? 429
-          : result.code === "NOT_FOUND"
-            ? 404
-            : 400;
+        result.code === STORAGE_WRITE_FROZEN_CODE
+          ? 503
+          : result.code === "RATE_LIMITED"
+            ? 429
+            : result.code === "NOT_FOUND"
+              ? 404
+              : 400;
+
       return NextResponse.json(result, {
         status,
         headers:
@@ -74,4 +78,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
