@@ -47,26 +47,12 @@ describe("cha lingerie — RSVP regression", () => {
   });
 
   it("accepts presence Sim with +258 phone", () => {
-    const result = validateLocalRsvpPayload({
-      name: "Convidada Teste",
-      phone: "+258841234567",
-      attending: true,
-      guests: 1,
-      slug: "jessicachadelingerie",
-      honeypot: "",
-    });
+    const result = validateLocalRsvpPayload({ name: "Convidada Teste", phone: "+258841234567", attending: true, guests: 1, slug: "jessicachadelingerie", honeypot: "" }, { now: new Date("2026-07-18T12:00:00+02:00") });
     assert.equal(result.ok, true);
   });
 
   it("accepts presence Não with phone", () => {
-    const result = validateLocalRsvpPayload({
-      name: "Convidada Teste",
-      phone: "841234567",
-      attending: false,
-      guests: 0,
-      slug: "jessicachadelingerie",
-      honeypot: "",
-    });
+    const result = validateLocalRsvpPayload({ name: "Convidada Teste", phone: "841234567", attending: false, guests: 0, slug: "jessicachadelingerie", honeypot: "" }, { now: new Date("2026-07-18T12:00:00+02:00") });
     assert.equal(result.ok, true);
   });
 

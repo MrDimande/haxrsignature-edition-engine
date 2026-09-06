@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   ],
   webpack: (config) => {
     config.output = config.output ?? {};
-    config.output.hashFunction = "xxhash64";
+    // config.output.hashFunction = "xxhash64"; // Disabled: incompatible with Node 24 WasmHash
     config.resolve.plugins = config.resolve.plugins ?? [];
     config.resolve.plugins.push(new InvitationAliasPlugin());
 

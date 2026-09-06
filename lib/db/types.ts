@@ -82,4 +82,20 @@ export interface EditionDatabaseProvider {
   getLeaderboardPhotos(slug: string): Promise<LeaderboardPhotoRow[]>;
   getParticipantPhotos(slug: string, participantId: string): Promise<LeaderboardPhotoRow[]>;
   updateModerationStatus(id: string, slug: string, status: 'approved' | 'rejected'): Promise<boolean>;
+  listGiftReservations(registryKey: string): Promise<GiftReservationRow[]>;
+  reserveGift(registryKey: string, giftId: string, reservedBy: string, giftName?: string): Promise<ReserveGiftResult>;
 }
+
+export type GiftReservationRow = {
+  gift_id: string;
+  reserved_by: string;
+  created_at: string;
+};
+
+export type ReserveGiftResult = {
+  ok: boolean;
+  error?: string;
+  reservedBy?: string;
+  timestamp?: string;
+};
+

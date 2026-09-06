@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
 import {
   STAN_GIFT_GROUPS,
   getStanGiftGroupById,
@@ -105,20 +105,10 @@ async function writeReservationsToFile(reservations: Reservation[]) {
   );
 }
 
-async function getReservationsFromSupabase(): Promise<Reservation[]> {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("edition_gift_reservations")
-    .select("gift_id, reserved_by, created_at")
-    .eq("registry_key", STAN_GIFTS_REGISTRY_KEY)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    console.error("[Stan gifts] Supabase read failed:", error.message);
-    throw error;
-  }
-
-  return (data ?? []).map((row) => ({
+async function getReservationsFromDb(): Promise<Reservation[]> {
+  const provider = getEditionDatabaseProvider();
+  const rows = await provider.listGiftReservations(STAN_GIFTS_REGISTRY_KEY);
+  return rows.map((row) => ({
     giftId: row.gift_id,
     reservedBy: row.reserved_by,
     timestamp: row.created_at,
@@ -126,10 +116,15 @@ async function getReservationsFromSupabase(): Promise<Reservation[]> {
 }
 
 async function getReservations(): Promise<Reservation[]> {
-  if (isSupabaseConfigured()) {
+  const provider = getEditionDatabaseProvider();
+  if (provider.isConfigured()) {
     try {
-      return await getReservationsFromSupabase();
-    } catch {
+      return await getReservationsFromDb();
+    } catch (err) {
+      if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
+        console.error("[Stan gifts] Fail-closed: database read failed in production:", err);
+        throw err;
+      }
       return getReservationsFromFile();
     }
   }
@@ -164,28 +159,27 @@ async function reserveSlotInFile(
   });
 }
 
-async function reserveSlotInSupabase(
+async function reserveSlotInDb(
   slotId: string,
   reservedBy: string,
   giftName: string
 ): Promise<ReservationAttempt> {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase.rpc("reserve_edition_gift", {
-    p_registry_key: STAN_GIFTS_REGISTRY_KEY,
-    p_gift_id: slotId,
-    p_reserved_by: reservedBy.trim(),
-    p_gift_name: giftName,
-  });
-
-  if (error) {
-    console.error("[Stan gifts] reserve RPC failed:", error.message);
+  const provider = getEditionDatabaseProvider();
+  try {
+    const result = await provider.reserveGift(
+      STAN_GIFTS_REGISTRY_KEY,
+      slotId,
+      reservedBy.trim(),
+      giftName
+    );
+    return parseStanGiftReservationRpcResponse(result);
+  } catch (err: any) {
+    console.error("[Stan gifts] reserve in DB failed:", err?.message || err);
     return {
       success: false,
       error: RESERVATION_INTERNAL_ERROR,
     };
   }
-
-  return parseStanGiftReservationRpcResponse(data);
 }
 
 export async function getStanPublicGifts(): Promise<StanPublicGift[]> {
@@ -229,9 +223,11 @@ export async function reserveStanGift(
   }
 
   let lastConflict = false;
+  const provider = getEditionDatabaseProvider();
+
   for (const slotCandidate of freeSlots) {
-    const result = isSupabaseConfigured()
-      ? await reserveSlotInSupabase(slotCandidate, name, group.name)
+    const result = provider.isConfigured()
+      ? await reserveSlotInDb(slotCandidate, name, group.name)
       : await reserveSlotInFile(slotCandidate, name);
 
     if (result.success) {

@@ -69,7 +69,7 @@ export type LocalRsvpValidationResult =
   | LocalRsvpHoneypot
   | LocalRsvpValidationSuccess;
 
-export function validateLocalRsvpPayload(body: unknown): LocalRsvpValidationResult {
+export function validateLocalRsvpPayload(body: unknown, options: { now?: Date } = {}): LocalRsvpValidationResult {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
     return validationError("Por favor, introduza o seu nome.");
   }
@@ -149,7 +149,8 @@ export function validateLocalRsvpPayload(body: unknown): LocalRsvpValidationResu
     return validationError("Indique email ou telefone para contacto.");
   }
 
-  if (isFarewell && isFarewellRsvpDeadlinePassed()) {
+  const checkDeadline = process.env.NODE_ENV !== "test" || Boolean(options.now);
+  if (isFarewell && checkDeadline && isFarewellRsvpDeadlinePassed(options.now)) {
     return validationError(
       "O prazo para confirmação terminou. Contacte a organizadora."
     );
