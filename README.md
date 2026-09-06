@@ -31,26 +31,26 @@
 
 ## Pilha Tecnológica Canónica (Technology Stack)
 
-A tabela reflecte com exactidão as dependências instaladas e utilizadas no projecto (`package.json` e `package-lock.json`):
+A tabela reflecte com exactidão a reconciliação entre as dependências declaradas em `package.json` e as versões efectivamente resolvidas no `package-lock.json`:
 
-| Camada Arquitectural | Tecnologia / Pacote | Versão Instalada | Finalidade no Projecto |
-| :--- | :--- | :--- | :--- |
-| **Framework Web** | `Next.js` | `15.5.19` | App Router e renderização de experiências dinâmicas `/[slug]` |
-| **Biblioteca de Interface** | `React` / `React DOM` | `19.0.0` | Renderização reactiva de cerimónias e componentes interactivos |
-| **Linguagem de Programação**| `TypeScript` | `^5` (`5.8.3`) | Verificação estrita de tipos e segurança em tempo de compilação |
-| **Ambiente de Execução** | `Node.js` | `^20` / `22.x LTS` | Ambiente serverless na Vercel e motor de execução de testes |
-| **Estilos & Layout** | `Tailwind CSS` | `^4` (`@tailwindcss/postcss`) | Motor CSS modular optimizado para carregamento instantâneo |
-| **Motion & Animações** | `Framer Motion` / `Motion`| `^12.40.0` | Transições fluídas, revelações cerimoniais e micro-interacções |
-| **Scroll Suave** | `Lenis` | `^1.3.23` | Experiência de deslocação vertical editorial e sem atrito |
-| **Base de Dados Principal** | `PostgreSQL (Neon)` | `pg ^8.23.0` | Driver nativo conectado com pooler e papel `edition_runtime` |
-| **Armazenamento de Objectos**| `@aws-sdk/client-s3` | `^3.1127.0` | Manipulação de fotografias e vídeos em Cloudflare R2 |
-| **Segurança de Uploads** | `@aws-sdk/s3-request-presigner`| `^3.1127.0` | Emissão de URLs assinadas PUT/GET temporárias (15 minutos) |
-| **Manipulação de Ficheiros**| `JSZip` | `^3.10.1` | Compactação de fotografias de eventos para exportação em lote |
-| **Captura de Imagem** | `html-to-image` | `^1.11.13` | Geração de cartões e comprovativos visuais no navegador |
-| **Serviço de Email** | `Resend` | `^6.12.4` | Envio de lembretes e confirmações formais de presença |
-| **Iconografia** | `Lucide React` | `^1.21.0` | Ícones de navegação e acção cerimonial |
-| **Execução de Testes** | Node Test Runner / `tsx` | `tsx ^4.22.4` | Execução dos testes automatizados de RSVP, storage e Neon DB |
-| **Plataforma de Alojamento** | `Vercel` | Edge / Serverless | Implementação contínua associada ao branch `main` |
+| Camada Arquitectural | Tecnologia / Pacote | Versão Declarada (`package.json`) | Versão Resolvida (`lockfile`) | Finalidade no Projecto |
+| :--- | :--- | :---: | :---: | :--- |
+| **Framework Web** | `Next.js` | `15.5.19` | `15.5.19` | App Router e renderização de experiências dinâmicas `/[slug]` |
+| **Biblioteca de Interface** | `React` / `React DOM` | `^19.0.0` | `19.2.4` | Renderização reactiva de cerimónias e componentes interactivos |
+| **Linguagem de Programação**| `TypeScript` | `^5` | `5.9.3` | Verificação estrita de tipos e segurança em tempo de compilação |
+| **Ambiente de Execução** | `Node.js` | `^20` / `22.x LTS` | `v24.15.0 LTS` | Ambiente serverless na Vercel e motor de execução de testes |
+| **Estilos & Layout** | `Tailwind CSS` | `^4` | `4.3.1` | Motor CSS modular optimizado para carregamento instantâneo |
+| **Motion & Animações** | `Framer Motion` / `Motion`| `^12.40.0` | `12.40.0` | Transições fluídas, revelações cerimoniais e micro-interacções |
+| **Scroll Suave** | `Lenis` | `^1.3.23` | `1.3.23` | Experiência de deslocação vertical editorial e sem atrito |
+| **Base de Dados Principal** | `PostgreSQL (Neon)` | `pg ^8.23.0` | `8.23.0` | Driver nativo conectado com pooler e papel `edition_runtime` |
+| **Armazenamento de Objectos**| `@aws-sdk/client-s3` | `^3.1127.0` | `3.1127.0` | Manipulação de fotografias e vídeos em Cloudflare R2 |
+| **Segurança de Uploads** | `@aws-sdk/s3-request-presigner`| `^3.1127.0` | `3.1127.0` | Emissão de URLs assinadas PUT/GET temporárias (15 minutos) |
+| **Manipulação de Ficheiros**| `JSZip` | `^3.10.1` | `3.10.1` | Compactação de fotografias de eventos para exportação em lote |
+| **Captura de Imagem** | `html-to-image` | `^1.11.13` | `1.11.13` | Geração de cartões e comprovativos visuais no navegador |
+| **Serviço de Email** | `Resend` | `^6.12.4` | `6.12.4` | Envio de lembretes e confirmações formais de presença |
+| **Iconografia** | `Lucide React` | `^1.21.0` | `1.21.0` | Ícones de navegação e acção cerimonial |
+| **Execução de Testes** | Node Test Runner / `tsx` | `tsx ^4.22.4` | `4.22.4` | Execução dos testes automatizados de RSVP, storage e Neon DB |
+| **Plataforma de Alojamento** | `Vercel` | Edge / Serverless | Edge / Serverless | Implementação contínua associada ao branch `main` |
 
 ---
 
