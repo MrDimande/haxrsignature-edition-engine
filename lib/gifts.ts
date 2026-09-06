@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { ROSE_ELEGANCE_GIFTS, type GiftItem } from "@data/gifts/rose-elegance";
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
 
 const REGISTRY_KEY = "rose-elegance";
 
@@ -96,20 +96,10 @@ async function saveReservationsToFile(
   }
 }
 
-async function getReservationsFromSupabase(): Promise<Reservation[]> {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("edition_gift_reservations")
-    .select("gift_id, reserved_by, created_at")
-    .eq("registry_key", REGISTRY_KEY)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    console.error("Error reading gift reservations from Supabase:", error);
-    throw error;
-  }
-
-  return (data ?? []).map((row) => ({
+async function getReservationsFromDb(): Promise<Reservation[]> {
+  const provider = getEditionDatabaseProvider();
+  const rows = await provider.listGiftReservations(REGISTRY_KEY);
+  return rows.map((row) => ({
     giftId: row.gift_id,
     reservedBy: row.reserved_by,
     timestamp: row.created_at,
@@ -117,51 +107,57 @@ async function getReservationsFromSupabase(): Promise<Reservation[]> {
 }
 
 async function getReservations(): Promise<Reservation[]> {
-  if (isSupabaseConfigured()) {
-    return getReservationsFromSupabase();
+  const provider = getEditionDatabaseProvider();
+  if (provider.isConfigured()) {
+    try {
+      return await getReservationsFromDb();
+    } catch (error) {
+      if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
+        console.error("[Gifts] Fail-closed: database read failed in production:", error);
+        throw error;
+      }
+      return getReservationsFromFile();
+    }
   }
   return getReservationsFromFile();
 }
 
-async function reserveGiftInSupabase(
+async function reserveGiftInDb(
   giftId: string,
   reservedBy: string,
   giftName: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createAdminClient();
-  const { data, error } = await supabase.rpc("reserve_edition_gift", {
-    p_registry_key: REGISTRY_KEY,
-    p_gift_id: giftId,
-    p_reserved_by: reservedBy.trim(),
-    p_gift_name: giftName,
-  });
+  try {
+    const provider = getEditionDatabaseProvider();
+    const payload = await provider.reserveGift(
+      REGISTRY_KEY,
+      giftId,
+      reservedBy.trim(),
+      giftName
+    );
 
-  if (error) {
-    console.error("Supabase reserve_edition_gift failed:", error.message);
-    return { success: false, error: "Ocorreu um erro interno ao processar a reserva." };
-  }
+    if (payload.ok) {
+      return { success: true };
+    }
 
-  const payload = data as {
-    ok?: boolean;
-    error?: string;
-    reservedBy?: string;
-  } | null;
+    if (payload.error === "already_reserved") {
+      return {
+        success: false,
+        error: "Este presente já foi reservado por outra convidada.",
+      };
+    }
 
-  if (payload?.ok) {
-    return { success: true };
-  }
-
-  if (payload?.error === "already_reserved") {
     return {
       success: false,
-      error: "Este presente já foi reservado por outra convidada.",
+      error: payload.error || "Ocorreu um erro interno ao processar a reserva.",
+    };
+  } catch (err: any) {
+    console.error("[Gifts] reserveGiftInDb error:", err?.message || err);
+    return {
+      success: false,
+      error: "Ocorreu um erro interno ao processar a reserva.",
     };
   }
-
-  return {
-    success: false,
-    error: "Ocorreu um erro interno ao processar a reserva.",
-  };
 }
 
 async function reserveGiftInFile(
@@ -226,8 +222,9 @@ export async function reserveGift(
           return;
         }
 
-        const result = isSupabaseConfigured()
-          ? await reserveGiftInSupabase(giftId, reservedBy, staticGift.name)
+        const provider = getEditionDatabaseProvider();
+        const result = provider.isConfigured()
+          ? await reserveGiftInDb(giftId, reservedBy, staticGift.name)
           : await reserveGiftInFile(giftId, reservedBy);
 
         if (!result.success) {

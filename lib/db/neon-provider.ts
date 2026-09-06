@@ -8,6 +8,8 @@ import type {
   PhotoUploadIntentRecord,
   RateLimitCheckResult,
   LeaderboardPhotoRow,
+  GiftReservationRow,
+  ReserveGiftResult,
 } from './types';
 
 export class NeonDatabaseProvider implements EditionDatabaseProvider {
@@ -191,5 +193,43 @@ export class NeonDatabaseProvider implements EditionDatabaseProvider {
     `;
     const res = await pool.query(query, [status, id, slug]);
     return (res.rowCount ?? 0) > 0;
+  }
+  async listGiftReservations(registryKey: string): Promise<GiftReservationRow[]> {
+    const pool = getNeonPool();
+    const query = `
+      SELECT gift_id, reserved_by, created_at
+      FROM edition_gift_reservations
+      WHERE registry_key = $1
+      ORDER BY created_at ASC
+    `;
+    const res = await pool.query(query, [registryKey]);
+    return res.rows.map((r: any) => ({
+      gift_id: r.gift_id,
+      reserved_by: r.reserved_by,
+      created_at: typeof r.created_at === 'object' && r.created_at ? r.created_at.toISOString() : String(r.created_at),
+    }));
+  }
+
+  async reserveGift(
+    registryKey: string,
+    giftId: string,
+    reservedBy: string,
+    giftName = ''
+  ): Promise<ReserveGiftResult> {
+    const pool = getNeonPool();
+    const query = `
+      SELECT reserve_edition_gift($1, $2, $3, $4) AS result
+    `;
+    const res = await pool.query(query, [registryKey, giftId, reservedBy.trim(), giftName]);
+    if (res.rows.length === 0 || !res.rows[0]?.result) {
+      return { ok: false, error: 'Ocorreu um erro interno ao processar a reserva.' };
+    }
+    const payload = res.rows[0].result;
+    return {
+      ok: Boolean(payload.ok),
+      error: payload.error,
+      reservedBy: payload.reservedBy,
+      timestamp: payload.timestamp,
+    };
   }
 }

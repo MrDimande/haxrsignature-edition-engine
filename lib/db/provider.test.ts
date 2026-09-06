@@ -97,6 +97,8 @@ test("getEditionDatabaseProvider respects test seam override", () => {
     getLeaderboardPhotos: async () => [],
     getParticipantPhotos: async () => [],
     updateModerationStatus: async () => true,
+    listGiftReservations: async () => [],
+    reserveGift: async () => ({ ok: true }),
   };
 
   try {

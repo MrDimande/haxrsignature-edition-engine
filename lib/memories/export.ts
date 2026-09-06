@@ -1,5 +1,6 @@
 import JSZip from "jszip";
-import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
+import { getEditionDatabaseProvider } from "@lib/db";
+import { getMemoriesStorageProvider } from "./storage";
 import { resolveMemoriesConfig } from "./config";
 import { PLUS_MEMORY_CHALLENGES, WEDDING_TABLES } from "@engines/true-theme/profiles/jessica-samuel-wedding/memories/plus-memorias-challenges";
 import { MEMORY_CHALLENGES as TRADITIONAL_CHALLENGES } from "@engines/true-theme/profiles/primavera-lobolo/memories/memorias-challenges";
@@ -24,69 +25,62 @@ function sanitizeFileName(str: string): string {
 export async function generateMemoriesZip(slug: string): Promise<Buffer | null> {
   const config = resolveMemoriesConfig(slug);
   if (!config) return null;
-  if (!isSupabaseConfigured()) return null;
 
-  const supabase = createAdminClient();
-  const bucketName = config.bucket;
+  const db = getEditionDatabaseProvider();
+  if (!db.isConfigured()) return null;
+
   const storageSlug = config.invitationSlug;
+  const rows = await db.listMemoriesPhotos(storageSlug, 1000);
+  if (!rows || rows.length === 0) return null;
 
-  // Buscar todas as memórias aprovadas/pendentes do evento
-  const { data: rows, error } = await supabase
-    .from("wedding_photos")
-    .select("id, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type, moderation_status")
-    .eq("invitation_slug", storageSlug)
-    .neq("moderation_status", "rejected")
-    .order("created_at", { ascending: true });
-
-  if (error || !rows?.length) return null;
-
+  const storage = getMemoriesStorageProvider();
   const zip = new JSZip();
   const isPlus = config.variant === "plus-memories";
   const challenges = isPlus ? PLUS_MEMORY_CHALLENGES : TRADITIONAL_CHALLENGES;
 
   for (const row of rows) {
-    // Baixar o ficheiro do storage
-    const { data: blob, error: downloadErr } = await supabase.storage
-      .from(bucketName)
-      .download(row.storage_path);
+    try {
+      const { downloadUrl } = await storage.createSignedDownloadUrl({
+        storagePath: row.storage_path,
+        expiresInSeconds: 600,
+      });
 
-    if (downloadErr || !blob) continue;
+      const response = await fetch(downloadUrl);
+      if (!response.ok) continue;
 
-    const arrayBuffer = await blob.arrayBuffer();
+      const arrayBuffer = await response.arrayBuffer();
 
-    // Determinar extensão
-    const contentType = row.content_type?.trim() || "image/jpeg";
-    const ext = contentType.startsWith("video/")
-      ? contentType.includes("webm") ? "webm" : contentType.includes("quicktime") ? "mov" : "mp4"
-      : contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
+      const contentType = row.content_type?.trim() || "image/jpeg";
+      const ext = contentType.startsWith("video/")
+        ? contentType.includes("webm") ? "webm" : contentType.includes("quicktime") ? "mov" : "mp4"
+        : contentType.includes("png") ? "png" : contentType.includes("webp") ? "webp" : "jpg";
 
-    // Determinar pasta de destino no ZIP
-    let folderPath = "Momentos_Espontaneos";
+      let folderPath = "Momentos_Espontaneos";
 
-    if (row.table_id) {
-      const tableInfo = WEDDING_TABLES.find((t) => t.id === row.table_id);
-      if (tableInfo) {
-        folderPath = `Por_Mesa/${tableInfo.id}_Mesa_${sanitizeFolderName(tableInfo.frenchName)}`;
-      } else {
-        folderPath = `Por_Mesa/Mesa_${row.table_id}`;
+      if (row.table_id) {
+        const tableInfo = WEDDING_TABLES.find((t) => t.id === row.table_id);
+        if (tableInfo) {
+          folderPath = `Por_Mesa/${tableInfo.id}_Mesa_${sanitizeFolderName(tableInfo.frenchName)}`;
+        } else {
+          folderPath = `Por_Mesa/Mesa_${row.table_id}`;
+        }
+      } else if (row.challenge_id) {
+        const ch = challenges.find((c) => c.id === row.challenge_id);
+        if (ch) {
+          folderPath = `Por_Desafio/Desafio_${ch.number}_${sanitizeFolderName(ch.title)}`;
+        }
       }
-    } else if (row.challenge_id) {
-      const ch = challenges.find((c) => c.id === row.challenge_id);
-      if (ch) {
-        folderPath = `Por_Desafio/Desafio_${ch.number}_${sanitizeFolderName(ch.title)}`;
-      }
+
+      const author = row.guest_name ? sanitizeFileName(row.guest_name) : "Convidado";
+      const shortId = row.id.slice(0, 8);
+      const filename = `${shortId}_${author}.${ext}`;
+
+      zip.folder(folderPath)?.file(filename, arrayBuffer);
+    } catch {
+      continue;
     }
-
-    // Nome do ficheiro
-    const author = row.guest_name ? sanitizeFileName(row.guest_name) : "Convidado";
-    const shortId = row.id.slice(0, 8);
-    const filename = `${shortId}_${author}.${ext}`;
-
-    // Adicionar ao ZIP
-    zip.folder(folderPath)?.file(filename, arrayBuffer);
   }
 
-  // Gerar o buffer final do arquivo ZIP
   const content = await zip.generateAsync({ type: "nodebuffer" });
   return content;
 }

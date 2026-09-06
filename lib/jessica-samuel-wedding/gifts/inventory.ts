@@ -27,7 +27,7 @@ export function __isJessicaSamuelGiftFileStoreAllowedForTests(
   if (env.NODE_ENV === "production" || env.VERCEL_ENV === "production") {
     return false;
   }
-  return !env.NEXT_PUBLIC_SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY;
+  return !env.DATABASE_URL && (!env.NEXT_PUBLIC_SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY);
 }
 
 export async function reserveJessicaSamuelGift(

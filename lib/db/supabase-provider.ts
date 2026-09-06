@@ -8,6 +8,8 @@ import type {
   PhotoUploadIntentRecord,
   RateLimitCheckResult,
   LeaderboardPhotoRow,
+  GiftReservationRow,
+  ReserveGiftResult,
 } from './types';
 
 export class SupabaseDatabaseProvider implements EditionDatabaseProvider {
@@ -155,5 +157,46 @@ export class SupabaseDatabaseProvider implements EditionDatabaseProvider {
       .eq('invitation_slug', slug);
 
     return !error;
+  }
+  async listGiftReservations(registryKey: string): Promise<GiftReservationRow[]> {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from('edition_gift_reservations')
+      .select('gift_id, reserved_by, created_at')
+      .eq('registry_key', registryKey)
+      .order('created_at', { ascending: true });
+
+    if (error || !data) return [];
+    return data.map((r: any) => ({
+      gift_id: r.gift_id,
+      reserved_by: r.reserved_by,
+      created_at: r.created_at,
+    }));
+  }
+
+  async reserveGift(
+    registryKey: string,
+    giftId: string,
+    reservedBy: string,
+    giftName = ''
+  ): Promise<ReserveGiftResult> {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.rpc('reserve_edition_gift', {
+      p_registry_key: registryKey,
+      p_gift_id: giftId,
+      p_reserved_by: reservedBy.trim(),
+      p_gift_name: giftName,
+    });
+
+    if (error || !data || typeof data !== 'object') {
+      return { ok: false, error: 'Ocorreu um erro interno ao processar a reserva.' };
+    }
+    const payload = data as any;
+    return {
+      ok: Boolean(payload.ok),
+      error: payload.error,
+      reservedBy: payload.reservedBy,
+      timestamp: payload.timestamp,
+    };
   }
 }
