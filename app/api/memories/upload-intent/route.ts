@@ -13,6 +13,8 @@ export async function POST(request: Request) {
     const record = body as Record<string, unknown>;
     const slug = typeof record.slug === "string" ? record.slug.trim() : "";
     const fileName = typeof record.fileName === "string" ? record.fileName.trim() : "";
+    // Alguns browsers móveis podem entregar File.type vazio. A camada de upload
+    // já infere o MIME pela extensão, por isso não rejeitamos o pedido aqui.
     const contentType = typeof record.contentType === "string" ? record.contentType.trim() : "";
     const fileSizeRaw = record.fileSizeBytes;
     const fileSizeBytes = typeof fileSizeRaw === "number" ? fileSizeRaw : Number(fileSizeRaw);
@@ -27,9 +29,6 @@ export async function POST(request: Request) {
     }
     if (!fileName) {
       return NextResponse.json({ success: false, error: "Seleccione um ficheiro." }, { status: 400 });
-    }
-    if (!contentType) {
-      return NextResponse.json({ success: false, error: "Tipo de ficheiro inválido." }, { status: 400 });
     }
     if (!Number.isInteger(fileSizeBytes) || fileSizeBytes <= 0) {
       return NextResponse.json({ success: false, error: "Tamanho de ficheiro inválido." }, { status: 400 });
