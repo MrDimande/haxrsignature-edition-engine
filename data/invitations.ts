@@ -53,6 +53,8 @@ export interface InvitationFeatures {
     /** Perfil funcional da experiência (determina componentes, desafios, etc.) */
     variant: MemoriesVariant;
     competition?: InvitationCompetitionConfig;
+    accessMode?: "legacy" | "session";
+    publicGalleryEnabled?: boolean;
   };
 }
 
@@ -157,6 +159,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       memories: {
         enabled: true,
         variant: "traditional-memories",
+        accessMode: "legacy",
       },
     },
   },
@@ -280,6 +283,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       memories: {
         enabled: true,
         variant: "plus-memories",
+        accessMode: "legacy",
         competition: {
           enabled: true,
           mode: "unique-challenges",
@@ -310,6 +314,49 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       eventDate: "2026-09-12",
       eventType: "Aniversário Infantil",
       ogImage: "/images/stan/social/stan-og.png",
+    },
+    admin: {
+      clientName: "Stan",
+      eventTypeLabel: "Aniversário",
+      adminEventName: "Edition · Aniversário · Stan",
+      envVar: "EDITION_EVENT_STAN_ID",
+      expectedRegistryKey: "stan-real-madrid",
+    },
+  },
+  "stan-real-madrid": {
+    slug: "stan-real-madrid",
+    aliases: [],
+    engine: "theme",
+    theme: "stan-real-madrid",
+    experienceType: "editorial",
+    sourcePath: "/stan-real-madrid",
+    legacyFolder: "stan",
+    status: "active",
+    metadata: {
+      title: "5º Aniversário do Stan — Real Madrid Experience",
+      date: "2026-09-12",
+      time: "11h00",
+      location: "Residência dos avós do S5 · Belo Horizonte, Maputo",
+      dressCode: "Kit Matchday · navy, azul, cream e areia",
+      subtitle: "O Quinto Acto de um Pequeno Campeão",
+      description:
+        "12 de Setembro de 2026 · 11h00 · Residência do S5, Belo Horizonte. Matchday Memories & Eu Espio.",
+      eventDate: "2026-09-12",
+      eventType: "Aniversário Infantil",
+      ogImage: "/images/stan/social/stan-og.png",
+    },
+    features: {
+      memories: {
+        enabled: true,
+        variant: "plus-memories",
+        accessMode: "session",
+        publicGalleryEnabled: true,
+        competition: {
+          enabled: true,
+          mode: "unique-challenges",
+          totalChallenges: 10,
+        },
+      },
     },
     admin: {
       clientName: "Stan",

@@ -48,6 +48,12 @@ export interface MemoriesStorageProvider {
   /** Leitura de prefixo de bytes delimitado (range) para validação de magic bytes */
   readObjectPrefix(storagePath: string, maxBytes: number): Promise<Uint8Array | null>;
 
+  /** Leitura do corpo completo de um objecto do storage */
+  readObject(storagePath: string): Promise<Uint8Array | null>;
+
+  /** Escreve um objecto directamente no storage (usado pelo pipeline de derivados) */
+  putObject(storagePath: string, data: Uint8Array | Buffer, contentType: string): Promise<void>;
+
   /** Elimina fisicamente um objecto exacto do balde */
   remove(storagePath: string): Promise<void>;
 }

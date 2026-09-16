@@ -2,6 +2,7 @@ import JSZip from "jszip";
 import { getEditionDatabaseProvider } from "@lib/db";
 import { getMemoriesStorageProvider } from "./storage";
 import { resolveMemoriesConfig } from "./config";
+import { isPublishedMemoryForEvent } from "./publication";
 import { PLUS_MEMORY_CHALLENGES, WEDDING_TABLES } from "@engines/true-theme/profiles/jessica-samuel-wedding/memories/plus-memorias-challenges";
 import { MEMORY_CHALLENGES as TRADITIONAL_CHALLENGES } from "@engines/true-theme/profiles/primavera-lobolo/memories/memorias-challenges";
 
@@ -27,11 +28,12 @@ export async function generateMemoriesZip(slug: string): Promise<Buffer | null> 
   if (!config) return null;
 
   const db = getEditionDatabaseProvider();
-  if (!db.isConfigured()) return null;
+  if (!db.isConfigured()) throw new Error("Serviço de memórias indisponível.");
 
   const storageSlug = config.invitationSlug;
-  const rows = await db.listMemoriesPhotos(storageSlug, 1000);
-  if (!rows || rows.length === 0) return null;
+  const rows = (await db.listMemoriesPhotos(storageSlug, 1000))
+    .filter((row) => isPublishedMemoryForEvent(row, storageSlug));
+  if (rows.length === 0) return null;
 
   const storage = getMemoriesStorageProvider();
   const zip = new JSZip();
@@ -46,7 +48,7 @@ export async function generateMemoriesZip(slug: string): Promise<Buffer | null> 
       });
 
       const response = await fetch(downloadUrl);
-      if (!response.ok) continue;
+      if (!response.ok) throw new Error("Não foi possível ler uma memória.");
 
       const arrayBuffer = await response.arrayBuffer();
 
@@ -62,7 +64,7 @@ export async function generateMemoriesZip(slug: string): Promise<Buffer | null> 
         if (tableInfo) {
           folderPath = `Por_Mesa/${tableInfo.id}_Mesa_${sanitizeFolderName(tableInfo.frenchName)}`;
         } else {
-          folderPath = `Por_Mesa/Mesa_${row.table_id}`;
+          folderPath = `Por_Mesa/Mesa_${sanitizeFolderName(row.table_id) || "Sem_nome"}`;
         }
       } else if (row.challenge_id) {
         const ch = challenges.find((c) => c.id === row.challenge_id);
@@ -72,12 +74,11 @@ export async function generateMemoriesZip(slug: string): Promise<Buffer | null> 
       }
 
       const author = row.guest_name ? sanitizeFileName(row.guest_name) : "Convidado";
-      const shortId = row.id.slice(0, 8);
-      const filename = `${shortId}_${author}.${ext}`;
+      const filename = `${row.id}_${author}.${ext}`;
 
       zip.folder(folderPath)?.file(filename, arrayBuffer);
     } catch {
-      continue;
+      throw new Error("Não foi possível concluir a exportação das memórias.");
     }
   }
 

@@ -121,7 +121,8 @@ A raiz (`/`) da plataforma não expõe nem indexa casais por motivos estritos de
 - **Papel de Menor Privilégio:** Conexões à base de dados limitadas ao papel `edition_runtime`.
 - **Row-Level Security (RLS):** Tabelas operacionais (`photo_upload_intents`, `wedding_photos`, `edition_gift_reservations`) protegidas por políticas de segurança ao nível da linha.
 - **Rate Limiting em Janela Deslizante:** Protecção contra negação de serviço e abuso de custos (*Denial of Wallet*) através de verificação de pedidos por IP e slug (`api_rate_limits` em PostgreSQL), devolvendo `HTTP 429` com cabeçalho `Retry-After`.
-- **Autenticação Administrativa para Moderação:** Rotas de moderação de fotografias (`/api/memories/moderate`) e exportação em lote (`/api/memories/export-zip`) exigem token Bearer secreto (`HAXR_MEMORIES_ADMIN_TOKEN`).
+- **Autenticação Administrativa de Memories:** Moderação (`/api/memories/moderate`), classificação (`/api/memories/leaderboard`) e exportação (`/api/memories/export-zip`) exigem `Authorization: Bearer <token>` com `ADMIN_MODERATION_SECRET` configurado exclusivamente no servidor. Credenciais no URL, no JSON ou em headers alternativos não são aceites. Sem configuração, as operações ficam indisponíveis (503).
+- **Publicação:** Galeria e ZIP incluem apenas media aprovada, com evento e caminho de storage correspondentes. `features.memories.publicGalleryEnabled: false` desactiva a leitura da galeria; não implementa uma sessão de convidado. A auditoria e o progresso para 2.0 estão em [Fase 0](docs/plus-memories-2-audit.md) e [Fase 1A](docs/plus-memories-2-phase-1a.md).
 
 ---
 
@@ -169,7 +170,7 @@ Configure as seguintes variáveis no ficheiro `.env.local` (nunca versionado no 
 | `CLOUDFLARE_R2_SECRET_ACCESS_KEY` | **Sim** | Servidor | Chave secreta S3 para o bucket `wedding-photos` |
 | `CLOUDFLARE_R2_ENDPOINT` | **Sim** | Servidor | Endpoint HTTPS S3 do Cloudflare R2 |
 | `CLOUDFLARE_R2_BUCKET_NAME` | **Sim** | Servidor | Nome do bucket R2 de fotografias (`wedding-photos`) |
-| `HAXR_MEMORIES_ADMIN_TOKEN` | **Sim** | Servidor | Token Bearer para moderação e exportação de memórias |
+| `ADMIN_MODERATION_SECRET` | **Sim** | Servidor | Token Bearer para moderação, classificação e exportação de memórias |
 | `NEXT_PUBLIC_SITE_URL` | **Sim** | Público | Domínio canónico público (`https://edition.haxrsignature.com`) |
 
 ---

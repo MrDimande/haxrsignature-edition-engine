@@ -2,10 +2,10 @@
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Camera, Image as ImageIcon, Video, X, Check, AlertCircle, Loader2, Sparkles } from "lucide-react";
+import { Camera, Image as ImageIcon, Video, X, Check, AlertCircle, Loader2, Palette } from "lucide-react";
 import { uploadPlusMemory } from "./plus-memorias-upload";
 import { optimizePhoto, isEnhanceable } from "./plus-memorias-enhance";
-import { queueOfflineMemory } from "./plus-memorias-offline-queue";
+import { enqueueMemoryUpload, processUploadQueue } from "@lib/memories/upload-queue";
 import type { MemoryChallenge } from "./plus-memorias-challenges";
 
 interface PlusMemoriasCaptureModalProps {
@@ -92,66 +92,66 @@ export function PlusMemoriasCaptureModal({
     setStatus("uploading");
     setErrorMessage("");
 
+    // Fase 6: Enfileiramento na Fila Persistente do Browser com Idempotência
     try {
-      const result = await uploadPlusMemory({
+      await enqueueMemoryUpload({
         slug,
-        file: fileToUpload,
-        challengeId: challenge?.id,
-        tableId,
-        guestName: guestName.trim() || undefined,
-        caption: caption.trim() || undefined,
-        participantId,
-      });
-
-      if (result.success) {
-        setStatus("success");
-        setTimeout(() => {
-          onSuccess(challenge?.id);
-          handleClose();
-        }, 1800);
-      } else {
-        // Se a falha for de ligação (offline), guardar na fila offline do dispositivo
-        if (!navigator.onLine || result.error.includes("ligação")) {
-          await queueOfflineMemory({
-            slug,
-            blob: fileToUpload,
-            fileName: fileToUpload.name,
-            contentType: fileToUpload.type,
-            guestName: guestName.trim() || undefined,
-            caption: caption.trim() || undefined,
-            challengeId: challenge?.id,
-            tableId,
-            participantId,
-          });
-          setStatus("success");
-          setErrorMessage("");
-          setTimeout(() => {
-            onSuccess(challenge?.id);
-            handleClose();
-          }, 2200);
-          return;
-        }
-
-        setStatus("error");
-        setErrorMessage(result.error);
-      }
-    } catch {
-      await queueOfflineMemory({
-        slug,
-        blob: fileToUpload,
+        fileBlob: fileToUpload,
         fileName: fileToUpload.name,
         contentType: fileToUpload.type,
+        fileSizeBytes: fileToUpload.size,
         guestName: guestName.trim() || undefined,
         caption: caption.trim() || undefined,
         challengeId: challenge?.id,
         tableId,
         participantId,
+        capturedAt: new Date().toISOString(),
       });
+
       setStatus("success");
+
+      // Desencadear processamento assíncrono em segundo plano sem bloquear a UI
+      processUploadQueue({ slug, currentParticipantId: participantId }).catch(() => {});
+
       setTimeout(() => {
         onSuccess(challenge?.id);
         handleClose();
-      }, 2200);
+      }, 1200);
+    } catch (err: any) {
+      // Regra 12: Se o armazenamento do browser estiver esgotado, tentar upload directo
+      if (err?.name === "QuotaExceededError") {
+        try {
+          const directResult = await uploadPlusMemory({
+            slug,
+            file: fileToUpload,
+            challengeId: challenge?.id,
+            tableId,
+            guestName: guestName.trim() || undefined,
+            caption: caption.trim() || undefined,
+            participantId,
+          });
+
+          if (directResult.success) {
+            setStatus("success");
+            setTimeout(() => {
+              onSuccess(challenge?.id);
+              handleClose();
+            }, 1200);
+            return;
+          } else {
+            setStatus("error");
+            setErrorMessage(directResult.error);
+            return;
+          }
+        } catch {
+          setStatus("error");
+          setErrorMessage("Armazenamento local cheio e não foi possível enviar de imediato.");
+          return;
+        }
+      }
+
+      setStatus("error");
+      setErrorMessage("Não foi possível preparar o momento para envio.");
     }
   };
 
@@ -298,7 +298,7 @@ export function PlusMemoriasCaptureModal({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <Sparkles className="w-3.5 h-3.5 text-[#7A2332]" />
+                            <Palette className="w-3.5 h-3.5 text-[#7A2332]" />
                             <span className="font-display text-[10px] tracking-[0.15em] uppercase text-[#171312] font-medium">
                               Optimizar fotografia
                             </span>

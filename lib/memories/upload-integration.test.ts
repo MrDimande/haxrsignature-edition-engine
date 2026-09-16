@@ -99,6 +99,8 @@ describe("HAXR Signature Edition — Memories Upload Flow & Freeze Integration",
       createSignedUploadUrl: async () => ({ uploadUrl: "https://mock" }),
       createSignedDownloadUrl: async () => ({ downloadUrl: "https://mock" }),
       getObjectInfo: async () => ({ exists: true, contentLength: 1024, contentType: "image/jpeg" }),
+      readObject: async () => Buffer.alloc(0),
+      putObject: async () => {},
       readObjectPrefix: async () => new Uint8Array([0x00, 0x00, 0x00, 0x00]), // corrupt bytes
       remove: async (p: string) => {
         purgedPath = p;
@@ -144,6 +146,8 @@ describe("HAXR Signature Edition — Memories Upload Flow & Freeze Integration",
       createSignedUploadUrl: async () => ({ uploadUrl: "https://mock" }),
       createSignedDownloadUrl: async () => ({ downloadUrl: "https://mock" }),
       getObjectInfo: async () => ({ exists: true, contentLength: 5000, contentType: "image/jpeg" }),
+      readObject: async () => Buffer.alloc(0),
+      putObject: async () => {},
       readObjectPrefix: async () => new Uint8Array([0xff, 0xd8, 0xff]), // valid JPEG
       remove: async (p: string) => {
         purgedPath = p;

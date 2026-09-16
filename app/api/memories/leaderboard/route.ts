@@ -1,38 +1,11 @@
 import { NextResponse } from "next/server";
 import { getMemoriesLeaderboard } from "@lib/memories/leaderboard";
+import { MEMORIES_PRIVATE_HEADERS, requireMemoriesAdmin } from "@lib/memories/admin-auth";
 
 export async function GET(request: Request) {
+  const auth = requireMemoriesAdmin(request);
+  if (!auth.ok) return auth.response;
   try {
-    // Directiva #4: Sem segredo configurado no ambiente -> indisponível. Sem fallback hardcoded.
-    const adminSecret = process.env.ADMIN_MODERATION_SECRET;
-    if (!adminSecret) {
-      return NextResponse.json(
-        { success: false, error: "Serviço de classificação indisponível." },
-        {
-          status: 503,
-          headers: { "Cache-Control": "no-store" },
-        }
-      );
-    }
-
-    // Directiva #4: Authorization obrigatório
-    const authHeader = request.headers.get("authorization") || "";
-    const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.substring(7).trim() : null;
-    const querySecret = new URL(request.url).searchParams.get("secretKey")?.trim() || null;
-    const headerSecret = request.headers.get("x-admin-secret")?.trim() || null;
-
-    const providedSecret = bearerToken || headerSecret || querySecret;
-
-    if (!providedSecret || providedSecret !== adminSecret) {
-      return NextResponse.json(
-        { success: false, error: "Acesso não autorizado." },
-        {
-          status: 401,
-          headers: { "Cache-Control": "no-store" },
-        }
-      );
-    }
-
     const { searchParams } = new URL(request.url);
     const slug = searchParams.get("slug")?.trim() || "";
     const rawMode = searchParams.get("mode")?.trim();
@@ -41,7 +14,7 @@ export async function GET(request: Request) {
     if (!slug) {
       return NextResponse.json(
         { success: false, error: "Convite inválido." },
-        { status: 400, headers: { "Cache-Control": "no-store" } }
+        { status: 400, headers: MEMORIES_PRIVATE_HEADERS }
       );
     }
 
@@ -49,20 +22,18 @@ export async function GET(request: Request) {
     if (!result.success) {
       return NextResponse.json(result, {
         status: 400,
-        headers: { "Cache-Control": "no-store" },
+        headers: MEMORIES_PRIVATE_HEADERS,
       });
     }
 
     return NextResponse.json(result, {
-      headers: {
-        "Cache-Control": "no-store",
-      },
+      headers: MEMORIES_PRIVATE_HEADERS,
     });
-  } catch (error) {
-    console.error("GET /api/memories/leaderboard error:", error);
+  } catch {
+    console.error("[memories] leaderboard_failed");
     return NextResponse.json(
       { success: false, error: "Pedido inválido." },
-      { status: 400, headers: { "Cache-Control": "no-store" } }
+      { status: 400, headers: MEMORIES_PRIVATE_HEADERS }
     );
   }
 }

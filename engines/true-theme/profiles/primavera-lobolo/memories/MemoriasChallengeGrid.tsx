@@ -18,7 +18,7 @@ export function MemoriasChallengeGrid({
     <section className="px-4 sm:px-6 max-w-4xl mx-auto my-6">
       <div className="text-center mb-8">
         <h2 className="font-display text-xl sm:text-2xl font-light text-[#2A1810] tracking-wide mb-1">
-          Desafios "Eu Espio..."
+          Desafios &quot;Eu Espio...&quot;
         </h2>
         <p className="font-body text-xs text-[#4A3020]/75">
           Toque num desafio para registar a fotografia ou vídeo correspondente.

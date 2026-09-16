@@ -10,6 +10,9 @@ import { PlusMemoriasLiveGallery } from "./PlusMemoriasLiveGallery";
 import { PlusMemoriasCaptureModal } from "./PlusMemoriasCaptureModal";
 import { PlusMemoriasCompetitionOptIn } from "./PlusMemoriasCompetitionOptIn";
 import { PlusMemoriasCompletionModal } from "./PlusMemoriasCompletionModal";
+import { PlusMemoriasExplorers } from "./PlusMemoriasExplorers";
+import { PlusMemoriasUploadBadge } from "./PlusMemoriasUploadBadge";
+import { HaxrMomentsSection } from "@components/memories/HaxrMomentsSection";
 import {
   PLUS_MEMORY_CHALLENGES,
   getCompletedChallenges,
@@ -25,8 +28,10 @@ import {
 } from "./plus-memorias-identity";
 import { PlusMemoriasToast } from "./PlusMemoriasToast";
 import { PlusMemoriasFooter } from "./PlusMemoriasFooter";
-import { Trophy, Edit3 } from "lucide-react";
+import { Trophy, Edit3, Film, Eye, Image as ImageIcon, Users } from "lucide-react";
 import "./plus-memorias.css";
+
+export type MemoriesNavTab = "moments" | "challenges" | "album" | "explorers";
 
 interface PlusMemoriasExperienceProps {
   config: InvitationConfig;
@@ -51,6 +56,7 @@ export function PlusMemoriasExperience({
   const [optInStatus, setOptInStatus] = useState<OptInStatus>("undecided");
   const [participantName, setParticipantNameState] = useState<string>("");
   const [isEditingOptIn, setIsEditingOptIn] = useState(false);
+  const [activeTab, setActiveTab] = useState<MemoriesNavTab>("moments");
 
   useEffect(() => {
     // 1. Inicializar IDs concluídos do localStorage
@@ -84,24 +90,15 @@ export function PlusMemoriasExperience({
       }
     }
 
-    // 3. Processar fila offline
+    // 3. Processar fila offline persistente (Fase 6)
     const handleRetry = async () => {
-      const { processOfflineQueue } = await import("./plus-memorias-offline-queue");
-      const { uploadPlusMemory } = await import("./plus-memorias-upload");
-      const count = await processOfflineQueue(async (item) => {
-        const file = new File([item.blob], item.fileName, { type: item.contentType });
-        const res = await uploadPlusMemory({
-          slug: item.slug,
-          file,
-          challengeId: item.challengeId,
-          tableId: item.tableId,
-          guestName: item.guestName,
-          caption: item.caption,
-          participantId: item.participantId,
-        });
-        return { success: res.success };
+      const { processUploadQueue } = await import("@lib/memories/upload-queue");
+      const currentPartId = optInStatus === "opted_in" ? participantId : undefined;
+      const res = await processUploadQueue({
+        slug: config.slug,
+        currentParticipantId: currentPartId,
       });
-      if (count > 0) {
+      if (res.succeeded > 0) {
         setGalleryRefreshTrigger((prev) => prev + 1);
       }
     };
@@ -109,7 +106,7 @@ export function PlusMemoriasExperience({
     handleRetry();
     window.addEventListener("online", handleRetry);
     return () => window.removeEventListener("online", handleRetry);
-  }, [config.slug, competitionEnabled]);
+  }, [config.slug, competitionEnabled, optInStatus, participantId]);
 
   const handleSelectChallenge = (challenge: MemoryChallenge) => {
     setSelectedChallenge(challenge);
@@ -184,23 +181,109 @@ export function PlusMemoriasExperience({
             </div>
           )}
 
-          {/* Grelha dos 12 Desafios revelada após a escolha */}
-          <PlusMemoriasChallengeGrid
-            completedIds={completedIds}
-            onSelectChallenge={handleSelectChallenge}
-          />
+          {/* Navegação Principal de 4 Abas: Momentos | Eu Espio | Álbum | Exploradores */}
+          <div className="max-w-md mx-auto px-4 mb-6 sticky top-2 z-30">
+            <div className="bg-[#FFF9F2]/95 backdrop-blur-md border border-[#D4AF37]/30 rounded-2xl p-1 flex items-center justify-between shadow-sm">
+              <button
+                type="button"
+                onClick={() => setActiveTab("moments")}
+                className={`flex-1 py-2 px-1 rounded-xl text-xs font-serif tracking-wide transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                  activeTab === "moments"
+                    ? "bg-[#7A2332] text-white shadow-xs font-medium"
+                    : "text-neutral-600 hover:text-[#7A2332]"
+                }`}
+              >
+                <Film className="w-3.5 h-3.5" />
+                <span>Momentos</span>
+              </button>
 
-          <PlusMemoriasProgress
-            completedCount={completedIds.length}
-            totalCount={PLUS_MEMORY_CHALLENGES.length}
-            onOpenFreeMoment={handleOpenFreeMoment}
-          />
+              <button
+                type="button"
+                onClick={() => setActiveTab("challenges")}
+                className={`flex-1 py-2 px-1 rounded-xl text-xs font-serif tracking-wide transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                  activeTab === "challenges"
+                    ? "bg-[#7A2332] text-white shadow-xs font-medium"
+                    : "text-neutral-600 hover:text-[#7A2332]"
+                }`}
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Eu Espio</span>
+              </button>
 
-          {/* Galeria Viva / Álbum Colectivo */}
-          <PlusMemoriasLiveGallery
-            slug={config.slug}
-            refreshTrigger={galleryRefreshTrigger}
-          />
+              <button
+                type="button"
+                onClick={() => setActiveTab("album")}
+                className={`flex-1 py-2 px-1 rounded-xl text-xs font-serif tracking-wide transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                  activeTab === "album"
+                    ? "bg-[#7A2332] text-white shadow-xs font-medium"
+                    : "text-neutral-600 hover:text-[#7A2332]"
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>Álbum</span>
+              </button>
+
+              {competitionEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("explorers")}
+                  className={`flex-1 py-2 px-1 rounded-xl text-xs font-serif tracking-wide transition-all flex flex-col sm:flex-row items-center justify-center gap-1 ${
+                    activeTab === "explorers"
+                      ? "bg-[#7A2332] text-white shadow-xs font-medium"
+                      : "text-neutral-600 hover:text-[#7A2332]"
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Exploradores</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Conteúdo da Aba Activa */}
+          {activeTab === "moments" && (
+            <div className="max-w-md mx-auto px-4">
+              <HaxrMomentsSection
+                slug={config.slug}
+                refreshTrigger={galleryRefreshTrigger}
+                onOpenCapture={() => handleOpenFreeMoment()}
+              />
+            </div>
+          )}
+
+          {activeTab === "challenges" && (
+            <>
+              {/* Grelha dos 12 Desafios / Missões revelada após a escolha */}
+              <PlusMemoriasChallengeGrid
+                slug={config.slug}
+                tableId={tableId}
+                completedIds={completedIds}
+                onSelectChallenge={handleSelectChallenge}
+              />
+
+              <PlusMemoriasProgress
+                completedCount={completedIds.length}
+                totalCount={PLUS_MEMORY_CHALLENGES.length}
+                onOpenFreeMoment={handleOpenFreeMoment}
+              />
+            </>
+          )}
+
+          {activeTab === "album" && (
+            /* Galeria Viva / Álbum Colectivo */
+            <PlusMemoriasLiveGallery
+              slug={config.slug}
+              refreshTrigger={galleryRefreshTrigger}
+            />
+          )}
+
+          {activeTab === "explorers" && competitionEnabled && (
+            /* Classificação de Exploradores */
+            <PlusMemoriasExplorers
+              slug={config.slug}
+              refreshTrigger={galleryRefreshTrigger}
+            />
+          )}
         </>
       )}
 
@@ -218,6 +301,12 @@ export function PlusMemoriasExperience({
       <PlusMemoriasCompletionModal
         isOpen={isCompletionModalOpen}
         onClose={() => setIsCompletionModalOpen(false)}
+      />
+
+      {/* Badge de Resiliência Offline e Estado de Uploads (Fase 6) */}
+      <PlusMemoriasUploadBadge
+        slug={config.slug}
+        participantId={optInStatus === "opted_in" ? participantId : undefined}
       />
 
       <PlusMemoriasFooter />

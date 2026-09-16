@@ -12,16 +12,22 @@ export function getNeonPool(): Pool {
     throw new Error('[NeonClient] Fail-closed: DATABASE_URL em falta.');
   }
 
-  poolInstance = new Pool({
+  const pool = new Pool({
     connectionString,
     ssl: {
       rejectUnauthorized: false,
     },
     max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
+    idleTimeoutMillis: 15000,
+    connectionTimeoutMillis: 10000,
+    keepAlive: true,
   });
 
+  pool.on('error', (err) => {
+    console.warn('[NeonClient] Unexpected error on idle client:', err?.message || err);
+  });
+
+  poolInstance = pool;
   return poolInstance;
 }
 

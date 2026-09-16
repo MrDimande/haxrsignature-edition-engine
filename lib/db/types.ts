@@ -2,6 +2,8 @@ export type DatabaseProviderName = 'neon' | 'supabase';
 
 export type PublicMemoryPhotoRow = {
   id: string;
+  invitation_slug: string;
+  moderation_status: string;
   caption: string | null;
   guest_name: string | null;
   challenge_id: string | null;
@@ -9,6 +11,23 @@ export type PublicMemoryPhotoRow = {
   created_at: string;
   storage_path: string;
   content_type: string;
+  // Phase 2: Media Core & Derivatives
+  stage_id?: string | null;
+  captured_at?: string | null;
+  width?: number | null;
+  height?: number | null;
+  orientation?: string | null;
+  duration_seconds?: number | null;
+  media_type?: 'image' | 'video';
+  thumbnail_storage_path?: string | null;
+  poster_storage_path?: string | null;
+  // Phase 5: Media Derivatives Pipeline
+  medium_storage_path?: string | null;
+  derivatives_status?: 'pending' | 'processing' | 'ready' | 'failed';
+  has_derivatives?: boolean;
+  derivatives_error?: string | null;
+  derivatives_attempts?: number;
+  derivatives_processed_at?: string | null;
 };
 
 export type InsertPendingPhotoInput = {
@@ -23,6 +42,20 @@ export type InsertPendingPhotoInput = {
   challengeId?: string | null;
   tableId?: string | null;
   participantId?: string | null;
+  eventId?: string | null;
+  experienceId?: string | null;
+  stageId?: string | null;
+  capturedAt?: string | null;
+  width?: number | null;
+  height?: number | null;
+  orientation?: string | null;
+  durationSeconds?: number | null;
+  mediaType?: 'image' | 'video';
+  thumbnailStoragePath?: string | null;
+  posterStoragePath?: string | null;
+  mediumStoragePath?: string | null;
+  derivativesStatus?: 'pending' | 'processing' | 'ready' | 'failed';
+  hasDerivatives?: boolean;
 };
 
 export type CreatePhotoUploadIntentRecordInput = {
@@ -33,6 +66,18 @@ export type CreatePhotoUploadIntentRecordInput = {
   contentType: string;
   declaredFileSizeBytes: number;
   expiresAt: string;
+  clientUploadId?: string | null;
+  eventId?: string | null;
+  participantId?: string | null;
+  sessionId?: string | null;
+  experienceId?: string | null;
+  stageId?: string | null;
+  capturedAt?: string | null;
+  width?: number | null;
+  height?: number | null;
+  durationSeconds?: number | null;
+  thumbnailStoragePath?: string | null;
+  posterStoragePath?: string | null;
 };
 
 export type ConsumePhotoUploadIntentInput = {
@@ -49,11 +94,55 @@ export type PhotoUploadIntentRecord = {
   storagePath: string;
   contentType: string;
   declaredFileSizeBytes: number;
-  status: 'pending' | 'consumed' | 'expired';
+  status: 'pending' | 'consumed' | 'expired' | 'completed' | 'cancelled';
   createdAt: string;
   expiresAt: string;
   consumedAt: string | null;
+  clientUploadId?: string | null;
+  completedMediaId?: string | null;
+  eventId?: string | null;
+  participantId?: string | null;
+  experienceId?: string | null;
+  stageId?: string | null;
+  capturedAt?: string | null;
+  width?: number | null;
+  height?: number | null;
+  durationSeconds?: number | null;
+  thumbnailStoragePath?: string | null;
+  posterStoragePath?: string | null;
 };
+
+export type TransactionalCompleteIntentInput = {
+  photoId: string;
+  slug: string;
+  actualSizeBytes: number;
+  originalFilename?: string;
+  guestName?: string | null;
+  caption?: string | null;
+  challengeId?: string | null;
+  tableId?: string | null;
+  participantId?: string | null;
+  stageId?: string | null;
+  capturedAt?: string | null;
+  width?: number | null;
+  height?: number | null;
+  orientation?: string | null;
+  durationSeconds?: number | null;
+  mediaType?: 'image' | 'video';
+  thumbnailStoragePath?: string | null;
+  posterStoragePath?: string | null;
+  clientUploadId?: string | null;
+  context?: {
+    eventId: string;
+    experienceId?: string;
+    participantId: string;
+    sessionId: string;
+  } | null;
+};
+
+export type TransactionalCompleteIntentResult =
+  | { success: true; mediaId: string; replayed?: boolean }
+  | { success: false; error: string; code: string };
 
 export type RateLimitCheckResult = {
   allowed: boolean;
@@ -78,6 +167,8 @@ export interface EditionDatabaseProvider {
   insertPendingPhoto(input: InsertPendingPhotoInput): Promise<boolean>;
   createUploadIntent(input: CreatePhotoUploadIntentRecordInput): Promise<void>;
   consumeUploadIntent(input: ConsumePhotoUploadIntentInput): Promise<PhotoUploadIntentRecord | null>;
+  findUploadIntentByClientIdempotency?(eventId: string, experienceId: string, participantId: string, clientUploadId: string): Promise<PhotoUploadIntentRecord | null>;
+  completePhotoUploadTransaction?(input: TransactionalCompleteIntentInput): Promise<TransactionalCompleteIntentResult>;
   checkApiRateLimit(bucketKey: string, maxRequests: number, windowSeconds: number): Promise<RateLimitCheckResult>;
   getLeaderboardPhotos(slug: string): Promise<LeaderboardPhotoRow[]>;
   getParticipantPhotos(slug: string, participantId: string): Promise<LeaderboardPhotoRow[]>;
@@ -98,4 +189,3 @@ export type ReserveGiftResult = {
   reservedBy?: string;
   timestamp?: string;
 };
-

@@ -13,6 +13,15 @@ describe("HAXR Signature Edition — Storage Path Security", () => {
     assert.doesNotThrow(() =>
       assertCanonicalStoragePath("lobolo-jessica-samuel/a1b2c3d4-e5f6-7890-abcd-ef1234567890/original.webp")
     );
+    assert.doesNotThrow(() =>
+      assertCanonicalStoragePath("jessicasamuelwedding/67a29bbd-6840-43c8-8b8e-31865023bf51/thumbnail.webp")
+    );
+    assert.doesNotThrow(() =>
+      assertCanonicalStoragePath("jessicasamuelwedding/67a29bbd-6840-43c8-8b8e-31865023bf51/medium.webp")
+    );
+    assert.doesNotThrow(() =>
+      assertCanonicalStoragePath("jessicasamuelwedding/67a29bbd-6840-43c8-8b8e-31865023bf51/poster.webp")
+    );
   });
 
   test("rejects directory traversal ../", () => {

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { listApprovedPublicPhotos } from "@lib/jessica-samuel-wedding/photo-wall/gallery";
 import { getPhotoWallPhase } from "@lib/jessica-samuel-wedding/photo-wall/validation";
 import { JESSICA_SAMUEL_PHOTO_WALL } from "@lib/jessica-samuel-wedding/photo-wall/config";
+import { authorizeMemoriesRequest } from "@lib/memories/gateway";
+import { memoriesJson } from "@lib/memories/admin-auth";
 
 export async function GET(request: Request) {
   try {
@@ -9,6 +11,12 @@ export async function GET(request: Request) {
     const slug =
       searchParams.get("slug")?.trim() ||
       JESSICA_SAMUEL_PHOTO_WALL.invitationSlug;
+
+    // Gateway central: assegura que este alias antigo não serve de bypass para eventos em session mode
+    const auth = await authorizeMemoriesRequest({ request, slug, permission: "gallery:read" });
+    if (!auth.ok) {
+      return auth.response;
+    }
 
     // Feature fechada nesta release — resposta vazia sem tocar Supabase/migrations.
     if (!JESSICA_SAMUEL_PHOTO_WALL.enabled) {
@@ -47,9 +55,6 @@ export async function GET(request: Request) {
     );
   } catch (error) {
     console.error("GET /api/wedding-photos error");
-    return NextResponse.json(
-      { success: false, error: "Não foi possível carregar a galeria." },
-      { status: 500 }
-    );
+    return memoriesJson(500, { success: false, error: "Não foi possível carregar a galeria." });
   }
 }

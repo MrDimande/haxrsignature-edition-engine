@@ -1,36 +1,20 @@
-import { NextResponse } from "next/server";
 import { listMemories } from "@lib/memories/gallery";
+import { memoriesJson } from "@lib/memories/admin-auth";
+import { authorizeMemoriesRequest } from "@lib/memories/gateway";
 
 export async function GET(request: Request) {
+  const slug = new URL(request.url).searchParams.get("slug")?.trim();
+  if (!slug) return memoriesJson(400, { success: false, error: "Slug em falta." });
+
+  const auth = await authorizeMemoriesRequest({ request, slug, permission: "gallery:read" });
+  if (!auth.ok) {
+    return auth.response;
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
-    const slug = searchParams.get("slug")?.trim();
-
-    if (!slug) {
-      return NextResponse.json(
-        { success: false, error: "Slug em falta." },
-        { status: 400 }
-      );
-    }
-
-    const memories = await listMemories(slug);
-
-    return NextResponse.json(
-      {
-        success: true,
-        memories,
-      },
-      {
-        headers: {
-          "Cache-Control": "private, max-age=15",
-        },
-      }
-    );
-  } catch (error) {
-    console.error("GET /api/memories error:", error);
-    return NextResponse.json(
-      { success: false, error: "Não foi possível carregar o álbum de memórias." },
-      { status: 500 }
-    );
+    return memoriesJson(200, { success: true, memories: await listMemories(slug) });
+  } catch {
+    console.error("[memories] gallery_unavailable");
+    return memoriesJson(503, { success: false, error: "Não foi possível carregar o álbum de memórias. Tente novamente." });
   }
 }

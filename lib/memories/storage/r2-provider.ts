@@ -168,6 +168,43 @@ export class R2MemoriesStorageProvider implements MemoriesStorageProvider {
     }
   }
 
+  async readObject(storagePath: string): Promise<Uint8Array | null> {
+    assertCanonicalStoragePath(storagePath);
+
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.bucketName,
+        Key: storagePath,
+      });
+
+      const res = await this.client.send(command);
+      if (!res.Body) return null;
+
+      const bytes = await res.Body.transformToByteArray();
+      return bytes;
+    } catch (err: any) {
+      const name = err?.name || "";
+      const httpCode = err?.$metadata?.httpStatusCode;
+      if (name === "NotFound" || name === "NoSuchKey" || httpCode === 404) {
+        return null;
+      }
+      throw err;
+    }
+  }
+
+  async putObject(storagePath: string, data: Uint8Array | Buffer, contentType: string): Promise<void> {
+    assertCanonicalStoragePath(storagePath);
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: storagePath,
+      Body: data,
+      ContentType: contentType,
+    });
+
+    await this.client.send(command);
+  }
+
   async remove(storagePath: string): Promise<void> {
     assertCanonicalStoragePath(storagePath);
 

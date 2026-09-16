@@ -3,7 +3,7 @@
 .memorias-container {
   background-color: #F5EDE4;
   color: #2A1810;
-  min-h-screen: 100vh;
+  min-height: 100vh;
 }
 
 .memorias-card {

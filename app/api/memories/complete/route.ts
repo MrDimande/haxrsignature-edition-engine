@@ -1,7 +1,25 @@
 import { NextResponse } from "next/server";
 import { completeMemoryUpload } from "@lib/memories/upload";
+import { randomUUID } from "node:crypto";
+import { memoryUploadHttpStatus, normalizeMemoryUploadErrorCode } from "@lib/memories/upload-error-contract";
+
+function correlationIdFor(request: Request): string {
+  const supplied = request.headers.get("x-haxr-correlation-id")?.trim();
+  return supplied && /^[a-zA-Z0-9_-]{8,128}$/.test(supplied) ? supplied : randomUUID();
+}
+
+function responseWithCorrelation(payload: Record<string, unknown>, status: number, correlationId: string, retryAfterSeconds?: number) {
+  return NextResponse.json({ ...payload, correlationId }, {
+    status,
+    headers: {
+      "x-haxr-correlation-id": correlationId,
+      ...(retryAfterSeconds ? { "Retry-After": String(retryAfterSeconds) } : {}),
+    },
+  });
+}
 
 export async function POST(request: Request) {
+  const correlationId = correlationIdFor(request);
   try {
     const body = (await request.json()) as {
       slug?: string;
@@ -14,7 +32,7 @@ export async function POST(request: Request) {
     };
 
     if (!body || typeof body !== "object") {
-      return NextResponse.json({ success: false, error: "Pedido inválido." }, { status: 400 });
+      return responseWithCorrelation({ success: false, error: "Pedido inválido.", code: "UPLOAD_COMPLETE_FAILED" }, 400, correlationId);
     }
 
     const result = await completeMemoryUpload(
@@ -31,30 +49,23 @@ export async function POST(request: Request) {
     );
 
     if (!result.success) {
-      const status =
-        result.code === "RATE_LIMITED"
-          ? 429
-          : result.code === "NOT_FOUND"
-            ? 404
-            : 400;
-      return NextResponse.json(result, {
-        status,
-        headers:
-          result.code === "RATE_LIMITED" && result.retryAfterSeconds
-            ? { "Retry-After": String(result.retryAfterSeconds) }
-            : undefined,
-      });
+      const code = normalizeMemoryUploadErrorCode(result.code, "UPLOAD_COMPLETE_FAILED");
+      const status = result.code === "RATE_LIMITED" ? 429 : result.code === "NOT_FOUND" ? 404 : memoryUploadHttpStatus(code);
+      return responseWithCorrelation({ ...result, code }, status, correlationId, result.code === "RATE_LIMITED" ? result.retryAfterSeconds : undefined);
     }
 
-    return NextResponse.json({
+    return responseWithCorrelation({
       success: true,
       message: "Momento guardado com sucesso. Obrigado por nos ajudar a guardar este dia.",
-    });
-  } catch (error) {
-    console.error("POST /api/memories/complete error:", error);
-    return NextResponse.json(
-      { success: false, error: "Pedido inválido." },
-      { status: 400 }
+      pointsAwarded: result.pointsAwarded,
+      totalPoints: result.totalPoints,
+    }, 200, correlationId);
+  } catch {
+    console.error("POST /api/memories/complete failed", { correlationId });
+    return responseWithCorrelation(
+      { success: false, error: "Serviço temporariamente indisponível.", code: "SERVICE_UNAVAILABLE" },
+      503,
+      correlationId
     );
   }
 }

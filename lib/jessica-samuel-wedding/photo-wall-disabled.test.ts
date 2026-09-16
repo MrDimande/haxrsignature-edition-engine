@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
+import { afterEach, beforeEach, describe, it } from "node:test";
 import { GET } from "../../app/api/wedding-photos/route";
 import { JESSICA_SAMUEL_PHOTO_WALL } from "./photo-wall/config";
 import {
@@ -9,6 +9,13 @@ import {
 } from "./photo-wall/gallery";
 
 describe("photo-wall disabled — zero Supabase", () => {
+  const enabledDescriptor = Object.getOwnPropertyDescriptor(JESSICA_SAMUEL_PHOTO_WALL, "enabled")!;
+  beforeEach(() => {
+    Object.defineProperty(JESSICA_SAMUEL_PHOTO_WALL, "enabled", { ...enabledDescriptor, value: false });
+  });
+  afterEach(() => {
+    Object.defineProperty(JESSICA_SAMUEL_PHOTO_WALL, "enabled", enabledDescriptor);
+  });
   it("GET /api/wedding-photos devolve 200 vazio sem createAdminClient", async () => {
     assert.equal(JESSICA_SAMUEL_PHOTO_WALL.enabled, false);
     __resetPhotoWallSupabaseAccessCountForTests();

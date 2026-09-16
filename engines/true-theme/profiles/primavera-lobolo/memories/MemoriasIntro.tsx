@@ -24,7 +24,7 @@ export function MemoriasIntro({ tableId }: MemoriasIntroProps) {
         </h1>
 
         <p className="font-display text-base sm:text-lg font-light leading-relaxed text-[#4A3020] italic max-w-lg mx-auto">
-          "Cada olhar, cada gargalhada, cada gesto de celebração. Ajude-nos a guardar este dia através dos seus olhos."
+          &quot;Cada olhar, cada gargalhada, cada gesto de celebração. Ajude-nos a guardar este dia através dos seus olhos.&quot;
         </p>
 
         <div className="w-16 h-px bg-[#C9A227]/40 mx-auto my-6" aria-hidden />

@@ -39,3 +39,6 @@ public/audio/if-i-aint-got-you.mp3
 
 # IDE
 .cursor/
+
+# Temporary active secrets
+.stanley_active_token

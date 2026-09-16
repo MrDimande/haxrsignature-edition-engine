@@ -16,6 +16,7 @@ import {
 } from "./memorias-challenges";
 import { MemoriasToast } from "./MemoriasToast";
 import { MemoriasFooter } from "./MemoriasFooter";
+import "./memorias.css";
 
 interface MemoriasExperienceProps {
   config: InvitationConfig;

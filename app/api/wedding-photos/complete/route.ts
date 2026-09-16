@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { completePhotoUpload } from "@lib/jessica-samuel-wedding/photo-wall/gallery";
 import { PHOTO_WALL_UPLOAD_SUCCESS } from "@lib/jessica-samuel-wedding/photo-wall/config";
+import { authorizeMemoriesRequest } from "@lib/memories/gateway";
+import { memoriesJson } from "@lib/memories/admin-auth";
 
 export async function POST(request: Request) {
   try {
@@ -10,8 +12,21 @@ export async function POST(request: Request) {
       guestName?: string;
       caption?: string;
     };
+
+    const slug = body.slug ?? "";
+
+    // Gateway central: valida que este alias antigo não permite contornar sessões
+    const auth = await authorizeMemoriesRequest({
+      request,
+      slug,
+      permission: "media:upload",
+    });
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const result = await completePhotoUpload(
-      body.slug ?? "",
+      slug,
       body.photoId ?? "",
       request,
       {
@@ -42,9 +57,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("POST /api/wedding-photos/complete error");
-    return NextResponse.json(
-      { success: false, error: "Pedido inválido." },
-      { status: 400 }
-    );
+    return memoriesJson(400, { success: false, error: "Pedido inválido." });
   }
 }

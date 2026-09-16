@@ -11,12 +11,81 @@ export type RateLimitResult = {
   retryAfterSeconds: number;
 };
 
-type Bucket = {
+export type Bucket = {
   count: number;
   resetAt: number;
 };
 
-const buckets = new Map<string, Bucket>();
+/**
+ * ==============================================================================
+ * ARQUITECTURA & TOPOLOGIA DO RATE LIMITER
+ * ==============================================================================
+ * TOPOLOGIA ACTUAL: Memória Local de Processo (In-Memory Process-Local Map).
+ *
+ * GARANTIAS FORNECIDAS:
+ * - Defesa em profundidade de primeira linha com latência sub-milissegundo (< 0.1ms).
+ * - Protecção eficaz contra loops infinitos de interface, double-clicks rápidos e
+ *   rajadas sucessivas que atinjam a mesma instância em execução.
+ *
+ * LIMITAÇÕES OPERACIONAIS (SERVERLESS / MULTI-INSTANCE):
+ * - Em ambientes serverless multi-instância (ex: múltiplas Vercel Lambdas efêmeras),
+ *   o estado de cada bucket é isolado por processo/instância.
+ * - Não constitui garantia global distribuída em larga escala através de instâncias
+ *   concorrentes distintas (requereria store centralizado distribuído).
+ *
+ * DESIGN EXTENSÍVEL:
+ * - A interface `RateLimitStore` padroniza o contrato de armazenamento.
+ * - A implementação padrão `MemoryRateLimitStore` opera localmente sem custos nem
+ *   dependências externas, pronta para receber adaptor distribuído futuro (ex: Redis/KV)
+ *   quando formalmente autorizado pelo proprietário do projecto.
+ * ==============================================================================
+ */
+
+export interface RateLimitStore {
+  getBucket(key: string, windowMs: number, now: number): Bucket;
+  reset?(): void;
+}
+
+export class MemoryRateLimitStore implements RateLimitStore {
+  private buckets = new Map<string, Bucket>();
+
+  private pruneExpired(now: number): void {
+    if (this.buckets.size < 500) return;
+    for (const [key, bucket] of this.buckets) {
+      if (bucket.resetAt <= now) {
+        this.buckets.delete(key);
+      }
+    }
+  }
+
+  getBucket(key: string, windowMs: number, now: number): Bucket {
+    this.pruneExpired(now);
+    const existing = this.buckets.get(key);
+    if (!existing || existing.resetAt <= now) {
+      const bucket = { count: 0, resetAt: now + windowMs };
+      this.buckets.set(key, bucket);
+      return bucket;
+    }
+    return existing;
+  }
+
+  reset(): void {
+    this.buckets.clear();
+  }
+}
+
+let activeStore: RateLimitStore = new MemoryRateLimitStore();
+
+/**
+ * Permite configurar um adaptador de armazenamento alternativo (ex: em testes ou store distribuído futuro).
+ */
+export function setRateLimitStore(store: RateLimitStore): void {
+  activeStore = store;
+}
+
+export function getRateLimitStore(): RateLimitStore {
+  return activeStore;
+}
 
 export const RATE_LIMITS = {
   /** RSVP Edition — por IP (protege Resend + Supabase) */
@@ -31,30 +100,13 @@ export const RATE_LIMITS = {
   memoriesIntent: { max: 10, windowMs: 15 * 60 * 1000 },
   /** Traditional wedding memories — upload completion */
   memoriesComplete: { max: 15, windowMs: 15 * 60 * 1000 },
+  /** Social reaction mutations — por participante/IP */
+  mediaReaction: { max: 40, windowMs: 60 * 1000 },
+  /** Social favorite mutations — por participante/IP */
+  mediaFavorite: { max: 40, windowMs: 60 * 1000 },
+  /** Social comment submissions — por participante/IP */
+  mediaComment: { max: 15, windowMs: 60 * 1000 },
 } as const satisfies Record<string, RateLimitConfig>;
-
-function pruneExpiredBuckets(now: number): void {
-  if (buckets.size < 500) return;
-
-  for (const [key, bucket] of buckets) {
-    if (bucket.resetAt <= now) {
-      buckets.delete(key);
-    }
-  }
-}
-
-function getBucket(key: string, windowMs: number, now: number): Bucket {
-  pruneExpiredBuckets(now);
-
-  const existing = buckets.get(key);
-  if (!existing || existing.resetAt <= now) {
-    const bucket = { count: 0, resetAt: now + windowMs };
-    buckets.set(key, bucket);
-    return bucket;
-  }
-
-  return existing;
-}
 
 export function getRequestIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -72,7 +124,7 @@ export function rateLimit(
 ): RateLimitResult {
   const increment = options?.increment ?? true;
   const now = Date.now();
-  const bucket = getBucket(key, config.windowMs, now);
+  const bucket = activeStore.getBucket(key, config.windowMs, now);
 
   if (bucket.count >= config.max) {
     return {

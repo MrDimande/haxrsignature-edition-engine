@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Play, X, Camera, User, Download, Share2 } from "lucide-react";
 import type { PublicMemoryItem } from "@lib/memories/gallery";
+import { useMemoriesGallery } from "@lib/memories/use-gallery";
 import { PLUS_MEMORY_CHALLENGES, getTableLabel } from "./plus-memorias-challenges";
 
 interface PlusMemoriasLiveGalleryProps {
@@ -12,29 +13,10 @@ interface PlusMemoriasLiveGalleryProps {
 }
 
 export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemoriasLiveGalleryProps) {
-  const [memories, setMemories] = useState<PublicMemoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { memories, loading, error, retry } = useMemoriesGallery(slug, refreshTrigger);
   const [selectedChallengeFilter, setSelectedChallengeFilter] = useState<string | null>(null);
   const [activeLightboxItem, setActiveLightboxItem] = useState<PublicMemoryItem | null>(null);
   const [downloading, setDownloading] = useState(false);
-
-  const fetchMemories = async () => {
-    try {
-      const res = await fetch(`/api/memories?slug=${encodeURIComponent(slug)}`);
-      const data = await res.json();
-      if (data.success && Array.isArray(data.memories)) {
-        setMemories(data.memories);
-      }
-    } catch (e) {
-      console.error("Error fetching live memories:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMemories();
-  }, [slug, refreshTrigger]);
 
   const handleDownload = async (item: PublicMemoryItem) => {
     try {
@@ -102,7 +84,8 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
         <div className="flex items-center gap-2 bg-[#FFF9F2] px-4 py-2 rounded-full border border-[#C9939B]/25 shadow-xs">
           <Camera className="w-4 h-4 text-[#7A2332]" />
           <span className="font-display text-xs font-medium text-[#171312]">
-            {memories.length} {memories.length === 1 ? "memória captada" : "memórias captadas"}
+            {loading ? "A carregar o álbum…" : error ? "Álbum indisponível" :
+              `${memories.length} ${memories.length === 1 ? "memória captada" : "memórias captadas"}`}
           </span>
         </div>
       </div>
@@ -154,6 +137,14 @@ export function PlusMemoriasLiveGallery({ slug, refreshTrigger = 0 }: PlusMemori
               }`}
             />
           ))}
+        </div>
+      ) : error ? (
+        <div role="alert" className="py-10 px-5 text-center bg-[#FFF9F2] rounded-xl border border-[#C9939B]/25 text-[#171312]">
+          <p className="font-display text-lg">Não foi possível abrir o álbum.</p>
+          <p className="font-body text-sm mt-2">Verifique a ligação e tente novamente.</p>
+          <button type="button" onClick={retry} className="mt-4 min-h-11 px-5 rounded-full border border-[#7A2332] text-[#7A2332] focus-visible:outline-2 focus-visible:outline-offset-4">
+            Tentar novamente
+          </button>
         </div>
       ) : filteredMemories.length === 0 ? (
         <motion.div

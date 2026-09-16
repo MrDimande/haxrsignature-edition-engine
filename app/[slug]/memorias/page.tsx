@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getInvitation, getActiveInvitations } from "@data/invitations";
 import { getTheme } from "@theme/resolver";
 import { resolveSlug } from "@lib/engine";
 import { MemoriasExperience } from "@engines/true-theme/profiles/primavera-lobolo/memories/MemoriasExperience";
 import { PlusMemoriasExperience } from "@engines/true-theme/profiles/jessica-samuel-wedding/memories/PlusMemoriasExperience";
+import { StanMatchdayExperience } from "@engines/true-theme/profiles/stan-real-madrid/memories/StanMatchdayExperience";
+import { StanMatchdayGate } from "@engines/true-theme/profiles/stan-real-madrid/memories/StanMatchdayGate";
+import { exchangeAccessLink, resolveMemoriesEvent, findSessionByTokenHash } from "@lib/memories/session-store";
+import { memoriesCookieName, hashMemoriesToken } from "@lib/memories/session-security";
 
 interface MemoriasPageProps {
   params: Promise<{ slug: string }>;
@@ -36,6 +41,15 @@ export async function generateMetadata({
   if (!invitation || invitation.status !== "active" || !invitation.features?.memories?.enabled) {
     return {
       title: "Página não encontrada",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const isStan = invitation.theme === "stan-real-madrid" || invitation.slug === "stan-real-madrid";
+  if (isStan) {
+    return {
+      title: "5º Aniversário do Stan — Matchday Memories & Eu Espio",
+      description: "Registe fotografias, cumpra as missões do Eu Espio e acompanhe o álbum de memórias do 5º Aniversário do Stan.",
       robots: { index: false, follow: false },
     };
   }
@@ -73,15 +87,69 @@ export default async function MemoriasPage({
     notFound();
   }
 
+  const isStan = invitation.theme === "stan-real-madrid" || invitation.slug === "stan-real-madrid";
+  const accessMode = invitation.features.memories.accessMode || "legacy";
+
+  // 1. Tratamento de Troca Automática de Link de Acesso (?link=... ou ?token=...)
+  if (sp) {
+    const rawParam = sp.link || sp.token || sp.code || sp.access;
+    const tokenOrCode = typeof rawParam === "string" ? rawParam.trim() : Array.isArray(rawParam) ? rawParam[0]?.trim() : "";
+
+    if (tokenOrCode) {
+      redirect(`/api/memories/session/exchange?token=${encodeURIComponent(tokenOrCode)}&slug=${encodeURIComponent(canonicalSlug)}`);
+    }
+  }
+
+  // 2. Verificação de Sessão para Modos com accessMode === "session"
+  if (accessMode === "session") {
+    let hasValidSession = false;
+    try {
+      const eventInfo = await resolveMemoriesEvent(canonicalSlug);
+      if (eventInfo) {
+        const cookieStore = await cookies();
+        const isSecure = process.env.NODE_ENV === "production";
+        const cookieName = memoriesCookieName(eventInfo.id, isSecure);
+        const sessionToken = cookieStore.get(cookieName)?.value;
+
+        if (sessionToken) {
+          const tokenHash = hashMemoriesToken(sessionToken, "participant-session");
+          const snapshot = await findSessionByTokenHash(tokenHash);
+          if (snapshot && snapshot.event.id === eventInfo.id && !snapshot.session.revokedAt && new Date(snapshot.session.expiresAt) > new Date()) {
+            hasValidSession = true;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[MemoriasPage] Erro ao verificar sessão do evento:", err);
+    }
+
+    // Se o evento exige sessão e o visitante não a possui, renderizar o Gate de Acesso
+    if (!hasValidSession) {
+      if (isStan) {
+        const authError = sp?.auth === "invalid" ? "Link de acesso inválido ou expirado." : undefined;
+        return <StanMatchdayGate slug={canonicalSlug} errorMessage={authError} />;
+      }
+    }
+  }
+
   const theme = getTheme(invitation.theme);
 
   // Extrair ?mesa=XX (opcional)
   const mesaRaw = sp?.mesa;
   const mesa = typeof mesaRaw === "string" ? mesaRaw.trim() : undefined;
 
-  // Variant determina o perfil funcional — theme é apenas apresentação
-  const variant = invitation.features.memories.variant;
+  // 3. Renderizar o perfil de experiência adequado
+  if (isStan) {
+    return (
+      <StanMatchdayExperience
+        config={invitation}
+        theme={theme}
+        tableId={mesa}
+      />
+    );
+  }
 
+  const variant = invitation.features.memories.variant;
   if (variant === "plus-memories") {
     return (
       <PlusMemoriasExperience
@@ -101,4 +169,3 @@ export default async function MemoriasPage({
     />
   );
 }
-

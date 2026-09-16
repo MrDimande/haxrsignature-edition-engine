@@ -50,7 +50,7 @@ export function MemoriasProgress({
         </h3>
 
         <p className="font-body text-xs sm:text-sm text-[#4A3020]/80 italic max-w-md mx-auto mb-6">
-          "Nem todas as memórias cabem numa lista. Se presenciou algo mágico que não está nos desafios, partilhe connosco."
+          &quot;Nem todas as memórias cabem numa lista. Se presenciou algo mágico que não está nos desafios, partilhe connosco.&quot;
         </p>
 
         <button

@@ -21,10 +21,13 @@ function loadNeonUrl(): string | null {
   return null;
 }
 
-test("Neon live provider integration against Neon Production", async () => {
+test("Neon live provider integration against Neon Production", {
+  // Esta prova inclui escrita no rate limiter; nunca a executar na suite local por omissão.
+  skip: process.env.EDITION_RUN_LIVE_DB_TESTS !== "true",
+}, async (context) => {
   const neonUrl = loadNeonUrl();
   if (!neonUrl) {
-    console.log("Skipping live neon test: DATABASE_URL not available");
+    context.skip("DATABASE_URL não disponível para a prova explicitamente activada");
     return;
   }
 

@@ -89,6 +89,33 @@ export class SupabaseMemoriesStorageProvider implements MemoriesStorageProvider 
     return buffer.slice(0, Math.min(buffer.length, maxBytes));
   }
 
+  async readObject(storagePath: string): Promise<Uint8Array | null> {
+    assertCanonicalStoragePath(storagePath);
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.storage
+      .from(this.bucketName)
+      .download(storagePath);
+
+    if (error || !data) {
+      return null;
+    }
+
+    const buffer = new Uint8Array(await data.arrayBuffer());
+    return buffer;
+  }
+
+  async putObject(storagePath: string, data: Uint8Array | Buffer, contentType: string): Promise<void> {
+    assertCanonicalStoragePath(storagePath);
+    const supabase = createAdminClient();
+    const { error } = await supabase.storage
+      .from(this.bucketName)
+      .upload(storagePath, data, { contentType, upsert: true });
+
+    if (error) {
+      throw new Error(`[SupabaseStorageProvider] Falha ao fazer upload de '${storagePath}': ${error.message}`);
+    }
+  }
+
   async remove(storagePath: string): Promise<void> {
     assertCanonicalStoragePath(storagePath);
     const supabase = createAdminClient();

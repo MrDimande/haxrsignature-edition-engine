@@ -98,12 +98,12 @@ export function MemoriasToast({ slug, refreshTrigger = 0 }: MemoriasToastProps) 
             </p>
 
             <p className="font-body text-xs text-[#4A3020]/90 mt-0.5">
-              Cumprido o <strong className="text-[#2A1810]">Desafio #{activeToast.challengeNumber}</strong>: "{activeToast.challengeTitle}"
+              Cumprido o <strong className="text-[#2A1810]">Desafio #{activeToast.challengeNumber}</strong>: &quot;{activeToast.challengeTitle}&quot;
             </p>
 
             {activeToast.caption && (
               <p className="font-body text-xs italic text-[#C45C26] mt-1 bg-[#F5EDE4] p-1.5 rounded border border-[#C9A227]/20">
-                "{activeToast.caption}"
+                &quot;{activeToast.caption}&quot;
               </p>
             )}
 

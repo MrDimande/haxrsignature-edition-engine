@@ -92,6 +92,7 @@ export function resolveMemoriesConfig(slug: string): MemoriesEventConfig | null 
     competition,
     challengeWhitelist: PLUS_MEMORIES_CHALLENGE_WHITELIST,
     ...MEMORIES_DEFAULTS,
+    publicGalleryEnabled: memoriesFeature.publicGalleryEnabled !== false,
   };
 }
 
@@ -113,4 +114,46 @@ export function getMemoriesInvitation(slug: string): InvitationConfig | null {
   if (!invitation || invitation.status !== "active") return null;
   if (!invitation.features?.memories?.enabled) return null;
   return invitation;
+}
+
+/**
+ * Resolve a config de memórias estática ou derivada de contexto de evento seguro.
+ */
+export function resolveMemoriesConfigForEvent(
+  slug: string,
+  eventContext?: { slug?: string; visibility?: string; competitionEnabled?: boolean } | null
+): MemoriesEventConfig | null {
+  const staticConfig = resolveMemoriesConfig(slug);
+  if (staticConfig) return staticConfig;
+
+  if (eventContext) {
+    return {
+      enabled: true,
+      variant: "plus-memories",
+      invitationSlug: eventContext.slug || slug,
+      bucket: MEMORIES_DEFAULTS.bucket,
+      opensAt: null,
+      closesAt: null,
+      moderationRequired: eventContext.visibility === "moderated",
+      publicGalleryEnabled: true,
+      maxImageFileSizeBytes: MEMORIES_DEFAULTS.maxImageFileSizeBytes,
+      maxVideoFileSizeBytes: MEMORIES_DEFAULTS.maxVideoFileSizeBytes,
+      acceptedImageMimeTypes: MEMORIES_DEFAULTS.acceptedImageMimeTypes,
+      acceptedVideoMimeTypes: MEMORIES_DEFAULTS.acceptedVideoMimeTypes,
+      maxCaptionLength: MEMORIES_DEFAULTS.maxCaptionLength,
+      maxGuestNameLength: MEMORIES_DEFAULTS.maxGuestNameLength,
+      signedUrlTtlSeconds: MEMORIES_DEFAULTS.signedUrlTtlSeconds,
+      uploadIntentTtlSeconds: MEMORIES_DEFAULTS.uploadIntentTtlSeconds,
+      competition: eventContext.competitionEnabled
+        ? {
+            enabled: true,
+            mode: "unique-challenges",
+            totalChallenges: 12,
+          }
+        : null,
+      challengeWhitelist: PLUS_MEMORIES_CHALLENGE_WHITELIST,
+    };
+  }
+
+  return null;
 }

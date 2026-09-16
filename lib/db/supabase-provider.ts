@@ -23,13 +23,15 @@ export class SupabaseDatabaseProvider implements EditionDatabaseProvider {
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from('wedding_photos')
-      .select('id, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type')
+      .select('id, invitation_slug, moderation_status, caption, guest_name, challenge_id, table_id, created_at, storage_path, content_type, stage_id, captured_at, width, height, orientation, duration_seconds, media_type, thumbnail_storage_path, poster_storage_path, medium_storage_path, has_derivatives, derivatives_status')
       .eq('invitation_slug', slug)
-      .neq('moderation_status', 'rejected')
+      .eq('moderation_status', 'approved')
       .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
       .limit(limit);
 
-    if (error || !data) return [];
+    if (error) throw new Error("Não foi possível consultar as memórias.");
+    if (!data) return [];
     return data as PublicMemoryPhotoRow[];
   }
 
@@ -150,13 +152,16 @@ export class SupabaseDatabaseProvider implements EditionDatabaseProvider {
 
   async updateModerationStatus(id: string, slug: string, status: 'approved' | 'rejected'): Promise<boolean> {
     const supabase = createAdminClient();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('wedding_photos')
       .update({ moderation_status: status })
       .eq('id', id)
-      .eq('invitation_slug', slug);
+      .eq('invitation_slug', slug)
+      .select('id')
+      .maybeSingle();
 
-    return !error;
+    if (error) throw new Error("Não foi possível actualizar a memória.");
+    return data !== null;
   }
   async listGiftReservations(registryKey: string): Promise<GiftReservationRow[]> {
     const supabase = createAdminClient();

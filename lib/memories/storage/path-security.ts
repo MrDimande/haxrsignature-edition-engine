@@ -2,12 +2,13 @@
  * Validação de Segurança de Caminhos de Armazenamento de Memórias
  *
  * Garante que caminhos para objectos seguem o formato canónico:
- * `${slug}/${photoId}/original.${ext}`
+ * `${slug}/${photoId}/(original|thumbnail|medium|poster).${ext}`
  *
- * Rejeita qualquer tentativa de path traversal (../, \, /, segmentos vazios).
+ * Rejeita qualquer tentativa de path traversal (../, \, /, segmentos vazios)
+ * ou nomes não canónicos.
  */
 
-const CANONICAL_PATH_REGEX = /^[a-zA-Z0-9_-]+\/[0-9a-fA-F-]{36}\/original\.[a-zA-Z0-9]+$/;
+const CANONICAL_PATH_REGEX = /^[a-zA-Z0-9_-]+\/[0-9a-fA-F-]{36}\/(original|thumbnail|medium|poster)\.[a-zA-Z0-9]+$/;
 
 export class InvalidStoragePathError extends Error {
   constructor(message: string) {

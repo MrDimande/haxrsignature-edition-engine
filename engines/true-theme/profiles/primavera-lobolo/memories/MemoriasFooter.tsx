@@ -39,7 +39,7 @@ export function MemoriasFooter() {
             ALTA-COSTURA DIGITAL
           </p>
           <p className="font-body text-xs sm:text-sm text-[#4A3020]/80 italic max-w-md mx-auto">
-            "Engenharia de experiências digitais de luxo, desenhadas à medida com precisão, arte e sofisticação cerimonial."
+            &quot;Engenharia de experiências digitais de luxo, desenhadas à medida com precisão, arte e sofisticação cerimonial.&quot;
           </p>
         </div>
 

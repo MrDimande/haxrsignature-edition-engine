@@ -1,0 +1,10 @@
+# Local credentials and transient session material must never enter a Vercel upload.
+.env
+.env.*
+.stanley_active_token
+
+# Legacy diagnostics with inline connection URLs are not application runtime code.
+scripts/setup_stanley_access_link.mjs
+scripts/print_share_cols.mjs
+scripts/inspect_stanley_preview.mjs
+scripts/check_stanley_event.mjs

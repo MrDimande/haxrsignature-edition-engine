@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createPhotoUploadIntent } from "@lib/jessica-samuel-wedding/photo-wall/upload-intent";
 import { validatePhotoUploadIntentPayload } from "@core/contracts/photos.contract";
+import { authorizeMemoriesRequest } from "@lib/memories/gateway";
+import { memoriesJson } from "@lib/memories/admin-auth";
 
 export async function POST(request: Request) {
   try {
@@ -8,10 +10,17 @@ export async function POST(request: Request) {
 
     const validation = validatePhotoUploadIntentPayload(body);
     if (!validation.ok) {
-      return NextResponse.json(
-        { success: false, error: validation.error },
-        { status: validation.status }
-      );
+      return memoriesJson(validation.status, { success: false, error: validation.error });
+    }
+
+    // Gateway central: valida que este alias antigo não permite contornar sessões
+    const auth = await authorizeMemoriesRequest({
+      request,
+      slug: validation.sanitized.slug,
+      permission: "media:upload",
+    });
+    if (!auth.ok) {
+      return auth.response;
     }
 
     const result = await createPhotoUploadIntent(validation.sanitized, request);
@@ -35,9 +44,6 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("POST /api/wedding-photos/upload-intent error:", error);
-    return NextResponse.json(
-      { success: false, error: "Pedido inválido." },
-      { status: 400 }
-    );
+    return memoriesJson(400, { success: false, error: "Pedido inválido." });
   }
 }

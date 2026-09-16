@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { parseAttending } from "./parse-attending";
 import { validateLocalRsvpPayload } from "./validate-local";
+import { FAREWELL_EVENT } from "../farewell/event-details";
 
 describe("parseAttending", () => {
   it("aceita true / false booleanos", () => {
@@ -57,20 +58,33 @@ describe("validateLocalRsvpPayload", () => {
     }
   });
 
-  it("aceita payload mínimo válido para despedida", () => {
+  it("aceita payload mínimo válido para despedida até ao limite do prazo", () => {
     const result = validateLocalRsvpPayload({
       slug: "despedida-de-solteira",
       name: "Convidada Teste",
       attending: true,
       guests: 1,
       phone: "840000000",
-    });
+    }, { now: new Date(`${FAREWELL_EVENT.rsvpDeadlineIso}T23:59:59+02:00`) });
 
     assert.equal(result.ok, true);
     if (result.ok) {
       assert.equal(result.slug, "jessicachadelingerie");
       assert.equal(result.submission.attending, true);
       assert.equal(result.submission.guests, 1);
+    }
+  });
+
+  it("rejeita o mesmo payload de despedida após o prazo, independentemente da data do runner", () => {
+    const deadline = new Date(`${FAREWELL_EVENT.rsvpDeadlineIso}T23:59:59+02:00`);
+    const result = validateLocalRsvpPayload({
+      slug: "despedida-de-solteira", name: "Convidada Teste", attending: true,
+      guests: 1, phone: "840000000",
+    }, { now: new Date(deadline.getTime() + 1) });
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.ok("error" in result.body);
+      assert.match(result.body.error, /prazo/i);
     }
   });
 

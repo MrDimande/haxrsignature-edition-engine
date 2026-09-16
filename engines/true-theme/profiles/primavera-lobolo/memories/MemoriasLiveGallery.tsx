@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Play, X, Filter, Camera, User, Download, Share2, Check } from "lucide-react";
 import type { PublicMemoryItem } from "@lib/jessica-samuel-traditional/memories/gallery";
+import { useMemoriesGallery } from "@lib/memories/use-gallery";
 import { MEMORY_CHALLENGES } from "./memorias-challenges";
 
 interface MemoriasLiveGalleryProps {
@@ -12,30 +13,11 @@ interface MemoriasLiveGalleryProps {
 }
 
 export function MemoriasLiveGallery({ slug, refreshTrigger = 0 }: MemoriasLiveGalleryProps) {
-  const [memories, setMemories] = useState<PublicMemoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { memories, loading, error, retry } = useMemoriesGallery(slug, refreshTrigger);
   const [selectedChallengeFilter, setSelectedChallengeFilter] = useState<string | null>(null);
   const [activeLightboxItem, setActiveLightboxItem] = useState<PublicMemoryItem | null>(null);
   const [downloading, setDownloading] = useState(false);
   const [copiedShare, setCopiedShare] = useState(false);
-
-  const fetchMemories = async () => {
-    try {
-      const res = await fetch(`/api/memories?slug=${encodeURIComponent(slug)}`);
-      const data = await res.json();
-      if (data.success && Array.isArray(data.memories)) {
-        setMemories(data.memories);
-      }
-    } catch (e) {
-      console.error("Error fetching live memories:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMemories();
-  }, [slug, refreshTrigger]);
 
   const handleDownload = async (item: PublicMemoryItem) => {
     try {
@@ -108,7 +90,8 @@ export function MemoriasLiveGallery({ slug, refreshTrigger = 0 }: MemoriasLiveGa
         <div className="flex items-center gap-2 bg-[#FBF6F0] px-4 py-2 rounded-full border border-[#C9A227]/30 shadow-xs">
           <Camera className="w-4 h-4 text-[#C45C26]" />
           <span className="font-display text-xs font-medium text-[#2A1810]">
-            {memories.length} {memories.length === 1 ? "memória captada" : "memórias captadas"}
+            {loading ? "A carregar o álbum…" : error ? "Álbum indisponível" :
+              `${memories.length} ${memories.length === 1 ? "memória captada" : "memórias captadas"}`}
           </span>
         </div>
       </div>
@@ -155,6 +138,14 @@ export function MemoriasLiveGallery({ slug, refreshTrigger = 0 }: MemoriasLiveGa
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="aspect-square bg-[#E8C4A8]/20 rounded-xl animate-pulse" />
           ))}
+        </div>
+      ) : error ? (
+        <div role="alert" className="py-10 px-5 text-center bg-[#FBF6F0] rounded-xl border border-[#C9A227]/25 text-[#2A1810]">
+          <p className="font-display text-lg">Não foi possível abrir o álbum.</p>
+          <p className="font-body text-sm mt-2">Verifique a ligação e tente novamente.</p>
+          <button type="button" onClick={retry} className="mt-4 min-h-11 px-5 rounded-full border border-[#C45C26] focus-visible:outline-2 focus-visible:outline-offset-4">
+            Tentar novamente
+          </button>
         </div>
       ) : filteredMemories.length === 0 ? (
         <div className="py-12 px-4 text-center bg-[#FBF6F0] rounded-xl border border-[#C9A227]/20">
@@ -280,7 +271,7 @@ export function MemoriasLiveGallery({ slug, refreshTrigger = 0 }: MemoriasLiveGa
                   )}
                   {activeLightboxItem.caption && (
                     <p className="font-body text-sm italic text-white/90">
-                      "{activeLightboxItem.caption}"
+                      &quot;{activeLightboxItem.caption}&quot;
                     </p>
                   )}
                   {activeLightboxItem.guestName && (
