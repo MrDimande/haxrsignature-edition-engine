@@ -45,7 +45,7 @@ export async function generateMetadata({
     };
   }
 
-  const isStan = invitation.theme === "stan-real-madrid" || invitation.slug === "stan-real-madrid";
+  const isStan = invitation.theme === "stan-real-madrid" || invitation.slug === "stanturns5";
   if (isStan) {
     return {
       title: "5º Aniversário do Stan — Matchday Memories & Eu Espio",
@@ -87,7 +87,7 @@ export default async function MemoriasPage({
     notFound();
   }
 
-  const isStan = invitation.theme === "stan-real-madrid" || invitation.slug === "stan-real-madrid";
+  const isStan = invitation.theme === "stan-real-madrid" || invitation.slug === "stanturns5";
   const accessMode = invitation.features.memories.accessMode || "legacy";
 
   // 1. Tratamento de Troca Automática de Link de Acesso (?link=... ou ?token=...)

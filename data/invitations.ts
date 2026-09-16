@@ -305,37 +305,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       title: "5º Aniversário do Stan — Real Madrid Experience",
       date: "2026-09-12",
       time: "11h00",
-      /** Residência do S5 · Belo Horizonte (Maputo) */
-      location: "Residência do S5 · Belo Horizonte, Maputo",
-      dressCode: "Kit Matchday · navy, azul, cream e areia",
-      subtitle: "O Quinto Acto de um Pequeno Campeão",
-      description:
-        "12 de Setembro de 2026 · 11h00 · Residência do S5, Belo Horizonte. O Quinto Acto de um Pequeno Campeão.",
-      eventDate: "2026-09-12",
-      eventType: "Aniversário Infantil",
-      ogImage: "/images/stan/social/stan-og.png",
-    },
-    admin: {
-      clientName: "Stan",
-      eventTypeLabel: "Aniversário",
-      adminEventName: "Edition · Aniversário · Stan",
-      envVar: "EDITION_EVENT_STAN_ID",
-      expectedRegistryKey: "stan-real-madrid",
-    },
-  },
-  "stan-real-madrid": {
-    slug: "stan-real-madrid",
-    aliases: [],
-    engine: "theme",
-    theme: "stan-real-madrid",
-    experienceType: "editorial",
-    sourcePath: "/stan-real-madrid",
-    legacyFolder: "stan",
-    status: "active",
-    metadata: {
-      title: "5º Aniversário do Stan — Real Madrid Experience",
-      date: "2026-09-12",
-      time: "11h00",
+      /** Residência dos avós do S5 · Belo Horizonte (Maputo) */
       location: "Residência dos avós do S5 · Belo Horizonte, Maputo",
       dressCode: "Kit Matchday · navy, azul, cream e areia",
       subtitle: "O Quinto Acto de um Pequeno Campeão",

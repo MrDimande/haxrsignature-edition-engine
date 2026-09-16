@@ -7,7 +7,7 @@ import { DERIVATIVE_CONFIG, processMediaDerivatives } from "./derivatives";
 import { MockMemoriesStorageProvider } from "./storage/mock-provider";
 
 const MEDIA_ID = "d1f4a2b5-02b0-4c22-8a88-8cf0d523ef1a";
-const SLUG = "stan-real-madrid";
+const SLUG = "stanturns5";
 const ORIGINAL_PATH = `${SLUG}/${MEDIA_ID}/original.jpg`;
 const PREVIOUS_LEASE = "old-orphaned-lease-token";
 const RECLAIMED_LEASE = "new-reclaimed-lease-token";

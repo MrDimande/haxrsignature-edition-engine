@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import QRCode from 'qrcode';
 
-const TARGET_URL = 'https://edition.haxrsignature.com/stan-real-madrid/memorias?link=stan-matchday';
+const TARGET_URL = 'https://edition.haxrsignature.com/stanturns5/memorias?link=stan-matchday';
 const OUTPUT_DIR = path.resolve('public/images/stan');
 
 async function generateQrAssets() {

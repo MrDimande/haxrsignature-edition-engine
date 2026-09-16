@@ -1,4 +1,5 @@
 import { getNeonPool } from "@lib/db/neon-client";
+import { getInvitation } from "@data/invitations";
 import {
   createMemoriesToken,
   hashMemoriesToken,
@@ -39,6 +40,9 @@ export async function resolveMemoriesEvent(identifier: string): Promise<SessionS
   const pool = getNeonPool();
   const isUuid = isMemoriesUuid(identifier);
 
+  const invitation = !isUuid ? getInvitation(identifier) : null;
+  const registryKey = invitation?.admin?.expectedRegistryKey ?? null;
+
   const query = `
     SELECT
       e.id AS event_id,
@@ -52,17 +56,24 @@ export async function resolveMemoriesEvent(identifier: string): Promise<SessionS
       COALESCE(me.competition_enabled, true) AS competition_enabled
     FROM memory_experiences me
     JOIN events e ON e.id = me.event_id
-    WHERE ${isUuid ? "e.id = $1 OR me.id = $1" : "me.event_slug = $1 OR me.invitation_slug = $1"}
+    WHERE ${
+      isUuid
+        ? "e.id = $1 OR me.id = $1"
+        : "me.event_slug = $1 OR me.invitation_slug = $1 OR ($2::text IS NOT NULL AND (me.event_slug = $2 OR me.invitation_slug = $2 OR e.edition_registry_key = $2))"
+    }
     LIMIT 1
   `;
 
-  const res = await pool.query(query, [identifier]);
+  const res = isUuid
+    ? await pool.query(query, [identifier])
+    : await pool.query(query, [identifier, registryKey]);
+
   if (res.rows.length === 0) return null;
 
   const row = res.rows[0];
   return {
     id: row.event_id,
-    slug: row.event_slug || row.invitation_slug,
+    slug: invitation?.slug || row.invitation_slug || row.event_slug,
     experienceId: row.experience_id,
     accessMode: row.access_mode as "legacy" | "session",
     active: Boolean(row.event_active),

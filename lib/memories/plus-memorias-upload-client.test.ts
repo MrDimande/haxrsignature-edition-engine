@@ -36,7 +36,7 @@ test("client keeps one idempotency key across intent, PUT and complete", async (
 
   try {
     const result = await uploadPlusMemory({
-      slug: "stan-real-madrid",
+      slug: "stanturns5",
       file: photoFile("image/jpg"),
       challengeId: "8ac7d52a-11dc-4a2c-825d-8d9f0b24288b",
       clientUploadId,
@@ -75,7 +75,7 @@ test("client reconciles an already-completed intent without another storage PUT"
   }) as typeof fetch;
 
   try {
-    const result = await uploadPlusMemory({ slug: "stan-real-madrid", file: photoFile() });
+    const result = await uploadPlusMemory({ slug: "stanturns5", file: photoFile() });
     assert.equal(result.success, true);
     assert.deepEqual(calls, ["/api/memories/upload-intent", "/api/memories/complete"]);
   } finally {
@@ -99,7 +99,7 @@ test("client names a failed physical PUT as a storage upload failure", async () 
   }) as typeof fetch;
 
   try {
-    const result = await uploadPlusMemory({ slug: "stan-real-madrid", file: photoFile() });
+    const result = await uploadPlusMemory({ slug: "stanturns5", file: photoFile() });
     assert.equal(result.success, false);
     if (!result.success) assert.equal(result.code, "STORAGE_UPLOAD_FAILED");
   } finally {

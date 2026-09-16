@@ -5,7 +5,7 @@ import { closeNeonPool } from "@lib/db/neon-client";
 import { resolveMemoriesConfig } from "./config";
 import { moderateMissionSubmission, submitMissionPhoto } from "./mission-store";
 
-const SLUG = "stan-real-madrid";
+const SLUG = "stanturns5";
 const EVENT_ID = "11111111-1111-4111-8111-111111111111";
 const EXPERIENCE_ID = "22222222-2222-4222-8222-222222222222";
 const PARTICIPANT_ID = "33333333-3333-4333-8333-333333333333";

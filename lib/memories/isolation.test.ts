@@ -9,6 +9,8 @@ import {
   resolveMemoriesConfig,
   isMemoriesEnabledForSlug,
 } from "./config";
+import { getInvitation } from "@data/invitations";
+import { resolveActiveInvitationSlug } from "@lib/invitations/allowlist";
 import {
   createPhotoUploadIntent,
   __setSignedUploadUrlForTests as __setPhotoWallSignedUrl,
@@ -80,9 +82,16 @@ describe("Generic Multi-Event Memories & Cross-Event Isolation Tests", () => {
     assert.equal(plusConfig.invitationSlug, "jessicasamuelwedding");
     assert.equal(plusConfig.variant, "plus-memories");
 
+    // Stanley Plus Memories
+    const stanleyConfig = resolveMemoriesConfig("stanturns5");
+    assert.ok(stanleyConfig);
+    assert.equal(stanleyConfig.invitationSlug, "stanturns5");
+    assert.equal(stanleyConfig.variant, "plus-memories");
+    assert.equal(isMemoriesEnabledForSlug("stanturns5"), true);
+
     // Convites sem memories
-    assert.equal(isMemoriesEnabledForSlug("stanturns5"), false);
-    assert.equal(resolveMemoriesConfig("stanturns5"), null);
+    assert.equal(isMemoriesEnabledForSlug("queenkailanecrisma"), false);
+    assert.equal(resolveMemoriesConfig("queenkailanecrisma"), null);
   });
 
   it("02. Upload Intent para Plus Memories (jessicasamuelwedding) usa prefixo de storage 'jessicasamuelwedding/'", async () => {
@@ -237,5 +246,27 @@ describe("Generic Multi-Event Memories & Cross-Event Isolation Tests", () => {
     } finally {
       (JESSICA_SAMUEL_PHOTO_WALL as any).opensAt = prevOpensAt;
     }
+  });
+
+  it("06. Stanley Matchday Edition — resolve rotas públicas canónicas stanturns5 e stanturns5/memorias", () => {
+    // Stanley invitation → /stanturns5
+    const invitation = getInvitation("stanturns5");
+    assert.ok(invitation);
+    assert.equal(invitation.slug, "stanturns5");
+    assert.equal(invitation.sourcePath, "/stanturns5");
+    assert.equal(resolveActiveInvitationSlug("stanturns5"), "stanturns5");
+    assert.equal(resolveActiveInvitationSlug("stan"), "stanturns5");
+    assert.equal(resolveActiveInvitationSlug("convite-stan"), "stanturns5");
+    assert.equal(resolveActiveInvitationSlug("stan-5-anos"), "stanturns5");
+
+    // Stanley Plus Memories → /stanturns5/memorias
+    assert.equal(isMemoriesEnabledForSlug("stanturns5"), true);
+    const stanleyMemories = resolveMemoriesConfig("stanturns5");
+    assert.ok(stanleyMemories);
+    assert.equal(stanleyMemories.invitationSlug, "stanturns5");
+    assert.equal(stanleyMemories.variant, "plus-memories");
+
+    // stan-real-madrid é chave interna e NÃO é exposto como slug de rota pública
+    assert.equal(resolveActiveInvitationSlug("stan-real-madrid"), null);
   });
 });

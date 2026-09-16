@@ -22,7 +22,7 @@ async function runQrGenerationAndVerification() {
   }
 
   // URL Canónica Oficial apontando para a Deployment Real de Preview Vercel
-  const intendedUrl = `${BASE_PREVIEW_URL}/stan-real-madrid/memorias?token=${activeToken}`;
+  const intendedUrl = `${BASE_PREVIEW_URL}/stanturns5/memorias?token=${activeToken}`;
 
   const svgPath = path.join(PUBLIC_DIR, 'qr-stan-matchday.svg');
   const pngPath = path.join(PUBLIC_DIR, 'qr-stan-matchday.png');

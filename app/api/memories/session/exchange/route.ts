@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const rawToken = searchParams.get("token") || searchParams.get("link") || searchParams.get("code") || searchParams.get("access");
-    const slug = searchParams.get("slug") || "stan-real-madrid";
+    const slug = searchParams.get("slug") || "stanturns5";
     const tokenOrCode = rawToken?.trim();
 
     if (!tokenOrCode) {
@@ -35,7 +35,9 @@ export async function GET(request: Request) {
     return response;
   } catch (err: any) {
     console.error("[SessionExchange GET] error:", err?.message || err);
-    return NextResponse.redirect(new URL(`/stan-real-madrid/memorias?auth=invalid`, request.url), 307);
+    const { searchParams } = new URL(request.url);
+    const fallbackSlug = searchParams.get("slug") || "stanturns5";
+    return NextResponse.redirect(new URL(`/${fallbackSlug}/memorias?auth=invalid`, request.url), 307);
   }
 }
 
