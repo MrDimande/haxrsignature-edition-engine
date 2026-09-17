@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
     "framer-motion",
   ],
   serverExternalPackages: ["heic-decode"],
+  outputFileTracingIncludes: {
+    "/api/cron/memories-derivatives": [
+      "./node_modules/heic-decode/**/*",
+      "./node_modules/libheif-js/**/*",
+    ],
+  },
   webpack: (config) => {
     config.output = config.output ?? {};
     // config.output.hashFunction = "xxhash64"; // Disabled: incompatible with Node 24 WasmHash
