@@ -6,6 +6,7 @@ import {
   processBrowserVideoPoster,
   sniffMediaFormat,
   decodeHeicWithLimits,
+  resolveHeicDecodeModulePath,
   DERIVATIVE_CONFIG,
   type ProcessMediaDerivativesResult,
 } from "./derivatives";
@@ -357,5 +358,116 @@ describe("HAXR PLUS MEMORIES — FASE 5: Media Derivatives Pipeline", () => {
       async () => decodeHeicWithLimits(heicBytes, { maxRawRgbaBytes: 1024 }),
       /HEIC_LIMIT_EXCEEDED: Memória de pixels descompactados/
     );
+  });
+
+  // 18. HEIC Module Resolution: Parent thread resolve caminho absoluto válido e callable
+  test("HEIC_MODULE_RESOLVE_PARENT devolve caminho absoluto existente com decoder callable", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const modulePath = resolveHeicDecodeModulePath();
+
+    // PROVA 1: O caminho é absoluto
+    assert.ok(
+      path.isAbsolute(modulePath),
+      `O caminho deve ser absoluto, recebeu: ${modulePath}`
+    );
+
+    // PROVA 2: O ficheiro existe fisicamente no filesystem
+    assert.ok(
+      fs.existsSync(modulePath),
+      `O módulo deve existir fisicamente em: ${modulePath}`
+    );
+
+    // PROVA 3: O módulo é carregável via require e exporta um decoder callable
+    const { createRequire } = await import("node:module");
+    const require = createRequire(import.meta.url);
+    const loaded = require(modulePath);
+    const decoder = typeof loaded === "function" ? loaded : loaded?.default;
+    assert.equal(
+      typeof decoder,
+      "function",
+      "O módulo heic-decode deve exportar uma função callable"
+    );
+  });
+
+  // 19. HEIC Worker Absolute Require: Worker(eval:true) descodifica fixture real com caminho absoluto
+  test("HEIC_WORKER_ABSOLUTE_REQUIRE descodifica fixture HEIC real via workerData.heicDecodeModulePath", async () => {
+    const fs = await import("node:fs");
+    const nodePath = await import("node:path");
+    const { Worker: WorkerThread } = await import("node:worker_threads");
+
+    const fixturePath = nodePath.resolve(process.cwd(), "lib/memories/fixtures/iphone_sample.heic");
+    assert.ok(fs.existsSync(fixturePath), "Fixture iPhone HEIC deve existir fisicamente");
+    const heicBytes = fs.readFileSync(fixturePath);
+
+    const heicModulePath = resolveHeicDecodeModulePath();
+
+    // Worker code idêntico ao de produção, usando workerData.heicDecodeModulePath
+    const workerCode = `
+      const { parentPort, workerData } = require('node:worker_threads');
+      const decodeHeic = require(workerData.heicDecodeModulePath);
+
+      (async () => {
+        try {
+          const buf = Buffer.from(workerData.buffer);
+          const decoded = await decodeHeic({ buffer: buf });
+          if (!decoded || typeof decoded.width !== 'number' || typeof decoded.height !== 'number' || !decoded.data) {
+            parentPort.postMessage({ ok: false, error: 'DECODE_INVALID_OUTPUT' });
+            return;
+          }
+          parentPort.postMessage({
+            ok: true,
+            width: decoded.width,
+            height: decoded.height,
+            dataLength: decoded.data.byteLength,
+          });
+        } catch (err) {
+          parentPort.postMessage({ ok: false, error: err?.message || String(err) });
+        }
+      })();
+    `;
+
+    const worker = new WorkerThread(workerCode, {
+      eval: true,
+      workerData: {
+        buffer: heicBytes.buffer.slice(heicBytes.byteOffset, heicBytes.byteOffset + heicBytes.byteLength),
+        heicDecodeModulePath: heicModulePath,
+      },
+    });
+
+    const result = await new Promise<{
+      ok: boolean;
+      width?: number;
+      height?: number;
+      dataLength?: number;
+      error?: string;
+    }>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        worker.terminate().catch(() => {});
+        reject(new Error("HEIC_WORKER_TIMEOUT: Worker de teste excedeu 30s"));
+      }, 30_000);
+
+      worker.on("message", (msg) => {
+        clearTimeout(timer);
+        resolve(msg);
+      });
+      worker.on("error", (err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+      worker.on("exit", (code) => {
+        clearTimeout(timer);
+        if (code !== 0) reject(new Error(`Worker saiu com código ${code}`));
+      });
+    });
+
+    await worker.terminate().catch(() => {});
+
+    // PROVA: O worker eval:true com caminho absoluto descodificou com sucesso
+    assert.equal(result.ok, true, `Worker decode falhou: ${result.error}`);
+    assert.ok(typeof result.width === "number" && result.width > 0, "Largura deve ser > 0");
+    assert.ok(typeof result.height === "number" && result.height > 0, "Altura deve ser > 0");
+    assert.ok(typeof result.dataLength === "number" && result.dataLength > 0, "Dados RGBA devem ter tamanho > 0");
   });
 });

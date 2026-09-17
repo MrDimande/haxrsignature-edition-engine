@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
     "motion-utils",
     "framer-motion",
   ],
+  serverExternalPackages: ["heic-decode"],
   webpack: (config) => {
     config.output = config.output ?? {};
     // config.output.hashFunction = "xxhash64"; // Disabled: incompatible with Node 24 WasmHash

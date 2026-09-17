@@ -9,7 +9,7 @@
 
 import sharp from "sharp";
 import { Worker } from "node:worker_threads";
-import decodeHeic from "heic-decode";
+import { createRequire } from "node:module";
 import { getNeonPool } from "../db/neon-client";
 import { getMemoriesStorageProvider } from "./storage";
 import { assertCanonicalStoragePath } from "./storage/path-security";
@@ -202,9 +202,27 @@ export interface DecodeHeicLimitsOptions {
   maxRawRgbaBytes?: number;
 }
 
+/**
+ * Resolve o caminho físico absoluto do módulo heic-decode no parent thread.
+ * Em contextos serverless (Vercel), o Next.js empacota dependências em chunks;
+ * ao declarar heic-decode como serverExternalPackage, o módulo permanece em
+ * node_modules e este resolve devolve o caminho real no filesystem.
+ *
+ * Memoizado: resolve uma única vez por instância de processo.
+ */
+let _heicDecodeModulePath: string | null = null;
+
+export function resolveHeicDecodeModulePath(): string {
+  if (_heicDecodeModulePath) return _heicDecodeModulePath;
+  const require = createRequire(import.meta.url);
+  const resolved = require.resolve("heic-decode");
+  _heicDecodeModulePath = resolved;
+  return resolved;
+}
+
 const HEIC_DECODE_WORKER_CODE = `
   const { parentPort, workerData } = require('node:worker_threads');
-  const decodeHeic = require('heic-decode');
+  const decodeHeic = require(workerData.heicDecodeModulePath);
 
   (async () => {
     try {
@@ -248,11 +266,15 @@ export async function decodeHeicWithLimits(
     );
   }
 
+  // Resolve o caminho absoluto do módulo heic-decode no parent thread (onde node_modules é acessível)
+  const heicModulePath = resolveHeicDecodeModulePath();
+
   // Descodificação isolada em worker_thread para garantir preempção real sem bloquear o event loop
   const worker = new Worker(HEIC_DECODE_WORKER_CODE, {
     eval: true,
     workerData: {
       buffer: buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
+      heicDecodeModulePath: heicModulePath,
     },
   });
 
