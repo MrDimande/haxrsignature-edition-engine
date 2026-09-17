@@ -8,6 +8,8 @@
  */
 
 import sharp from "sharp";
+import { Worker } from "node:worker_threads";
+import decodeHeic from "heic-decode";
 import { getNeonPool } from "../db/neon-client";
 import { getMemoriesStorageProvider } from "./storage";
 import { assertCanonicalStoragePath } from "./storage/path-security";
@@ -29,6 +31,9 @@ export const DERIVATIVE_CONFIG = {
   limits: {
     maxInputPixels: 50_000_000, // 50 Megapixels (protecção contra decompression bombs)
     maxDimension: 16384,
+    maxFileSizeBytes: 25 * 1024 * 1024, // 25 MB para fotos
+    maxDecodeTimeMs: 15_000, // 15 segundos timeout para descodificação
+    maxRawRgbaBytes: 250_000_000, // Limite de 250 MB para buffer descompactado
     defaultLeaseTimeoutSeconds: 300, // 5 minutos
   },
 } as const;
@@ -94,9 +99,46 @@ export interface ProcessMediaDerivativesResult {
 }
 
 export interface SniffedMediaFormat {
-  format: "jpeg" | "png" | "webp" | "mp4" | "unknown";
+  format: "jpeg" | "png" | "webp" | "heic" | "mp4" | "unknown";
   isImage: boolean;
   isVideo: boolean;
+}
+
+function readAscii(buffer: Buffer | Uint8Array, start: number, length: number): string {
+  const slice = buffer.subarray(start, Math.min(start + length, buffer.length));
+  return String.fromCharCode(...slice);
+}
+
+const HEIC_BRANDS = [
+  "heic",
+  "heix",
+  "hevc",
+  "hevx",
+  "mif1",
+  "msf1",
+  "heim",
+  "heis",
+  "heif",
+] as const;
+
+export function isFtypHeicBrand(buffer: Buffer | Uint8Array): boolean {
+  if (buffer.length < 12) return false;
+  if (
+    buffer[4] !== 0x66 || // 'f'
+    buffer[5] !== 0x74 || // 't'
+    buffer[6] !== 0x79 || // 'y'
+    buffer[7] !== 0x70    // 'p'
+  ) {
+    return false;
+  }
+  const major = readAscii(buffer, 8, 4).toLowerCase();
+  if ((HEIC_BRANDS as readonly string[]).includes(major)) return true;
+  // Marcas compatíveis
+  for (let offset = 16; offset + 4 <= Math.min(buffer.length, 64); offset += 4) {
+    const brand = readAscii(buffer, offset, 4).toLowerCase();
+    if ((HEIC_BRANDS as readonly string[]).includes(brand)) return true;
+  }
+  return false;
 }
 
 /**
@@ -136,7 +178,12 @@ export function sniffMediaFormat(buffer: Buffer | Uint8Array): SniffedMediaForma
     return { format: "webp", isImage: true, isVideo: false };
   }
 
-  // MP4: 'ftyp' at bytes 4..7
+  // HEIC / HEIF: container ISOBMFF com marca de imagem estática HEVC / HEIF
+  if (isFtypHeicBrand(buffer)) {
+    return { format: "heic", isImage: true, isVideo: false };
+  }
+
+  // MP4 / QuickTime: 'ftyp' at bytes 4..7
   if (
     buffer.length >= 8 &&
     buffer[4] === 0x66 && buffer[5] === 0x74 && buffer[6] === 0x79 && buffer[7] === 0x70
@@ -145,6 +192,147 @@ export function sniffMediaFormat(buffer: Buffer | Uint8Array): SniffedMediaForma
   }
 
   return { format: "unknown", isImage: false, isVideo: false };
+}
+
+export interface DecodeHeicLimitsOptions {
+  timeoutMs?: number;
+  maxFileSizeBytes?: number;
+  maxInputPixels?: number;
+  maxDimension?: number;
+  maxRawRgbaBytes?: number;
+}
+
+const HEIC_DECODE_WORKER_CODE = `
+  const { parentPort, workerData } = require('node:worker_threads');
+  const decodeHeic = require('heic-decode');
+
+  (async () => {
+    try {
+      const buf = Buffer.from(workerData.buffer);
+      const decoded = await decodeHeic({ buffer: buf });
+      if (!decoded || typeof decoded.width !== 'number' || typeof decoded.height !== 'number' || !decoded.data) {
+        parentPort.postMessage({
+          ok: false,
+          error: 'HEIC_DECODE_FAILED: O descodificador HEIC não produziu dimensões ou dados de imagem válidos.',
+        });
+        return;
+      }
+      parentPort.postMessage({
+        ok: true,
+        width: decoded.width,
+        height: decoded.height,
+        data: decoded.data,
+      }, [decoded.data.buffer]);
+    } catch (err) {
+      parentPort.postMessage({
+        ok: false,
+        error: 'HEIC_DECODE_FAILED: ' + (err?.message || String(err)),
+      });
+    }
+  })();
+`;
+
+export async function decodeHeicWithLimits(
+  buf: Buffer,
+  options?: DecodeHeicLimitsOptions
+): Promise<{ width: number; height: number; data: Uint8ClampedArray }> {
+  const maxBytes = options?.maxFileSizeBytes ?? DERIVATIVE_CONFIG.limits.maxFileSizeBytes;
+  const timeoutMs = options?.timeoutMs ?? DERIVATIVE_CONFIG.limits.maxDecodeTimeMs;
+  const maxPixels = options?.maxInputPixels ?? DERIVATIVE_CONFIG.limits.maxInputPixels;
+  const maxDim = options?.maxDimension ?? DERIVATIVE_CONFIG.limits.maxDimension;
+  const maxRawBytes = options?.maxRawRgbaBytes ?? DERIVATIVE_CONFIG.limits.maxRawRgbaBytes;
+
+  if (buf.length > maxBytes) {
+    throw new Error(
+      `HEIC_LIMIT_EXCEEDED: O ficheiro HEIC (${buf.length} bytes) excede o limite máximo permitido de ${maxBytes} bytes.`
+    );
+  }
+
+  // Descodificação isolada em worker_thread para garantir preempção real sem bloquear o event loop
+  const worker = new Worker(HEIC_DECODE_WORKER_CODE, {
+    eval: true,
+    workerData: {
+      buffer: buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
+    },
+  });
+
+  let timer: NodeJS.Timeout | undefined;
+  let decoded: { width: number; height: number; data: Uint8ClampedArray };
+
+  try {
+    const workerResult = await new Promise<{
+      ok: boolean;
+      width?: number;
+      height?: number;
+      data?: Uint8ClampedArray;
+      error?: string;
+    }>((resolve, reject) => {
+      timer = setTimeout(async () => {
+        try {
+          await worker.terminate();
+        } catch {
+          // Ignorar erro na terminação
+        }
+        reject(new Error(`HEIC_TIMEOUT: Tempo limite de descodificação (${timeoutMs}ms) excedido.`));
+      }, timeoutMs);
+
+      worker.on("message", (msg) => {
+        if (timer) clearTimeout(timer);
+        resolve(msg);
+      });
+
+      worker.on("error", (err) => {
+        if (timer) clearTimeout(timer);
+        reject(new Error(`HEIC_DECODE_FAILED: ${err.message}`));
+      });
+
+      worker.on("exit", (code) => {
+        if (timer) clearTimeout(timer);
+        if (code !== 0) {
+          reject(new Error(`HEIC_DECODE_FAILED: Worker de descodificação terminou prematuramente com código ${code}.`));
+        }
+      });
+    });
+
+    if (!workerResult.ok) {
+      throw new Error(workerResult.error || "HEIC_DECODE_FAILED: Falha na descodificação HEIC.");
+    }
+
+    decoded = {
+      width: workerResult.width!,
+      height: workerResult.height!,
+      data: workerResult.data!,
+    };
+  } finally {
+    if (timer) clearTimeout(timer);
+    try {
+      await worker.terminate();
+    } catch {
+      // Ignorar se já terminado
+    }
+  }
+
+  const totalPixels = decoded.width * decoded.height;
+  if (totalPixels > maxPixels) {
+    throw new Error(
+      `HEIC_LIMIT_EXCEEDED: Pixels totais da imagem (${totalPixels}) excedem o limite de segurança de ${maxPixels}px.`
+    );
+  }
+
+  if (decoded.width > maxDim || decoded.height > maxDim) {
+    throw new Error(
+      `HEIC_LIMIT_EXCEEDED: Dimensões da imagem (${decoded.width}x${decoded.height}) excedem o limite de segurança de ${maxDim}px.`
+    );
+  }
+
+  const rawByteLength = decoded.data.byteLength;
+  if (rawByteLength > maxRawBytes) {
+    throw new Error(
+      `HEIC_LIMIT_EXCEEDED: Memória de pixels descompactados (${rawByteLength} bytes) excede a salvaguarda de ${maxRawBytes} bytes.`
+    );
+  }
+
+  return decoded;
 }
 
 /**
@@ -162,10 +350,89 @@ export async function generateImageDerivatives(
     if (sniffed.isVideo) {
       throw new Error("MIME_MISMATCH: Declarado como imagem, mas o payload contém assinatura de vídeo MP4.");
     }
-    throw new Error("CORRUPT_OR_UNSUPPORTED_IMAGE: Os bytes fornecidos não contêm cabeçalho de imagem válido (JPEG/PNG/WebP).");
+    throw new Error("CORRUPT_OR_UNSUPPORTED_IMAGE: Os bytes fornecidos não contêm cabeçalho de imagem válido (JPEG/PNG/WebP/HEIC).");
   }
 
-  // 1. Inspecção de metadados e salvaguarda contra decompression bombs
+  // Pipeline nativo para HEIC / HEIF
+  if (sniffed.format === "heic") {
+    const decoded = await decodeHeicWithLimits(buf);
+
+    const effectiveWidth = decoded.width;
+    const effectiveHeight = decoded.height;
+    const orientation: "portrait" | "landscape" | "square" =
+      effectiveWidth > effectiveHeight
+        ? "landscape"
+        : effectiveWidth < effectiveHeight
+        ? "portrait"
+        : "square";
+
+    const rawBuffer = Buffer.from(
+      decoded.data.buffer,
+      decoded.data.byteOffset,
+      decoded.data.byteLength
+    );
+
+    const thumbBuffer = await sharp(rawBuffer, {
+      raw: {
+        width: effectiveWidth,
+        height: effectiveHeight,
+        channels: 4,
+      },
+    })
+      .resize({
+        width: DERIVATIVE_CONFIG.thumbnail.maxWidth,
+        height: DERIVATIVE_CONFIG.thumbnail.maxHeight,
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({ quality: DERIVATIVE_CONFIG.thumbnail.quality, effort: 4 })
+      .toBuffer();
+
+    const thumbMeta = await sharp(thumbBuffer).metadata();
+
+    const mediumBuffer = await sharp(rawBuffer, {
+      raw: {
+        width: effectiveWidth,
+        height: effectiveHeight,
+        channels: 4,
+      },
+    })
+      .resize({
+        width: DERIVATIVE_CONFIG.medium.maxWidth,
+        height: DERIVATIVE_CONFIG.medium.maxHeight,
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .webp({ quality: DERIVATIVE_CONFIG.medium.quality, effort: 4 })
+      .toBuffer();
+
+    const mediumMeta = await sharp(mediumBuffer).metadata();
+
+    return {
+      thumbnail: {
+        buffer: thumbBuffer,
+        width: thumbMeta.width || effectiveWidth,
+        height: thumbMeta.height || effectiveHeight,
+        format: "webp",
+        contentType: "image/webp",
+      },
+      medium: {
+        buffer: mediumBuffer,
+        width: mediumMeta.width || effectiveWidth,
+        height: mediumMeta.height || effectiveHeight,
+        format: "webp",
+        contentType: "image/webp",
+      },
+      metadata: {
+        width: effectiveWidth,
+        height: effectiveHeight,
+        orientation,
+        format: "heic",
+      },
+    };
+  }
+
+  // 1. Inspecção de metadados e salvaguarda contra decompression bombs para JPEG/PNG/WebP
   const image = sharp(buf, {
     limitInputPixels: DERIVATIVE_CONFIG.limits.maxInputPixels,
     sequentialRead: true,
@@ -253,6 +520,7 @@ export async function generateImageDerivatives(
   };
 }
 
+
 /**
  * Processa com segurança um poster de vídeo fornecido pelo browser (Canvas / captura de frame).
  * 
@@ -285,9 +553,10 @@ export async function processBrowserVideoPoster(
 
   // 1. Validação estrita de magic bytes de imagem
   const sniffed = sniffMediaFormat(buf);
-  if (!sniffed.isImage) {
+  if (!sniffed.isImage || sniffed.format === "heic") {
     throw new Error("INVALID_POSTER_BYTES: Os bytes fornecidos não contêm cabeçalho de imagem válido (JPEG/PNG/WebP).");
   }
+
 
   // 2. Leitura de metadados e validação de limites
   const image = sharp(buf, {
@@ -600,15 +869,20 @@ export async function processPendingDerivativesBatchWithDependencies(
   const pool = dependencies.pool;
 
   // Selecciona registos pendentes ou bloqueios órfãos (com mais de 5 minutos)
+  // elegíveis para o pipeline moderno de derivados (exclui estruturalmente mídias legadas)
   const pendingRes = await pool.query(
     `
-    SELECT id
-    FROM wedding_photos
-    WHERE (derivatives_status = 'pending'
-       OR (derivatives_status = 'processing' AND derivatives_locked_at < now() - INTERVAL '5 minutes'))
-      AND ($2::text IS NULL OR invitation_slug = $2)
-      AND ($3::uuid IS NULL OR id = $3::uuid)
-    ORDER BY created_at ASC
+    SELECT p.id
+    FROM wedding_photos p
+    JOIN photo_upload_intents i ON i.id = p.id
+    WHERE (p.derivatives_status = 'pending'
+       OR (p.derivatives_status = 'processing' AND p.derivatives_locked_at < now() - INTERVAL '5 minutes'))
+      AND p.client_upload_id IS NOT NULL
+      AND i.client_upload_id IS NOT NULL
+      AND i.bucket_name != 'wedding-photos'
+      AND ($2::text IS NULL OR p.invitation_slug = $2)
+      AND ($3::uuid IS NULL OR p.id = $3::uuid)
+    ORDER BY p.created_at ASC
     LIMIT $1;
     `,
     [safeLimit, slug || null, mediaId || null]

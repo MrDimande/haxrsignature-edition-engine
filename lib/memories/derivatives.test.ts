@@ -5,6 +5,7 @@ import {
   generateImageDerivatives,
   processBrowserVideoPoster,
   sniffMediaFormat,
+  decodeHeicWithLimits,
   DERIVATIVE_CONFIG,
   type ProcessMediaDerivativesResult,
 } from "./derivatives";
@@ -180,6 +181,18 @@ describe("HAXR PLUS MEMORIES — FASE 5: Media Derivatives Pipeline", () => {
     assert.equal(sniffMediaFormat(mp4Header).isVideo, true);
     assert.equal(sniffMediaFormat(mp4Header).isImage, false);
 
+    // HEIC (brand heic)
+    const heicHeader = Buffer.from([0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x68, 0x65, 0x69, 0x63]);
+    assert.equal(sniffMediaFormat(heicHeader).format, "heic");
+    assert.equal(sniffMediaFormat(heicHeader).isImage, true);
+    assert.equal(sniffMediaFormat(heicHeader).isVideo, false);
+
+    // HEIF (brand mif1)
+    const mif1Header = Buffer.from([0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x6d, 0x69, 0x66, 0x31]);
+    assert.equal(sniffMediaFormat(mif1Header).format, "heic");
+    assert.equal(sniffMediaFormat(mif1Header).isImage, true);
+    assert.equal(sniffMediaFormat(mif1Header).isVideo, false);
+
     // Corrupted / Garbage
     const corrupt = Buffer.from([0x00, 0x11, 0x22, 0x33]);
     assert.equal(sniffMediaFormat(corrupt).format, "unknown");
@@ -257,5 +270,92 @@ describe("HAXR PLUS MEMORIES — FASE 5: Media Derivatives Pipeline", () => {
     assert.notEqual(poster.canonicalPath, arbitraryPath);
     assert.ok(poster.width <= 1280);
     assert.ok(poster.height <= 720);
+  });
+
+  // 13. HEIC Real: Processamento nativo de ficheiro iPhone HEIC autêntico
+  test("generateImageDerivatives processa ficheiro iPhone HEIC real e produz derivados WebP", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const fixturePath = path.resolve(process.cwd(), "lib/memories/fixtures/iphone_sample.heic");
+
+    assert.ok(fs.existsSync(fixturePath), "Fixture iPhone HEIC deve existir fisicamente");
+    const heicBytes = fs.readFileSync(fixturePath);
+
+    const result = await generateImageDerivatives(heicBytes);
+
+    // Validações de Thumbnail
+    assert.equal(result.thumbnail.format, "webp");
+    assert.equal(result.thumbnail.contentType, "image/webp");
+    assert.ok(result.thumbnail.width <= DERIVATIVE_CONFIG.thumbnail.maxWidth);
+    assert.ok(result.thumbnail.height <= DERIVATIVE_CONFIG.thumbnail.maxHeight);
+
+    // Validações de Medium
+    assert.equal(result.medium.format, "webp");
+    assert.equal(result.medium.contentType, "image/webp");
+    assert.ok(result.medium.width <= DERIVATIVE_CONFIG.medium.maxWidth);
+    assert.ok(result.medium.height <= DERIVATIVE_CONFIG.medium.maxHeight);
+
+    // Metadados
+    assert.equal(result.metadata.format, "heic");
+    assert.ok(result.metadata.width > 0);
+    assert.ok(result.metadata.height > 0);
+    assert.ok(["portrait", "landscape", "square"].includes(result.metadata.orientation));
+  });
+
+  // 14. HEIC Real: Payload HEIC corrompido falha com erro específico de descodificação
+  test("generateImageDerivatives rejeita HEIC corrompido com HEIC_DECODE_FAILED específico", async () => {
+    // Cabeçalho ftypheic válido seguido de lixo corrompido
+    const corruptHeic = Buffer.from([
+      0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x68, 0x65, 0x69, 0x63,
+      0xde, 0xad, 0xbe, 0xef, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+    ]);
+
+    await assert.rejects(
+      async () => generateImageDerivatives(corruptHeic),
+      /HEIC_DECODE_FAILED/
+    );
+  });
+
+  // 15. HEIC Isolation: Timeout preemptivo via worker_threads
+  test("HEIC_DECODE_TIMEOUT_PREEMPTIVE cancela o decoder preemptivamente sem bloquear o processo", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const fixturePath = path.resolve(process.cwd(), "lib/memories/fixtures/iphone_sample.heic");
+    const heicBytes = fs.readFileSync(fixturePath);
+
+    const start = Date.now();
+    await assert.rejects(
+      async () => decodeHeicWithLimits(heicBytes, { timeoutMs: 1 }),
+      /HEIC_TIMEOUT/
+    );
+    const elapsed = Date.now() - start;
+    // O timeout deve preempter em menos de 2000ms, em vez de esperar a descodificação completa
+    assert.ok(elapsed < 2000, `Decoder deve ser preemptado rapidamente (demorou ${elapsed}ms)`);
+  });
+
+  // 16. HEIC Isolation: Limite estrito de pixels totais (50 MP)
+  test("HEIC_PIXEL_LIMIT rejeita imagens que excedam o limite de resolução", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const fixturePath = path.resolve(process.cwd(), "lib/memories/fixtures/iphone_sample.heic");
+    const heicBytes = fs.readFileSync(fixturePath);
+
+    await assert.rejects(
+      async () => decodeHeicWithLimits(heicBytes, { maxInputPixels: 100 }),
+      /HEIC_LIMIT_EXCEEDED: Pixels totais da imagem/
+    );
+  });
+
+  // 17. HEIC Isolation: Limite estrito de memória descompactada RGBA (250 MB)
+  test("HEIC_RAW_MEMORY_LIMIT rejeita payloads que excedam a salvaguarda de memória RGBA", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const fixturePath = path.resolve(process.cwd(), "lib/memories/fixtures/iphone_sample.heic");
+    const heicBytes = fs.readFileSync(fixturePath);
+
+    await assert.rejects(
+      async () => decodeHeicWithLimits(heicBytes, { maxRawRgbaBytes: 1024 }),
+      /HEIC_LIMIT_EXCEEDED: Memória de pixels descompactados/
+    );
   });
 });
