@@ -17,12 +17,16 @@ import {
   Users,
   Flame,
   ArrowUpRight,
-  Sparkle,
   QrCode,
   Check,
+  AlertCircle,
+  RotateCw,
+  Play,
 } from "lucide-react";
 import { StanleyWordmark } from "../StanleyWordmark";
 import { StanMatchdayCaptureModal } from "./StanMatchdayCaptureModal";
+import { useMemoriesGallery } from "@lib/memories/use-gallery";
+import type { PublicMemoryItem } from "@lib/memories/gallery";
 
 export type StanNavTab = "moments" | "challenges" | "album" | "explorers";
 
@@ -46,14 +50,6 @@ interface StanExplorer {
   rank: number;
 }
 
-interface StanGalleryPhoto {
-  id: string;
-  url: string;
-  guestName?: string;
-  caption?: string;
-  createdAt: string;
-}
-
 interface StanMatchdayExperienceProps {
   config: InvitationConfig;
   theme: TrueTheme;
@@ -68,7 +64,7 @@ export function StanMatchdayExperience({
   const [activeTab, setActiveTab] = useState<StanNavTab>("challenges");
   const [missions, setMissions] = useState<StanMissionItem[]>([]);
   const [explorers, setExplorers] = useState<StanExplorer[]>([]);
-  const [photos, setPhotos] = useState<StanGalleryPhoto[]>([]);
+  const [galleryRefreshTrigger, setGalleryRefreshTrigger] = useState<number>(0);
   const [selectedMission, setSelectedMission] = useState<StanMissionItem | null>(null);
   const [isCaptureModalOpen, setIsCaptureModalOpen] = useState(false);
   const [isLoadingMissions, setIsLoadingMissions] = useState(true);
@@ -76,6 +72,13 @@ export function StanMatchdayExperience({
   const [userScore, setUserScore] = useState<number>(0);
 
   const slug = config.slug;
+
+  const {
+    memories,
+    loading: isGalleryLoading,
+    error: isGalleryError,
+    retry: retryGallery,
+  } = useMemoriesGallery(slug, galleryRefreshTrigger);
 
   // 1. Carregar Missões do Servidor via /api/memories/missions
   const loadMissions = useCallback(async () => {
@@ -113,26 +116,10 @@ export function StanMatchdayExperience({
     }
   }, [slug]);
 
-  // 3. Carregar Galeria do Álbum via /api/memories/gallery
-  const loadGallery = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/memories/gallery?slug=${encodeURIComponent(slug)}`);
-      if (!res.ok) return;
-
-      const data = await res.json();
-      if (data.success && Array.isArray(data.photos)) {
-        setPhotos(data.photos);
-      }
-    } catch (err) {
-      console.warn("[StanMatchday] Erro ao carregar galeria:", err);
-    }
-  }, [slug]);
-
   useEffect(() => {
     loadMissions();
     loadExplorers();
-    loadGallery();
-  }, [loadMissions, loadExplorers, loadGallery]);
+  }, [loadMissions, loadExplorers]);
 
   // Handler de Missão Concluída
   const handleMissionSuccess = (missionId: string, pointsAwarded: number) => {
@@ -152,7 +139,7 @@ export function StanMatchdayExperience({
 
     // Actualizar galeria e exploradores em background
     loadExplorers();
-    loadGallery();
+    setGalleryRefreshTrigger((prev) => prev + 1);
   };
 
   const completedCount = missions.filter((m) => m.isCompleted).length;
@@ -430,10 +417,46 @@ export function StanMatchdayExperience({
               </p>
             </div>
 
-            {photos.length === 0 ? (
+            {/* Estado 1: Loading */}
+            {isGalleryLoading && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={`gallery-skeleton-${i}`}
+                    className="aspect-square rounded-xl bg-[#0A1628]/60 border border-[#D4AF37]/15 animate-pulse"
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Estado 2: Error — nunca apresentar o empty state em caso de falha de rede/API */}
+            {!isGalleryLoading && isGalleryError && (
+              <div className="text-center py-12 px-4 rounded-2xl bg-[#0A1628]/40 border border-rose-500/20">
+                <AlertCircle className="w-8 h-8 text-rose-400/70 mx-auto mb-3" />
+                <p className="font-display text-sm text-[#F7F4EF] mb-1">
+                  Não foi possível carregar as memórias
+                </p>
+                <p className="text-xs text-[#5B6B7C] max-w-xs mx-auto mb-4">
+                  Ocorreu uma instabilidade na consulta do álbum. Tente recarregar.
+                </p>
+                <button
+                  type="button"
+                  onClick={retryGallery}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] hover:bg-[#D4AF37]/30 transition-colors font-mono text-xs font-semibold uppercase tracking-wider cursor-pointer"
+                >
+                  <RotateCw className="w-3.5 h-3.5" />
+                  Tentar Novamente
+                </button>
+              </div>
+            )}
+
+            {/* Estado 3: Empty — estritamente quando não há erro, o carregamento terminou e o array está vazio */}
+            {!isGalleryLoading && !isGalleryError && memories.length === 0 && (
               <div className="text-center py-16 px-4 rounded-2xl bg-[#0A1628]/40 border border-[#D4AF37]/15">
                 <ImageIcon className="w-8 h-8 text-[#D4AF37]/40 mx-auto mb-3" />
-                <p className="font-display text-sm text-[#F7F4EF] mb-1">O álbum está à espera do primeiro golo!</p>
+                <p className="font-display text-sm text-[#F7F4EF] mb-1">
+                  O álbum está à espera do primeiro golo!
+                </p>
                 <p className="text-xs text-[#5B6B7C] max-w-xs mx-auto mb-4">
                   Sê o primeiro a cumprir uma das missões fotográficas do Eu Espio.
                 </p>
@@ -445,25 +468,67 @@ export function StanMatchdayExperience({
                   Ver Missões
                 </button>
               </div>
-            ) : (
+            )}
+
+            {/* Estado 4: Loaded — renderização da grelha de PublicMemoryItem com suporte a imagem e vídeo */}
+            {!isGalleryLoading && !isGalleryError && memories.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {photos.map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="relative aspect-square rounded-xl overflow-hidden border border-[#D4AF37]/25 bg-[#0A1628] group"
-                  >
-                    <img
-                      src={photo.url}
-                      alt={photo.caption || "Foto do álbum Stanley"}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    {photo.guestName && (
-                      <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-[#0A1628] to-transparent text-[10px] text-[#F7F4EF]">
-                        {photo.guestName}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                {memories.map((item: PublicMemoryItem) => {
+                  const mediaUrl = item.thumbnailUrl || item.mediumUrl || item.signedUrl;
+                  const isVideo = item.kind === "video" || item.contentType?.startsWith("video/");
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="relative aspect-square rounded-xl overflow-hidden border border-[#D4AF37]/25 bg-[#0A1628] group"
+                    >
+                      {isVideo ? (
+                        item.posterUrl ? (
+                          <div className="relative w-full h-full">
+                            <img
+                              src={item.posterUrl}
+                              alt={item.caption || "Vídeo do álbum Stanley"}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/20 transition-colors">
+                              <div className="w-10 h-10 rounded-full bg-[#0A1628]/80 border border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow-lg">
+                                <Play className="w-4 h-4 fill-current ml-0.5" />
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="relative w-full h-full bg-black/60 flex items-center justify-center">
+                            <video
+                              src={item.signedUrl}
+                              preload="metadata"
+                              muted
+                              playsInline
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <div className="w-9 h-9 rounded-full bg-[#0A1628]/80 border border-[#D4AF37]/60 flex items-center justify-center text-[#D4AF37]">
+                                <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        <img
+                          src={mediaUrl}
+                          alt={item.caption || "Foto do álbum Stanley"}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      )}
+
+                      {item.guestName && (
+                        <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-[#0A1628] via-[#0A1628]/80 to-transparent text-[10px] text-[#F7F4EF] font-mono">
+                          {item.guestName}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>

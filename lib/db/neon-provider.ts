@@ -1,4 +1,8 @@
 import { getNeonPool } from './neon-client';
+import {
+  resolveInitialMediaModerationStatus,
+  validateExperienceForUploadCompletion,
+} from '@lib/memories/publication';
 import type {
   EditionDatabaseProvider,
   PublicMemoryPhotoRow,
@@ -385,7 +389,17 @@ export class NeonDatabaseProvider implements EditionDatabaseProvider {
       const originalFilename = input.originalFilename || intent.storage_path.split("/").pop() || "original.jpg";
       const eventId = input.context?.eventId || intent.event_id || null;
       const participantId = input.context?.participantId || input.participantId || intent.participant_id || null;
-      const experienceId = input.context?.experienceId || intent.experience_id || null;
+
+      // Resolução autoritativa da experiência: priorizar intent.experience_id da emissão server-side
+      const intentExperienceId = intent.experience_id || null;
+      const contextExperienceId = input.context?.experienceId || null;
+
+      if (intentExperienceId && contextExperienceId && intentExperienceId !== contextExperienceId) {
+        await client.query("ROLLBACK");
+        return { success: false, error: "Inconsistência entre o pedido de envio e o contexto da experiência.", code: "EXPERIENCE_INCONSISTENT" };
+      }
+
+      const experienceId = intentExperienceId || contextExperienceId;
       const stageId = input.stageId || intent.stage_id || null;
       const capturedAt = input.capturedAt || intent.captured_at || null;
       const width = input.width || (intent.width ? Number(intent.width) : null);
@@ -398,6 +412,31 @@ export class NeonDatabaseProvider implements EditionDatabaseProvider {
       // Regra 6: o client_upload_id gravado em wedding_photos vem ESTRITAMENTE do intent server-side
       const clientUploadId = intent.client_upload_id || null;
 
+      // Resolução autoritativa da visibilidade e status da experiência na BD (Fonte da Verdade)
+      let initialModerationStatus: "approved" | "pending" = "pending";
+      let approvedAt: string | null = null;
+
+      if (experienceId) {
+        const expQuery = `
+          SELECT id, event_id, visibility, status
+          FROM memory_experiences
+          WHERE id = $1
+          FOR SHARE
+        `;
+        const expRes = await client.query(expQuery, [experienceId]);
+        const expRow = expRes.rows[0] || null;
+
+        const validation = validateExperienceForUploadCompletion(expRow, experienceId, eventId);
+        if (!validation.valid) {
+          await client.query("ROLLBACK");
+          return { success: false, error: validation.error, code: validation.code };
+        }
+
+        const decision = resolveInitialMediaModerationStatus(validation.visibility, now);
+        initialModerationStatus = decision.moderationStatus;
+        approvedAt = decision.approvedAt ? decision.approvedAt.toISOString() : null;
+      }
+
       const insertPhotoQuery = `
         INSERT INTO wedding_photos (
           id, event_id, invitation_slug, storage_path, original_filename,
@@ -405,10 +444,10 @@ export class NeonDatabaseProvider implements EditionDatabaseProvider {
           table_id, participant_id, experience_id, moderation_status,
           stage_id, captured_at, width, height, orientation, duration_seconds,
           media_type, thumbnail_storage_path, poster_storage_path,
-          client_upload_id
+          client_upload_id, approved_at
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'pending',
-          $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+          $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25
         )
         ON CONFLICT (id) DO NOTHING
         RETURNING id
@@ -428,6 +467,7 @@ export class NeonDatabaseProvider implements EditionDatabaseProvider {
         input.tableId?.trim() || null,
         participantId,
         experienceId,
+        initialModerationStatus,
         stageId,
         capturedAt,
         width,
@@ -438,6 +478,7 @@ export class NeonDatabaseProvider implements EditionDatabaseProvider {
         thumbnailStoragePath,
         posterStoragePath,
         clientUploadId,
+        approvedAt,
       ];
 
       await client.query("SAVEPOINT before_insert_photo");
