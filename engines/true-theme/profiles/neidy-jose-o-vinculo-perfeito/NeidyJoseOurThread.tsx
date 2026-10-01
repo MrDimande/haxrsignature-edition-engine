@@ -150,10 +150,91 @@ export function NeidyJoseOurThread({ prefersReducedMotion = false }: NeidyJoseOu
         </header>
 
         <div className="relative">
-          <div
-            className="nj-continuity-line absolute bottom-0 left-1/2 top-0 hidden -translate-x-1/2 opacity-40 lg:block"
-            aria-hidden
-          />
+          {/* Fio Dourado Vivo — SVG progressivo cerimonial bordado (Desktop: horizontal através de Fé → Amor → Vitória → Aliança) */}
+          <div className="pointer-events-none absolute inset-0 z-0 hidden lg:block overflow-visible" aria-hidden>
+            <svg
+              viewBox="0 0 1200 480"
+              preserveAspectRatio="none"
+              className="h-full w-full"
+            >
+              <defs>
+                <linearGradient id="nj-golden-thread-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#CBB994" stopOpacity="0.08" />
+                  <stop offset="12%" stopColor="#CBB994" stopOpacity="0.45" />
+                  <stop offset="50%" stopColor="#CBB994" stopOpacity="0.55" />
+                  <stop offset="88%" stopColor="#CBB994" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#CBB994" stopOpacity="0.08" />
+                </linearGradient>
+              </defs>
+              {/* Linha principal com pathLength progressivo */}
+              <motion.path
+                d="M 30 215 C 130 185, 200 245, 315 210 C 430 170, 520 255, 635 200 C 750 150, 835 245, 945 195 C 1035 155, 1105 215, 1170 200"
+                fill="none"
+                stroke="url(#nj-golden-thread-grad)"
+                strokeWidth="1.15"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0, opacity: 0 }}
+                whileInView={{ pathLength: 1, opacity: 0.4 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{
+                  duration: prefersReducedMotion ? 0.01 : 2.8,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              />
+              {/* Fio secundário subtil de tecitura bordada */}
+              <motion.path
+                d="M 30 218 C 132 188, 198 242, 315 213 C 428 173, 522 252, 635 203 C 748 153, 837 242, 945 198 C 1033 158, 1107 218, 1170 203"
+                fill="none"
+                stroke="#CBB994"
+                strokeWidth="0.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0, opacity: 0 }}
+                whileInView={{ pathLength: 1, opacity: 0.2 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{
+                  duration: prefersReducedMotion ? 0.01 : 3.2,
+                  delay: prefersReducedMotion ? 0 : 0.25,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              />
+            </svg>
+          </div>
+
+          {/* Fio Dourado Vivo — SVG progressivo cerimonial bordado (Mobile / Tablet: vertical através das virtudes) */}
+          <div className="pointer-events-none absolute inset-0 z-0 block lg:hidden overflow-visible" aria-hidden>
+            <svg
+              viewBox="0 0 320 1200"
+              preserveAspectRatio="none"
+              className="h-full w-full"
+            >
+              <defs>
+                <linearGradient id="nj-golden-thread-grad-v" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#CBB994" stopOpacity="0.08" />
+                  <stop offset="10%" stopColor="#CBB994" stopOpacity="0.4" />
+                  <stop offset="50%" stopColor="#CBB994" stopOpacity="0.5" />
+                  <stop offset="90%" stopColor="#CBB994" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#CBB994" stopOpacity="0.08" />
+                </linearGradient>
+              </defs>
+              <motion.path
+                d="M 160 30 C 125 160, 195 290, 160 430 C 125 570, 195 700, 160 840 C 125 970, 195 1100, 160 1170"
+                fill="none"
+                stroke="url(#nj-golden-thread-grad-v)"
+                strokeWidth="1.15"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0, opacity: 0 }}
+                whileInView={{ pathLength: 1, opacity: 0.35 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{
+                  duration: prefersReducedMotion ? 0.01 : 2.8,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              />
+            </svg>
+          </div>
 
           <ol className="m-0 grid list-none grid-cols-1 gap-12 p-0 md:grid-cols-2 md:gap-10 lg:grid-cols-4 lg:gap-6">
             {ourThread.beats.map((beat, index) => {

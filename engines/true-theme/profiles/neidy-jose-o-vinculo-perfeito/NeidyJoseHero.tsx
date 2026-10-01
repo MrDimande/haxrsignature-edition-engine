@@ -159,41 +159,43 @@ export function NeidyJoseHero({
     >
       <div className="absolute inset-0 z-0 bg-[#0A211A]" aria-hidden />
 
-      {/* Backplane blur — parallax ligeiramente mais rápido */}
+      {/* Backplane blur — parallax e profundidade 3D em wrappers separados */}
       <motion.div
-        className="nj-backplane absolute inset-0 z-0 pointer-events-none overflow-hidden"
+        className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
         style={{ y: backParallaxY }}
         aria-hidden
       >
-        <motion.div
-          className="absolute inset-[-6%]"
-          initial={false}
-          animate={{ opacity: revealPhoto ? 1 : 0 }}
-          transition={{
-            duration: prefersReducedMotion ? 0.01 : 1.4,
-            delay: delay(STAGGER.curtain),
-            ease: EASE_CEREMONIAL,
-          }}
-        >
-          <Image
-            src={hero.imageMobile}
-            alt=""
-            fill
-            priority
-            unoptimized
-            className="object-cover object-center scale-125 blur-3xl opacity-40 md:hidden"
-            sizes="100vw"
-          />
-          <Image
-            src={hero.imageDesktop}
-            alt=""
-            fill
-            priority
-            unoptimized
-            className="hidden object-cover object-center scale-110 blur-3xl opacity-45 md:block"
-            sizes="100vw"
-          />
-        </motion.div>
+        <div className="nj-backplane absolute inset-0">
+          <motion.div
+            className="absolute inset-[-6%]"
+            initial={false}
+            animate={{ opacity: revealPhoto ? 1 : 0 }}
+            transition={{
+              duration: prefersReducedMotion ? 0.01 : 1.4,
+              delay: delay(STAGGER.curtain),
+              ease: EASE_CEREMONIAL,
+            }}
+          >
+            <Image
+              src={hero.imageMobile}
+              alt=""
+              fill
+              priority
+              unoptimized
+              className="object-cover object-center scale-125 blur-3xl opacity-40 md:hidden"
+              sizes="100vw"
+            />
+            <Image
+              src={hero.imageDesktop}
+              alt=""
+              fill
+              priority
+              unoptimized
+              className="hidden object-cover object-center scale-110 blur-3xl opacity-45 md:block"
+              sizes="100vw"
+            />
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Placa nítida — cortina de baixo → cima + Ken Burns + parallax */}
@@ -464,7 +466,7 @@ export function NeidyJoseHero({
             {hero.editorialLine2}
           </motion.p>
 
-          <motion.p
+          <motion.div
             initial={false}
             animate={
               revealType
@@ -476,10 +478,30 @@ export function NeidyJoseHero({
               delay: delay(STAGGER.date),
               ease: EASE_CEREMONIAL,
             }}
-            className="mt-6 sm:mt-7 font-body text-[11px] sm:text-xs tracking-[0.4em] uppercase text-[#CBB994]"
+            className="relative mt-6 sm:mt-7 inline-block overflow-hidden px-2.5 py-0.5"
           >
-            {hero.dateSeal}
-          </motion.p>
+            <p className="font-body text-[11px] sm:text-xs tracking-[0.4em] uppercase text-[#CBB994]">
+              {hero.dateSeal}
+            </p>
+            {/* Passagem luminosa dourada única no dia/mês/ano */}
+            {!prefersReducedMotion && (
+              <motion.span
+                initial={{ x: "-130%", opacity: 0 }}
+                animate={
+                  revealType
+                    ? { x: "230%", opacity: [0, 0.75, 0] }
+                    : { x: "-130%", opacity: 0 }
+                }
+                transition={{
+                  duration: 1.6,
+                  delay: delay(STAGGER.date + 0.4),
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="pointer-events-none absolute inset-0 z-10 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-[#FFF7E6]/75 to-transparent"
+                aria-hidden
+              />
+            )}
+          </motion.div>
         </div>
       </div>
 

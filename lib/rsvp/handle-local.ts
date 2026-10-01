@@ -10,7 +10,7 @@ import { getRsvpEmailConfig } from "@lib/rsvp/config";
 import { isEditionPersistenceConfigured } from "@lib/rsvp/events";
 import { logLocalRsvp } from "@lib/rsvp/logging";
 import { buildLocalRsvpSuccessBody } from "@lib/rsvp/local-response";
-import { persistEditionRsvp } from "@lib/rsvp/persist";
+import { isRsvpDatabaseConfigured, persistEditionRsvp } from "@lib/rsvp/persist";
 import { sendRsvpNotificationEmail } from "@lib/rsvp/send-notification";
 import { validateLocalRsvpPayload } from "@lib/rsvp/validate-local";
 import {
@@ -19,7 +19,6 @@ import {
   rateLimitResponse,
 } from "@lib/security/rate-limit";
 import { persistentRateLimit } from "@lib/security/persistent-rate-limit";
-import { isSupabaseConfigured } from "@lib/supabase/server";
 
 type HandleLocalOptions = {
   rawBody?: string;
@@ -90,11 +89,25 @@ export async function handleLocalRsvpPost(
   const startedAt = Date.now();
 
   try {
-    const body = options?.rawBody
-      ? JSON.parse(options.rawBody)
-      : await request.json();
+    let body: unknown;
+    try {
+      body = options?.rawBody
+        ? JSON.parse(options.rawBody)
+        : await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Formato de dados inválido.",
+          code: "invalid_json",
+          persisted: false,
+        },
+        { status: 400 }
+      );
+    }
 
     const validation = validateLocalRsvpPayload(body);
+
 
     if (!validation.ok) {
       logStage(
@@ -114,7 +127,7 @@ export async function handleLocalRsvpPost(
     }
 
     if (
-      !isSupabaseConfigured() ||
+      !isRsvpDatabaseConfigured() ||
       !isEditionPersistenceConfigured(slug)
     ) {
       return rsvpBindingMissingResponse(requestId, slug);
@@ -171,13 +184,13 @@ export async function handleLocalRsvpPost(
       guestEmailSent: false,
     });
 
-    return NextResponse.json(
-      buildLocalRsvpSuccessBody({
-        notificationSkipped,
-        guestId: persistResult.guestId,
-      }),
-      { status: 200 }
-    );
+    const responseBody = buildLocalRsvpSuccessBody({
+      notificationSkipped,
+      guestId: persistResult.guestId,
+    });
+
+
+    return NextResponse.json(responseBody, { status: 200 });
   } catch (error) {
     console.error("RSVP Server Error:", error);
     logStage(requestId, "complete", startedAt, 500, "server_error");

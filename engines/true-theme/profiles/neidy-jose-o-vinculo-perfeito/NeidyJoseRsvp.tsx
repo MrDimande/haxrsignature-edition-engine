@@ -17,7 +17,7 @@ import {
   useTransform,
 } from "motion/react";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface NeidyJoseRsvpProps {
   prefersReducedMotion?: boolean;
@@ -60,16 +60,24 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
   const [companionTwo, setCompanionTwo] = useState("");
   const [dietaryOrNotes, setDietaryOrNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSealImpressed, setIsSealImpressed] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [ticketCode, setTicketCode] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [canTilt, setCanTilt] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCanTilt(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+    }
+  }, []);
   const supportWhatsApp = process.env.NEXT_PUBLIC_EDITION_NEIDY_JOSE_WHATSAPP
     ?.replace(/\D/g, "")
     .trim();
 
   const onMove = (e: React.MouseEvent) => {
-    if (prefersReducedMotion || !cardRef.current) return;
+    if (prefersReducedMotion || !canTilt || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     mx.set((e.clientX - rect.left) / rect.width - 0.5);
     my.set((e.clientY - rect.top) / rect.height - 0.5);
@@ -110,6 +118,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
     }
 
     setIsSubmitting(true);
+    setIsSealImpressed(false);
     setErrorMessage("");
     const code = buildTicketCode(fullName);
 
@@ -147,6 +156,9 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
         clearTimeout(timeout);
       }
 
+      // Conclusão cerimonial da impressão do selo
+      setIsSealImpressed(true);
+
       try {
         localStorage.setItem(
           "nj_rsvp_submission",
@@ -168,6 +180,10 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
       }
 
       setTicketCode(code);
+      if (!prefersReducedMotion) {
+        // Pausa cerimonial para visualização do selo impresso antes da revelação
+        await new Promise((resolve) => setTimeout(resolve, 400));
+      }
       setIsSubmitted(true);
     } catch (error) {
       setErrorMessage(
@@ -272,17 +288,19 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
           style={{ perspective: 1400 }}
           className="w-full max-w-xl"
         >
-          <motion.div
-            ref={cardRef}
-            onMouseMove={onMove}
-            onMouseLeave={onLeave}
-            style={
-              prefersReducedMotion
-                ? undefined
-                : { rotateX, rotateY, transformStyle: "preserve-3d" }
-            }
-            className="nj-letter-frame nj-letter-emerge"
-          >
+          {/* Wrapper separado para a emergência CSS (.nj-letter-emerge) sem conflito com tilt 3D (Motion) */}
+          <div className="nj-letter-emerge w-full flex justify-center">
+            <motion.div
+              ref={cardRef}
+              onMouseMove={canTilt ? onMove : undefined}
+              onMouseLeave={canTilt ? onLeave : undefined}
+              style={
+                prefersReducedMotion || !canTilt
+                  ? undefined
+                  : { rotateX, rotateY, transformStyle: "preserve-3d" }
+              }
+              className="nj-letter-frame w-full max-w-xl"
+            >
             {/* Soft emerald glow under frame */}
             <div
               className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] bg-[radial-gradient(ellipse_at_center,rgba(45,90,76,0.22),transparent_70%)] blur-2xl"
@@ -506,7 +524,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                           {errorMessage}
                         </p>
                       ) : null}
-                      <button
+                      <motion.button
                         type="submit"
                         disabled={
                           isSubmitting ||
@@ -514,15 +532,45 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                           isAttending === null ||
                           (isAttending === true && !companionsFilled)
                         }
-                        className="group relative flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full bg-[#0A211A] shadow-[0_16px_40px_-10px_rgba(10,33,26,0.65),0_0_0_1px_rgba(203,185,148,0.35)] transition-transform hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 sm:h-[4.75rem] sm:w-[4.75rem]"
+                        whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
+                        whileHover={prefersReducedMotion ? undefined : { scale: 1.03 }}
+                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="group relative flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full bg-[#0A211A] shadow-[0_16px_40px_-10px_rgba(10,33,26,0.65),0_0_0_1px_rgba(203,185,148,0.35)] disabled:opacity-40 disabled:hover:scale-100 sm:h-[4.75rem] sm:w-[4.75rem]"
                         aria-label="Selar e enviar a carta"
                       >
+                        {/* Halo dourado cerimonial breve no toque/envio */}
+                        <motion.span
+                          className="pointer-events-none absolute -inset-2 rounded-full border border-[#CBB994]"
+                          initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.9 }}
+                          animate={
+                            prefersReducedMotion
+                              ? isSealImpressed || isSubmitting
+                                ? { opacity: 0.45, scale: 1 }
+                                : { opacity: 0, scale: 1 }
+                              : isSealImpressed
+                              ? { opacity: [0, 0.85, 0], scale: [0.95, 1.35, 1.45] }
+                              : isSubmitting
+                              ? { opacity: [0.2, 0.55, 0.2], scale: [1, 1.15, 1] }
+                              : { opacity: 0, scale: 0.9 }
+                          }
+                          transition={
+                            prefersReducedMotion
+                              ? { duration: 0.05 }
+                              : isSealImpressed
+                              ? { duration: 0.5, ease: "easeOut" }
+                              : isSubmitting
+                              ? { repeat: Infinity, duration: 1.2, ease: "easeInOut" }
+                              : { duration: 0.2 }
+                          }
+                          aria-hidden
+                        />
+
                         <span className="absolute inset-[3px] rounded-full border border-[#CBB994]/55" />
                         <span className="absolute inset-[7px] rounded-full border border-[#CBB994]/25" />
                         <span className="nj-script-font relative z-10 text-2xl text-[#CBB994] sm:text-[1.65rem]">
                           {isSubmitting ? "…" : "NJ"}
                         </span>
-                      </button>
+                      </motion.button>
                       <p className="font-body text-[9px] uppercase tracking-[0.35em] text-[#3B6456]">
                         {isSubmitting ? "A selar a carta…" : "Toque no selo para enviar"}
                       </p>
@@ -530,8 +578,12 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                   </form>
                 ) : (
                   <motion.div
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: prefersReducedMotion ? 0.01 : 0.6,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
                     className="flex flex-col items-center gap-6 text-center"
                   >
                     <p className="nj-script-font text-3xl text-[#CBB994] sm:text-4xl">
@@ -545,8 +597,15 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
 
                     {isAttending && (
                       <>
-                        <div
+                        <motion.div
                           ref={ticketRef}
+                          initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{
+                            duration: prefersReducedMotion ? 0.01 : 0.65,
+                            delay: prefersReducedMotion ? 0 : 0.18,
+                            ease: [0.16, 1, 0.3, 1],
+                          }}
                           className="nj-depth-card relative w-full max-w-sm overflow-hidden rounded-2xl border border-[#CBB994]/50 bg-[#0A211A] p-6 text-[#FCFDFC]"
                         >
                           <div className="absolute inset-0 opacity-15">
@@ -581,7 +640,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                               HAXR Signature · Private Edition
                             </p>
                           </div>
-                        </div>
+                        </motion.div>
 
                         <button
                           type="button"
@@ -621,7 +680,8 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
               </div>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
+      </motion.div>
       </div>
     </section>
   );

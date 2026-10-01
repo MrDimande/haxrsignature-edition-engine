@@ -124,7 +124,9 @@ export function validateLocalRsvpPayload(body: unknown, options: { now?: Date } 
   }
   const isAttending = attendingResult.attending;
 
-  const parsedGuests = parseInt(String(guests), 10);
+  // Contrato canónico no request: 'guests'. Suporte transparente a 'partySize' legado.
+  const rawGuests = guests !== undefined ? guests : record.partySize;
+  const parsedGuests = parseInt(String(rawGuests), 10);
   if (
     isAttending &&
     (Number.isNaN(parsedGuests) || parsedGuests < 1 || parsedGuests > 10)

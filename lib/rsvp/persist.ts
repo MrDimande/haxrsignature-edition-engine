@@ -1,5 +1,7 @@
 import { createAdminClient, isSupabaseConfigured } from "@lib/supabase/server";
 import { getEditionEventBinding } from "@lib/rsvp/events";
+import { resolveDatabaseProviderName } from "@lib/db/config";
+import { getNeonPool } from "@lib/db/neon-client";
 import {
   buildRsvpIdentityKey,
   normalizeGuestName,
@@ -60,10 +62,29 @@ export function resolveExistingRsvpIdentityKey(
   return buildRsvpIdentityKey(submission);
 }
 
+export function isRsvpDatabaseConfigured(): boolean {
+  try {
+    const provider = resolveDatabaseProviderName();
+    if (provider === "neon") {
+      return Boolean((process.env.DATABASE_URL || "").trim());
+    }
+  } catch {}
+  return isSupabaseConfigured();
+}
+
 export async function persistEditionRsvp(
   submission: RsvpSubmission
 ): Promise<EditionRsvpPersistResult> {
-  if (!isSupabaseConfigured()) {
+  let provider: "neon" | "supabase" = "supabase";
+  try {
+    provider = resolveDatabaseProviderName();
+  } catch {}
+
+  if (provider === "neon") {
+    if (!Boolean((process.env.DATABASE_URL || "").trim())) {
+      return { ok: false, error: "neon_not_configured", skipped: "neon" };
+    }
+  } else if (!isSupabaseConfigured()) {
     return { ok: false, error: "supabase_not_configured", skipped: "supabase" };
   }
 
@@ -80,6 +101,70 @@ export async function persistEditionRsvp(
   const partySize = attending ? submission.guests : 0;
   const emailNormalized = normalizeRsvpEmail(submission.email);
   const phoneNormalized = normalizeRsvpPhone(submission.phone);
+
+  if (provider === "neon") {
+    try {
+      const pool = getNeonPool();
+      const { rows: existingGuests } = await pool.query(
+        `SELECT name_normalized, email, phone FROM guests WHERE event_id = $1 AND guest_source = 'edition_rsvp'`,
+        [binding.eventId]
+      );
+
+      const identityKey = resolveExistingRsvpIdentityKey(
+        (existingGuests ?? []) as ExistingEditionGuestIdentity[],
+        submission
+      );
+
+      const { rows } = await pool.query(
+        `SELECT public.submit_edition_rsvp($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) AS result`,
+        [
+          binding.eventId,
+          submission.name.trim(),
+          identityKey,
+          attending,
+          partySize,
+          binding.slug,
+          emailNormalized,
+          phoneNormalized,
+          submission.messageForBride?.trim() ?? "",
+          submission.size?.trim() ?? "",
+          submission.dressCodeConfirmed ?? null,
+        ]
+      );
+
+      const payload = rows[0]?.result as {
+        ok?: boolean;
+        error?: string;
+        guestId?: string;
+        status?: "confirmed" | "declined";
+        created?: boolean;
+        partySize?: number;
+        plusOnes?: number;
+      } | null;
+
+      if (!payload?.ok || !payload.guestId || !payload.status) {
+        return {
+          ok: false,
+          error: payload?.error ?? "persist_failed",
+        };
+      }
+
+      return {
+        ok: true,
+        guestId: payload.guestId,
+        status: payload.status,
+        created: Boolean(payload.created),
+        partySize: payload.partySize ?? partySize,
+        plusOnes: payload.plusOnes ?? Math.max(0, partySize - 1),
+      };
+    } catch (err: unknown) {
+      const isPgError = typeof err === "object" && err !== null && "code" in err;
+      console.error("[RSVP] Neon persist failed", {
+        code: isPgError ? String((err as { code: unknown }).code) : "unknown",
+      });
+      return { ok: false, error: "neon_error" };
+    }
+  }
 
   const supabase = createAdminClient();
   const { data: existingGuests, error: lookupError } = await supabase

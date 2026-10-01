@@ -16,6 +16,7 @@ const SLUGS = [
   "jessicaesamueltraditionalwedding",
   "jessicachadelingerie",
   "jessicasamuelwedding",
+  "neidyejosewedding",
 ] as const;
 
 describe("Universal RSVP client contract", () => {

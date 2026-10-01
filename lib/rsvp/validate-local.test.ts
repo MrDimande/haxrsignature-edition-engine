@@ -3,6 +3,8 @@ import { describe, it } from "node:test";
 import { parseAttending } from "./parse-attending";
 import { validateLocalRsvpPayload } from "./validate-local";
 
+Reflect.set(process.env, "NODE_ENV", "test");
+
 describe("parseAttending", () => {
   it("aceita true / false booleanos", () => {
     assert.deepEqual(parseAttending(true), { ok: true, attending: true });
@@ -173,6 +175,34 @@ describe("validateLocalRsvpPayload", () => {
       assert.equal(result.body.success, false);
       assert.equal(result.body.persisted, false);
       assert.doesNotMatch(result.body.message, /honeypot/i);
+    }
+  });
+
+  it("aceita contrato canónico de request com 'guests'", () => {
+    const result = validateLocalRsvpPayload({
+      slug: "neidyejosewedding",
+      name: "Convidado Canónico",
+      attending: true,
+      guests: 2,
+      phone: "+258841234567",
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.submission.guests, 2);
+    }
+  });
+
+  it("aceita fallback retrocompatível de 'partySize' normalizando para guests", () => {
+    const result = validateLocalRsvpPayload({
+      slug: "neidyejosewedding",
+      name: "Convidado Legado",
+      attending: true,
+      partySize: 3,
+      phone: "+258841234567",
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.submission.guests, 3);
     }
   });
 });
