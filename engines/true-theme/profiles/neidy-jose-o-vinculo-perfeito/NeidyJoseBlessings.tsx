@@ -3,7 +3,7 @@
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
 import { Feather } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface NeidyJoseBlessingsProps {
   prefersReducedMotion?: boolean;
@@ -77,6 +77,49 @@ function MagicalInkText({
   );
 }
 
+function getStoredLegacyBlessings(): BlessingMessage[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const saved = localStorage.getItem("nj_blessings_list");
+    if (!saved) return [];
+    const parsed = JSON.parse(saved) as BlessingMessage[];
+    return Array.isArray(parsed) ? parsed.filter((item) => !SEED_IDS.has(item.id)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function removeStoredLegacyBlessing(id: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const saved = localStorage.getItem("nj_blessings_list");
+    if (!saved) return;
+    const parsed = JSON.parse(saved) as BlessingMessage[];
+    const remaining = parsed.filter((item) => item.id !== id);
+    if (remaining.length === 0) {
+      localStorage.removeItem("nj_blessings_list");
+    } else {
+      localStorage.setItem("nj_blessings_list", JSON.stringify(remaining));
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function saveLocalPendingBlessing(item: BlessingMessage): void {
+  if (typeof window === "undefined") return;
+  try {
+    const existing = getStoredLegacyBlessings().filter((e) => e.id !== item.id);
+    const updated = [item, ...existing];
+    localStorage.setItem(
+      "nj_blessings_list",
+      JSON.stringify(updated.map(({ isMagic, ...rest }) => rest))
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
 /**
  * Livro de Felicitações — mural mágico:
  * escrever com pena · revelar no muro como tinta viva.
@@ -93,50 +136,152 @@ export function NeidyJoseBlessings({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [writingId, setWritingId] = useState<string | null>(null);
   const [authorDone, setAuthorDone] = useState(false);
+  const [submitFeedback, setSubmitFeedback] = useState("");
   const muralRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const isSyncingLegacyRef = useRef(false);
 
-  useEffect(() => {
+  // Carregar mensagens do mural a partir da API central
+  const fetchMural = useCallback(async () => {
     try {
-      const saved = localStorage.getItem("nj_blessings_list");
-      if (!saved) return;
-      const parsed = JSON.parse(saved) as BlessingMessage[];
-      const real = parsed.filter((item) => !SEED_IDS.has(item.id));
-      setEntries(real);
-      localStorage.setItem("nj_blessings_list", JSON.stringify(real));
+      const res = await fetch("/api/blessings?slug=neidyejosewedding&limit=60");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.success && Array.isArray(data.blessings)) {
+        const remoteMessages: BlessingMessage[] = data.blessings.map(
+          (b: {
+            clientId: string;
+            author: string;
+            message: string;
+            createdAt: string;
+          }) => ({
+            id: b.clientId,
+            author: b.author,
+            message: b.message,
+            date: b.createdAt
+              ? b.createdAt.split("T")[0]
+              : new Date().toISOString().split("T")[0],
+            isMagic: false,
+          })
+        );
+
+        setEntries((prev) => {
+          const existingIds = new Set(remoteMessages.map((m) => m.id));
+          const localOnly = prev.filter(
+            (p) => p.isMagic || !existingIds.has(p.id)
+          );
+          return [...localOnly, ...remoteMessages];
+        });
+      }
     } catch {
-      /* ignore */
+      /* offline / fallback */
     }
   }, []);
 
-  const persist = (list: BlessingMessage[]) => {
-    try {
-      localStorage.setItem(
-        "nj_blessings_list",
-        JSON.stringify(list.map(({ isMagic, ...rest }) => rest))
-      );
-    } catch {
-      /* ignore */
-    }
-  };
+  // Sincronização retroactiva de mensagens legadas em localStorage
+  const syncLegacyEntries = useCallback(async () => {
+    if (isSyncingLegacyRef.current) return;
+    const legacy = getStoredLegacyBlessings();
+    if (legacy.length === 0) return;
 
-  const handleAdd = (e: React.FormEvent) => {
+    isSyncingLegacyRef.current = true;
+    for (const item of legacy) {
+      try {
+        const res = await fetch("/api/blessings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: "neidyejosewedding",
+            clientId: item.id,
+            author: item.author,
+            message: item.message,
+            honeypot: "",
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          removeStoredLegacyBlessing(item.id);
+        }
+      } catch {
+        // Preserva localmente em caso de falha de rede temporária
+      }
+    }
+    isSyncingLegacyRef.current = false;
+    void fetchMural();
+  }, [fetchMural]);
+
+  // Montagem inicial: carregar cache local, buscar remoto e sincronizar legados
+  useEffect(() => {
+    const local = getStoredLegacyBlessings();
+    if (local.length > 0) {
+      setEntries(local);
+    }
+    void fetchMural();
+    void syncLegacyEntries();
+  }, [fetchMural, syncLegacyEntries]);
+
+  // Polling periódico (30s) e revalidação ao regressar à aba visível
+  useEffect(() => {
+    let isNear = false;
+    const section = sectionRef.current;
+
+    const observer = new IntersectionObserver(
+      (items) => {
+        for (const item of items) {
+          isNear = item.isIntersecting;
+          if (isNear && document.visibilityState === "visible") {
+            void fetchMural();
+          }
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    if (section) observer.observe(section);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void fetchMural();
+        void syncLegacyEntries();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    const interval = window.setInterval(() => {
+      if (document.visibilityState === "visible" && isNear) {
+        void fetchMural();
+      }
+    }, 30000);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.clearInterval(interval);
+    };
+  }, [fetchMural, syncLegacyEntries]);
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!author.trim() || !message.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
     setAuthorDone(false);
+    setSubmitFeedback("");
+
+    const clientId = `b-${Date.now()}`;
+    const submittedAuthor = author.trim();
+    const submittedMessage = message.trim();
 
     const next: BlessingMessage = {
-      id: `b-${Date.now()}`,
-      author: author.trim(),
-      message: message.trim(),
+      id: clientId,
+      author: submittedAuthor,
+      message: submittedMessage,
       date: new Date().toISOString().split("T")[0],
       isMagic: !prefersReducedMotion,
     };
 
-    const updated = [next, ...entries];
-    setEntries(updated);
-    persist(updated);
+    // Apresentação optimista no mural com animação
+    setEntries((prev) => [next, ...prev.filter((item) => item.id !== next.id)]);
     setWritingId(next.id);
 
     requestAnimationFrame(() => {
@@ -145,6 +290,32 @@ export function NeidyJoseBlessings({
 
     setAuthor("");
     setMessage("");
+
+    // Enviar para a API central com idempotência
+    try {
+      const res = await fetch("/api/blessings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: "neidyejosewedding",
+          clientId,
+          author: submittedAuthor,
+          message: submittedMessage,
+          honeypot: "",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Falha na sincronização");
+      }
+    } catch {
+      // Em caso de falha de rede, preserva no storage local para sincronizar futuramente
+      saveLocalPendingBlessing(next);
+      setSubmitFeedback(
+        "A sua palavra foi guardada neste dispositivo e será sincronizada com o mural."
+      );
+    }
   };
 
   const finishMagic = (id: string) => {
@@ -158,6 +329,7 @@ export function NeidyJoseBlessings({
 
   return (
     <section
+      ref={sectionRef}
       id="blessings"
       className="nj-section-full nj-section-rise relative w-full overflow-hidden bg-[#FBFBFA] py-16 sm:py-20 md:py-28"
     >
@@ -237,8 +409,12 @@ export function NeidyJoseBlessings({
             </label>
             <input
               required
+              maxLength={80}
               value={author}
-              onChange={(e) => setAuthor(e.target.value)}
+              onChange={(e) => {
+                setAuthor(e.target.value);
+                if (submitFeedback) setSubmitFeedback("");
+              }}
               placeholder="O seu nome ou família…"
               className="nj-quill-field mb-6 w-full border-0 border-b border-[#0A211A]/20 bg-transparent py-2 font-serif text-lg italic text-[#0A211A] outline-none placeholder:text-[#0A211A]/30 focus:border-[#CBB994]"
             />
@@ -248,9 +424,13 @@ export function NeidyJoseBlessings({
             </label>
             <textarea
               required
+              maxLength={600}
               rows={4}
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => {
+                setMessage(e.target.value);
+                if (submitFeedback) setSubmitFeedback("");
+              }}
               placeholder="Escreva como quem deixa tinta no papel…"
               className="nj-quill-field mb-7 w-full resize-none border-0 border-b border-[#0A211A]/20 bg-transparent py-2 font-serif text-lg italic leading-relaxed text-[#0A211A] outline-none placeholder:text-[#0A211A]/30 focus:border-[#CBB994]"
             />
@@ -267,6 +447,11 @@ export function NeidyJoseBlessings({
               {isSubmitting && (
                 <p className="font-serif text-xs italic text-[#3B6456]">
                   A magia escreve no muro…
+                </p>
+              )}
+              {submitFeedback && (
+                <p className="max-w-md text-center font-serif text-xs italic text-[#3B6456]">
+                  {submitFeedback}
                 </p>
               )}
             </div>
