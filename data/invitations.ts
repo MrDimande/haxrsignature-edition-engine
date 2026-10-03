@@ -402,11 +402,11 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     metadata: {
       title: "Neidy Marino e José Mateus — Convite de Casamento",
       date: "2026-12-05",
-      time: "13:00 · Civil · 15:00 · Copo de Água",
+      time: "13:00 · Acolhimento · 14:30 · Civil",
       location: "Espaço Águia, Marracuene",
       subtitle: "O VÍNCULO DA PERFEIÇÃO · Colossenses 3:14",
       description:
-        "Celebração do Matrimónio de Neidy Marino e José Mateus. 5 de Dezembro de 2026 — Civil 13:00 & Copo de Água 15:00 · Espaço Águia, Marracuene. Fé · Vitória · Amor.",
+        "Celebração do Matrimónio de Neidy Marino e José Mateus. 5 de Dezembro de 2026 — Acolhimento 13:00 · Civil 14:30 · Espaço Águia, Marracuene. Fé · Vitória · Amor.",
       eventDate: "2026-12-05",
       eventType: "Casamento",
       dressCode: "Traje de Gala",

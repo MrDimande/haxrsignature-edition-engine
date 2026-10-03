@@ -54,7 +54,7 @@ export const neidyJoseVinculoTrueTheme: TrueTheme = {
     location: {
       name: "Espaço Águia",
       address: "Marracuene, Moçambique",
-      directions: "Casamento civil às 13:00 e Copo de Água às 15:00 no Espaço Águia.",
+      directions: "Acolhimento às 13:00 e Casamento Civil às 14:30 no Espaço Águia.",
       mapCoordinates: "-25.7417945, 32.6487008",
       externalMapUrl:
         "https://www.google.com/maps/place/Eventos+%26+Acomoda%C3%A7%C3%A3o+%C3%81guia/@-25.7417945,32.6487008,17z",

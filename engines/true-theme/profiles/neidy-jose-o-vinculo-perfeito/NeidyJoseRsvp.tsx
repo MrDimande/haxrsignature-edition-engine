@@ -628,7 +628,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                               05 · XII · 2026
                             </p>
                             <p className="font-body text-[10px] tracking-[0.2em] text-[#CBB994]">
-                              Civil 13:00 · Copo de Água 15:00
+                              Acolhimento 13:00 · Civil 14:30 · Salão 15:00
                             </p>
                             <p className="font-body text-[10px] text-[#EBE4D5]/70">
                               Espaço Águia · Marracuene
