@@ -227,8 +227,8 @@ export function buildGoogleCalendarUrl(): string {
       "O Vínculo da Perfeição · Colossenses 3:14"
   );
   const location = encodeURIComponent("Espaço Águia, Marracuene, Moçambique");
-  /** Início oficial da recepção: 13:00 CAT = 11:00 UTC */
-  const dates = "20261205T110000Z/20261205T200000Z";
+  /** Início oficial da recepção: 13:00 CAT = 11:00 UTC | Término técnico: 23:00 CAT = 21:00 UTC */
+  const dates = "20261205T110000Z/20261205T210000Z";
 
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
 }
@@ -244,7 +244,7 @@ export function downloadWeddingIcsFile(): void {
     "UID:wedding-neidy-jose-20261205@haxrsignature.com",
     "DTSTAMP:20261205T110000Z",
     "DTSTART:20261205T110000Z",
-    "DTEND:20261205T200000Z",
+    "DTEND:20261205T210000Z",
     "SUMMARY:Casamento: Neidy Marino e José Mateus",
     "DESCRIPTION:Celebração do Matrimónio de Neidy Marino e José Mateus.\\n\\nO Ritmo do Nosso Dia:\\n13:00 - Acolhimento\\n14:00 - Welcome Drink\\n14:30 - O Nosso Sim\\n15:00 - Entramos Juntos\\n18:00 - A Celebração Muda de Ritmo\\n19:00 - A Noite é Nossa\\n\\nDress Code: Traje de Gala\\nColossenses 3:14",
     "LOCATION:Espaço Águia, Marracuene, Moçambique",
