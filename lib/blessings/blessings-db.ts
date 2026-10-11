@@ -4,8 +4,9 @@ import { getNeonPool } from "@lib/db/neon-client";
 import type { BlessingItem, SubmitBlessingResult } from "./types";
 
 function ensureDatabaseUrl(): string {
-  const current = (process.env.DATABASE_URL || "").trim();
-  if (current) return current;
+  if (process.env.DATABASE_URL !== undefined) {
+    return process.env.DATABASE_URL.trim();
+  }
 
   try {
     for (const filename of [".env.neon.local", ".env.local"]) {
@@ -79,7 +80,10 @@ export async function listBlessingsFromDatabase(
   limit: number = 60
 ): Promise<BlessingItem[]> {
   if (!isBlessingsDatabaseConfigured()) {
-    return [];
+    console.error(
+      `[blessings-db] Falha de configuração: DATABASE_URL ausente ou vazia ao tentar listar felicitações para o slug '${slug}'.`
+    );
+    throw new Error("Base de dados de felicitações não configurada.");
   }
 
   try {
@@ -93,10 +97,17 @@ export async function listBlessingsFromDatabase(
     if (Array.isArray(result)) {
       return result as BlessingItem[];
     }
+    console.warn(
+      `[blessings-db] Resultado inesperado da função list_edition_blessings para slug '${slug}':`,
+      result
+    );
     return [];
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error("[blessings-db] Error listing blessings:", message);
-    return [];
+    console.error(
+      `[blessings-db] Erro ao consultar felicitações para slug '${slug}':`,
+      message
+    );
+    throw new Error(`Falha ao ler felicitações da base de dados: ${message}`);
   }
 }

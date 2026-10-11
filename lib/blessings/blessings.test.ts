@@ -223,3 +223,21 @@ test("Blessings Legacy Recovery: deduplication and seed filtering logic", () => 
   assert.equal(merged.length, 2);
   assert.deepEqual(merged.map((m) => m.id).sort(), ["b-100", "b-200"]);
 });
+
+test("Blessings DB: listBlessingsFromDatabase throws when DB is not configured, never silently returning []", async () => {
+  const { listBlessingsFromDatabase } = await import("./blessings-db");
+  const originalUrl = process.env.DATABASE_URL;
+  try {
+    process.env.DATABASE_URL = "";
+    await assert.rejects(
+      async () => {
+        await listBlessingsFromDatabase("neidyejosewedding", 60);
+      },
+      {
+        message: /Base de dados de felicitações não configurada/i,
+      }
+    );
+  } finally {
+    process.env.DATABASE_URL = originalUrl;
+  }
+});
