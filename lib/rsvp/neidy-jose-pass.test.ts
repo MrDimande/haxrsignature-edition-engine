@@ -44,17 +44,63 @@ describe("Neidy & José — Digital Pass & Token Security", () => {
     }
   });
 
-  it("resolveNeidyJoseCheckinUrl rejeita apontar para Produção quando em ambiente Preview", () => {
+  it("resolveNeidyJoseCheckinUrl rejeita apontar para Produção e aliases quando em ambiente Preview", () => {
+    const token = "b7a2d4f9e1c3856012345678abcdef01";
+    const aliases = [
+      "https://www.haxrsignature.com",
+      "https://haxrsignature.com",
+      "https://edition.haxrsignature.com",
+      "https://haxrsignature.vercel.app",
+      "https://subdomain.haxrsignature.com",
+    ];
+
+    for (const alias of aliases) {
+      const res = resolveNeidyJoseCheckinUrl(token, {
+        env: "preview",
+        previewBaseUrl: alias,
+      });
+      assert.equal(res.ok, false);
+      if (!res.ok) {
+        assert.equal(res.error, "preview_cannot_target_production");
+      }
+    }
+  });
+
+  it("resolveNeidyJoseCheckinUrl rejeita esquemas inválidos em Preview", () => {
     const token = "b7a2d4f9e1c3856012345678abcdef01";
     const res = resolveNeidyJoseCheckinUrl(token, {
       env: "preview",
-      previewBaseUrl: "https://www.haxrsignature.com",
+      previewBaseUrl: "ftp://preview.example.com",
     });
-
     assert.equal(res.ok, false);
     if (!res.ok) {
-      assert.equal(res.error, "preview_cannot_target_production");
+      assert.equal(res.error, "invalid_target_url");
     }
+  });
+
+  it("buildNeidyJoseCheckinUrl lança excepção e NUNCA faz fallback para Produção quando a resolução falha", () => {
+    const token = "b7a2d4f9e1c3856012345678abcdef01";
+    // Forçar resolução em Preview sem destino
+    assert.throws(
+      () => {
+        // Simular chamada directa com token curto ou erro
+        const origEnv = process.env.NEXT_PUBLIC_VERCEL_ENV;
+        try {
+          process.env.NEXT_PUBLIC_VERCEL_ENV = "preview";
+          delete process.env.NEXT_PUBLIC_CORE_PREVIEW_URL;
+          delete process.env.NEXT_PUBLIC_CORE_BASE_URL;
+          delete process.env.HAXR_CORE_API_BASE_URL;
+          buildNeidyJoseCheckinUrl(token);
+        } finally {
+          if (origEnv !== undefined) process.env.NEXT_PUBLIC_VERCEL_ENV = origEnv;
+          else delete process.env.NEXT_PUBLIC_VERCEL_ENV;
+        }
+      },
+      (err: Error) => {
+        assert.ok(err.message.includes("Falha na resolução"));
+        return true;
+      }
+    );
   });
 
   it("resolveNeidyJoseCheckinUrl aceita destino de Preview válido e isolado", () => {

@@ -23,9 +23,10 @@ export interface NeidyJoseDigitalPassProps {
 
 export function buildNeidyJoseCheckinUrl(qrToken: string): string {
   const resolution = resolveNeidyJoseCheckinUrl(qrToken);
-  if (resolution.ok) return resolution.url;
-  const safeToken = encodeURIComponent(qrToken.trim());
-  return `${CANONICAL_CORE_PRODUCTION_BASE}/event/${NEIDY_JOSE_CANONICAL_EVENT_ID}/checkin/${safeToken}`;
+  if (!resolution.ok) {
+    throw new Error(`[DigitalPass] Falha na resolução da URL de check-in: ${resolution.message}`);
+  }
+  return resolution.url;
 }
 
 export function NeidyJoseDigitalPass({

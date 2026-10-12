@@ -87,6 +87,21 @@ export function detectEnvironment(options?: ResolveCheckinUrlOptions): ResolvedE
   return "development";
 }
 
+export const PRODUCTION_HOSTNAMES = new Set([
+  "haxrsignature.com",
+  "www.haxrsignature.com",
+  "edition.haxrsignature.com",
+  "haxrsignature.vercel.app",
+  "projecto-haxrsignature-edition.vercel.app",
+]);
+
+export function isProductionHostOrAlias(hostname: string): boolean {
+  const norm = hostname.trim().toLowerCase();
+  if (PRODUCTION_HOSTNAMES.has(norm)) return true;
+  if (norm.endsWith(".haxrsignature.com")) return true;
+  return false;
+}
+
 export function resolveNeidyJoseCheckinUrl(
   qrToken: string,
   options?: ResolveCheckinUrlOptions
@@ -139,17 +154,25 @@ export function resolveNeidyJoseCheckinUrl(
 
     try {
       const parsed = new URL(previewBase);
-      const origin = parsed.origin.replace(/\/$/, "");
 
-      if (origin === CANONICAL_CORE_PRODUCTION_BASE) {
+      if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+        return {
+          ok: false,
+          error: "invalid_target_url",
+          message: "Ambiente de Preview: Esquema de URL inválido. Apenas http e https são permitidos.",
+        };
+      }
+
+      if (isProductionHostOrAlias(parsed.hostname)) {
         return {
           ok: false,
           error: "preview_cannot_target_production",
           message:
-            "Ambiente de Preview: O destino configurado aponta para a produção. Por segurança, os passes de preview não podem apontar para o check-in de produção.",
+            "Ambiente de Preview: O destino configurado aponta para a produção ou um alias de produção. Por segurança, os passes de preview não podem apontar para o check-in de produção.",
         };
       }
 
+      const origin = parsed.origin.replace(/\/$/, "");
       return {
         ok: true,
         url: `${origin}${path}`,
