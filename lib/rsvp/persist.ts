@@ -18,6 +18,7 @@ export type EditionRsvpPersistResult =
       created: boolean;
       partySize: number;
       plusOnes: number;
+      qrToken?: string;
     }
   | {
       ok: false;
@@ -149,6 +150,22 @@ export async function persistEditionRsvp(
         };
       }
 
+      let qrToken: string | undefined = undefined;
+      // Emissão segura de token: apenas para novo registo confirmado (least privilege / anti-harvesting)
+      if (payload.status === "confirmed" && Boolean(payload.created)) {
+        try {
+          const { rows: tokenRows } = await pool.query(
+            `SELECT qr_token FROM public.guests WHERE id = $1::uuid LIMIT 1`,
+            [payload.guestId]
+          );
+          if (tokenRows[0]?.qr_token) {
+            qrToken = String(tokenRows[0].qr_token).trim();
+          }
+        } catch (tokenErr) {
+          console.error("[RSVP] Failed to fetch qr_token after creation:", tokenErr);
+        }
+      }
+
       return {
         ok: true,
         guestId: payload.guestId,
@@ -156,6 +173,7 @@ export async function persistEditionRsvp(
         created: Boolean(payload.created),
         partySize: payload.partySize ?? partySize,
         plusOnes: payload.plusOnes ?? Math.max(0, partySize - 1),
+        ...(qrToken ? { qrToken } : {}),
       };
     } catch (err: unknown) {
       const isPgError = typeof err === "object" && err !== null && "code" in err;
@@ -219,6 +237,22 @@ export async function persistEditionRsvp(
     };
   }
 
+  let qrToken: string | undefined = undefined;
+  if (payload.status === "confirmed" && Boolean(payload.created)) {
+    try {
+      const { data: guestRow } = await supabase
+        .from("guests")
+        .select("qr_token")
+        .eq("id", payload.guestId)
+        .single();
+      if (guestRow?.qr_token) {
+        qrToken = String(guestRow.qr_token).trim();
+      }
+    } catch (tokenErr) {
+      console.error("[RSVP] Failed to fetch qr_token from Supabase:", tokenErr);
+    }
+  }
+
   return {
     ok: true,
     guestId: payload.guestId,
@@ -226,5 +260,6 @@ export async function persistEditionRsvp(
     created: Boolean(payload.created),
     partySize: payload.partySize ?? partySize,
     plusOnes: payload.plusOnes ?? Math.max(0, partySize - 1),
+    ...(qrToken ? { qrToken } : {}),
   };
 }

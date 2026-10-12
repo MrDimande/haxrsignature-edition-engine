@@ -2,11 +2,10 @@
 
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
 import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
-import { toPng } from "html-to-image";
 import {
   CheckCircle2,
-  Download,
   MessageCircle,
+  ShieldCheck,
   XCircle,
 } from "lucide-react";
 import {
@@ -18,21 +17,10 @@ import {
 } from "motion/react";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
+import { NeidyJoseDigitalPass } from "./NeidyJoseDigitalPass";
 
 interface NeidyJoseRsvpProps {
   prefersReducedMotion?: boolean;
-}
-
-function buildTicketCode(name: string): string {
-  const initials = name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 3)
-    .map((w) => w[0]?.toUpperCase() ?? "")
-    .join("");
-  const stamp = Date.now().toString(36).slice(-5).toUpperCase();
-  return `NJ-${initials || "GV"}-${stamp}`;
 }
 
 /** Inline letter fields — feel like writing on paper */
@@ -42,7 +30,6 @@ const inkLine =
 export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpProps) {
   const duration = prefersReducedMotion ? 0.01 : 1.0;
   const ease = [0.16, 1, 0.3, 1] as const;
-  const ticketRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const mx = useMotionValue(0);
@@ -62,8 +49,9 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSealImpressed, setIsSealImpressed] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [ticketCode, setTicketCode] = useState("");
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [officialQrToken, setOfficialQrToken] = useState<string | null>(null);
+  const [officialPartySize, setOfficialPartySize] = useState<number>(1);
+  const [isPreExistingRecord, setIsPreExistingRecord] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [canTilt, setCanTilt] = useState(false);
 
@@ -120,7 +108,6 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
     setIsSubmitting(true);
     setIsSealImpressed(false);
     setErrorMessage("");
-    const code = buildTicketCode(fullName);
 
     const guests = isAttending ? parseInt(guestsCount, 10) : 0;
     const messageForBride = [
@@ -130,12 +117,16 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
       .filter(Boolean)
       .join("\n");
 
+    let qrTokenFromServer: string | null = null;
+    let partySizeFromServer = guests;
+    let preExisting = false;
+
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 12000);
 
       try {
-        const { outcome } = await submitUniversalRsvp(
+        const { data, outcome } = await submitUniversalRsvp(
           {
             slug: "neidyejosewedding",
             name: fullName.trim(),
@@ -152,34 +143,25 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
           setErrorMessage(outcome.message);
           return;
         }
+
+        if (isAttending) {
+          if (data.qrToken) {
+            qrTokenFromServer = data.qrToken;
+            partySizeFromServer = data.partySize ?? guests;
+          } else if (data.created === false) {
+            preExisting = true;
+          }
+        }
       } finally {
         clearTimeout(timeout);
       }
 
       // Conclusão cerimonial da impressão do selo
       setIsSealImpressed(true);
+      setOfficialQrToken(qrTokenFromServer);
+      setOfficialPartySize(partySizeFromServer);
+      setIsPreExistingRecord(preExisting);
 
-      try {
-        localStorage.setItem(
-          "nj_rsvp_submission",
-          JSON.stringify({
-            fullName,
-            phone,
-            isAttending,
-            guestsCount: isAttending ? guestsCount : 0,
-            guestNames: isAttending ? companionNames : "",
-            companionOne: isAttending ? companionOne.trim() : "",
-            companionTwo: isAttending ? companionTwo.trim() : "",
-            dietaryOrNotes,
-            ticketCode: code,
-            submittedAt: new Date().toISOString(),
-          })
-        );
-      } catch {
-        /* ignore */
-      }
-
-      setTicketCode(code);
       if (!prefersReducedMotion) {
         // Pausa cerimonial para visualização do selo impresso antes da revelação
         await new Promise((resolve) => setTimeout(resolve, 400));
@@ -211,7 +193,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
     if (isAttending) {
       message += `*Pessoas:* ${guestsCount}\n`;
       if (companionNames) message += `*Acompanhantes:* ${companionNames}\n`;
-      message += `*Ticket:* ${ticketCode}\n`;
+      message += `*Estado:* Registo oficial submetido\n`;
     }
     if (dietaryOrNotes.trim()) {
       message += `*Nota:* ${dietaryOrNotes.trim()}\n`;
@@ -222,26 +204,6 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
       ? `https://wa.me/${supportWhatsApp}`
       : "https://wa.me/";
     window.open(`${base}?text=${encodeURIComponent(message)}`, "_blank");
-  };
-
-  const downloadTicket = async () => {
-    if (!ticketRef.current || !isAttending) return;
-    setIsDownloading(true);
-    try {
-      const dataUrl = await toPng(ticketRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: "#0A211A",
-      });
-      const link = document.createElement("a");
-      link.download = `ticket-neidy-jose-${ticketCode}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsDownloading(false);
-    }
   };
 
   return (
@@ -597,60 +559,25 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
 
                     {isAttending && (
                       <>
-                        <motion.div
-                          ref={ticketRef}
-                          initial={{ opacity: 0, y: 24, scale: 0.96 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{
-                            duration: prefersReducedMotion ? 0.01 : 0.65,
-                            delay: prefersReducedMotion ? 0 : 0.18,
-                            ease: [0.16, 1, 0.3, 1],
-                          }}
-                          className="nj-depth-card relative w-full max-w-sm overflow-hidden rounded-2xl border border-[#CBB994]/50 bg-[#0A211A] p-6 text-[#FCFDFC]"
-                        >
-                          <div className="absolute inset-0 opacity-15">
-                            <Image
-                              src={NEIDY_JOSE_CONSTANTS.hero.monogram}
-                              alt=""
-                              fill
-                              unoptimized
-                              className="object-contain p-10"
-                            />
-                          </div>
-                          <div className="relative z-10 flex flex-col items-center gap-3">
-                            <p className="font-body text-[9px] uppercase tracking-[0.4em] text-[#CBB994]">
-                              Ticket de presença
+                        {officialQrToken ? (
+                          <NeidyJoseDigitalPass
+                            fullName={fullName.trim()}
+                            qrToken={officialQrToken}
+                            partySize={officialPartySize}
+                            companionNames={companionNames}
+                            prefersReducedMotion={prefersReducedMotion}
+                          />
+                        ) : isPreExistingRecord ? (
+                          <div className="my-2 flex w-full max-w-md flex-col items-center rounded-2xl border border-[#CBB994]/30 bg-[#0A211A] p-6 text-center text-[#FCFDFC] shadow-lg">
+                            <ShieldCheck className="mb-2 h-8 w-8 text-[#CBB994]" />
+                            <p className="font-serif text-lg text-[#FCFDFC]">
+                              Presença Actualizada com Sucesso
                             </p>
-                            <p className="nj-script-font text-3xl text-[#FCFDFC]">Neidy e José</p>
-                            <div className="nj-hero-rule my-1 opacity-80" />
-                            <p className="font-serif text-lg tracking-wide">{fullName}</p>
-                            <p className="font-body text-[10px] uppercase tracking-[0.3em] text-[#EBE4D5]/80">
-                              05 · XII · 2026
-                            </p>
-                            <p className="font-body text-[10px] tracking-[0.2em] text-[#CBB994]">
-                              Acolhimento 13:00 · Civil 14:30 · Salão 15:00
-                            </p>
-                            <p className="font-body text-[10px] text-[#EBE4D5]/70">
-                              Espaço Águia · Marracuene
-                            </p>
-                            <p className="mt-3 border border-[#CBB994]/40 px-3 py-1 font-mono text-[11px] tracking-widest text-[#CBB994]">
-                              {ticketCode}
-                            </p>
-                            <p className="mt-2 font-body text-[8px] uppercase tracking-[0.25em] text-[#EBE4D5]/45">
-                              HAXR Signature · Private Edition
+                            <p className="mt-2 font-serif text-sm italic leading-relaxed text-[#EBE4D5]/80">
+                              Como a sua presença já constava do registo oficial, o seu passe digital foi preservado em segurança. A nossa recepção e equipa de concierge dispõem do seu passe oficial activo para a entrada no evento.
                             </p>
                           </div>
-                        </motion.div>
-
-                        <button
-                          type="button"
-                          onClick={downloadTicket}
-                          disabled={isDownloading}
-                          className="inline-flex items-center gap-2 rounded-full bg-[#0A211A] px-5 py-3 font-body text-[10px] uppercase tracking-[0.25em] text-[#FCFDFC] hover:bg-[#153B30] disabled:opacity-60"
-                        >
-                          <Download className="h-3.5 w-3.5 text-[#CBB994]" />
-                          {isDownloading ? "A gerar…" : "Descarregar ticket PNG"}
-                        </button>
+                        ) : null}
                       </>
                     )}
 
@@ -667,7 +594,8 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                       type="button"
                       onClick={() => {
                         setIsSubmitted(false);
-                        setTicketCode("");
+                        setOfficialQrToken(null);
+                        setIsPreExistingRecord(false);
                         setErrorMessage("");
                       }}
                       className="font-serif text-sm italic text-[#3B6456] underline underline-offset-4"

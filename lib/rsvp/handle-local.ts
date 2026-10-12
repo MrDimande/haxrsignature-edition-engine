@@ -187,6 +187,11 @@ export async function handleLocalRsvpPost(
     const responseBody = buildLocalRsvpSuccessBody({
       notificationSkipped,
       guestId: persistResult.guestId,
+      qrToken: persistResult.qrToken,
+      status: persistResult.status,
+      created: persistResult.created,
+      partySize: persistResult.partySize,
+      plusOnes: persistResult.plusOnes,
     });
 
 

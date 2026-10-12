@@ -5,6 +5,12 @@ export type RsvpApiPayload = {
   persisted?: boolean;
   notificationSkipped?: boolean;
   guestEmailSent?: boolean;
+  guestId?: string;
+  qrToken?: string;
+  status?: "confirmed" | "declined";
+  created?: boolean;
+  partySize?: number;
+  plusOnes?: number;
   /** Honeypot / silent discard — never treat as confirmation. */
   honeypot?: boolean;
 };
