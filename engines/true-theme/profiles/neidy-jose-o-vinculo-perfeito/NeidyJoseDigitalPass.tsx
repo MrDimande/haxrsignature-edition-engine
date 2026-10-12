@@ -7,6 +7,11 @@ import { toPng } from "html-to-image";
 import { Download, CheckCircle2, ShieldCheck, AlertCircle } from "lucide-react";
 import { motion } from "motion/react";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
+import {
+  resolveNeidyJoseCheckinUrl,
+  CANONICAL_CORE_PRODUCTION_BASE,
+  NEIDY_JOSE_CANONICAL_EVENT_ID,
+} from "@lib/rsvp/checkin-url";
 
 export interface NeidyJoseDigitalPassProps {
   fullName: string;
@@ -16,11 +21,11 @@ export interface NeidyJoseDigitalPassProps {
   prefersReducedMotion?: boolean;
 }
 
-const CANONICAL_EVENT_ID = "aed4c44a-49f8-4e9e-8b6b-cd5b3c701102";
-
 export function buildNeidyJoseCheckinUrl(qrToken: string): string {
+  const resolution = resolveNeidyJoseCheckinUrl(qrToken);
+  if (resolution.ok) return resolution.url;
   const safeToken = encodeURIComponent(qrToken.trim());
-  return `https://www.haxrsignature.com/event/${CANONICAL_EVENT_ID}/checkin/${safeToken}`;
+  return `${CANONICAL_CORE_PRODUCTION_BASE}/event/${NEIDY_JOSE_CANONICAL_EVENT_ID}/checkin/${safeToken}`;
 }
 
 export function NeidyJoseDigitalPass({
@@ -43,7 +48,14 @@ export function NeidyJoseDigitalPass({
       return;
     }
 
-    const checkinUrl = buildNeidyJoseCheckinUrl(qrToken);
+    const resolution = resolveNeidyJoseCheckinUrl(qrToken);
+    if (!resolution.ok) {
+      setQrError(resolution.message);
+      setQrDataUrl("");
+      return;
+    }
+
+    const checkinUrl = resolution.url;
 
     QRCode.toDataURL(checkinUrl, {
       width: 380,

@@ -4,20 +4,85 @@ import { buildNeidyJoseCheckinUrl } from "@engines/true-theme/profiles/neidy-jos
 import { buildLocalRsvpSuccessBody } from "@lib/rsvp/local-response";
 import { resolveRsvpClientOutcome } from "@lib/rsvp/client-outcome";
 
-describe("Neidy & José — Digital Pass & Token Security", () => {
-  it("buildNeidyJoseCheckinUrl encodes canonical event ID and token without PII", () => {
-    const token = "b7a2d4f9e1c3856012345678abcdef01";
-    const url = buildNeidyJoseCheckinUrl(token);
+import {
+  resolveNeidyJoseCheckinUrl,
+  CANONICAL_CORE_PRODUCTION_BASE,
+  NEIDY_JOSE_CANONICAL_EVENT_ID,
+} from "@lib/rsvp/checkin-url";
 
-    assert.equal(
-      url,
-      `https://www.haxrsignature.com/event/aed4c44a-49f8-4e9e-8b6b-cd5b3c701102/checkin/${token}`
-    );
-    // Verificação estrita de ausência de dados privados na URL do QR
-    assert.ok(!url.includes("name="));
-    assert.ok(!url.includes("phone="));
-    assert.ok(!url.includes("notes="));
-    assert.ok(!url.includes("plus_ones="));
+describe("Neidy & José — Digital Pass & Token Security", () => {
+  it("buildNeidyJoseCheckinUrl encodes canonical event ID and token without PII in production", () => {
+    const token = "b7a2d4f9e1c3856012345678abcdef01";
+    const res = resolveNeidyJoseCheckinUrl(token, { env: "production" });
+
+    assert.equal(res.ok, true);
+    if (res.ok) {
+      assert.equal(
+        res.url,
+        `${CANONICAL_CORE_PRODUCTION_BASE}/event/${NEIDY_JOSE_CANONICAL_EVENT_ID}/checkin/${token}`
+      );
+      assert.equal(res.environment, "production");
+      // Verificação estrita de ausência de dados privados na URL do QR
+      assert.ok(!res.url.includes("name="));
+      assert.ok(!res.url.includes("phone="));
+      assert.ok(!res.url.includes("notes="));
+      assert.ok(!res.url.includes("plus_ones="));
+    }
+  });
+
+  it("resolveNeidyJoseCheckinUrl falha fechado (fail-closed) em Preview sem destino configurado", () => {
+    const token = "b7a2d4f9e1c3856012345678abcdef01";
+    const res = resolveNeidyJoseCheckinUrl(token, {
+      env: "preview",
+      previewBaseUrl: "",
+    });
+
+    assert.equal(res.ok, false);
+    if (!res.ok) {
+      assert.equal(res.error, "preview_target_unconfigured");
+      assert.ok(res.message.includes("bloqueada"));
+    }
+  });
+
+  it("resolveNeidyJoseCheckinUrl rejeita apontar para Produção quando em ambiente Preview", () => {
+    const token = "b7a2d4f9e1c3856012345678abcdef01";
+    const res = resolveNeidyJoseCheckinUrl(token, {
+      env: "preview",
+      previewBaseUrl: "https://www.haxrsignature.com",
+    });
+
+    assert.equal(res.ok, false);
+    if (!res.ok) {
+      assert.equal(res.error, "preview_cannot_target_production");
+    }
+  });
+
+  it("resolveNeidyJoseCheckinUrl aceita destino de Preview válido e isolado", () => {
+    const token = "b7a2d4f9e1c3856012345678abcdef01";
+    const res = resolveNeidyJoseCheckinUrl(token, {
+      env: "preview",
+      previewBaseUrl: "https://haxrsignature-preview-pr-123.vercel.app",
+    });
+
+    assert.equal(res.ok, true);
+    if (res.ok) {
+      assert.equal(res.environment, "preview");
+      assert.equal(
+        res.url,
+        `https://haxrsignature-preview-pr-123.vercel.app/event/${NEIDY_JOSE_CANONICAL_EVENT_ID}/checkin/${token}`
+      );
+    }
+  });
+
+  it("resolveNeidyJoseCheckinUrl rejeita tokens inválidos ou curtos", () => {
+    const resEmpty = resolveNeidyJoseCheckinUrl("");
+    assert.equal(resEmpty.ok, false);
+
+    const resShort = resolveNeidyJoseCheckinUrl("curto");
+    assert.equal(resShort.ok, false);
+    if (!resShort.ok) {
+      assert.equal(resShort.error, "invalid_token");
+    }
   });
 
   it("buildLocalRsvpSuccessBody includes qrToken and partySize for newly confirmed guests", () => {
