@@ -105,7 +105,7 @@ export const NEIDY_JOSE_CONSTANTS = {
       act: "I",
       actLabel: "ACTO I",
       actTitle: "O ENCONTRO",
-      time: "13:00",
+      time: "12:00",
       title: "Acolhimento",
       locationName: "Espaço Águia",
       address: "Marracuene, Moçambique",
@@ -118,7 +118,7 @@ export const NEIDY_JOSE_CONSTANTS = {
       act: "I",
       actLabel: "ACTO I",
       actTitle: "O ENCONTRO",
-      time: "14:00",
+      time: "13:00",
       title: "Welcome Drink",
       locationName: "Espaço Águia",
       address: "Marracuene, Moçambique",
@@ -131,7 +131,7 @@ export const NEIDY_JOSE_CONSTANTS = {
       act: "II",
       actLabel: "ACTO II",
       actTitle: "O VÍNCULO & A MESA",
-      time: "14:30",
+      time: "13:30",
       title: "O Nosso Sim",
       locationName: "Espaço Águia",
       address: "Marracuene, Moçambique",
@@ -144,7 +144,7 @@ export const NEIDY_JOSE_CONSTANTS = {
       act: "II",
       actLabel: "ACTO II",
       actTitle: "O VÍNCULO & A MESA",
-      time: "15:00",
+      time: "14:00",
       title: "Entramos Juntos",
       locationName: "Espaço Águia",
       address: "Marracuene, Moçambique",
@@ -157,7 +157,7 @@ export const NEIDY_JOSE_CONSTANTS = {
       act: "III",
       actLabel: "ACTO III",
       actTitle: "A NOITE",
-      time: "18:00",
+      time: "17:00",
       title: "A Celebração Muda de Ritmo",
       locationName: "Espaço Águia",
       address: "Marracuene, Moçambique",
@@ -170,7 +170,7 @@ export const NEIDY_JOSE_CONSTANTS = {
       act: "III",
       actLabel: "ACTO III",
       actTitle: "A NOITE",
-      time: "19:00",
+      time: "18:00",
       title: "A Noite é Nossa",
       locationName: "Espaço Águia",
       address: "Marracuene, Moçambique",
@@ -217,18 +217,18 @@ export function buildGoogleCalendarUrl(): string {
   const details = encodeURIComponent(
     "Celebração do Matrimónio de Neidy Marino e José Mateus.\n\n" +
       "O Ritmo do Nosso Dia:\n" +
-      "13:00 - Acolhimento\n" +
-      "14:00 - Welcome Drink\n" +
-      "14:30 - O Nosso Sim\n" +
-      "15:00 - Entramos Juntos\n" +
-      "18:00 - A Celebração Muda de Ritmo\n" +
-      "19:00 - A Noite é Nossa\n\n" +
+      "12:00 - Acolhimento\n" +
+      "13:00 - Welcome Drink\n" +
+      "13:30 - O Nosso Sim\n" +
+      "14:00 - Entramos Juntos\n" +
+      "17:00 - A Celebração Muda de Ritmo\n" +
+      "18:00 - A Noite é Nossa\n\n" +
       "Dress Code: Traje de Gala\n" +
       "O Vínculo da Perfeição · Colossenses 3:14"
   );
   const location = encodeURIComponent("Espaço Águia, Marracuene, Moçambique");
-  /** Início oficial da recepção: 13:00 CAT = 11:00 UTC | Término técnico: 23:00 CAT = 21:00 UTC */
-  const dates = "20261205T110000Z/20261205T210000Z";
+  /** Início oficial da recepção: 12:00 CAT = 10:00 UTC | Término técnico: 23:00 CAT = 21:00 UTC */
+  const dates = "20261205T100000Z/20261205T210000Z";
 
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
 }
@@ -242,11 +242,11 @@ export function downloadWeddingIcsFile(): void {
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",
     "UID:wedding-neidy-jose-20261205@haxrsignature.com",
-    "DTSTAMP:20261205T110000Z",
-    "DTSTART:20261205T110000Z",
+    "DTSTAMP:20261205T100000Z",
+    "DTSTART:20261205T100000Z",
     "DTEND:20261205T210000Z",
     "SUMMARY:Casamento: Neidy Marino e José Mateus",
-    "DESCRIPTION:Celebração do Matrimónio de Neidy Marino e José Mateus.\\n\\nO Ritmo do Nosso Dia:\\n13:00 - Acolhimento\\n14:00 - Welcome Drink\\n14:30 - O Nosso Sim\\n15:00 - Entramos Juntos\\n18:00 - A Celebração Muda de Ritmo\\n19:00 - A Noite é Nossa\\n\\nDress Code: Traje de Gala\\nColossenses 3:14",
+    "DESCRIPTION:Celebração do Matrimónio de Neidy Marino e José Mateus.\\n\\nO Ritmo do Nosso Dia:\\n12:00 - Acolhimento\\n13:00 - Welcome Drink\\n13:30 - O Nosso Sim\\n14:00 - Entramos Juntos\\n17:00 - A Celebração Muda de Ritmo\\n18:00 - A Noite é Nossa\\n\\nDress Code: Traje de Gala\\nColossenses 3:14",
     "LOCATION:Espaço Águia, Marracuene, Moçambique",
     "STATUS:CONFIRMED",
     "END:VEVENT",

@@ -264,7 +264,7 @@ export function NeidyJoseTheWeddingDay({
                 </div>
 
                 <p className="mt-8 font-body text-[9px] uppercase tracking-[0.28em] text-[#EBE4D5]/50">
-                  Acolhimento 13:00 · Civil 14:30 · Salão 15:00
+                  Acolhimento 12:00 · Civil 13:30 · Salão 14:00
                 </p>
                 <p className="mt-2 font-serif text-[11px] italic text-[#CBB994]/65">
                   Espaço Águia · Marracuene

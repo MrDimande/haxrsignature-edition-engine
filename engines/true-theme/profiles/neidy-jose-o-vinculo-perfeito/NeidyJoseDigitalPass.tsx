@@ -177,7 +177,7 @@ export function NeidyJoseDigitalPass({
               05 · XII · 2026
             </p>
             <p className="font-body text-[9.5px] tracking-[0.18em] text-[#CBB994]">
-              Acolhimento 13:00 · Matrimónio 14:30 · Banquete 15:00
+              Acolhimento 12:00 · Matrimónio 13:30 · Banquete 14:00
             </p>
             <p className="font-body text-[9.5px] text-[#EBE4D5]/80">
               Espaço Águia · Marracuene

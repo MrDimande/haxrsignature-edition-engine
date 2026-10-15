@@ -427,7 +427,7 @@ export function NeidyJoseCelebration({
                           </>
                         ) : isONossoSim ? (
                           <>
-                            {/* Momento 03: 14:30 · O Nosso Sim — Duas Trajectórias → Convergência → Assinatura → Ponto de Luz */}
+                            {/* Momento 03: 13:30 · O Nosso Sim — Duas Trajectórias → Convergência → Assinatura → Ponto de Luz */}
                             {!prefersReducedMotion ? (
                               <div
                                 className={`relative mb-3 h-7 w-full max-w-[240px] overflow-visible ${
@@ -616,7 +616,7 @@ export function NeidyJoseCelebration({
                           </>
                         ) : isEntramosJuntos ? (
                           <>
-                            {/* Momento 04: 15:00 · Entramos Juntos — Limiar de Profundidade → Expansão do Horizonte → Entrada Solene */}
+                            {/* Momento 04: 14:00 · Entramos Juntos — Limiar de Profundidade → Expansão do Horizonte → Entrada Solene */}
                             {!prefersReducedMotion ? (
                               <div
                                 className={`relative mb-3 h-8 w-full max-w-[250px] overflow-visible ${
@@ -830,7 +830,7 @@ export function NeidyJoseCelebration({
                           </>
                         ) : isMudaDeRitmo ? (
                           <>
-                            {/* Momento 05: 18:00 · A Celebração Muda de Ritmo — Atmosfera Nocturna & Cadência de Curvas */}
+                            {/* Momento 05: 17:00 · A Celebração Muda de Ritmo — Atmosfera Nocturna & Cadência de Curvas */}
                             {!prefersReducedMotion ? (
                                 <div
                                   className={`relative mb-3 h-8 w-full max-w-[250px] overflow-visible ${
@@ -1015,7 +1015,7 @@ export function NeidyJoseCelebration({
                           </>
                         ) : isANoiteENossa ? (
                           <>
-                            {/* Momento 06: 19:00 · A Noite é Nossa — Contenção → Libertação do Tempo → Espaço Aberto */}
+                            {/* Momento 06: 18:00 · A Noite é Nossa — Contenção → Libertação do Tempo → Espaço Aberto */}
                             {/* Respiro de Luz Marfim/Dourada — O Espaço Ficou Livre (Fecho Couture) */}
                             {!prefersReducedMotion && (
                               <motion.div
