@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
+import { useLenis } from "lenis/react";
 import {
   Heart,
   MapPin,
@@ -108,10 +109,14 @@ export function NeidyJoseFloatingNav({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const lenis = useLenis();
   const scrollTo = (id: string) => {
     openEnvelope();
     const element = document.getElementById(id);
-    if (element) {
+    if (!element) return;
+    if (lenis) {
+      lenis.scrollTo(element, { duration: 1.2 });
+    } else {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };

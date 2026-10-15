@@ -886,6 +886,28 @@ footer.nj-section-rise::before {
   transform: none !important;
 }
 
+/* ---- Mobile performance, scroll stability & visibility guards ---- */
+@media (max-width: 768px) {
+  /* No mobile, perspectiva 3D na raiz do scroll causa travamento de momentum no WebKit */
+  .nj-depth-scene {
+    perspective: none;
+    transform-style: flat;
+  }
+
+  /* No mobile, garante visibilidade contínua de segurança sem travar em área branca */
+  .nj-section-rise,
+  .nj-letter-emerge {
+    opacity: 1;
+    transform: none;
+  }
+
+  .nj-section-rise.is-visible,
+  .nj-letter-emerge.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Reduced motion overrides */
 @media (prefers-reduced-motion: reduce) {
   .nj-gate-container *,

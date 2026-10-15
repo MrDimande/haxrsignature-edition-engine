@@ -31,13 +31,13 @@ type GatePhase =
   | "exiting";
 
 const TIMING = {
-  enterMs: 2200,
-  uniteDuration: 2.85,
-  sealAfterMs: 3000,
-  holdAfterMs: 5100,
-  exitAfterMs: 7600,
-  exitFadeMs: 1400,
-  reducedExitMs: 650,
+  enterMs: 1400,
+  uniteDuration: 1.85,
+  sealAfterMs: 1900,
+  holdAfterMs: 3400,
+  exitAfterMs: 4600,
+  exitFadeMs: 650,
+  reducedExitMs: 350,
 } as const;
 
 const EASE_CEREMONIAL = [0.22, 1, 0.36, 1] as const;
@@ -110,7 +110,14 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
   const prefersReducedMotion = mounted ? (mediaPreference ?? false) : false;
   const [phase, setPhase] = useState<GatePhase>("entering");
   const completedRef = useRef(false);
+  const unitingRef = useRef(false);
+  const lastInteractionRef = useRef(0);
   const timersRef = useRef<number[]>([]);
+
+  const clearTimers = useCallback(() => {
+    timersRef.current.forEach((id) => window.clearTimeout(id));
+    timersRef.current = [];
+  }, []);
 
   const schedule = useCallback((fn: () => void, ms: number) => {
     const id = window.setTimeout(fn, ms);
@@ -122,10 +129,9 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
     setMounted(true);
     primeNeidyJoseAmbient();
     return () => {
-      timersRef.current.forEach((id) => window.clearTimeout(id));
-      timersRef.current = [];
+      clearTimers();
     };
-  }, []);
+  }, [clearTimers]);
 
   // Entrada automática → awaiting
   useEffect(() => {
@@ -141,12 +147,16 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
   const finish = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
+    clearTimers();
     setPhase("exiting");
     schedule(onComplete, prefersReducedMotion ? 280 : TIMING.exitFadeMs);
-  }, [onComplete, prefersReducedMotion, schedule]);
+  }, [clearTimers, onComplete, prefersReducedMotion, schedule]);
 
   const unite = useCallback(() => {
-    if (phase !== "awaiting") return;
+    if (unitingRef.current) return;
+    if (phase !== "entering" && phase !== "awaiting") return;
+    unitingRef.current = true;
+    clearTimers();
     // Unlock + fade no mesmo gesto do toque — senão o browser bloqueia o autoplay.
     void startNeidyJoseAmbient();
 
@@ -162,9 +172,27 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
     }, TIMING.sealAfterMs);
     schedule(() => setPhase("holding"), TIMING.holdAfterMs);
     schedule(finish, TIMING.exitAfterMs);
-  }, [finish, phase, prefersReducedMotion, schedule]);
+  }, [clearTimers, finish, phase, prefersReducedMotion, schedule]);
 
-  const canInteract = phase === "awaiting";
+  const handleInteraction = useCallback(() => {
+    const now = Date.now();
+    if (now - lastInteractionRef.current < 350) return;
+    lastInteractionRef.current = now;
+
+    if (phase === "entering" || phase === "awaiting") {
+      unite();
+      return;
+    }
+    if (phase === "sealed" || phase === "holding") {
+      finish();
+    }
+  }, [finish, phase, unite]);
+
+  const canInteract =
+    phase === "entering" ||
+    phase === "awaiting" ||
+    phase === "sealed" ||
+    phase === "holding";
   const bandsAtRest = phase === "entering" || phase === "awaiting";
   const bandsJoining =
     phase === "uniting" ||
@@ -185,12 +213,17 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
 
   return (
     <motion.div
-      onClick={canInteract ? unite : undefined}
+      onClick={canInteract ? handleInteraction : undefined}
+      onPointerDown={(e) => {
+        if (canInteract && e.pointerType === "touch") {
+          handleInteraction();
+        }
+      }}
       onKeyDown={(event) => {
         if (!canInteract) return;
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          unite();
+          handleInteraction();
         }
       }}
       initial={{ opacity: 1 }}
@@ -204,7 +237,11 @@ export function NeidyJoseRingsOpening({ onComplete }: NeidyJoseRingsOpeningProps
       aria-label="Toque para unir as alianças e abrir o convite de Neidy Marino e José Mateus."
       aria-disabled={!canInteract}
       className={`fixed inset-0 z-[100] flex select-none flex-col items-center overflow-hidden bg-[#05120E] px-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 text-[#FCFDFC] max-[520px]:pt-4 sm:px-10 sm:pb-10 sm:pt-10 ${
-        canInteract ? "cursor-pointer" : "cursor-default"
+        phase === "exiting"
+          ? "pointer-events-none"
+          : canInteract
+            ? "cursor-pointer touch-manipulation"
+            : "cursor-default"
       }`}
     >
       {/* Base esmeralda */}

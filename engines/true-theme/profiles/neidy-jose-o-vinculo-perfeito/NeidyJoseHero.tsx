@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import { useLenis } from "lenis/react";
 import { motion, useScroll, useTransform } from "motion/react";
 import Image from "next/image";
 import { NEIDY_JOSE_CONSTANTS } from "@lib/neidy-jose/constants";
@@ -142,12 +143,18 @@ export function NeidyJoseHero({
     enableCinema ? [0, 28] : [0, 0]
   );
 
+  const lenis = useLenis();
   const scrollToNext = () => {
     const nextSection =
       document.getElementById("our-thread") ||
       document.getElementById("the-wedding-day") ||
       document.getElementById("scripture");
-    nextSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!nextSection) return;
+    if (lenis) {
+      lenis.scrollTo(nextSection, { duration: 1.2 });
+    } else {
+      nextSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (

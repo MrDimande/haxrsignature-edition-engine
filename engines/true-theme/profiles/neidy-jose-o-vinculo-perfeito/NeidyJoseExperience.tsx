@@ -33,7 +33,7 @@ function usePrefersReducedMotionAfterMount(): boolean {
   return mediaPreference ?? false;
 }
 
-/** Activa .is-visible nas secções com .nj-section-rise quando entram no viewport */
+/** Activa .is-visible nas secções com .nj-section-rise quando entram no viewport com fallback de segurança */
 function useDepthReveal(active: boolean) {
   const mainRef = useRef<HTMLElement>(null);
 
@@ -47,20 +47,33 @@ function useDepthReveal(active: boolean) {
     );
     if (!targets.length) return;
 
+    const markVisible = (el: HTMLElement) => {
+      el.classList.add("is-visible", "is-focused");
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.classList.add("is-visible", "is-focused");
+            markVisible(e.target as HTMLElement);
             io.unobserve(e.target);
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+      { threshold: 0.02, rootMargin: "80px 0px 80px 0px" }
     );
 
     targets.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+
+    // Fallback de resiliência: garante que nenhuma secção fique presa em branco
+    const safetyTimer = window.setTimeout(() => {
+      targets.forEach((el) => markVisible(el));
+    }, 2000);
+
+    return () => {
+      window.clearTimeout(safetyTimer);
+      io.disconnect();
+    };
   }, [active]);
 
   return mainRef;
@@ -84,12 +97,7 @@ export function NeidyJoseExperience() {
   const handleGateComplete = () => {
     setHasEntered(true);
     setIntroComplete(true);
-    if (prefersReducedMotion) {
-      setCinematicReady(true);
-      return;
-    }
-    // Crossfade: cortina começa a meio do fade do gate (~1.15s)
-    window.setTimeout(() => setCinematicReady(true), 420);
+    setCinematicReady(true);
   };
 
   const mainRef = useDepthReveal(!prefersReducedMotion && hasEntered);
@@ -101,8 +109,9 @@ export function NeidyJoseExperience() {
           <motion.div
             key="nj-gate"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0, transition: { duration: 1.15, ease: [0.22, 1, 0.36, 1] } }}
-            className="pointer-events-auto fixed inset-0 z-50"
+            exit={{ opacity: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } }}
+            className={`fixed inset-0 z-50 ${hasEntered ? "pointer-events-none" : "pointer-events-auto"}`}
+            style={{ pointerEvents: hasEntered ? "none" : "auto" }}
           >
             <NeidyJoseOpeningGate onComplete={handleGateComplete} />
           </motion.div>
