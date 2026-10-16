@@ -42,9 +42,8 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [isAttending, setIsAttending] = useState<boolean | null>(null);
-  const [guestsCount, setGuestsCount] = useState("1");
-  const [companionOne, setCompanionOne] = useState("");
-  const [companionTwo, setCompanionTwo] = useState("");
+  const [hasCompanion, setHasCompanion] = useState(false);
+  const [companionName, setCompanionName] = useState("");
   const [dietaryOrNotes, setDietaryOrNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSealImpressed, setIsSealImpressed] = useState(false);
@@ -76,30 +75,13 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
     my.set(0);
   };
 
-  const companionNames = [companionOne, companionTwo]
-    .map((n) => n.trim())
-    .filter(Boolean)
-    .join(", ");
-
-  const companionsNeeded = Math.max(0, parseInt(guestsCount, 10) - 1);
-  const companionsFilled =
-    companionsNeeded === 0 ||
-    (companionsNeeded === 1 && companionOne.trim().length > 0) ||
-    (companionsNeeded === 2 &&
-      companionOne.trim().length > 0 &&
-      companionTwo.trim().length > 0);
-
-  const handleGuestsChange = (value: string) => {
-    setGuestsCount(value);
-    const n = parseInt(value, 10);
-    if (n < 3) setCompanionTwo("");
-    if (n < 2) setCompanionOne("");
-  };
+  const companionNames = hasCompanion ? companionName.trim() : "";
+  const companionFilled = !hasCompanion || companionName.trim().length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || isAttending === null) return;
-    if (isAttending && !companionsFilled) return;
+    if (isAttending && !companionFilled) return;
     if (isAttending && !phone.trim()) {
       setErrorMessage("Indique um contacto para registar a sua confirmação.");
       return;
@@ -109,9 +91,9 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
     setIsSealImpressed(false);
     setErrorMessage("");
 
-    const guests = isAttending ? parseInt(guestsCount, 10) : 0;
+    const guests = isAttending ? (hasCompanion ? 2 : 1) : 0;
     const messageForBride = [
-      companionNames ? `Acompanhantes: ${companionNames}` : "",
+      companionNames ? `Acompanhante: ${companionNames}` : "",
       dietaryOrNotes.trim(),
     ]
       .filter(Boolean)
@@ -191,8 +173,9 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
       `*Presença:* ${attendanceText}\n`;
 
     if (isAttending) {
-      message += `*Pessoas:* ${guestsCount}\n`;
-      if (companionNames) message += `*Acompanhantes:* ${companionNames}\n`;
+      const guests = hasCompanion ? 2 : 1;
+      message += `*Pessoas:* ${guests}\n`;
+      if (companionNames) message += `*Acompanhante:* ${companionNames}\n`;
       message += `*Estado:* Registo oficial submetido\n`;
     }
     if (dietaryOrNotes.trim()) {
@@ -400,59 +383,82 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                       <div className="nj-companion-card mb-8 space-y-5 px-5 py-6 sm:px-6">
                         <div className="flex flex-col items-center text-center">
                           <p className="font-body text-[9px] uppercase tracking-[0.35em] text-[#CBB994]">
-                            Acompanhantes
+                            Acompanhante
                           </p>
-                          <p className="mt-1 font-serif text-sm italic text-[#3B6456]">
-                            Convite até +2
+                          <p className="mt-1 font-serif text-base italic text-[#0A211A] sm:text-lg">
+                            O seu convite inclui 1 acompanhante
+                          </p>
+                          <p className="mt-1 max-w-sm font-serif text-xs italic leading-relaxed text-[#3B6456] sm:text-sm">
+                            A sua presença já está incluída. Pode trazer mais uma pessoa, caso pretenda.
                           </p>
                         </div>
 
-                        <p className="text-center font-serif text-base leading-relaxed text-[#0A211A]/80 sm:text-lg">
-                          Viremos em{" "}
-                          <select
-                            id="nj-guests"
-                            value={guestsCount}
-                            onChange={(e) => handleGuestsChange(e.target.value)}
-                            className="mx-1 cursor-pointer border-0 border-b border-[#0A211A]/25 bg-transparent py-0.5 font-serif text-base italic text-[#0A211A] outline-none focus:border-[#CBB994] sm:text-lg"
-                            aria-label="Total de pessoas (máximo 3 — convite +2)"
-                          >
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                          </select>{" "}
-                          {parseInt(guestsCount, 10) === 1 ? "pessoa." : "pessoas."}
-                        </p>
+                        <div className="pt-1">
+                          <p className="mb-3 text-center font-serif text-sm italic text-[#0A211A]/90 sm:text-base">
+                            Vai levar acompanhante?
+                          </p>
+                          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setHasCompanion(false);
+                                setCompanionName("");
+                              }}
+                              className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all ${
+                                !hasCompanion
+                                  ? "border-[#CBB994] bg-[rgba(10,33,26,0.07)] text-[#0A211A] shadow-sm ring-1 ring-[#CBB994]/50"
+                                  : "border-[#0A211A]/15 bg-transparent text-[#0A211A]/70 hover:border-[#CBB994]/50 hover:bg-[rgba(10,33,26,0.02)]"
+                              }`}
+                            >
+                              <span className="font-serif text-sm italic leading-snug sm:text-base">
+                                Não, irei sozinho(a) — 1 pessoa
+                              </span>
+                              <span
+                                className={`ml-2 h-2.5 w-2.5 shrink-0 rounded-full transition-colors ${
+                                  !hasCompanion ? "bg-[#2D5A4C]" : "border border-[#0A211A]/30 bg-transparent"
+                                }`}
+                                aria-hidden
+                              />
+                            </button>
 
-                        {companionsNeeded >= 1 && (
-                          <div>
-                            <p className="mb-2 font-serif text-sm italic text-[#3B6456]">
-                              Nome do/a acompanhante *
-                            </p>
-                            <input
-                              id="nj-companion-1"
-                              required
-                              value={companionOne}
-                              onChange={(e) => setCompanionOne(e.target.value)}
-                              className={inkLine}
-                              placeholder="Escreva o nome do/a acompanhante…"
-                              aria-label="Nome do primeiro acompanhante"
-                            />
+                            <button
+                              type="button"
+                              onClick={() => setHasCompanion(true)}
+                              className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left transition-all ${
+                                hasCompanion
+                                  ? "border-[#CBB994] bg-[rgba(10,33,26,0.07)] text-[#0A211A] shadow-sm ring-1 ring-[#CBB994]/50"
+                                  : "border-[#0A211A]/15 bg-transparent text-[#0A211A]/70 hover:border-[#CBB994]/50 hover:bg-[rgba(10,33,26,0.02)]"
+                              }`}
+                            >
+                              <span className="font-serif text-sm italic leading-snug sm:text-base">
+                                Sim, levarei 1 acompanhante — 2 pessoas
+                              </span>
+                              <span
+                                className={`ml-2 h-2.5 w-2.5 shrink-0 rounded-full transition-colors ${
+                                  hasCompanion ? "bg-[#2D5A4C]" : "border border-[#0A211A]/30 bg-transparent"
+                                }`}
+                                aria-hidden
+                              />
+                            </button>
                           </div>
-                        )}
+                        </div>
 
-                        {companionsNeeded >= 2 && (
-                          <div>
-                            <p className="mb-2 font-serif text-sm italic text-[#3B6456]">
-                              Nome do/a 2.º acompanhante *
-                            </p>
+                        {hasCompanion && (
+                          <div className="pt-2 text-left">
+                            <label
+                              htmlFor="nj-companion"
+                              className="mb-1.5 block font-serif text-sm italic text-[#3B6456]"
+                            >
+                              Nome do acompanhante *
+                            </label>
                             <input
-                              id="nj-companion-2"
+                              id="nj-companion"
                               required
-                              value={companionTwo}
-                              onChange={(e) => setCompanionTwo(e.target.value)}
+                              value={companionName}
+                              onChange={(e) => setCompanionName(e.target.value)}
                               className={inkLine}
-                              placeholder="Escreva o nome do/a 2.º acompanhante…"
-                              aria-label="Nome do segundo acompanhante"
+                              placeholder="Escreva o nome do acompanhante…"
+                              aria-label="Nome do acompanhante"
                             />
                           </div>
                         )}
@@ -492,7 +498,7 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                           isSubmitting ||
                           !fullName.trim() ||
                           isAttending === null ||
-                          (isAttending === true && !companionsFilled)
+                          (isAttending === true && !companionFilled)
                         }
                         whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
                         whileHover={prefersReducedMotion ? undefined : { scale: 1.03 }}
@@ -597,6 +603,8 @@ export function NeidyJoseRsvp({ prefersReducedMotion = false }: NeidyJoseRsvpPro
                         setOfficialQrToken(null);
                         setIsPreExistingRecord(false);
                         setErrorMessage("");
+                        setHasCompanion(false);
+                        setCompanionName("");
                       }}
                       className="font-serif text-sm italic text-[#3B6456] underline underline-offset-4"
                     >

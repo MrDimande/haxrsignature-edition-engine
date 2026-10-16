@@ -197,12 +197,72 @@ describe("validateLocalRsvpPayload", () => {
       slug: "neidyejosewedding",
       name: "Convidado Legado",
       attending: true,
-      partySize: 3,
+      partySize: 2,
       phone: "+258841234567",
     });
     assert.equal(result.ok, true);
     if (result.ok) {
-      assert.equal(result.submission.guests, 3);
+      assert.equal(result.submission.guests, 2);
+    }
+  });
+
+  it("neidyejosewedding: aceita 1 pessoa (titular sozinho)", () => {
+    const result = validateLocalRsvpPayload({
+      slug: "neidyejosewedding",
+      name: "Julio Esperança",
+      attending: true,
+      guests: 1,
+      phone: "+258841234567",
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.submission.guests, 1);
+    }
+  });
+
+  it("neidyejosewedding: aceita 2 pessoas (titular + 1 acompanhante)", () => {
+    const result = validateLocalRsvpPayload({
+      slug: "neidyejosewedding",
+      name: "Julio Esperança",
+      attending: true,
+      guests: 2,
+      phone: "+258841234567",
+      messageForBride: "Acompanhante: Luisa Novela",
+    });
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.submission.guests, 2);
+      assert.equal(result.submission.messageForBride, "Acompanhante: Luisa Novela");
+    }
+  });
+
+  it("neidyejosewedding: rejeita mais de 2 pessoas (guests > 2)", () => {
+    const result = validateLocalRsvpPayload({
+      slug: "neidyejosewedding",
+      name: "Julio Esperança",
+      attending: true,
+      guests: 3,
+      phone: "+258841234567",
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.equal(result.status, 400);
+      assert.equal(result.body.error, "O convite permite no máximo 2 pessoas (o titular e 1 acompanhante).");
+    }
+  });
+
+  it("neidyejosewedding: rejeita mais de 2 pessoas com partySize legado", () => {
+    const result = validateLocalRsvpPayload({
+      slug: "neidyejosewedding",
+      name: "Julio Esperança",
+      attending: true,
+      partySize: 3,
+      phone: "+258841234567",
+    });
+    assert.equal(result.ok, false);
+    if (!result.ok) {
+      assert.equal(result.status, 400);
+      assert.equal(result.body.error, "O convite permite no máximo 2 pessoas (o titular e 1 acompanhante).");
     }
   });
 });
