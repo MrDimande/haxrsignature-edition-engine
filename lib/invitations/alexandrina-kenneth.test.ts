@@ -366,3 +366,306 @@ describe("Alexandrina & Kenneth — Engine Registry & Architecture Verification"
     await __clearAlexandrinaKennethReservationsForTests();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Fail-Closed Gift Registry — Production / Preview enforcement
+// ---------------------------------------------------------------------------
+
+describe("Alexandrina & Kenneth — Fail-Closed Gift Registry (Production / Preview)", () => {
+  it("isAlexandrinaKennethGiftFileStoreAllowed returns false in production even with GIFT_REGISTRY_FORCE_FILE=1", async () => {
+    const { isAlexandrinaKennethGiftFileStoreAllowed } = await import(
+      "@lib/alexandrina-kenneth-wedding/gifts/inventory"
+    );
+
+    const prevNodeEnv = process.env.NODE_ENV;
+    const prevVercelEnv = process.env.VERCEL_ENV;
+    const prevForceFile = process.env.GIFT_REGISTRY_FORCE_FILE;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+      delete process.env.VERCEL_ENV;
+      process.env.GIFT_REGISTRY_FORCE_FILE = "1";
+
+      const allowed = isAlexandrinaKennethGiftFileStoreAllowed();
+      assert.equal(
+        allowed,
+        false,
+        "File store must be strictly forbidden in production even when GIFT_REGISTRY_FORCE_FILE=1"
+      );
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
+      if (prevVercelEnv !== undefined) process.env.VERCEL_ENV = prevVercelEnv;
+      else delete process.env.VERCEL_ENV;
+      if (prevForceFile !== undefined) process.env.GIFT_REGISTRY_FORCE_FILE = prevForceFile;
+      else delete process.env.GIFT_REGISTRY_FORCE_FILE;
+    }
+  });
+
+  it("isAlexandrinaKennethGiftFileStoreAllowed returns false in Vercel preview even with GIFT_REGISTRY_FORCE_FILE=1", async () => {
+    const { isAlexandrinaKennethGiftFileStoreAllowed } = await import(
+      "@lib/alexandrina-kenneth-wedding/gifts/inventory"
+    );
+
+    const prevNodeEnv = process.env.NODE_ENV;
+    const prevVercelEnv = process.env.VERCEL_ENV;
+    const prevVercel = process.env.VERCEL;
+    const prevForceFile = process.env.GIFT_REGISTRY_FORCE_FILE;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "development";
+      process.env.VERCEL_ENV = "preview";
+      process.env.GIFT_REGISTRY_FORCE_FILE = "1";
+
+      const allowed = isAlexandrinaKennethGiftFileStoreAllowed();
+      assert.equal(
+        allowed,
+        false,
+        "File store must be strictly forbidden in Vercel preview even when GIFT_REGISTRY_FORCE_FILE=1"
+      );
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
+      if (prevVercelEnv !== undefined) process.env.VERCEL_ENV = prevVercelEnv;
+      else delete process.env.VERCEL_ENV;
+      if (prevVercel !== undefined) process.env.VERCEL = prevVercel;
+      else delete process.env.VERCEL;
+      if (prevForceFile !== undefined) process.env.GIFT_REGISTRY_FORCE_FILE = prevForceFile;
+      else delete process.env.GIFT_REGISTRY_FORCE_FILE;
+    }
+  });
+
+  it("isAlexandrinaKennethGiftFileStoreAllowed returns false when VERCEL=1", async () => {
+    const { isAlexandrinaKennethGiftFileStoreAllowed } = await import(
+      "@lib/alexandrina-kenneth-wedding/gifts/inventory"
+    );
+
+    const prevNodeEnv = process.env.NODE_ENV;
+    const prevVercelEnv = process.env.VERCEL_ENV;
+    const prevVercel = process.env.VERCEL;
+    const prevForceFile = process.env.GIFT_REGISTRY_FORCE_FILE;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "development";
+      delete process.env.VERCEL_ENV;
+      process.env.VERCEL = "1";
+      process.env.GIFT_REGISTRY_FORCE_FILE = "1";
+
+      const allowed = isAlexandrinaKennethGiftFileStoreAllowed();
+      assert.equal(
+        allowed,
+        false,
+        "File store must be strictly forbidden when VERCEL=1 (Vercel runtime)"
+      );
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
+      if (prevVercelEnv !== undefined) process.env.VERCEL_ENV = prevVercelEnv;
+      else delete process.env.VERCEL_ENV;
+      if (prevVercel !== undefined) process.env.VERCEL = prevVercel;
+      else delete process.env.VERCEL;
+      if (prevForceFile !== undefined) process.env.GIFT_REGISTRY_FORCE_FILE = prevForceFile;
+      else delete process.env.GIFT_REGISTRY_FORCE_FILE;
+    }
+  });
+
+  it("getAlexandrinaKennethReservations throws fail-closed when database is unconfigured in production", async () => {
+    const { getAlexandrinaKennethReservations } = await import(
+      "@lib/alexandrina-kenneth-wedding/gifts/inventory"
+    );
+    const { __setEditionDatabaseProviderForTests } = await import("@lib/db");
+
+    const prevNodeEnv = process.env.NODE_ENV;
+    const prevVercelEnv = process.env.VERCEL_ENV;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+      delete process.env.VERCEL_ENV;
+
+      // Mock unconfigured provider
+      __setEditionDatabaseProviderForTests({
+        name: "neon",
+        isConfigured: () => false,
+        listMemoriesPhotos: async () => [],
+        insertPendingPhoto: async () => false,
+        createUploadIntent: async () => {},
+        consumeUploadIntent: async () => null,
+        checkApiRateLimit: async () => ({ allowed: true, remaining: 10, retryAfterSeconds: 0 }),
+        getLeaderboardPhotos: async () => [],
+        getParticipantPhotos: async () => [],
+        updateModerationStatus: async () => false,
+        listGiftReservations: async () => [],
+        reserveGift: async () => ({ ok: false }),
+      });
+
+      await assert.rejects(
+        () => getAlexandrinaKennethReservations(),
+        (err: Error) => {
+          assert.ok(
+            err.message.includes("unconfigured"),
+            `Error should mention unconfigured, got: ${err.message}`
+          );
+          return true;
+        },
+        "Must throw fail-closed when DB unconfigured in production"
+      );
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
+      if (prevVercelEnv !== undefined) process.env.VERCEL_ENV = prevVercelEnv;
+      else delete process.env.VERCEL_ENV;
+      __setEditionDatabaseProviderForTests(null);
+    }
+  });
+
+  it("getAlexandrinaKennethReservations throws fail-closed when Neon query fails in production", async () => {
+    const { getAlexandrinaKennethReservations } = await import(
+      "@lib/alexandrina-kenneth-wedding/gifts/inventory"
+    );
+    const { __setEditionDatabaseProviderForTests } = await import("@lib/db");
+
+    const prevNodeEnv = process.env.NODE_ENV;
+    const prevVercelEnv = process.env.VERCEL_ENV;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+      delete process.env.VERCEL_ENV;
+
+      // Mock a configured but failing provider
+      __setEditionDatabaseProviderForTests({
+        name: "neon",
+        isConfigured: () => true,
+        listMemoriesPhotos: async () => [],
+        insertPendingPhoto: async () => false,
+        createUploadIntent: async () => {},
+        consumeUploadIntent: async () => null,
+        checkApiRateLimit: async () => ({ allowed: true, remaining: 10, retryAfterSeconds: 0 }),
+        getLeaderboardPhotos: async () => [],
+        getParticipantPhotos: async () => [],
+        updateModerationStatus: async () => false,
+        listGiftReservations: async () => [],
+        reserveGift: async () => ({ ok: false }),
+      });
+
+      // Override DATABASE_URL to force getNeonPool() to initialise, but point to unreachable
+      const prevDbUrl = process.env.DATABASE_URL;
+      process.env.DATABASE_URL =
+        "postgres://fakeuser:fakepass@does-not-exist.invalid:5432/neondb?sslmode=verify-full";
+
+      try {
+        await assert.rejects(
+          () => getAlexandrinaKennethReservations(),
+          (err: unknown) => {
+            assert.ok(err instanceof Error, "Must throw an Error");
+            return true;
+          },
+          "Must throw (not silently return []) when Neon query fails in production"
+        );
+      } finally {
+        if (prevDbUrl !== undefined) process.env.DATABASE_URL = prevDbUrl;
+        else delete process.env.DATABASE_URL;
+      }
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
+      if (prevVercelEnv !== undefined) process.env.VERCEL_ENV = prevVercelEnv;
+      else delete process.env.VERCEL_ENV;
+      __setEditionDatabaseProviderForTests(null);
+    }
+  });
+
+  it("reserveAlexandrinaKennethGift throws fail-closed when DB unconfigured in production", async () => {
+    const { reserveAlexandrinaKennethGift } = await import(
+      "@lib/alexandrina-kenneth-wedding/gifts/inventory"
+    );
+    const { __setEditionDatabaseProviderForTests } = await import("@lib/db");
+
+    const prevNodeEnv = process.env.NODE_ENV;
+    const prevVercelEnv = process.env.VERCEL_ENV;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+      delete process.env.VERCEL_ENV;
+
+      __setEditionDatabaseProviderForTests({
+        name: "neon",
+        isConfigured: () => false,
+        listMemoriesPhotos: async () => [],
+        insertPendingPhoto: async () => false,
+        createUploadIntent: async () => {},
+        consumeUploadIntent: async () => null,
+        checkApiRateLimit: async () => ({ allowed: true, remaining: 10, retryAfterSeconds: 0 }),
+        getLeaderboardPhotos: async () => [],
+        getParticipantPhotos: async () => [],
+        updateModerationStatus: async () => false,
+        listGiftReservations: async () => [],
+        reserveGift: async () => ({ ok: false }),
+      });
+
+      await assert.rejects(
+        () =>
+          reserveAlexandrinaKennethGift({
+            itemId: "batedeira",
+            guestName: "Convidado Teste",
+            quantity: 1,
+          }),
+        (err: Error) => {
+          assert.ok(
+            err.message.includes("DATABASE_URL") || err.message.includes("produção"),
+            `Error should mention DATABASE_URL or produção, got: ${err.message}`
+          );
+          return true;
+        },
+        "Must throw fail-closed when DB unconfigured in production"
+      );
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
+      if (prevVercelEnv !== undefined) process.env.VERCEL_ENV = prevVercelEnv;
+      else delete process.env.VERCEL_ENV;
+      __setEditionDatabaseProviderForTests(null);
+    }
+  });
+
+  it("file store fallback works normally in local test environment (non-production)", async () => {
+    const {
+      isAlexandrinaKennethGiftFileStoreAllowed,
+      __clearAlexandrinaKennethReservationsForTests,
+    } = await import("@lib/alexandrina-kenneth-wedding/gifts/inventory");
+    const { __setEditionDatabaseProviderForTests } = await import("@lib/db");
+
+    const prevNodeEnv = process.env.NODE_ENV;
+    const prevVercelEnv = process.env.VERCEL_ENV;
+    const prevVercel = process.env.VERCEL;
+    const prevForceFile = process.env.GIFT_REGISTRY_FORCE_FILE;
+    try {
+      (process.env as Record<string, string | undefined>).NODE_ENV = "test";
+      delete process.env.VERCEL_ENV;
+      delete process.env.VERCEL;
+      process.env.GIFT_REGISTRY_FORCE_FILE = "1";
+
+      // Mock unconfigured provider (simulates no DATABASE_URL in test)
+      __setEditionDatabaseProviderForTests({
+        name: "neon",
+        isConfigured: () => false,
+        listMemoriesPhotos: async () => [],
+        insertPendingPhoto: async () => false,
+        createUploadIntent: async () => {},
+        consumeUploadIntent: async () => null,
+        checkApiRateLimit: async () => ({ allowed: true, remaining: 10, retryAfterSeconds: 0 }),
+        getLeaderboardPhotos: async () => [],
+        getParticipantPhotos: async () => [],
+        updateModerationStatus: async () => false,
+        listGiftReservations: async () => [],
+        reserveGift: async () => ({ ok: false }),
+      });
+
+      // With FORCE_FILE=1 in non-production, file store should be allowed
+      const allowed = isAlexandrinaKennethGiftFileStoreAllowed();
+      assert.equal(
+        allowed,
+        true,
+        "File store must be allowed in non-production test environment with GIFT_REGISTRY_FORCE_FILE=1"
+      );
+
+      await __clearAlexandrinaKennethReservationsForTests();
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = prevNodeEnv;
+      if (prevVercelEnv !== undefined) process.env.VERCEL_ENV = prevVercelEnv;
+      else delete process.env.VERCEL_ENV;
+      if (prevVercel !== undefined) process.env.VERCEL = prevVercel;
+      else delete process.env.VERCEL;
+      if (prevForceFile !== undefined) process.env.GIFT_REGISTRY_FORCE_FILE = prevForceFile;
+      else delete process.env.GIFT_REGISTRY_FORCE_FILE;
+      __setEditionDatabaseProviderForTests(null);
+    }
+  });
+});

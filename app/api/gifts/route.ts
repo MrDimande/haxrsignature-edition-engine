@@ -14,16 +14,33 @@ export async function GET(request: Request) {
       rawSlug === "alexandrinaekennethwedding" ||
       rawSlug === "alexandrina-kenneth"
     ) {
-      const gifts = await getAlexandrinaKennethPublicGifts();
-      return NextResponse.json(
-        { success: true, gifts },
-        {
-          status: 200,
-          headers: {
-            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      try {
+        const gifts = await getAlexandrinaKennethPublicGifts();
+        return NextResponse.json(
+          { success: true, gifts },
+          {
+            status: 200,
+            headers: {
+              "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            },
+          }
+        );
+      } catch (akError) {
+        console.error("[Alexandrina & Kenneth Gifts] Fail-closed: Catalog unavailable:", akError);
+        return NextResponse.json(
+          {
+            success: false,
+            code: "GIFT_REGISTRY_UNAVAILABLE",
+            error: "A lista de presentes está temporariamente indisponível. Por favor, tente novamente mais tarde.",
           },
-        }
-      );
+          {
+            status: 503,
+            headers: {
+              "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            },
+          }
+        );
+      }
     }
 
     const gifts = await getPublicGifts();

@@ -55,20 +55,30 @@ export type ReserveAlexandrinaKennethGiftResult =
 let localFileMutexQueue: Promise<unknown> = Promise.resolve();
 
 /**
+ * Checks whether the current process is running in production or Vercel preview.
+ */
+export function isAlexandrinaKennethProductionRuntime(): boolean {
+  return (
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production" ||
+    process.env.VERCEL_ENV === "preview" ||
+    process.env.VERCEL === "1"
+  );
+}
+
+/**
  * Determines whether local file-backed storage is allowed.
- * - In production: strictly prohibited (fail-closed, Neon is the sole authority).
+ * - In production or Vercel preview: strictly prohibited (fail-closed, Neon is the sole authority).
+ * - GIFT_REGISTRY_FORCE_FILE="1" is strictly ignored in production/preview.
  * - In local test / dev without database: allowed as fallback.
- * - Can be explicitly forced via GIFT_REGISTRY_FORCE_FILE="1".
+ * - Can be explicitly forced via GIFT_REGISTRY_FORCE_FILE="1" ONLY in non-production environments.
  */
 export function isAlexandrinaKennethGiftFileStoreAllowed(): boolean {
+  if (isAlexandrinaKennethProductionRuntime()) {
+    return false;
+  }
   if (process.env.GIFT_REGISTRY_FORCE_FILE === "1") {
     return true;
-  }
-  const isProd =
-    process.env.NODE_ENV === "production" ||
-    process.env.VERCEL_ENV === "production";
-  if (isProd) {
-    return false;
   }
   const provider = getEditionDatabaseProvider();
   return !provider.isConfigured();
@@ -137,30 +147,34 @@ export async function getAlexandrinaKennethReservationsFromDb(): Promise<
 export async function getAlexandrinaKennethReservations(): Promise<
   AlexandrinaKennethReservation[]
 > {
+  const isProd = isAlexandrinaKennethProductionRuntime();
+
   if (isAlexandrinaKennethGiftFileStoreAllowed()) {
     return getAlexandrinaKennethReservationsFromFile();
   }
 
   const provider = getEditionDatabaseProvider();
-  if (provider.isConfigured()) {
-    try {
-      return await getAlexandrinaKennethReservationsFromDb();
-    } catch (err) {
-      const isProd =
-        process.env.NODE_ENV === "production" ||
-        process.env.VERCEL_ENV === "production";
-      if (isProd) {
-        console.error(
-          "[Alexandrina & Kenneth Gifts] Fail-closed: database read failed in production:",
-          err
-        );
-        throw err;
-      }
-      return getAlexandrinaKennethReservationsFromFile();
+  if (!provider.isConfigured()) {
+    if (isProd) {
+      throw new Error(
+        "[Alexandrina & Kenneth Gifts] Fail-closed: Neon database is unconfigured in production/preview runtime."
+      );
     }
+    return getAlexandrinaKennethReservationsFromFile();
   }
 
-  return getAlexandrinaKennethReservationsFromFile();
+  try {
+    return await getAlexandrinaKennethReservationsFromDb();
+  } catch (err) {
+    if (isProd) {
+      console.error(
+        "[Alexandrina & Kenneth Gifts] Fail-closed: database read failed in production/preview:",
+        err
+      );
+      throw err;
+    }
+    return getAlexandrinaKennethReservationsFromFile();
+  }
 }
 
 export function mergeCatalogWithReservations(
@@ -434,18 +448,17 @@ export async function reserveAlexandrinaKennethGift(
     };
   }
 
+  const isProd = isAlexandrinaKennethProductionRuntime();
+
   if (isAlexandrinaKennethGiftFileStoreAllowed()) {
     return reserveAlexandrinaKennethGiftInFile(input, item);
   }
 
   const provider = getEditionDatabaseProvider();
   if (!provider.isConfigured()) {
-    const isProd =
-      process.env.NODE_ENV === "production" ||
-      process.env.VERCEL_ENV === "production";
     if (isProd) {
       throw new Error(
-        "[Alexandrina & Kenneth Gifts] Fail-closed: DATABASE_URL ausente em produção."
+        "[Alexandrina & Kenneth Gifts] Fail-closed: DATABASE_URL ausente em produção/preview."
       );
     }
     return reserveAlexandrinaKennethGiftInFile(input, item);

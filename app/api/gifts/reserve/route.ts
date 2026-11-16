@@ -48,37 +48,58 @@ export async function POST(request: Request) {
     }
 
     if (registryKey === "alexandrina-kenneth") {
-      const result = await reserveAlexandrinaKennethGift({
-        itemId,
-        guestName,
-        guestPhone,
-        quantity,
-        message,
-        slug: context.slug,
-      });
+      try {
+        const result = await reserveAlexandrinaKennethGift({
+          itemId,
+          guestName,
+          guestPhone,
+          quantity,
+          message,
+          slug: context.slug,
+        });
 
-      if (!result.success) {
+        if (!result.success) {
+          return NextResponse.json(
+            {
+              success: false,
+              code: result.code,
+              error: result.error,
+              items: result.items,
+              available: result.available,
+            },
+            { status: 409 }
+          );
+        }
+
+        return NextResponse.json(
+          {
+            success: true,
+            message: result.message,
+            alreadyReserved: result.alreadyReserved,
+            items: result.items,
+          },
+          { status: 200 }
+        );
+      } catch (akReserveError) {
+        console.error(
+          "[Alexandrina & Kenneth Gifts] Fail-closed: Reserve unavailable:",
+          akReserveError
+        );
         return NextResponse.json(
           {
             success: false,
-            code: result.code,
-            error: result.error,
-            items: result.items,
-            available: result.available,
+            code: "GIFT_REGISTRY_UNAVAILABLE",
+            error:
+              "A lista de presentes está temporariamente indisponível. Por favor, tente novamente dentro de instantes.",
           },
-          { status: 409 }
+          {
+            status: 503,
+            headers: {
+              "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            },
+          }
         );
       }
-
-      return NextResponse.json(
-        {
-          success: true,
-          message: result.message,
-          alreadyReserved: result.alreadyReserved,
-          items: result.items,
-        },
-        { status: 200 }
-      );
     }
 
     if (registryKey === "jessica-samuel") {
