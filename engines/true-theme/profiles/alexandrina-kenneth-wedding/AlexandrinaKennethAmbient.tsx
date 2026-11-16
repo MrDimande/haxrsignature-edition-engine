@@ -110,4 +110,3 @@ export function triggerCelebrationConfetti() {
     }, i * 25);
   }
 }
-

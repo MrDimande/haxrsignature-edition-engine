@@ -18,7 +18,7 @@ export function AlexandrinaKennethCouple() {
                 <h3>Alexandrina Mitilane</h3>
                 <p className="couple-lineage">
                   A Noiva
-                  <span className="couple-amp">&amp;</span> Filha abenÃ§oada
+                  <span className="couple-amp">&amp;</span> Filha abençoada
                 </p>
               </div>
 
@@ -39,7 +39,7 @@ export function AlexandrinaKennethCouple() {
                 <h3>Kenneth Novele</h3>
                 <p className="couple-lineage">
                   O Noivo
-                  <span className="couple-amp">&amp;</span> Filho abenÃ§oado
+                  <span className="couple-amp">&amp;</span> Filho abençoado
                 </p>
               </div>
             </div>
@@ -49,4 +49,3 @@ export function AlexandrinaKennethCouple() {
     </section>
   );
 }
-

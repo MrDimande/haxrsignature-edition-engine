@@ -10,11 +10,10 @@ export function AlexandrinaKennethScripture() {
           O que Deus uniu...
         </h2>
         <p className="quote">
-          Assim, eles jÃ¡ nÃ£o sÃ£o dois, mas sim uma sÃ³ carne. Portanto, o que Deus uniu, ninguÃ©m o separe.
+          Assim, eles já não são dois, mas sim uma só carne. Portanto, o que Deus uniu, ninguém o separe.
         </p>
         <div className="quote-ref">Mateus 19:6</div>
       </div>
     </section>
   );
 }
-

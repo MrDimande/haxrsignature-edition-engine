@@ -88,17 +88,17 @@ function AtelierGiftRibbonIcon({ className = "w-4 h-4", color = "currentColor" }
 
 function getGoogleCalendarUrl(): string {
   const title = encodeURIComponent("Casamento de Alexandrina Mitilane & Kenneth Novele");
-  // 09 de Janeiro de 2027 â€” Maputo Time UTC+2 (08h00 - 23h00 local = 06h00 - 21h00 UTC)
+  // 09 de Janeiro de 2027 — Maputo Time UTC+2 (08h00 - 23h00 local = 06h00 - 21h00 UTC)
   const dates = "20270109T060000Z/20270109T210000Z";
   const details = encodeURIComponent(
     "Casamento de Alexandrina Mitilane & Kenneth Novele\n\n" +
     "Programa do Grande Dia:\n" +
-    "â€¢ 08h00 â€” Registo Civil: 3.Âª ConservatÃ³ria do Registo Civil (Bairro 25 de Junho B)\n" +
-    "â€¢ 10h00 â€” MatrimÃ³nio Religioso: Igreja Internacional Casa da GlÃ³ria da Palavra (Zimpeto)\n" +
-    "â€¢ 15h00 â€” Copo de Ãgua: SalÃ£o da Igreja EvangÃ©lica Assembleia Livre (Zimpeto)\n\n" +
-    "A vossa presenÃ§a Ã© a nossa maior honra e bÃªnÃ§Ã£o!"
+    "• 08h00 — Registo Civil: 3.ª Conservatória do Registo Civil (Bairro 25 de Junho B)\n" +
+    "• 10h00 — Matrimónio Religioso: Igreja Internacional Casa da Glória da Palavra (Zimpeto)\n" +
+    "• 15h00 — Copo de Água: Salão da Igreja Evangélica Assembleia Livre (Zimpeto)\n\n" +
+    "A vossa presença é a nossa maior honra e bênção!"
   );
-  const location = encodeURIComponent("Maputo, MoÃ§ambique");
+  const location = encodeURIComponent("Maputo, Moçambique");
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
 }
 
@@ -115,8 +115,8 @@ function downloadIcsCalendarFile(): void {
     "DTSTART:20270109T060000Z",
     "DTEND:20270109T210000Z",
     "SUMMARY:Casamento de Alexandrina & Kenneth",
-    "DESCRIPTION:Casamento de Alexandrina Mitilane & Kenneth Novele\\n08h00: Registo Civil\\n10h00: Casamento Religioso\\n15h00: Copo de Ãgua (SalÃ£o Assembleia Livre Zimpeto)",
-    "LOCATION:Maputo\\, MoÃ§ambique",
+    "DESCRIPTION:Casamento de Alexandrina Mitilane & Kenneth Novele\\n08h00: Registo Civil\\n10h00: Casamento Religioso\\n15h00: Copo de Água (Salão Assembleia Livre Zimpeto)",
+    "LOCATION:Maputo\\, Moçambique",
     "STATUS:CONFIRMED",
     "END:VEVENT",
     "END:VCALENDAR",
@@ -138,7 +138,7 @@ function downloadIcsCalendarFile(): void {
 function formatPhoneInput(value: string): string {
   if (!value) return "";
 
-  // Se comeÃ§ar com +, formata suavemente sem bloquear dÃ­gitos internacionais
+  // Se começar com +, formata suavemente sem bloquear dígitos internacionais
   if (value.startsWith("+")) {
     const clean = value.replace(/[^\d+]/g, "");
     if (clean.startsWith("+258")) {
@@ -158,7 +158,7 @@ function formatPhoneInput(value: string): string {
     return `+258 ${localDigits.slice(0, 2)} ${localDigits.slice(2, 5)} ${localDigits.slice(5, 9)}`;
   }
 
-  // Se digitar dÃ­gitos locais moÃ§ambicanos diretamente (84, 85, 86, 87, 82, 83...)
+  // Se digitar dígitos locais moçambicanos diretamente (84, 85, 86, 87, 82, 83...)
   const digitsOnly = value.replace(/\D/g, "");
   if (digitsOnly.length <= 2) return digitsOnly;
   if (digitsOnly.length <= 5) return `${digitsOnly.slice(0, 2)} ${digitsOnly.slice(2)}`;
@@ -232,7 +232,7 @@ export function AlexandrinaKennethRsvp() {
 
   const validate = (): boolean => {
     if (!formData.presenca) {
-      setErrorMessage("Por favor, indica se vais poder estar presente ou nÃ£o.");
+      setErrorMessage("Por favor, indica se vais poder estar presente ou não.");
       return false;
     }
 
@@ -242,18 +242,18 @@ export function AlexandrinaKennethRsvp() {
     }
 
     if (!formData.telefone.trim()) {
-      setErrorMessage("Por favor, indica o teu telemÃ³vel para contacto.");
+      setErrorMessage("Por favor, indica o teu telemóvel para contacto.");
       return false;
     }
 
     const digits = formData.telefone.replace(/\D/g, "");
     if (digits.length < 8) {
-      setErrorMessage("Por favor, indica um telemÃ³vel vÃ¡lido (mÃ­nimo 8 dÃ­gitos).");
+      setErrorMessage("Por favor, indica um telemóvel válido (mínimo 8 dígitos).");
       return false;
     }
 
     if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setErrorMessage("Por favor, indica um email vÃ¡lido ou deixa o campo em branco.");
+      setErrorMessage("Por favor, indica um email válido ou deixa o campo em branco.");
       return false;
     }
 
@@ -276,7 +276,7 @@ export function AlexandrinaKennethRsvp() {
       isAttending && formData.acompanhantes === "1" && companionNameTrimmed
         ? `Acompanhante: ${companionNameTrimmed}`
         : "";
-    const restrictionsLine = formData.restricoes.trim() ? `RestriÃ§Ãµes: ${formData.restricoes.trim()}` : "";
+    const restrictionsLine = formData.restricoes.trim() ? `Restrições: ${formData.restricoes.trim()}` : "";
     const messageLine = formData.mensagem.trim() ? `Mensagem: ${formData.mensagem.trim()}` : "";
 
     const messageLines = [companionLine, restrictionsLine, messageLine]
@@ -296,7 +296,7 @@ export function AlexandrinaKennethRsvp() {
       });
 
       if (result.outcome.kind !== "success" && result.outcome.kind !== "persisted_partial") {
-        setErrorMessage(result.outcome.message || "NÃ£o foi possÃ­vel registar a confirmaÃ§Ã£o.");
+        setErrorMessage(result.outcome.message || "Não foi possível registar a confirmação.");
         return;
       }
 
@@ -315,7 +315,7 @@ export function AlexandrinaKennethRsvp() {
       }
     } catch (err) {
       console.error("RSVP error:", err);
-      setErrorMessage("NÃ£o foi possÃ­vel enviar o RSVP agora. Verifica a ligaÃ§Ã£o e tenta novamente.");
+      setErrorMessage("Não foi possível enviar o RSVP agora. Verifica a ligação e tenta novamente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -330,36 +330,36 @@ export function AlexandrinaKennethRsvp() {
     }
   };
 
-  // Mensagem prÃ©-formatada para contacto oficial de WhatsApp com Kenneth
+  // Mensagem pré-formatada para contacto oficial de WhatsApp com Kenneth
   const whatsappPrefilledMessage = encodeURIComponent(
-    "OlÃ¡ Kenneth! Recebi o convite do vosso casamento com a Alexandrina e gostaria de confirmar a minha presenÃ§a."
+    "Olá Kenneth! Recebi o convite do vosso casamento com a Alexandrina e gostaria de confirmar a minha presença."
   );
 
   return (
     <div className="panel panel--rsvp panel--rsvp-layout" id="rsvpPanel">
       {/* =================================================================
-          1. CABEÃ‡ALHO CERIMONIAL DO RSVP â€” IDENTIDADE HAUTE COUTURE
+          1. CABEÇALHO CERIMONIAL DO RSVP — IDENTIDADE HAUTE COUTURE
           (Perfeitamente alinhado com "Presente de Casamento" no painel ao lado)
           ================================================================= */}
       <div className="ak-gifts-header text-left">
         <div className="ak-gifts-tag">
-          <span className="ak-gifts-tag__glyph">â–</span>
-          <span>RSVP &amp; ConfirmaÃ§Ã£o</span>
+          <span className="ak-gifts-tag__glyph">❖</span>
+          <span>RSVP &amp; Confirmação</span>
         </div>
 
         <h3 id="rsvp-card-title" className="ak-gifts-title">
           <AtelierHeartIcon className="w-6 h-6 shrink-0" color="#d4af37" />
-          <span>ConfirmaÃ§Ã£o de PresenÃ§a</span>
+          <span>Confirmação de Presença</span>
         </h3>
 
         <p className="ak-gifts-lead">
-          A tua presenÃ§a Ã© a nossa maior honra e alegria. Confirma aqui a tua participaÃ§Ã£o no nosso
+          A tua presença é a nossa maior honra e alegria. Confirma aqui a tua participação no nosso
           casamento directamente com os noivos.
         </p>
       </div>
 
       {/* =================================================================
-          2. ESTADO DE SUCESSO PÃ“S-ENVIO (RECIBO CERIMONIAL HAUTE COUTURE)
+          2. ESTADO DE SUCESSO PÓS-ENVIO (RECIBO CERIMONIAL HAUTE COUTURE)
           ================================================================= */}
       {successStatus ? (
         <div
@@ -378,21 +378,21 @@ export function AlexandrinaKennethRsvp() {
 
           <h3 className="rsvp-confirmation__title ak-rsvp-success-title">
             {successStatus.attending
-              ? `PresenÃ§a Confirmada, ${successStatus.name}!`
+              ? `Presença Confirmada, ${successStatus.name}!`
               : `Obrigado pelo carinho, ${successStatus.name}`}
           </h3>
 
           <p className="rsvp-confirmation__text ak-rsvp-success-text">
             {successStatus.attending
-              ? "A tua presenÃ§a ficou registada com muito amor. Estamos a preparar cada detalhe com imenso carinho para celebrar este dia inesquecÃ­vel contigo!"
-              : "RegistÃ¡mos com carinho a tua resposta. Sentiremos a tua falta na celebraÃ§Ã£o, mas sabemos que estarÃ¡s connosco em oraÃ§Ã£o e pensamento."}
+              ? "A tua presença ficou registada com muito amor. Estamos a preparar cada detalhe com imenso carinho para celebrar este dia inesquecível contigo!"
+              : "Registámos com carinho a tua resposta. Sentiremos a tua falta na celebração, mas sabemos que estarás connosco em oração e pensamento."}
           </p>
 
-          {/* Resumo Visual Oficial do Registo (User Value & ConfirmaÃ§Ã£o Fidedigna) */}
+          {/* Resumo Visual Oficial do Registo (User Value & Confirmação Fidedigna) */}
           <div className="ak-rsvp-receipt-card animate-in fade-in duration-300">
             <div className="ak-rsvp-receipt-header">
               <AtelierSparklesIcon className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span>Comprovativo Oficial de ConfirmaÃ§Ã£o</span>
+              <span>Comprovativo Oficial de Confirmação</span>
             </div>
             <div className="ak-rsvp-receipt-body">
               <div className="ak-rsvp-receipt-row">
@@ -416,7 +416,7 @@ export function AlexandrinaKennethRsvp() {
                       <span><strong>1 lugar individual</strong></span>
                     )
                   ) : (
-                    <span>AusÃªncia registada</span>
+                    <span>Ausência registada</span>
                   )}
                 </span>
               </div>
@@ -431,12 +431,12 @@ export function AlexandrinaKennethRsvp() {
                     successStatus.attending ? "is-confirmed" : "is-declined"
                   }`}
                 >
-                  {successStatus.attending ? "PresenÃ§a Confirmada âœ“" : "AusÃªncia Notificada"}
+                  {successStatus.attending ? "Presença Confirmada ✓" : "Ausência Notificada"}
                 </span>
               </div>
             </div>
             <div className="ak-rsvp-receipt-footer">
-              Registo cerimonial HAXR Signature Â· Alexandrina &amp; Kenneth 2027
+              Registo cerimonial HAXR Signature · Alexandrina &amp; Kenneth 2027
             </div>
           </div>
 
@@ -500,17 +500,17 @@ export function AlexandrinaKennethRsvp() {
                 marginTop: "4px",
               }}
             >
-              Alterar ou enviar nova confirmaÃ§Ã£o
+              Alterar ou enviar nova confirmação
             </button>
           </div>
         </div>
       ) : (
         /* =================================================================
-            3. CANAIS DIRETOS & FORMULÃRIO OFICIAL INTELIGENTE
+            3. CANAIS DIRETOS & FORMULÁRIO OFICIAL INTELIGENTE
             ================================================================= */
         <div className="rsvp-main-block" style={{ marginTop: "18px" }}>
           {/* A. Cards de Contacto Direto Cerimonial (Ambos do Kenneth Novele) */}
-          <div className="rsvp-contact-row" role="group" aria-label="Contactos oficiais para confirmaÃ§Ã£o com Kenneth Novele">
+          <div className="rsvp-contact-row" role="group" aria-label="Contactos oficiais para confirmação com Kenneth Novele">
             <a
               href={`https://wa.me/258870410112?text=${whatsappPrefilledMessage}`}
               className="phone-btn phone-btn--whatsapp cursor-pointer ak-rsvp-contact-card ak-rsvp-contact-card--whatsapp"
@@ -519,7 +519,7 @@ export function AlexandrinaKennethRsvp() {
               aria-label="Confirmar por WhatsApp com Kenneth Novele (+258 87 041 0112)"
             >
               <div className="ak-rsvp-contact-card__top">
-                <span className="ak-rsvp-contact-card__target-name">Kenneth Novele Â· Noivo</span>
+                <span className="ak-rsvp-contact-card__target-name">Kenneth Novele · Noivo</span>
                 <div className="ak-rsvp-contact-card__icon-box">
                   <AtelierWhatsAppIcon className="w-4 h-4" />
                 </div>
@@ -536,7 +536,7 @@ export function AlexandrinaKennethRsvp() {
               aria-label="Ligar para Kenneth Novele (+258 84 967 4279)"
             >
               <div className="ak-rsvp-contact-card__top">
-                <span className="ak-rsvp-contact-card__target-name">Kenneth Novele Â· Noivo</span>
+                <span className="ak-rsvp-contact-card__target-name">Kenneth Novele · Noivo</span>
                 <div className="ak-rsvp-contact-card__icon-box">
                   <AtelierPhoneIcon className="w-4 h-4" />
                 </div>
@@ -569,18 +569,18 @@ export function AlexandrinaKennethRsvp() {
           )}
 
           <form id="rsvp-form" className="rsvp-form" onSubmit={handleSubmit} noValidate>
-            {/* Escolha TÃ¡til de PresenÃ§a */}
+            {/* Escolha Tátil de Presença */}
             <div className="form-group" style={{ marginBottom: "22px" }}>
               <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span>Vais estar presente? <span style={{ color: "var(--gold, #d4af37)" }}>*</span></span>
                 {formData.presenca && (
                   <span style={{ fontSize: "0.68rem", textTransform: "none", color: "#166534", fontWeight: 600 }}>
-                    OpÃ§Ã£o selecionada âœ“
+                    Opção selecionada ✓
                   </span>
                 )}
               </label>
 
-              <div className="ak-rsvp-choice-grid" role="radiogroup" aria-label="ConfirmaÃ§Ã£o de presenÃ§a">
+              <div className="ak-rsvp-choice-grid" role="radiogroup" aria-label="Confirmação de presença">
                 <button
                   type="button"
                   className={`ak-rsvp-choice-card ${
@@ -607,28 +607,28 @@ export function AlexandrinaKennethRsvp() {
                 <button
                   type="button"
                   className={`ak-rsvp-choice-card ${
-                    formData.presenca === "Infelizmente nÃ£o poderei comparecer" ? "is-selected-no" : ""
+                    formData.presenca === "Infelizmente não poderei comparecer" ? "is-selected-no" : ""
                   }`}
-                  onClick={() => handlePresenceSelect("Infelizmente nÃ£o poderei comparecer")}
+                  onClick={() => handlePresenceSelect("Infelizmente não poderei comparecer")}
                   role="radio"
-                  aria-checked={formData.presenca === "Infelizmente nÃ£o poderei comparecer"}
+                  aria-checked={formData.presenca === "Infelizmente não poderei comparecer"}
                 >
                   <div className="ak-rsvp-choice-card__badge">
                     <AtelierDoveIcon className="w-4 h-4" />
                   </div>
                   <h4 className="ak-rsvp-choice-card__title">
-                    <span>Infelizmente nÃ£o poderei</span>
-                    {formData.presenca === "Infelizmente nÃ£o poderei comparecer" && (
+                    <span>Infelizmente não poderei</span>
+                    {formData.presenca === "Infelizmente não poderei comparecer" && (
                       <AtelierCheckIcon className="w-4 h-4 shrink-0" color="#8b7355" />
                     )}
                   </h4>
                   <p className="ak-rsvp-choice-card__desc">
-                    NÃ£o poderei estar, mas celebro em oraÃ§Ã£o e carinho.
+                    Não poderei estar, mas celebro em oração e carinho.
                   </p>
                 </button>
               </div>
 
-              {/* Hidden select para retrocompatibilidade semÃ¢ntica com scripts/testes */}
+              {/* Hidden select para retrocompatibilidade semântica com scripts/testes */}
               <select
                 id="presenca"
                 name="presenca"
@@ -640,11 +640,11 @@ export function AlexandrinaKennethRsvp() {
               >
                 <option value="">Por favor, seleciona...</option>
                 <option value="Sim, com muito gosto">Sim, com muito gosto</option>
-                <option value="Infelizmente nÃ£o poderei comparecer">Infelizmente nÃ£o poderei comparecer</option>
+                <option value="Infelizmente não poderei comparecer">Infelizmente não poderei comparecer</option>
               </select>
             </div>
 
-            {/* IdentificaÃ§Ã£o do Convidado */}
+            {/* Identificação do Convidado */}
             <div className="form-group">
               <label htmlFor="nome">
                 Nome e apelido <span style={{ color: "var(--gold, #d4af37)" }}>*</span>
@@ -653,7 +653,7 @@ export function AlexandrinaKennethRsvp() {
                 id="nome"
                 name="nome"
                 type="text"
-                placeholder="O teu primeiro e Ãºltimo nome"
+                placeholder="O teu primeiro e último nome"
                 value={formData.nome}
                 onChange={handleChange}
                 required
@@ -664,7 +664,7 @@ export function AlexandrinaKennethRsvp() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "0" }}>
               <div className="form-group">
                 <label htmlFor="telefone">
-                  TelemÃ³vel / WhatsApp <span style={{ color: "var(--gold, #d4af37)" }}>*</span>
+                  Telemóvel / WhatsApp <span style={{ color: "var(--gold, #d4af37)" }}>*</span>
                 </label>
                 <input
                   id="telefone"
@@ -678,7 +678,7 @@ export function AlexandrinaKennethRsvp() {
                   autoComplete="tel"
                 />
                 <span className="ak-rsvp-input-hint">
-                  MoÃ§ambique (84, 85, 86, 87, 82, 83) ou indicativo internacional
+                  Moçambique (84, 85, 86, 87, 82, 83) ou indicativo internacional
                 </span>
               </div>
 
@@ -696,13 +696,13 @@ export function AlexandrinaKennethRsvp() {
               </div>
             </div>
 
-            {/* LÃ³gica Condicional Progressiva: Apenas quando vai comparecer */}
+            {/* Lógica Condicional Progressiva: Apenas quando vai comparecer */}
             {formData.presenca === "Sim, com muito gosto" && (
               <div className="animate-in fade-in duration-300">
-                {/* Seletor de Acompanhantes em Pills TÃ¡teis */}
+                {/* Seletor de Acompanhantes em Pills Táteis */}
                 <div className="form-group">
                   <label htmlFor="acompanhantes">Acompanhantes</label>
-                  <div className="ak-rsvp-guests-pills" role="radiogroup" aria-label="NÃºmero de acompanhantes">
+                  <div className="ak-rsvp-guests-pills" role="radiogroup" aria-label="Número de acompanhantes">
                     <button
                       type="button"
                       className={`ak-rsvp-guest-pill ${formData.acompanhantes === "0" ? "is-active" : ""}`}
@@ -744,7 +744,7 @@ export function AlexandrinaKennethRsvp() {
                     <label htmlFor="nomeAcompanhante">
                       Nome do(a) acompanhante{" "}
                       <span style={{ fontSize: "0.68rem", textTransform: "none", color: "#8b7355", fontWeight: 500 }}>
-                        (opcional â€” para a lista de convidados e lugares Ã  mesa)
+                        (opcional — para a lista de convidados e lugares à mesa)
                       </span>
                     </label>
                     <input
@@ -760,7 +760,7 @@ export function AlexandrinaKennethRsvp() {
                 )}
 
                 <div className="form-group" style={{ marginTop: "14px" }}>
-                  <label htmlFor="restricoes">RestriÃ§Ãµes alimentares (opcional)</label>
+                  <label htmlFor="restricoes">Restrições alimentares (opcional)</label>
                   <input
                     id="restricoes"
                     name="restricoes"
@@ -773,21 +773,21 @@ export function AlexandrinaKennethRsvp() {
               </div>
             )}
 
-            {/* Mensagem de BÃªnÃ§Ã£o para os Noivos */}
+            {/* Mensagem de Bênção para os Noivos */}
             <div className="form-group">
               <label htmlFor="mensagem">
-                {formData.presenca === "Infelizmente nÃ£o poderei comparecer"
+                {formData.presenca === "Infelizmente não poderei comparecer"
                   ? "Mensagem de carinho para os noivos (opcional)"
-                  : "Mensagem de bÃªnÃ§Ã£o aos noivos (opcional)"}
+                  : "Mensagem de bênção aos noivos (opcional)"}
               </label>
               <textarea
                 id="mensagem"
                 name="mensagem"
-                rows={formData.presenca === "Infelizmente nÃ£o poderei comparecer" ? 3 : 2}
+                rows={formData.presenca === "Infelizmente não poderei comparecer" ? 3 : 2}
                 placeholder={
-                  formData.presenca === "Infelizmente nÃ£o poderei comparecer"
+                  formData.presenca === "Infelizmente não poderei comparecer"
                     ? "Deixa uma palavra de carinho e felicidades para Alexandrina e Kenneth..."
-                    : "Escreve uma bÃªnÃ§Ã£o especial para Alexandrina & Kenneth..."
+                    : "Escreve uma bênção especial para Alexandrina & Kenneth..."
                 }
                 value={formData.mensagem}
                 onChange={handleChange}
@@ -795,7 +795,7 @@ export function AlexandrinaKennethRsvp() {
               />
             </div>
 
-            {/* BotÃ£o de SubmissÃ£o Cerimonial */}
+            {/* Botão de Submissão Cerimonial */}
             <button
               type="submit"
               className="submit cursor-pointer"
@@ -804,7 +804,7 @@ export function AlexandrinaKennethRsvp() {
             >
               {isSubmitting ? (
                 <span>A registar com carinho...</span>
-              ) : formData.presenca === "Infelizmente nÃ£o poderei comparecer" ? (
+              ) : formData.presenca === "Infelizmente não poderei comparecer" ? (
                 <>
                   <AtelierDoveIcon className="w-4 h-4" />
                   <span>Enviar Resposta com Carinho</span>
@@ -812,7 +812,7 @@ export function AlexandrinaKennethRsvp() {
               ) : (
                 <>
                   <AtelierHeartIcon className="w-4 h-4" color="currentColor" />
-                  <span>Confirmar PresenÃ§a com Alegria</span>
+                  <span>Confirmar Presença com Alegria</span>
                 </>
               )}
             </button>

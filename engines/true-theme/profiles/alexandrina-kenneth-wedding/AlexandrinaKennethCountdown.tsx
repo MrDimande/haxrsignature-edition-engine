@@ -57,7 +57,7 @@ export function AlexandrinaKennethCountdown() {
           <div className="count-image">
             <Image
               src="/images/alexandrina-kenneth/contagem.jpg"
-              alt="Alexandrina e Kenneth â€” Contagem Regressiva"
+              alt="Alexandrina e Kenneth — Contagem Regressiva"
               width={1132}
               height={1600}
               loading="lazy"
@@ -72,14 +72,14 @@ export function AlexandrinaKennethCountdown() {
             </h2>
             <p className="mini-lead">
               {isPast
-                ? "Este momento Ãºnico foi celebrado com amor e bÃªnÃ§Ã£os em 09 de Janeiro de 2027. Agradecemos a todos que partilharam este dia connosco!"
-                : "Faltam poucos dias para celebrarmos este momento Ãºnico. Queremos muito ter-te connosco."}
+                ? "Este momento único foi celebrado com amor e bênçãos em 09 de Janeiro de 2027. Agradecemos a todos que partilharam este dia connosco!"
+                : "Faltam poucos dias para celebrarmos este momento único. Queremos muito ter-te connosco."}
             </p>
 
             <div
               className="count-grid-boxes"
               data-target-date="2027-01-09T08:00:00+02:00"
-              aria-label="Contagem regressiva atÃ© 2027-01-09T08:00:00+02:00"
+              aria-label="Contagem regressiva até 2027-01-09T08:00:00+02:00"
             >
               <div className="mini-box">
                 <strong id="days" suppressHydrationWarning>{timeLeft.days}</strong>
@@ -104,4 +104,3 @@ export function AlexandrinaKennethCountdown() {
     </section>
   );
 }
-

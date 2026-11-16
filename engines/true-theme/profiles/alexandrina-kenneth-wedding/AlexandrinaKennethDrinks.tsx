@@ -5,14 +5,14 @@ import { Wine, Send, Check } from "lucide-react";
 import { triggerCelebrationConfetti } from "./AlexandrinaKennethAmbient";
 
 const DRINK_OPTIONS = [
-  { id: "cerveja", label: "Cerveja", icon: "ðŸº" },
-  { id: "vinho", label: "Vinho", icon: "ðŸ·" },
-  { id: "whisky", label: "Whisky", icon: "ðŸ¥ƒ" },
-  { id: "gin", label: "Gin", icon: "ðŸ¸" },
-  { id: "refrigerante", label: "Refrigerante", icon: "ðŸ¥¤" },
-  { id: "agua", label: "Ãgua", icon: "ðŸ’§" },
-  { id: "sumos", label: "Sumos", icon: "ðŸ§ƒ" },
-  { id: "cocktail-sem-alcool", label: "Cocktail sem Ã¡lcool", icon: "ðŸ¹" },
+  { id: "cerveja", label: "Cerveja", icon: "🍺" },
+  { id: "vinho", label: "Vinho", icon: "🍷" },
+  { id: "whisky", label: "Whisky", icon: "🥃" },
+  { id: "gin", label: "Gin", icon: "🍸" },
+  { id: "refrigerante", label: "Refrigerante", icon: "🥤" },
+  { id: "agua", label: "Água", icon: "💧" },
+  { id: "sumos", label: "Sumos", icon: "🧃" },
+  { id: "cocktail-sem-alcool", label: "Cocktail sem álcool", icon: "🍹" },
 ];
 
 const WHATSAPP_DRINKS_NUMBER = "258840000000";
@@ -62,7 +62,7 @@ export function AlexandrinaKennethDrinks() {
     e.preventDefault();
 
     if (!name.trim() || name.trim().length < 3) {
-      setError("Por favor, insere o teu nome completo (mÃ­nimo 3 caracteres)");
+      setError("Por favor, insere o teu nome completo (mínimo 3 caracteres)");
       return;
     }
 
@@ -96,19 +96,19 @@ export function AlexandrinaKennethDrinks() {
       minute: "2-digit",
     });
 
-    const text = `ðŸ· *PEDIDO DE BEBIDAS - CASAMENTO ALEXANDRINA & KENNETH* ðŸ·
+    const text = `🍷 *PEDIDO DE BEBIDAS - CASAMENTO ALEXANDRINA & KENNETH* 🍷
 
 Nome: ${name.trim()}
 Mesa: ${table.trim()}
 Bebidas selecionadas: ${drinkLabels}
-${message.trim() ? `ObservaÃ§Ãµes: ${message.trim()}\n` : ""}
-Data: ${formattedDate} Ã s ${formattedTime}`;
+${message.trim() ? `Observações: ${message.trim()}\n` : ""}
+Data: ${formattedDate} às ${formattedTime}`;
 
     const url = `https://wa.me/${WHATSAPP_DRINKS_NUMBER}?text=${encodeURIComponent(text)}`;
     window.open(url, "_blank", "noopener,noreferrer");
 
     triggerCelebrationConfetti();
-    setToastMessage("Pedido enviado para o bar com sucesso! ðŸ¥‚");
+    setToastMessage("Pedido enviado para o bar com sucesso! 🥂");
     setTimeout(() => setToastMessage(null), 4000);
 
     // Reset form
@@ -130,7 +130,7 @@ Data: ${formattedDate} Ã s ${formattedTime}`;
           Pedido de Bebidas
         </h3>
         <p>
-          Durante o copo de Ã¡gua, pede as tuas bebidas favoritas Ã  nossa equipa sem saÃ­res do teu lugar.
+          Durante o copo de água, pede as tuas bebidas favoritas à nossa equipa sem saíres do teu lugar.
         </p>
 
         {error && (
@@ -165,7 +165,7 @@ Data: ${formattedDate} Ã s ${formattedTime}`;
                 setError(null);
               }}
               required
-              aria-label="NÃºmero ou identificaÃ§Ã£o da mesa"
+              aria-label="Número ou identificação da mesa"
               className="w-full"
             />
           </div>
@@ -179,7 +179,7 @@ Data: ${formattedDate} Ã s ${formattedTime}`;
               aria-expanded={isDropdownOpen}
             >
               <span>{getTriggerText()}</span>
-              <span className="arrow text-xs text-[#d4af37]">{isDropdownOpen ? "â–²" : "â–¼"}</span>
+              <span className="arrow text-xs text-[#d4af37]">{isDropdownOpen ? "▲" : "▼"}</span>
             </button>
 
             {isDropdownOpen && (
@@ -219,7 +219,7 @@ Data: ${formattedDate} Ã s ${formattedTime}`;
               placeholder="Ex.: prefiro bebida fresca..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              aria-label="ObservaÃ§Ãµes para o bar"
+              aria-label="Observações para o bar"
               className="w-full"
             />
           </div>
@@ -246,4 +246,3 @@ Data: ${formattedDate} Ã s ${formattedTime}`;
     </div>
   );
 }
-

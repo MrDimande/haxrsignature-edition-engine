@@ -333,7 +333,7 @@ export function AlexandrinaKennethArticlesModal({
         setGifts(data.gifts);
       }
     } catch (err) {
-      console.error("Erro ao sincronizar catÃ¡logo de presentes:", err);
+      console.error("Erro ao sincronizar catálogo de presentes:", err);
     }
   };
 
@@ -464,7 +464,7 @@ export function AlexandrinaKennethArticlesModal({
       if (res.ok && data.success) {
         setFeedback({
           type: "success",
-          message: `Presente "${activeItem.name}" confirmado com carinho! Muito obrigado pela vossa bÃªnÃ§Ã£o.`,
+          message: `Presente "${activeItem.name}" confirmado com carinho! Muito obrigado pela vossa bênção.`,
         });
         await fetchGifts();
         setTimeout(() => {
@@ -478,7 +478,7 @@ export function AlexandrinaKennethArticlesModal({
         const errorMsg =
           data.code === "GIFT_SOLD_OUT"
             ? "Este presente acabou de ser escolhido por outro convidado."
-            : data.error || "NÃ£o foi possÃ­vel confirmar a escolha. Tenta novamente.";
+            : data.error || "Não foi possível confirmar a escolha. Tenta novamente.";
         setFeedback({
           type: "error",
           message: errorMsg,
@@ -488,7 +488,7 @@ export function AlexandrinaKennethArticlesModal({
     } catch {
       setFeedback({
         type: "error",
-        message: "Ocorreu uma falha de ligaÃ§Ã£o. Por favor, tenta novamente.",
+        message: "Ocorreu uma falha de ligação. Por favor, tenta novamente.",
       });
     } finally {
       setIsSubmitting(false);
@@ -515,7 +515,7 @@ export function AlexandrinaKennethArticlesModal({
         id="artigosModalDialog"
       >
         {/* =================================================================
-            1. CABEÃ‡ALHO EDITORIAL â€” ATELIER DE CASAMENTO
+            1. CABEÇALHO EDITORIAL — ATELIER DE CASAMENTO
             ================================================================= */}
         <div className="ak-atelier-header">
           <div className="ak-atelier-header__lead">
@@ -544,7 +544,7 @@ export function AlexandrinaKennethArticlesModal({
         </div>
 
         {/* =================================================================
-            2. MURAL DE PRESENTES OFERECIDOS â€” FAIXA EDITORIAL COMPACTA
+            2. MURAL DE PRESENTES OFERECIDOS — FAIXA EDITORIAL COMPACTA
             ================================================================= */}
         {selectedGifts.length > 0 && (
           <div className="ak-atelier-mural">
@@ -553,7 +553,7 @@ export function AlexandrinaKennethArticlesModal({
               onClick={() => setIsHonorsExpanded((prev) => !prev)}
               className="ak-atelier-mural__btn"
               aria-expanded={isHonorsExpanded}
-              aria-label={`Mural de presentes oferecidos: ${selectedGifts.length} artigos jÃ¡ escolhidos. Clique para ${isHonorsExpanded ? "ocultar" : "ver"} lista.`}
+              aria-label={`Mural de presentes oferecidos: ${selectedGifts.length} artigos já escolhidos. Clique para ${isHonorsExpanded ? "ocultar" : "ver"} lista.`}
             >
               <div className="ak-atelier-mural__left">
                 <div className="ak-atelier-mural__icon-box">
@@ -564,7 +564,7 @@ export function AlexandrinaKennethArticlesModal({
                     Mural de Presentes Oferecidos
                   </h3>
                   <p className="ak-atelier-mural__sub">
-                    {selectedGifts.length} {selectedGifts.length === 1 ? "presente jÃ¡ foi carinhosamente escolhido" : "presentes jÃ¡ foram carinhosamente escolhidos"}
+                    {selectedGifts.length} {selectedGifts.length === 1 ? "presente já foi carinhosamente escolhido" : "presentes já foram carinhosamente escolhidos"}
                   </p>
                 </div>
               </div>
@@ -574,7 +574,7 @@ export function AlexandrinaKennethArticlesModal({
                   {selectedGifts.length}
                 </span>
                 <span className="ak-atelier-mural__toggle-text">
-                  {isHonorsExpanded ? "Ocultar â–²" : "Ver lista â–¼"}
+                  {isHonorsExpanded ? "Ocultar ▲" : "Ver lista ▼"}
                 </span>
               </div>
             </button>
@@ -601,7 +601,7 @@ export function AlexandrinaKennethArticlesModal({
         )}
 
         {/* =================================================================
-            3. NAVEGAÃ‡ÃƒO POR CATEGORIAS â€” CARROSSEL TÃCTIL INDEPENDENTE
+            3. NAVEGAÇÃO POR CATEGORIAS — CARROSSEL TÁCTIL INDEPENDENTE
             ================================================================= */}
         <div className="ak-atelier-nav-categories">
           <div
@@ -642,7 +642,7 @@ export function AlexandrinaKennethArticlesModal({
         </div>
 
         {/* =================================================================
-            4. CATÃLOGO DE PRESENTES â€” SCROLL VERTICAL EXCLUSIVO
+            4. CATÁLOGO DE PRESENTES — SCROLL VERTICAL EXCLUSIVO
             ================================================================= */}
         <div className="ak-atelier-catalog">
           <div className="ak-atelier-grid">
@@ -656,7 +656,7 @@ export function AlexandrinaKennethArticlesModal({
                   key={item.id}
                   className={`ak-atelier-card ${isSoldOut ? "is-sold-out" : ""}`}
                 >
-                  {/* Ãrea Superior: Categoria & Disponibilidade */}
+                  {/* Área Superior: Categoria & Disponibilidade */}
                   <div className="ak-atelier-card__top">
                     <div className="ak-atelier-card__category">
                       <div className="ak-atelier-card__cat-icon">
@@ -670,21 +670,21 @@ export function AlexandrinaKennethArticlesModal({
                     <div style={{ flexShrink: 0 }}>
                       {isSoldOut ? (
                         <span className="ak-atelier-card__badge ak-atelier-card__badge--sold">
-                          JÃ¡ oferecido
+                          Já oferecido
                         </span>
                       ) : isPartial ? (
                         <span className="ak-atelier-card__badge ak-atelier-card__badge--available">
-                          {item.availableQuantity} de {item.totalQuantity} disponÃ­veis
+                          {item.availableQuantity} de {item.totalQuantity} disponíveis
                         </span>
                       ) : (
                         <span className="ak-atelier-card__badge ak-atelier-card__badge--available">
-                          {item.availableQuantity} {item.availableQuantity === 1 ? "disponÃ­vel" : "disponÃ­veis"}
+                          {item.availableQuantity} {item.availableQuantity === 1 ? "disponível" : "disponíveis"}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Ãrea Central: Nome Editorial do Presente */}
+                  {/* Área Central: Nome Editorial do Presente */}
                   <div className="ak-atelier-card__body">
                     <h3 className="ak-atelier-card__title">
                       {item.name}
@@ -693,14 +693,14 @@ export function AlexandrinaKennethArticlesModal({
                       {isSoldOut
                         ? "Totalmente oferecido para o enxoval dos noivos"
                         : isPartial
-                          ? `${item.selectedQuantity} de ${item.totalQuantity} jÃ¡ oferecido(s) Â· Resta ${item.availableQuantity} para oferta`
+                          ? `${item.selectedQuantity} de ${item.totalQuantity} já oferecido(s) · Resta ${item.availableQuantity} para oferta`
                           : item.totalQuantity > 1
-                            ? `${item.totalQuantity} unidades no enxoval Â· DisponÃ­veis para oferta`
-                            : "Artigo oficial do enxoval Â· 1 unidade disponÃ­vel"}
+                            ? `${item.totalQuantity} unidades no enxoval · Disponíveis para oferta`
+                            : "Artigo oficial do enxoval · 1 unidade disponível"}
                     </p>
                   </div>
 
-                  {/* Ãrea Inferior: BotÃ£o Escolher Presente (Full-Width sem CompetiÃ§Ã£o) */}
+                  {/* Área Inferior: Botão Escolher Presente (Full-Width sem Competição) */}
                   <div className="ak-atelier-card__bottom">
                     <button
                       type="button"
@@ -708,7 +708,7 @@ export function AlexandrinaKennethArticlesModal({
                       onClick={() => handleOpenReserve(item)}
                       aria-label={
                         isSoldOut
-                          ? `Presente ${item.name} jÃ¡ escolhido`
+                          ? `Presente ${item.name} já escolhido`
                           : `Escolher presente ${item.name}`
                       }
                       className="ak-atelier-card__btn"
@@ -716,7 +716,7 @@ export function AlexandrinaKennethArticlesModal({
                       {!isSoldOut && (
                         <AtelierGiftRibbonIcon className="w-4 h-4 shrink-0" />
                       )}
-                      <span>{isSoldOut ? "JÃ¡ escolhido âœ“" : "Escolher presente"}</span>
+                      <span>{isSoldOut ? "Já escolhido ✓" : "Escolher presente"}</span>
                     </button>
                   </div>
                 </div>
@@ -730,19 +730,19 @@ export function AlexandrinaKennethArticlesModal({
               style={{ textAlign: "center", padding: "36px 20px" }}
             >
               <p style={{ margin: 0, fontSize: "0.85rem", color: "#786A5B" }}>
-                Todos os artigos desta categoria jÃ¡ foram gentilmente escolhidos para o novo lar.
+                Todos os artigos desta categoria já foram gentilmente escolhidos para o novo lar.
               </p>
             </div>
           )}
         </div>
 
         {/* =================================================================
-            5. RODAPÃ‰ EDITORIAL SERENO â€” ZERO COLISÃƒO COM O CATÃLOGO
+            5. RODAPÉ EDITORIAL SERENO — ZERO COLISÃO COM O CATÁLOGO
             ================================================================= */}
         <div className="ak-atelier-footer">
           <AtelierHeartIcon className="w-3.5 h-3.5 shrink-0" />
           <span className="ak-atelier-footer__text">
-            A vossa bÃªnÃ§Ã£o Ã© o nosso maior presente.
+            A vossa bênção é o nosso maior presente.
           </span>
         </div>
 
@@ -754,9 +754,9 @@ export function AlexandrinaKennethArticlesModal({
             className="ak-atelier-drawer animate-in fade-in duration-200"
             id="reservationFormContainer"
             role="region"
-            aria-label="Painel de ConfirmaÃ§Ã£o de Presente"
+            aria-label="Painel de Confirmação de Presente"
           >
-            {/* Header: idÃªntico ao cabeÃ§alho principal */}
+            {/* Header: idêntico ao cabeçalho principal */}
             <div className="ak-atelier-drawer__header">
               <div className="ak-atelier-header__eyebrow">
                 <AtelierGiftRibbonIcon className="w-4 h-4" color="#d4af37" />
@@ -770,14 +770,14 @@ export function AlexandrinaKennethArticlesModal({
                 }}
                 className="ak-atelier-pill"
                 style={{ minHeight: "38px", padding: "6px 14px", display: "inline-flex", alignItems: "center", gap: "8px" }}
-                aria-label="Voltar Ã  lista de presentes"
+                aria-label="Voltar à lista de presentes"
               >
                 <AtelierBackArrowIcon className="w-3.5 h-3.5 shrink-0" color="currentColor" />
-                <span>Voltar Ã  lista</span>
+                <span>Voltar à lista</span>
               </button>
             </div>
 
-            {/* ConteÃºdo do FormulÃ¡rio */}
+            {/* Conteúdo do Formulário */}
             <div className="ak-atelier-drawer__content">
               <div className="ak-atelier-drawer__form-box">
                 {/* Joia do Artigo Escolhido */}
@@ -814,7 +814,7 @@ export function AlexandrinaKennethArticlesModal({
                     {activeItem.name}
                   </h3>
                   <p style={{ fontSize: "0.8rem", color: "var(--text-light, #4a4a4a)", margin: 0 }}>
-                    Artigo oficial do enxoval Â· DisponÃ­vel:{" "}
+                    Artigo oficial do enxoval · Disponível:{" "}
                     <strong style={{ color: "var(--dark, #1a1a1a)" }}>{activeItem.availableQuantity}</strong> de{" "}
                     {activeItem.totalQuantity}
                   </p>
@@ -865,7 +865,7 @@ export function AlexandrinaKennethArticlesModal({
                     <input
                       type="text"
                       required
-                      placeholder="O teu primeiro e Ãºltimo nome"
+                      placeholder="O teu primeiro e último nome"
                       value={guestName}
                       onChange={(e) => setGuestName(e.target.value)}
                       className="ak-atelier-input"
@@ -875,7 +875,7 @@ export function AlexandrinaKennethArticlesModal({
                   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "14px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--accent, #8b7355)", marginBottom: "6px" }}>
-                        TelemÃ³vel / WhatsApp (opcional)
+                        Telemóvel / WhatsApp (opcional)
                       </label>
                       <input
                         type="tel"
@@ -926,7 +926,7 @@ export function AlexandrinaKennethArticlesModal({
                             fontWeight: 500,
                           }}
                         >
-                          1 unidade Ãºnica
+                          1 unidade única
                         </div>
                       </div>
                     )}
@@ -934,11 +934,11 @@ export function AlexandrinaKennethArticlesModal({
 
                   <div>
                     <label style={{ display: "block", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--accent, #8b7355)", marginBottom: "6px" }}>
-                      Mensagem de bÃªnÃ§Ã£o aos noivos (opcional)
+                      Mensagem de bênção aos noivos (opcional)
                     </label>
                     <textarea
                       rows={2}
-                      placeholder="Escreve uma bÃªnÃ§Ã£o especial para Alexandrina &amp; Kenneth..."
+                      placeholder="Escreve uma bênção especial para Alexandrina &amp; Kenneth..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       className="ak-atelier-input"
@@ -956,8 +956,8 @@ export function AlexandrinaKennethArticlesModal({
                       <span>{isSubmitting ? "A confirmar com carinho..." : "Confirmar escolha com carinho"}</span>
                     </button>
                     <p style={{ fontSize: "0.72rem", color: "var(--accent, #8b7355)", textAlign: "center", margin: "10px 0 0 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-                      <span style={{ color: "var(--gold, #d4af37)" }}>â–</span>
-                      <span>A tua oferta serÃ¡ associada com carinho ao novo lar dos noivos.</span>
+                      <span style={{ color: "var(--gold, #d4af37)" }}>❖</span>
+                      <span>A tua oferta será associada com carinho ao novo lar dos noivos.</span>
                     </p>
                   </div>
                 </form>

@@ -88,7 +88,7 @@ export function AlexandrinaKennethCoverGate({ isOpen, onOpen }: AlexandrinaKenne
             <div className="cover-vignette" aria-hidden="true" />
             <div className="cover-grain" aria-hidden="true" />
             <div className="cover-inner">
-              <p className="cover-kicker">FamÃ­lia e amigos, o casamento de</p>
+              <p className="cover-kicker">Família e amigos, o casamento de</p>
 
               <div className="cover-names-wrap">
                 <div className="cover-names">
@@ -120,7 +120,7 @@ export function AlexandrinaKennethCoverGate({ isOpen, onOpen }: AlexandrinaKenne
                 className="cover-cta cursor-pointer"
                 id="openInvite"
                 onClick={handleOpen}
-                aria-label="Abrir convite e comeÃ§ar mÃºsica"
+                aria-label="Entrar e ver convite"
               >
                 <span className="cover-cta__shimmer" aria-hidden="true" />
                 <span className="cover-cta__text">Ver convite</span>
@@ -136,4 +136,3 @@ export function AlexandrinaKennethCoverGate({ isOpen, onOpen }: AlexandrinaKenne
     </AnimatePresence>
   );
 }
-

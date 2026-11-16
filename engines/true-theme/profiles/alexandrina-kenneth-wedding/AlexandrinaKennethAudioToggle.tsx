@@ -29,7 +29,7 @@ export function AlexandrinaKennethAudioToggle({
 
   const startPlayback = useCallback(async () => {
     if (!isAuthorized) {
-      showFeedbackToast("Ãudio cerimonial sob consulta");
+      showFeedbackToast("Áudio cerimonial sob consulta");
       return;
     }
 
@@ -40,7 +40,7 @@ export function AlexandrinaKennethAudioToggle({
       await audio.play();
       setIsPlaying(true);
       showFeedbackToast(
-        `ðŸŽ¶ ${ALEXANDRINA_KENNETH_AUDIO_CONFIG.title} â€” ${ALEXANDRINA_KENNETH_AUDIO_CONFIG.artist}`
+        `🎶 ${ALEXANDRINA_KENNETH_AUDIO_CONFIG.title} — ${ALEXANDRINA_KENNETH_AUDIO_CONFIG.artist}`
       );
     } catch (err) {
       console.warn("Autoplay prevent / user interaction needed:", err);
@@ -53,12 +53,12 @@ export function AlexandrinaKennethAudioToggle({
     if (!audio) return;
     audio.pause();
     setIsPlaying(false);
-    showFeedbackToast("MÃºsica pausada");
+    showFeedbackToast("Música pausada");
   }, [showFeedbackToast]);
 
   const togglePlayback = useCallback(() => {
     if (!isAuthorized) {
-      showFeedbackToast("Ãudio cerimonial sob consulta");
+      showFeedbackToast("Áudio cerimonial sob consulta");
       return;
     }
 
@@ -97,10 +97,10 @@ export function AlexandrinaKennethAudioToggle({
           onClick={togglePlayback}
           aria-label={
             !isAuthorized
-              ? "Ãudio cerimonial sob consulta"
+              ? "Áudio cerimonial sob consulta"
               : isPlaying
-                ? "Pausar mÃºsica"
-                : "Tocar mÃºsica"
+                ? "Pausar música"
+                : "Tocar música"
           }
           aria-pressed={isPlaying}
         >
@@ -125,10 +125,10 @@ export function AlexandrinaKennethAudioToggle({
           )}
           <span className="audio-toggle__sr sr-only">
             {!isAuthorized
-              ? "Ãudio cerimonial sob consulta"
+              ? "Áudio cerimonial sob consulta"
               : isPlaying
-                ? "MÃºsica a tocar"
-                : "MÃºsica pausada"}
+                ? "Música a tocar"
+                : "Música pausada"}
           </span>
         </button>
       )}

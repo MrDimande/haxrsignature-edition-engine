@@ -224,36 +224,36 @@ interface VenueItem {
 const VENUES: VenueItem[] = [
   {
     id: "civil",
-    name: "3.Âª ConservatÃ³ria do Registo Civil",
+    name: "3.ª Conservatória do Registo Civil",
     ceremony: "Casamento Civil",
     time: "08h00",
     address: "Rua 5343, Bairro 25 de Junho B, KaMubukwana, Maputo.",
     reference: "Junto ao Mercado 25 de Junho.",
-    scheduleNote: "InÃ­cio pontual Ã s 08h00. Recomenda-se chegada dos convidados Ã s 07h45.",
+    scheduleNote: "Início pontual às 08h00. Recomenda-se chegada dos convidados às 07h45.",
     isConfirmed: true,
     lat: -25.9096223,
     lng: 32.5674959,
   },
   {
     id: "religioso",
-    name: "Igreja Internacional Casa da GlÃ³ria da Palavra",
+    name: "Igreja Internacional Casa da Glória da Palavra",
     ceremony: "Casamento Religioso",
     time: "10h00",
-    address: "Av. de MoÃ§ambique, Coqueiros, Zimpeto, KaMubukwana, Maputo.",
-    reference: "Perto das bombas da BP, na zona da MissÃ£o Roque.",
-    scheduleNote: "CerimÃ³nia Religiosa Ã s 10h00. CelebraÃ§Ã£o da bÃªnÃ§Ã£o matrimonial.",
+    address: "Av. de Moçambique, Coqueiros, Zimpeto, KaMubukwana, Maputo.",
+    reference: "Perto das bombas da BP, na zona da Missão Roque.",
+    scheduleNote: "Cerimónia Religiosa às 10h00. Celebração da bênção matrimonial.",
     isConfirmed: true,
     lat: -25.8680067,
     lng: 32.5667773,
   },
   {
     id: "copo-agua",
-    name: "SalÃ£o da Igreja EvangÃ©lica Assembleia Livre em MoÃ§ambique â€“ MinistÃ©rio FiladÃ©lfia",
-    ceremony: "RecepÃ§Ã£o Â· Copo de Ãgua",
+    name: "Salão da Igreja Evangélica Assembleia Livre em Moçambique – Ministério Filadélfia",
+    ceremony: "Recepção · Copo de Água",
     time: "15h00",
     address: "Rua do Rio Revue, Zimpeto, Maputo.",
-    reference: "Acesso pela rua do portÃ£o principal da Escola SecundÃ¡ria Quisse Mavota.",
-    scheduleNote: "RecepÃ§Ã£o, banquete e celebraÃ§Ã£o a partir das 15h00.",
+    reference: "Acesso pela rua do portão principal da Escola Secundária Quisse Mavota.",
+    scheduleNote: "Recepção, banquete e celebração a partir das 15h00.",
     isConfirmed: true,
     lat: -25.8503187,
     lng: 32.5789995,
@@ -289,19 +289,19 @@ export function AlexandrinaKennethLocation() {
   return (
     <section className="location-section" id="localizacao" aria-labelledby="location-heading">
       <div className="container">
-        <div className="section-title">LocalizaÃ§Ã£o</div>
+        <div className="section-title">Localização</div>
         <h2 className="script-title" id="location-heading">
           Onde a magia acontece
         </h2>
         <p className="lead">
-          Conhece os locais onde celebraremos o nosso amor em cada momento deste dia tÃ£o especial.
+          Conhece os locais onde celebraremos o nosso amor em cada momento deste dia tão especial.
         </p>
 
-        {/* Seletor dos TrÃªs Momentos â€” Atelier Haute Couture */}
+        {/* Seletor dos Três Momentos — Atelier Haute Couture */}
         <div
           className="ak-ceremony-tabs-wrap flex flex-wrap items-center justify-center gap-3 mb-8"
           role="tablist"
-          aria-label="Selecione o momento da celebraÃ§Ã£o"
+          aria-label="Selecione o momento da celebração"
         >
           {VENUES.map((venue) => {
             const isSelected = venue.id === selectedVenueId;
@@ -323,7 +323,7 @@ export function AlexandrinaKennethLocation() {
                   <span className="ak-ceremony-tab__title">{venue.ceremony}</span>
                   {isSelected && (
                     <span className="ak-ceremony-tab__heraldic" aria-hidden="true">
-                      â–
+                      ❖
                     </span>
                   )}
                 </div>
@@ -336,18 +336,18 @@ export function AlexandrinaKennethLocation() {
         </div>
 
         <div className="location-grid" id={`panel-${selectedVenue.id}`} role="tabpanel" aria-labelledby={`tab-${selectedVenue.id}`}>
-          {/* Coluna de InformaÃ§Ãµes do Local Seleccionado */}
+          {/* Coluna de Informações do Local Seleccionado */}
           <div className="location-info">
             <div className="venue-card venue-card--premium">
               <div className="venue-header">
                 <span className="text-xs uppercase tracking-widest text-[#b8941f] font-semibold block mb-1">
-                  {selectedVenue.ceremony} Â· {selectedVenue.time}
+                  {selectedVenue.ceremony} · {selectedVenue.time}
                 </span>
                 <h3>{selectedVenue.name}</h3>
 
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 mt-2.5 rounded-full bg-[#e8f5e9] border border-[#a5d6a7] text-[11px] text-[#2e7d32] font-medium">
                   <HauteCoutureVerifiedIcon size={13} className="text-[#2e7d32]" />
-                  <span>LocalizaÃ§Ã£o e coordenadas confirmadas</span>
+                  <span>Localização e coordenadas confirmadas</span>
                 </div>
               </div>
 
@@ -365,12 +365,12 @@ export function AlexandrinaKennethLocation() {
                   </div>
                 </div>
 
-                {/* 2. ReferÃªncia de Chegada */}
+                {/* 2. Referência de Chegada */}
                 <div className="detail-item flex items-start gap-3">
                   <HauteCoutureCompassIcon size={20} className="icon mt-1 text-[#d4af37] shrink-0" />
                   <div>
                     <span className="text-[11px] font-bold tracking-wider uppercase text-[#b8941f] block mb-0.5">
-                      ReferÃªncia de Chegada
+                      Referência de Chegada
                     </span>
                     <p className="venue-reference text-sm text-[#5a5245] leading-relaxed">
                       {selectedVenue.reference}
@@ -378,12 +378,12 @@ export function AlexandrinaKennethLocation() {
                   </div>
                 </div>
 
-                {/* 3. HorÃ¡rio e RecomendaÃ§Ã£o */}
+                {/* 3. Horário e Recomendação */}
                 <div className="detail-item flex items-start gap-3">
                   <HauteCoutureClockIcon size={18} className="icon mt-1 text-[#b8941f] shrink-0" />
                   <div>
                     <span className="text-[11px] font-bold tracking-wider uppercase text-[#b8941f] block mb-0.5">
-                      HorÃ¡rio
+                      Horário
                     </span>
                     <p className="venue-schedule text-xs text-[#6a6255] leading-relaxed">
                       {selectedVenue.scheduleNote}
@@ -392,7 +392,7 @@ export function AlexandrinaKennethLocation() {
                 </div>
               </div>
 
-              {/* BotÃµes de NavegaÃ§Ã£o Activos com Coordenadas do Local Seleccionado */}
+              {/* Botões de Navegação Activos com Coordenadas do Local Seleccionado */}
               <div className="navigation-buttons">
                 <a
                   href={googleMapsUrl}
@@ -466,7 +466,7 @@ export function AlexandrinaKennethLocation() {
                 </div>
               </div>
 
-              {/* Controlos de Zoom e EcrÃ£ Inteiro */}
+              {/* Controlos de Zoom e Ecrã Inteiro */}
               <div className="map-controls">
                 <button
                   type="button"
@@ -499,8 +499,8 @@ export function AlexandrinaKennethLocation() {
                   type="button"
                   className="map-btn cursor-pointer"
                   onClick={toggleFullscreen}
-                  aria-label="Mapa em ecrÃ£ inteiro"
-                  title="EcrÃ£ inteiro"
+                  aria-label="Mapa em ecrã inteiro"
+                  title="Ecrã inteiro"
                 >
                   <HauteCoutureExpandIcon size={14} />
                 </button>

@@ -36,19 +36,19 @@ export function AlexandrinaKennethGifts() {
         aria-labelledby="presentes-heading"
       >
         <div className="ak-gifts-panel__inner">
-          {/* Header com Ã­cone de alta costura */}
+          {/* Header com ícone de alta costura */}
           <div className="ak-gifts-header">
             <div className="ak-gifts-tag">
-              <span className="ak-gifts-tag__glyph">â–</span>
-              <span>Lista &amp; BÃªnÃ§Ã£os</span>
+              <span className="ak-gifts-tag__glyph">❖</span>
+              <span>Lista &amp; Bênçãos</span>
             </div>
             <h3 id="presentes-heading" className="ak-gifts-title">
               <HauteCoutureGiftIcon className="w-6 h-6 shrink-0" color="#d4af37" />
               <span>Presente de Casamento</span>
             </h3>
             <p className="ak-gifts-lead">
-              A vossa presenÃ§a Ã© a nossa maior bÃªnÃ§Ã£o e alegria. Para quem desejar mimar o nosso novo
-              lar, preparÃ¡mos com muito amor e carinho a nossa lista oficial de presentes.
+              A vossa presença é a nossa maior bênção e alegria. Para quem desejar mimar o nosso novo
+              lar, preparámos com muito amor e carinho a nossa lista oficial de presentes.
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export function AlexandrinaKennethGifts() {
               <span>Ver Lista de Presentes</span>
             </button>
             <p className="ak-gifts-modal-hint">
-              Escolhe artigos para cozinha, sala de estar e decoraÃ§Ã£o com reserva instantÃ¢nea.
+              Escolhe artigos para cozinha, sala de estar e decoração com reserva instantânea.
             </p>
           </div>
         </div>

@@ -32,7 +32,7 @@ export function AlexandrinaKennethHero({
           type="button"
           className="ak-back-to-cover cursor-pointer"
           onClick={onBackToCover}
-          aria-label="Voltar Ã  capa do convite"
+          aria-label="Voltar à capa do convite"
         >
           <svg
             className="ak-back-to-cover__icon"
@@ -48,7 +48,7 @@ export function AlexandrinaKennethHero({
           >
             <path d="M15 18l-6-6 6-6" />
           </svg>
-          <span className="ak-back-to-cover__text">Voltar Ã  capa</span>
+          <span className="ak-back-to-cover__text">Voltar à capa</span>
         </button>
       )}
 
@@ -88,7 +88,7 @@ export function AlexandrinaKennethHero({
               <span className="names__amp">&amp;</span>
               <span className="names__line">Kenneth Novele</span>
             </h1>
-            <p className="date">09&nbsp;â€¢&nbsp;01&nbsp;â€¢&nbsp;2027</p>
+            <p className="date">09&nbsp;•&nbsp;01&nbsp;•&nbsp;2027</p>
           </div>
           <a
             href="#convite"
@@ -138,4 +138,3 @@ export function AlexandrinaKennethHero({
     </>
   );
 }
-

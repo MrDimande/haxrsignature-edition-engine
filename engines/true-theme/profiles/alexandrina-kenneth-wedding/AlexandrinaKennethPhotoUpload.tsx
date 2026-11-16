@@ -32,7 +32,7 @@ export function AlexandrinaKennethPhotoUpload() {
     if (!files || files.length === 0) return;
 
     if (files.length > MAX_PHOTOS) {
-      setUploadStatus(`MÃ¡ximo de ${MAX_PHOTOS} fotos permitidas por envio.`);
+      setUploadStatus(`Máximo de ${MAX_PHOTOS} fotos permitidas por envio.`);
       setStatusType("error");
       return;
     }
@@ -66,7 +66,7 @@ export function AlexandrinaKennethPhotoUpload() {
     });
 
     if (hasSizeError) {
-      setUploadStatus("Algumas fotos excedem o tamanho mÃ¡ximo de 10MB.");
+      setUploadStatus("Algumas fotos excedem o tamanho máximo de 10MB.");
       setStatusType("error");
     }
   };
@@ -75,7 +75,7 @@ export function AlexandrinaKennethPhotoUpload() {
     if (photos.length === 0) return;
 
     setIsUploading(true);
-    setUploadStatus("A enviar as tuas fotografias com seguranÃ§a...");
+    setUploadStatus("A enviar as tuas fotografias com segurança...");
 
     // Store in browser memory store / local storage
     try {
@@ -90,14 +90,14 @@ export function AlexandrinaKennethPhotoUpload() {
       localStorage.setItem(storageKey, JSON.stringify([...stored, ...records]));
 
       // Success
-      setUploadStatus(`ðŸŽ‰ ${photos.length} fotografia(s) guardada(s) com sucesso! Obrigado pela partilha.`);
+      setUploadStatus(`🎉 ${photos.length} fotografia(s) guardada(s) com sucesso! Obrigado pela partilha.`);
       setStatusType("success");
       triggerCelebrationConfetti();
 
       // Offer WhatsApp notification to couple
-      const msg = `ðŸ“¸ *NOVAS FOTOS ENVIADAS - CASAMENTO ALEXANDRINA & KENNETH* ðŸ“¸
+      const msg = `📸 *NOVAS FOTOS ENVIADAS - CASAMENTO ALEXANDRINA & KENNETH* 📸
 
-OlÃ¡! Acabei de enviar ${photos.length} foto(s) para a galeria de recordaÃ§Ãµes do casamento.`;
+Olá! Acabei de enviar ${photos.length} foto(s) para a galeria de recordações do casamento.`;
 
       setTimeout(() => {
         const url = `https://wa.me/${WHATSAPP_COUPLE_NUMBER}?text=${encodeURIComponent(msg)}`;
@@ -107,7 +107,7 @@ OlÃ¡! Acabei de enviar ${photos.length} foto(s) para a galeria de recordaÃ§�
       setPhotos([]);
     } catch (e) {
       console.error("Upload error:", e);
-      setUploadStatus("NÃ£o foi possÃ­vel concluir o envio agora.");
+      setUploadStatus("Não foi possível concluir o envio agora.");
       setStatusType("error");
     } finally {
       setIsUploading(false);
@@ -147,10 +147,10 @@ OlÃ¡! Acabei de enviar ${photos.length} foto(s) para a galeria de recordaÃ§�
           >
             <UploadCloud className="text-[#b8941f] mb-2" size={32} />
             <span className="font-semibold text-xs tracking-wider uppercase text-[#1a1a1a]">
-              Selecionar fotos do telemÃ³vel
+              Selecionar fotos do telemóvel
             </span>
             <span className="text-[11px] text-[#4a4a4a] mt-1">
-              AtÃ© 20 fotos por envio (JPG, PNG, HEIC)
+              Até 20 fotos por envio (JPG, PNG, HEIC)
             </span>
           </button>
         </div>
@@ -205,4 +205,3 @@ OlÃ¡! Acabei de enviar ${photos.length} foto(s) para a galeria de recordaÃ§�
     </div>
   );
 }
-

@@ -44,7 +44,7 @@ export function AlexandrinaKennethExperience() {
       }}
       data-render-profile="alexandrina-kenneth-wedding"
     >
-      {/* Google Fonts: Great Vibes (tÃ­tulos e nomes) e Montserrat (corpo, horÃ¡rios, botÃµes) */}
+      {/* Google Fonts: Great Vibes (títulos e nomes) e Montserrat (corpo, horários, botões) */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link
@@ -78,7 +78,7 @@ export function AlexandrinaKennethExperience() {
           showBackToCover={!isCoverOpen}
         />
 
-        {/* VersÃ­culo BÃ­blico */}
+        {/* Versículo Bíblico */}
         <AlexandrinaKennethScripture />
 
         {/* Os Noivos */}
@@ -90,26 +90,26 @@ export function AlexandrinaKennethExperience() {
         {/* Galeria / Nossa Jornada */}
         <AlexandrinaKennethJourney />
 
-        {/* LocalizaÃ§Ã£o & Mapa Interativo dos TrÃªs Locais */}
+        {/* Localização & Mapa Interativo dos Três Locais */}
         <AlexandrinaKennethLocation />
 
         {/* Contagem Regressiva */}
         <AlexandrinaKennethCountdown />
 
-        {/* ConfirmaÃ§Ã£o (RSVP), Presentes, Bebidas & Fotos */}
+        {/* Confirmação (RSVP), Presentes, Bebidas & Fotos */}
         <section className="rsvp-gifts" id="rsvp" aria-labelledby="rsvp-heading">
           <div className="container">
-            <div className="section-title">ConfirmaÃ§Ã£o</div>
+            <div className="section-title">Confirmação</div>
             <h2 className="script-title" id="rsvp-heading">
               Contamos contigo?
             </h2>
             <p className="lead rsvp-lead">
-              Confirma a tua presenÃ§a atÃ© <strong>20 de Dezembro de 2026</strong>, para podermos
+              Confirma a tua presença até <strong>20 de Dezembro de 2026</strong>, para podermos
               preparar este dia com carinho.
             </p>
 
             <div className="info-grid rsvp-info-grid">
-              {/* Coluna Esquerda: FormulÃ¡rio de ConfirmaÃ§Ã£o RSVP */}
+              {/* Coluna Esquerda: Formulário de Confirmação RSVP */}
               <AlexandrinaKennethRsvp />
 
               {/* Coluna Direita: Presentes (com Modal da Lista Online) e Upload de Fotos */}
@@ -121,10 +121,9 @@ export function AlexandrinaKennethExperience() {
           </div>
         </section>
 
-        {/* RodapÃ© Premium com bÃªnÃ§Ã£o, crÃ©ditos e assinatura */}
+        {/* Rodapé Premium com bênção, créditos e assinatura */}
         <AlexandrinaKennethFooter />
       </div>
     </div>
   );
 }
-

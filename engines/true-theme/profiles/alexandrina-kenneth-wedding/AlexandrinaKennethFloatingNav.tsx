@@ -10,7 +10,7 @@ interface NavItem {
 }
 
 /* ==========================================================================
-   Bespoke Authorial SVG Icons (TraÃ§o Fino 1.2px â€” Sem Ã­cones genÃ©ricos)
+   Bespoke Authorial SVG Icons (Traço Fino 1.2px — Sem ícones genéricos)
    ========================================================================== */
 
 function HauteCoutureNavHeart({ className = "w-4 h-4", active = false }: { className?: string; active?: boolean }) {
@@ -131,8 +131,8 @@ function HauteCoutureNavGifts({ className = "w-4 h-4", active = false }: { class
 const NAV_ITEMS: NavItem[] = [
   {
     id: "intro",
-    label: "InÃ­cio",
-    mobileLabel: "InÃ­cio",
+    label: "Início",
+    mobileLabel: "Início",
     renderIcon: (props) => <HauteCoutureNavHeart {...props} />,
   },
   {
@@ -143,19 +143,19 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: "cerimonias",
-    label: "CerimÃ³nias",
+    label: "Cerimónias",
     mobileLabel: "Agenda",
     renderIcon: (props) => <HauteCoutureNavCeremonies {...props} />,
   },
   {
     id: "localizacao",
-    label: "LocalizaÃ§Ã£o",
+    label: "Localização",
     mobileLabel: "Local",
     renderIcon: (props) => <HauteCoutureNavLocation {...props} />,
   },
   {
     id: "rsvp",
-    label: "PresenÃ§a",
+    label: "Presença",
     mobileLabel: "RSVP",
     renderIcon: (props) => <HauteCoutureNavRsvp {...props} />,
   },
@@ -230,12 +230,12 @@ export function AlexandrinaKennethFloatingNav() {
   return (
     <aside
       className="ak-floating-dock-anchor fixed z-[85] pointer-events-none"
-      aria-label="Menu de navegaÃ§Ã£o rÃ¡pida"
+      aria-label="Menu de navegação rápida"
     >
       <nav
         className="ak-floating-dock-stage pointer-events-auto"
         role="navigation"
-        aria-label="Atalhos das secÃ§Ãµes do convite"
+        aria-label="Atalhos das secções do convite"
       >
         <div className="ak-floating-dock-bar">
           {NAV_ITEMS.map((item) => {
