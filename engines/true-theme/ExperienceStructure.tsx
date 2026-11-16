@@ -11,7 +11,10 @@ export function ExperienceStructure({ children }: ExperienceStructureProps) {
   const { theme, tokens } = useExperience();
 
   /* Full-bleed — fundos e fotos edge-to-edge; cada secção gere o seu max-width interno */
-  if (theme.renderProfile === "neidy-jose-o-vinculo-perfeito") {
+  if (
+    theme.renderProfile === "neidy-jose-o-vinculo-perfeito" ||
+    theme.renderProfile === "alexandrina-kenneth-wedding"
+  ) {
     return <main className="relative w-full flex flex-col">{children}</main>;
   }
 

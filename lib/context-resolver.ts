@@ -9,6 +9,7 @@ export type InvitationContext = {
 
 const SLUG_ALIASES: Record<string, string> = {
   "jessica-samuel": "jessicasamuelwedding",
+  "alexandrina-kenneth": "alexandrinaekennethwedding",
 };
 
 const INVITATION_FEATURES: Record<string, Omit<InvitationContext, "slug">> = {
@@ -19,6 +20,9 @@ const INVITATION_FEATURES: Record<string, Omit<InvitationContext, "slug">> = {
   },
   jessicachadelingerie: {
     giftsRegistryKey: "rose-elegance",
+  },
+  alexandrinaekennethwedding: {
+    giftsRegistryKey: "alexandrina-kenneth",
   },
 };
 

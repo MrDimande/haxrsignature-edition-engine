@@ -46,5 +46,10 @@ export function AmbientLayer() {
     return null;
   }
 
+  /* Ambient próprio Alexandrina & Kenneth — sem AmbientBackground genérico */
+  if (theme.renderProfile === "alexandrina-kenneth-wedding") {
+    return null;
+  }
+
   return <AmbientBackground />;
 }

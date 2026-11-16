@@ -420,6 +420,44 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       expectedRegistryKey: "neidy-jose-vinculo",
     },
   },
+  alexandrinaekennethwedding: {
+    slug: "alexandrinaekennethwedding",
+    aliases: [
+      "alexandrinaekenneth",
+      "alexandrina-kenneth",
+      "alexandrina-e-kenneth",
+      "alexandrinaekenneth2027",
+      "conviteak-2027",
+      "convite-alexandrina-kenneth",
+    ],
+    engine: "theme",
+    theme: "alexandrina-kenneth-gold",
+    experienceType: "ceremonial",
+    sourcePath: "/alexandrinaekennethwedding",
+    legacyFolder: "alexandrina-kenneth",
+    status: "active",
+    metadata: {
+      title: "Alexandrina Mitilane e Kenneth Novele | Convite de Casamento",
+      date: "2027-01-09",
+      time: "08h00 · Casamento Civil",
+      location: "Maputo, Moçambique",
+      subtitle: "Assim, eles já não são dois, mas sim uma só carne — Mateus 19:6",
+      description:
+        "Convite de casamento de Alexandrina Mitilane e Kenneth Novele — Sábado, 09 de Janeiro de 2027, Maputo. Celebra connosco este dia especial.",
+      eventDate: "2027-01-09",
+      eventType: "Casamento",
+      dressCode: "Formal Elegante",
+      audio: "ambient-ceremony",
+      ogImage: "/images/alexandrina-kenneth/capa.jpg",
+    },
+    admin: {
+      clientName: "Alexandrina Mitilane e Kenneth Novele",
+      eventTypeLabel: "Casamento",
+      adminEventName: "Edition · Casamento · Alexandrina Mitilane e Kenneth Novele",
+      envVar: "EDITION_EVENT_ALEXANDRINA_KENNETH_ID",
+      expectedRegistryKey: "alexandrina-kenneth-gold",
+    },
+  },
 };
 
 /** @deprecated Use INVITATIONS */
@@ -459,6 +497,8 @@ export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
   stan: "stanturns5",
   /** Nian — rota antiga → canónica /nianwebnight */
   nian: "nianwebnight",
+  /** Alexandrina & Kenneth — rota legado */
+  conviteak: "alexandrinaekennethwedding",
 };
 
 export const ALIAS_INDEX: Record<string, string> = {};

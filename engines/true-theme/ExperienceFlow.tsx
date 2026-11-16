@@ -263,14 +263,16 @@ export function AudioToggle() {
   const isWedding = theme.renderProfile === "jessica-samuel-wedding";
   const isStan = theme.renderProfile === "stan-real-madrid";
   const isNian = theme.renderProfile === "nian-night-of-the-web";
+  const isAlexandrina = theme.renderProfile === "alexandrina-kenneth-wedding";
   const useBrandToggle = isRose || isWedding;
   const hasAudioSrc =
     typeof theme.audio.src === "string" && theme.audio.src.trim().length > 0;
 
-  /** Stan / Nian usam controlos próprios — não o AudioToggle global */
+  /** Stan / Nian / Alexandrina usam controlos próprios — não o AudioToggle global */
   if (
     isStan ||
     isNian ||
+    isAlexandrina ||
     !introComplete ||
     theme.audio.type === "silent" ||
     !hasAudioSrc

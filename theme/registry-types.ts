@@ -11,4 +11,5 @@ export type RegistryThemeKey =
   | "stan-real-madrid"
   | "nian-night-of-the-web"
   | "queen-kailane-luz-da-graca"
-  | "neidy-jose-vinculo";
+  | "neidy-jose-vinculo"
+  | "alexandrina-kenneth-gold";
