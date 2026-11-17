@@ -30,7 +30,8 @@ export type RenderProfile =
   | "stan-real-madrid"
   | "nian-night-of-the-web"
   | "queen-kailane-luz-da-graca"
-  | "neidy-jose-o-vinculo-perfeito";
+  | "neidy-jose-o-vinculo-perfeito"
+  | "alexandrina-kenneth-wedding";
 
 export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
 

@@ -37,6 +37,7 @@ data/gifts/*reservations*.json
 # Audio original pesado (usar versão -web.mp3 no tema)
 **/bg-music.mp3
 public/audio/if-i-aint-got-you.mp3
+public/audio/alexandrina-kenneth/say-you-wont-let-go.mp3
 
 # IDE
 .cursor/

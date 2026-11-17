@@ -9,6 +9,7 @@ import { stanRealMadridTheme } from "./definitions/stan-real-madrid";
 import { nianNightOfTheWebTheme } from "./definitions/nian-night-of-the-web";
 import { queenKailaneLuzDaGracaTheme } from "./definitions/queen-kailane-luz-da-graca";
 import { neidyJoseVinculoTrueTheme } from "./definitions/neidy-jose-vinculo";
+import { alexandrinaKennethGoldTheme } from "./definitions/alexandrina-kenneth-gold";
 import type { TrueTheme } from "./true-types";
 import type { RegistryThemeKey } from "./registry-types";
 
@@ -27,6 +28,7 @@ export const ThemeRegistry: Record<RegistryThemeKey, TrueTheme> = {
   "nian-night-of-the-web": nianNightOfTheWebTheme,
   "queen-kailane-luz-da-graca": queenKailaneLuzDaGracaTheme,
   "neidy-jose-vinculo": neidyJoseVinculoTrueTheme,
+  "alexandrina-kenneth-gold": alexandrinaKennethGoldTheme,
 };
 
 export type { RegistryThemeKey };

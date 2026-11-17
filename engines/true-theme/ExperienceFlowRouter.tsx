@@ -47,5 +47,10 @@ export function ExperienceFlowRouter() {
     return null;
   }
 
+  /* Gate próprio AlexandrinaKennethCoverGate — evita o StandardExperienceFlow */
+  if (theme.renderProfile === "alexandrina-kenneth-wedding") {
+    return null;
+  }
+
   return <StandardExperienceFlow />;
 }

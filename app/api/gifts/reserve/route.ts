@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { reserveGift } from "@lib/gifts";
 import { sendGiftReserveNotificationEmail } from "@lib/gifts/send-notification";
 import { reserveJessicaSamuelGift } from "@lib/jessica-samuel-wedding/gifts/inventory";
+import { reserveAlexandrinaKennethGift } from "@lib/alexandrina-kenneth-wedding/gifts/inventory";
 import { resolveInvitationContext } from "@lib/context-resolver";
 import { validateGiftReservationPayload } from "@core/contracts/gifts.contract";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
@@ -44,6 +45,61 @@ export async function POST(request: Request) {
     );
     if (!limit.allowed) {
       return rateLimitResponse(limit, { code: "RATE_LIMITED" });
+    }
+
+    if (registryKey === "alexandrina-kenneth") {
+      try {
+        const result = await reserveAlexandrinaKennethGift({
+          itemId,
+          guestName,
+          guestPhone,
+          quantity,
+          message,
+          slug: context.slug,
+        });
+
+        if (!result.success) {
+          return NextResponse.json(
+            {
+              success: false,
+              code: result.code,
+              error: result.error,
+              items: result.items,
+              available: result.available,
+            },
+            { status: 409 }
+          );
+        }
+
+        return NextResponse.json(
+          {
+            success: true,
+            message: result.message,
+            alreadyReserved: result.alreadyReserved,
+            items: result.items,
+          },
+          { status: 200 }
+        );
+      } catch (akReserveError) {
+        console.error(
+          "[Alexandrina & Kenneth Gifts] Fail-closed: Reserve unavailable:",
+          akReserveError
+        );
+        return NextResponse.json(
+          {
+            success: false,
+            code: "GIFT_REGISTRY_UNAVAILABLE",
+            error:
+              "A lista de presentes está temporariamente indisponível. Por favor, tente novamente dentro de instantes.",
+          },
+          {
+            status: 503,
+            headers: {
+              "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            },
+          }
+        );
+      }
     }
 
     if (registryKey === "jessica-samuel") {
