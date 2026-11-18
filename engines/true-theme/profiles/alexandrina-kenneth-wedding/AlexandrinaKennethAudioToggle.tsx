@@ -38,6 +38,8 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isStartingRef = useRef(false);
+  const autoStartAttemptedRef = useRef(false);
 
   const config = getAlexandrinaKennethAudioConfig();
   const isAuthorized = config.isAuthorized;
@@ -98,11 +100,19 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     const audio = audioRef.current;
     if (!audio) return false;
 
+    // Idempotency & concurrency guard: prevent duplicate play calls and avoid restarting ongoing fade-in
+    if ((!audio.paused && audio.currentTime > 0) || isStartingRef.current) {
+      return true;
+    }
+
+    isStartingRef.current = true;
     try {
-      audio.volume = 0;
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        await playPromise;
+      if (audio.paused) {
+        audio.volume = 0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+        }
       }
       fadeTo(config.targetVolume, config.fadeInDurationMs);
       return true;
@@ -110,6 +120,8 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
       console.warn("[Alexandrina & Kenneth Audio] Playback prevented:", err);
       setIsPlaying(false);
       return false;
+    } finally {
+      isStartingRef.current = false;
     }
   }, [config.fadeInDurationMs, config.targetVolume, fadeTo, isAuthorized]);
 
@@ -133,6 +145,11 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     const audio = audioRef.current;
     if (!audio) return false;
 
+    if (!audio.paused || isStartingRef.current) {
+      return true;
+    }
+
+    isStartingRef.current = true;
     try {
       audio.volume = 0;
       await audio.play();
@@ -142,6 +159,8 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
       console.warn("[Alexandrina & Kenneth Audio] Resume failed:", err);
       setIsPlaying(false);
       return false;
+    } finally {
+      isStartingRef.current = false;
     }
   }, [config.fadeInDurationMs, config.targetVolume, fadeTo, isAuthorized, showFeedbackToast]);
 
@@ -176,9 +195,10 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     [isPlaying, pausePlayback, startPlayback, togglePlayback]
   );
 
-  // Deep-link auto-start fallback
+  // Deep-link auto-start fallback (single guaranteed execution across lifecycle)
   useEffect(() => {
-    if (autoStart && isAuthorized) {
+    if (autoStart && isAuthorized && !autoStartAttemptedRef.current) {
+      autoStartAttemptedRef.current = true;
       void startPlayback();
     }
   }, [autoStart, isAuthorized, startPlayback]);

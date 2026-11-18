@@ -24,13 +24,11 @@ import { AlexandrinaKennethFooter } from "./AlexandrinaKennethFooter";
 
 export function AlexandrinaKennethExperience() {
   const [isCoverOpen, setIsCoverOpen] = useState(true);
-  const [audioTriggered, setAudioTriggered] = useState(false);
   const audioHandleRef = useRef<AlexandrinaKennethAudioHandle>(null);
 
   const handleOpenInvite = () => {
     setIsCoverOpen(false);
-    setAudioTriggered(true);
-    // Initiated synchronously within the guest's tap event to satisfy browser autoplay policies
+    // Explicit single invocation strictly on the guest's user gesture token
     void audioHandleRef.current?.playOnUserGesture();
   };
 
@@ -38,7 +36,6 @@ export function AlexandrinaKennethExperience() {
     // If URL has #convite or other deep links, start with cover closed
     if (typeof window !== "undefined" && window.location.hash) {
       setIsCoverOpen(false);
-      setAudioTriggered(true);
     }
   }, []);
 
@@ -67,7 +64,6 @@ export function AlexandrinaKennethExperience() {
       {/* 2. Floating Audio Toggle */}
       <AlexandrinaKennethAudioToggle
         ref={audioHandleRef}
-        autoStart={audioTriggered}
         showToggle={!isCoverOpen}
       />
 
