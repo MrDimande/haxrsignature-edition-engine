@@ -113,6 +113,14 @@ export function AlexandrinaKennethFooter() {
           </p>
         </div>
 
+        {/* 7.1. Crédito Musical Cerimonial Oficial */}
+        <p
+          className="ak-footer-music-credit text-[10px] md:text-[11px] font-sans text-[#d4af37]/85 tracking-[0.16em] uppercase mt-5"
+          style={{ letterSpacing: "0.16em" }}
+        >
+          Música: “Say You Won&apos;t Let Go” — James Arthur
+        </p>
+
         {/* 8. Copyright Oficial */}
         <p
           className="ak-footer-copyright text-[9.5px] tracking-wider text-[#ffe9b8]/50 mt-6 font-sans"

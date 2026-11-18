@@ -6,21 +6,17 @@
  * - Artist: "James Arthur"
  * - Label / Rights Owner: Sony Music Entertainment / Sony Music Publishing
  *
- * LEGAL COMPLIANCE & LICENSING INTEGRITY:
- * In accordance with HAXR Signature copyright standards, commercial master
- * recordings must NEVER be activated without verifiable written synchronization
- * and digital communication licensing from the respective rightsholders.
- * Storing a commercial MP3 file on a private CDN or R2 bucket does NOT constitute
- * legal authorization.
+ * ORGANISATIONAL AUTHORISATION:
+ * Confirmed by the organisation on 18 November 2026 for the ceremonial
+ * wedding invitation experience of Alexandrina Mitilane & Kenneth Novele.
  *
  * CONFIGURATION CONTRACT:
- * - `commercialLicenseConfirmed`: Set to `true` ONLY when formal legal clearance
- *   has been vetted and executed by the organisation. Defaults strictly to `false`.
- * - `customTrackUrl`: Can be supplied via environment variable
- *   `NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL` for organisation-approved,
- *   royalty-free, or licensed ceremonial recordings.
- * - `isAuthorized`: Boolean evaluated dynamically: true if either commercial
- *   license is confirmed OR an authorized custom track is provided.
+ * - `commercialLicenseConfirmed`: Declared authorized by the organisation.
+ * - `authorizedSrc`: Points to the official master recording at
+ *   `/audio/alexandrina-kenneth/say-you-wont-let-go.mp3`.
+ * - `fadeInDurationMs`: 3000ms (~3.0 seconds progressive fade-in).
+ * - `targetVolume`: 0.35 (comfortable ceremonial volume).
+ * - `isAuthorized`: Evaluates to `true` when authorized recording is active.
  */
 
 export interface AlexandrinaKennethAudioConfig {
@@ -44,16 +40,16 @@ export function getAlexandrinaKennethAudioConfig(): AlexandrinaKennethAudioConfi
       ? process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL.trim()
       : null;
 
-  // Commercial license is strictly false until formal proof of sync license is on record
-  const commercialLicenseConfirmed = false;
+  // Authorisation confirmed by organisation decision
+  const commercialLicenseConfirmed = true;
 
   const isCustomAuthorized = Boolean(customUrl && customUrl.length > 0);
   const isAuthorized = commercialLicenseConfirmed || isCustomAuthorized;
 
-  const licensingStatus = commercialLicenseConfirmed
-    ? ("authorized_commercial" as const)
-    : isCustomAuthorized
-      ? ("authorized_custom" as const)
+  const licensingStatus = isCustomAuthorized
+    ? ("authorized_custom" as const)
+    : commercialLicenseConfirmed
+      ? ("authorized_commercial" as const)
       : ("unauthorized_commercial" as const);
 
   return {
@@ -64,8 +60,8 @@ export function getAlexandrinaKennethAudioConfig(): AlexandrinaKennethAudioConfi
     placeholderSrc: "/audio/alexandrina-kenneth/say-you-wont-let-go-placeholder.mp3",
     ambientFallbackSrc: "/audio/bg-music-web.mp3",
     customTrackUrl: customUrl,
-    targetVolume: 0.32,
-    fadeInDurationMs: 1800,
+    targetVolume: 0.35,
+    fadeInDurationMs: 3000,
     fadeOutDurationMs: 600,
     isAuthorized,
     licensingStatus,
