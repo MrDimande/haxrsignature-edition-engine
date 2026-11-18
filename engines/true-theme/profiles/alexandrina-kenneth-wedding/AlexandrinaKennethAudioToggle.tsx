@@ -3,15 +3,17 @@
 import React, {
   useEffect,
   useRef,
-  useState,
+  useReducer,
   useCallback,
   forwardRef,
   useImperativeHandle,
+  useState,
 } from "react";
-import { Play, Pause, VolumeX } from "lucide-react";
+import { Play, Pause, VolumeX, Loader2 } from "lucide-react";
 import {
-  ALEXANDRINA_KENNETH_AUDIO_CONFIG,
   getAlexandrinaKennethAudioConfig,
+  audioPlaybackReducer,
+  type AudioPlaybackState,
 } from "@lib/alexandrina-kenneth-wedding/audio";
 
 export interface AlexandrinaKennethAudioHandle {
@@ -19,6 +21,7 @@ export interface AlexandrinaKennethAudioHandle {
   pause: () => void;
   toggle: () => void;
   isPlaying: () => boolean;
+  getState: () => AudioPlaybackState;
 }
 
 export interface AlexandrinaKennethAudioToggleProps {
@@ -33,16 +36,15 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
   { autoStart = false, showToggle = true },
   ref
 ) {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const config = getAlexandrinaKennethAudioConfig();
+  const [state, dispatch] = useReducer(audioPlaybackReducer, config.initialState);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isStartingRef = useRef(false);
   const autoStartAttemptedRef = useRef(false);
-
-  const config = getAlexandrinaKennethAudioConfig();
-  const isAuthorized = config.isAuthorized;
 
   const showFeedbackToast = useCallback((msg: string) => {
     if (toastTimeoutRef.current) {
@@ -78,7 +80,6 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
         }
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / durationMs, 1);
-        // Exponential ease-out for natural, elegant luxury transition
         const easedProgress = 1 - Math.pow(1 - progress, 2);
         const currentVal = startVolume + (targetVolume - startVolume) * easedProgress;
         audio.volume = Math.max(0, Math.min(1, currentVal));
@@ -93,19 +94,22 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
   );
 
   const startPlayback = useCallback(async (): Promise<boolean> => {
-    if (!isAuthorized) {
+    // A. Sem origem configurada -> modo silencioso intencional
+    if (state === "disabled" || !config.authorizedSrc) {
       return false;
     }
 
     const audio = audioRef.current;
     if (!audio) return false;
 
-    // Idempotency & concurrency guard: prevent duplicate play calls and avoid restarting ongoing fade-in
+    // Idempotency & concurrency guard
     if ((!audio.paused && audio.currentTime > 0) || isStartingRef.current) {
       return true;
     }
 
     isStartingRef.current = true;
+    dispatch({ type: "LOAD_START" });
+
     try {
       if (audio.paused) {
         audio.volume = 0;
@@ -114,16 +118,18 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
           await playPromise;
         }
       }
+      dispatch({ type: "PLAYING" });
       fadeTo(config.targetVolume, config.fadeInDurationMs);
       return true;
     } catch (err) {
       console.warn("[Alexandrina & Kenneth Audio] Playback prevented:", err);
-      setIsPlaying(false);
+      clearFade();
+      dispatch({ type: "ERROR", error: err });
       return false;
     } finally {
       isStartingRef.current = false;
     }
-  }, [config.fadeInDurationMs, config.targetVolume, fadeTo, isAuthorized]);
+  }, [config.authorizedSrc, config.fadeInDurationMs, config.targetVolume, fadeTo, state]);
 
   const pausePlayback = useCallback(() => {
     const audio = audioRef.current;
@@ -131,13 +137,13 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
 
     fadeTo(0, config.fadeOutDurationMs, () => {
       audio.pause();
-      setIsPlaying(false);
+      dispatch({ type: "PAUSE" });
     });
     showFeedbackToast("Música pausada");
   }, [config.fadeOutDurationMs, fadeTo, showFeedbackToast]);
 
   const resumePlayback = useCallback(async (): Promise<boolean> => {
-    if (!isAuthorized) {
+    if (state === "disabled" || !config.authorizedSrc) {
       showFeedbackToast("Áudio cerimonial sob consulta");
       return false;
     }
@@ -153,35 +159,47 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     try {
       audio.volume = 0;
       await audio.play();
+      dispatch({ type: "PLAYING" });
       fadeTo(config.targetVolume, Math.min(config.fadeInDurationMs, 1200));
       return true;
     } catch (err) {
       console.warn("[Alexandrina & Kenneth Audio] Resume failed:", err);
-      setIsPlaying(false);
+      clearFade();
+      dispatch({ type: "ERROR", error: err });
       return false;
     } finally {
       isStartingRef.current = false;
     }
-  }, [config.fadeInDurationMs, config.targetVolume, fadeTo, isAuthorized, showFeedbackToast]);
+  }, [config.authorizedSrc, config.fadeInDurationMs, config.targetVolume, fadeTo, showFeedbackToast, state]);
 
   const togglePlayback = useCallback(() => {
-    if (!isAuthorized) {
+    if (state === "disabled" || !config.authorizedSrc) {
       showFeedbackToast("Áudio cerimonial sob consulta");
       return;
     }
 
-    if (isPlaying) {
+    if (state === "error") {
+      showFeedbackToast("Tentando reiniciar áudio...");
+      dispatch({ type: "RETRY" });
+      void startPlayback();
+      return;
+    }
+
+    if (state === "playing") {
       pausePlayback();
     } else {
       void resumePlayback();
     }
-  }, [isAuthorized, isPlaying, pausePlayback, resumePlayback, showFeedbackToast]);
+  }, [config.authorizedSrc, pausePlayback, resumePlayback, showFeedbackToast, startPlayback, state]);
 
   // Imperative handle for parent (Cover Gate) to trigger audio immediately on user tap
   useImperativeHandle(
     ref,
     () => ({
       playOnUserGesture: async () => {
+        if (state === "disabled" || !config.authorizedSrc) {
+          return false;
+        }
         return startPlayback();
       },
       pause: () => {
@@ -190,18 +208,19 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
       toggle: () => {
         togglePlayback();
       },
-      isPlaying: () => isPlaying,
+      isPlaying: () => state === "playing",
+      getState: () => state,
     }),
-    [isPlaying, pausePlayback, startPlayback, togglePlayback]
+    [config.authorizedSrc, pausePlayback, startPlayback, state, togglePlayback]
   );
 
-  // Deep-link auto-start fallback (single guaranteed execution across lifecycle)
+  // Deep-link auto-start fallback
   useEffect(() => {
-    if (autoStart && isAuthorized && !autoStartAttemptedRef.current) {
+    if (autoStart && config.hasConfiguredOrigin && state !== "disabled" && !autoStartAttemptedRef.current) {
       autoStartAttemptedRef.current = true;
       void startPlayback();
     }
-  }, [autoStart, isAuthorized, startPlayback]);
+  }, [autoStart, config.hasConfiguredOrigin, startPlayback, state]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -215,53 +234,76 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
 
   return (
     <>
-      <audio
-        ref={audioRef}
-        id="bgMusic"
-        loop
-        playsInline
-        preload={isAuthorized ? "auto" : "none"}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onPlaying={() => {
-          setIsPlaying(true);
-          if (isAuthorized) {
+      {/* Media element rendered ONLY when an authorized origin is configured */}
+      {config.authorizedSrc && (
+        <audio
+          ref={audioRef}
+          id="bgMusic"
+          loop
+          playsInline
+          preload="auto"
+          onCanPlay={() => dispatch({ type: "CAN_PLAY" })}
+          onPlay={() => dispatch({ type: "PLAYING" })}
+          onPause={() => dispatch({ type: "PAUSE" })}
+          onPlaying={() => {
+            dispatch({ type: "PLAYING" });
             showFeedbackToast(`🎶 ${config.title} — ${config.artist}`);
-          }
-        }}
-        onError={(e) => {
-          console.warn("[Alexandrina & Kenneth Audio] Native audio error:", e);
-          setIsPlaying(false);
-          clearFade();
-        }}
-      >
-        {isAuthorized && (
+          }}
+          onError={(e) => {
+            console.warn("[Alexandrina & Kenneth Audio] Native audio error:", e);
+            clearFade();
+            dispatch({ type: "ERROR", error: e });
+          }}
+        >
           <source src={config.authorizedSrc} type="audio/mpeg" />
-        )}
-      </audio>
+        </audio>
+      )}
 
       {showToggle && (
         <button
           type="button"
-          className="audio-toggle cursor-pointer"
+          className={`audio-toggle ${
+            state === "disabled"
+              ? "audio-toggle--disabled cursor-not-allowed opacity-60"
+              : state === "error"
+              ? "audio-toggle--error border-red-400/40 text-red-300"
+              : "cursor-pointer"
+          }`}
           id="audioToggle"
           onClick={togglePlayback}
           aria-label={
-            !isAuthorized
+            state === "disabled"
               ? "Áudio cerimonial sob consulta"
-              : isPlaying
-                ? "Pausar música"
-                : "Tocar música"
+              : state === "error"
+              ? "Áudio cerimonial indisponível (clique para tentar novamente)"
+              : state === "loading"
+              ? "A carregar áudio cerimonial"
+              : state === "playing"
+              ? "Pausar música"
+              : "Tocar música"
           }
-          aria-pressed={isPlaying}
+          aria-pressed={state === "playing"}
+          aria-disabled={state === "disabled"}
         >
-          {!isAuthorized ? (
+          {state === "disabled" ? (
             <VolumeX
-              className="audio-toggle__icon opacity-80"
+              className="audio-toggle__icon opacity-75"
               aria-hidden="true"
               size={20}
             />
-          ) : isPlaying ? (
+          ) : state === "error" ? (
+            <VolumeX
+              className="audio-toggle__icon text-red-300/80"
+              aria-hidden="true"
+              size={20}
+            />
+          ) : state === "loading" ? (
+            <Loader2
+              className="audio-toggle__icon animate-spin"
+              aria-hidden="true"
+              size={20}
+            />
+          ) : state === "playing" ? (
             <Pause
               className="audio-toggle__icon"
               aria-hidden="true"
@@ -275,11 +317,15 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
             />
           )}
           <span className="audio-toggle__sr sr-only">
-            {!isAuthorized
+            {state === "disabled"
               ? "Áudio cerimonial sob consulta"
-              : isPlaying
-                ? "Música a tocar"
-                : "Música pausada"}
+              : state === "error"
+              ? "Áudio cerimonial indisponível"
+              : state === "loading"
+              ? "A carregar áudio"
+              : state === "playing"
+              ? "Música a tocar"
+              : "Música pausada"}
           </span>
         </button>
       )}
