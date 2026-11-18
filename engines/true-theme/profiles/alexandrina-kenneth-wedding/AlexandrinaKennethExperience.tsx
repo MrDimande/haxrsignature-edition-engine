@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./alexandrina-kenneth.css";
 
 import { AlexandrinaKennethAmbient } from "./AlexandrinaKennethAmbient";
 import { AlexandrinaKennethCoverGate } from "./AlexandrinaKennethCoverGate";
-import { AlexandrinaKennethAudioToggle } from "./AlexandrinaKennethAudioToggle";
+import {
+  AlexandrinaKennethAudioToggle,
+  type AlexandrinaKennethAudioHandle,
+} from "./AlexandrinaKennethAudioToggle";
 import { AlexandrinaKennethFloatingNav } from "./AlexandrinaKennethFloatingNav";
 import { AlexandrinaKennethHero } from "./AlexandrinaKennethHero";
 import { AlexandrinaKennethScripture } from "./AlexandrinaKennethScripture";
@@ -22,10 +25,13 @@ import { AlexandrinaKennethFooter } from "./AlexandrinaKennethFooter";
 export function AlexandrinaKennethExperience() {
   const [isCoverOpen, setIsCoverOpen] = useState(true);
   const [audioTriggered, setAudioTriggered] = useState(false);
+  const audioHandleRef = useRef<AlexandrinaKennethAudioHandle>(null);
 
   const handleOpenInvite = () => {
     setIsCoverOpen(false);
     setAudioTriggered(true);
+    // Initiated synchronously within the guest's tap event to satisfy browser autoplay policies
+    void audioHandleRef.current?.playOnUserGesture();
   };
 
   useEffect(() => {
@@ -60,6 +66,7 @@ export function AlexandrinaKennethExperience() {
 
       {/* 2. Floating Audio Toggle */}
       <AlexandrinaKennethAudioToggle
+        ref={audioHandleRef}
         autoStart={audioTriggered}
         showToggle={!isCoverOpen}
       />

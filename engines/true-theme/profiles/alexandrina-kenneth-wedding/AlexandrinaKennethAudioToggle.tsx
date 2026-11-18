@@ -1,60 +1,149 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Play, Pause, VolumeX } from "lucide-react";
-import { ALEXANDRINA_KENNETH_AUDIO_CONFIG } from "@lib/alexandrina-kenneth-wedding/audio";
+import {
+  ALEXANDRINA_KENNETH_AUDIO_CONFIG,
+  getAlexandrinaKennethAudioConfig,
+} from "@lib/alexandrina-kenneth-wedding/audio";
 
-interface AlexandrinaKennethAudioToggleProps {
+export interface AlexandrinaKennethAudioHandle {
+  playOnUserGesture: () => Promise<boolean>;
+  pause: () => void;
+  toggle: () => void;
+  isPlaying: () => boolean;
+}
+
+export interface AlexandrinaKennethAudioToggleProps {
   autoStart?: boolean;
   showToggle?: boolean;
 }
 
-export function AlexandrinaKennethAudioToggle({
-  autoStart = false,
-  showToggle = true,
-}: AlexandrinaKennethAudioToggleProps) {
+export const AlexandrinaKennethAudioToggle = forwardRef<
+  AlexandrinaKennethAudioHandle,
+  AlexandrinaKennethAudioToggleProps
+>(function AlexandrinaKennethAudioToggle(
+  { autoStart = false, showToggle = true },
+  ref
+) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const isAuthorized = ALEXANDRINA_KENNETH_AUDIO_CONFIG.isAuthorized;
+  const config = getAlexandrinaKennethAudioConfig();
+  const isAuthorized = config.isAuthorized;
 
   const showFeedbackToast = useCallback((msg: string) => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
     setToastMessage(msg);
-    const timer = setTimeout(() => {
+    toastTimeoutRef.current = setTimeout(() => {
       setToastMessage(null);
+      toastTimeoutRef.current = null;
     }, 3200);
-    return () => clearTimeout(timer);
   }, []);
 
-  const startPlayback = useCallback(async () => {
+  const clearFade = useCallback(() => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+  }, []);
+
+  const fadeTo = useCallback(
+    (targetVolume: number, durationMs: number, onComplete?: () => void) => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      clearFade();
+      const startVolume = audio.volume;
+      const startTime = Date.now();
+      const intervalMs = 40;
+
+      fadeIntervalRef.current = setInterval(() => {
+        if (!audio) {
+          clearFade();
+          return;
+        }
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / durationMs, 1);
+        // Exponential ease-out for natural, elegant luxury transition
+        const easedProgress = 1 - Math.pow(1 - progress, 2);
+        const currentVal = startVolume + (targetVolume - startVolume) * easedProgress;
+        audio.volume = Math.max(0, Math.min(1, currentVal));
+
+        if (progress >= 1) {
+          clearFade();
+          onComplete?.();
+        }
+      }, intervalMs);
+    },
+    [clearFade]
+  );
+
+  const startPlayback = useCallback(async (): Promise<boolean> => {
     if (!isAuthorized) {
-      showFeedbackToast("Áudio cerimonial sob consulta");
-      return;
+      return false;
     }
 
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio) return false;
+
     try {
-      audio.volume = 0.35;
-      await audio.play();
-      setIsPlaying(true);
-      showFeedbackToast(
-        `🎶 ${ALEXANDRINA_KENNETH_AUDIO_CONFIG.title} — ${ALEXANDRINA_KENNETH_AUDIO_CONFIG.artist}`
-      );
+      audio.volume = 0;
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        await playPromise;
+      }
+      fadeTo(config.targetVolume, config.fadeInDurationMs);
+      return true;
     } catch (err) {
-      console.warn("Autoplay prevent / user interaction needed:", err);
+      console.warn("[Alexandrina & Kenneth Audio] Playback prevented:", err);
       setIsPlaying(false);
+      return false;
     }
-  }, [isAuthorized, showFeedbackToast]);
+  }, [config.fadeInDurationMs, config.targetVolume, fadeTo, isAuthorized]);
 
   const pausePlayback = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.pause();
-    setIsPlaying(false);
+
+    fadeTo(0, config.fadeOutDurationMs, () => {
+      audio.pause();
+      setIsPlaying(false);
+    });
     showFeedbackToast("Música pausada");
-  }, [showFeedbackToast]);
+  }, [config.fadeOutDurationMs, fadeTo, showFeedbackToast]);
+
+  const resumePlayback = useCallback(async (): Promise<boolean> => {
+    if (!isAuthorized) {
+      showFeedbackToast("Áudio cerimonial sob consulta");
+      return false;
+    }
+
+    const audio = audioRef.current;
+    if (!audio) return false;
+
+    try {
+      audio.volume = 0;
+      await audio.play();
+      fadeTo(config.targetVolume, Math.min(config.fadeInDurationMs, 1200));
+      return true;
+    } catch (err) {
+      console.warn("[Alexandrina & Kenneth Audio] Resume failed:", err);
+      setIsPlaying(false);
+      return false;
+    }
+  }, [config.fadeInDurationMs, config.targetVolume, fadeTo, isAuthorized, showFeedbackToast]);
 
   const togglePlayback = useCallback(() => {
     if (!isAuthorized) {
@@ -65,29 +154,71 @@ export function AlexandrinaKennethAudioToggle({
     if (isPlaying) {
       pausePlayback();
     } else {
-      void startPlayback();
+      void resumePlayback();
     }
-  }, [isAuthorized, isPlaying, pausePlayback, startPlayback, showFeedbackToast]);
+  }, [isAuthorized, isPlaying, pausePlayback, resumePlayback, showFeedbackToast]);
 
+  // Imperative handle for parent (Cover Gate) to trigger audio immediately on user tap
+  useImperativeHandle(
+    ref,
+    () => ({
+      playOnUserGesture: async () => {
+        return startPlayback();
+      },
+      pause: () => {
+        pausePlayback();
+      },
+      toggle: () => {
+        togglePlayback();
+      },
+      isPlaying: () => isPlaying,
+    }),
+    [isPlaying, pausePlayback, startPlayback, togglePlayback]
+  );
+
+  // Deep-link auto-start fallback
   useEffect(() => {
     if (autoStart && isAuthorized) {
-      const timer = setTimeout(() => {
-        void startPlayback();
-      }, 150);
-      return () => clearTimeout(timer);
+      void startPlayback();
     }
   }, [autoStart, isAuthorized, startPlayback]);
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearFade();
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+    };
+  }, [clearFade]);
+
   return (
     <>
-      {isAuthorized && (
-        <audio ref={audioRef} id="bgMusic" loop preload="none">
-          <source
-            src={ALEXANDRINA_KENNETH_AUDIO_CONFIG.authorizedSrc}
-            type="audio/mpeg"
-          />
-        </audio>
-      )}
+      <audio
+        ref={audioRef}
+        id="bgMusic"
+        loop
+        playsInline
+        preload={isAuthorized ? "auto" : "none"}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onPlaying={() => {
+          setIsPlaying(true);
+          if (isAuthorized) {
+            showFeedbackToast(`🎶 ${config.title} — ${config.artist}`);
+          }
+        }}
+        onError={(e) => {
+          console.warn("[Alexandrina & Kenneth Audio] Native audio error:", e);
+          setIsPlaying(false);
+          clearFade();
+        }}
+      >
+        {isAuthorized && (
+          <source src={config.authorizedSrc} type="audio/mpeg" />
+        )}
+      </audio>
 
       {showToggle && (
         <button
@@ -144,4 +275,4 @@ export function AlexandrinaKennethAudioToggle({
       )}
     </>
   );
-}
+});
