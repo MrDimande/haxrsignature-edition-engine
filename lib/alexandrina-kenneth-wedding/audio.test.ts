@@ -1,46 +1,96 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
-import { describe, it } from "node:test";
+import { describe, it, afterEach } from "node:test";
 import {
   ALEXANDRINA_KENNETH_AUDIO_CONFIG,
   getAlexandrinaKennethAudioConfig,
 } from "./audio";
 
-describe("Alexandrina & Kenneth — Official Audio Activation & Licensing", () => {
-  it("activates official master recording per organisation authorisation decision", () => {
-    const config = getAlexandrinaKennethAudioConfig();
+describe("Alexandrina & Kenneth — Audio Configuration & Origin Precedence", () => {
+  const originalEnv = process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
 
+  afterEach(() => {
+    if (originalEnv !== undefined) {
+      process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL = originalEnv;
+    } else {
+      delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
+    }
+  });
+
+  it("1. Precedence: External URL overrides default local path when present", () => {
+    process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL =
+      "https://storage.haxrsignature.com/audio/alexandrina-kenneth/say-you-wont-let-go.mp3";
+    const config = getAlexandrinaKennethAudioConfig();
     assert.equal(
-      config.commercialLicenseConfirmed,
-      true,
-      "Commercial licence must be confirmed per organisation decision"
+      config.authorizedSrc,
+      "https://storage.haxrsignature.com/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
     );
     assert.equal(
-      config.isAuthorized,
-      true,
-      "Audio must be authorised when organisation decision is confirmed"
+      config.customTrackUrl,
+      "https://storage.haxrsignature.com/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
     );
-    assert.equal(
-      config.licensingStatus,
-      "authorized_commercial",
-      "Status must indicate authorised commercial track"
-    );
-    assert.equal(config.title, "Say You Won't Let Go");
-    assert.equal(config.artist, "James Arthur");
+  });
+
+  it("2. Behavior when external URL is absent: defaults to canonical relative route", () => {
+    delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
+    const config = getAlexandrinaKennethAudioConfig();
     assert.equal(
       config.authorizedSrc,
       "/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
     );
+    assert.equal(config.customTrackUrl, null);
   });
 
-  it("verifies authorized audio source is configured with clean asset or storage contract", () => {
+  it("3. Behavior when external URL is empty or whitespace: trims and falls back cleanly", () => {
+    process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL = "   ";
     const config = getAlexandrinaKennethAudioConfig();
-    assert.ok(
+    assert.equal(
       config.authorizedSrc,
-      "Authorized audio source must be defined"
+      "/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
     );
+    assert.equal(config.customTrackUrl, null);
+  });
 
+  it("4. Invariant Musical Identity: maintains canonical Title and Artist regardless of storage origin", () => {
+    // Test with local default
+    delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
+    const localConfig = getAlexandrinaKennethAudioConfig();
+    assert.equal(localConfig.title, "Say You Won't Let Go");
+    assert.equal(localConfig.artist, "James Arthur");
+
+    // Test with CDN / External URL
+    process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL =
+      "https://cdn.haxrsignature.com/say-you-wont-let-go.mp3";
+    const cdnConfig = getAlexandrinaKennethAudioConfig();
+    assert.equal(cdnConfig.title, "Say You Won't Let Go");
+    assert.equal(cdnConfig.artist, "James Arthur");
+  });
+
+  it("5. Strict Acoustic Parameters: enforces 3-second progressive fade-in and volume ceiling", () => {
+    const config = getAlexandrinaKennethAudioConfig();
+    assert.equal(config.targetVolume, 0.35, "Target volume must be 0.35");
+    assert.equal(config.fadeInDurationMs, 3000, "Fade-in duration must be 3000ms (~3.0s)");
+    assert.equal(config.fadeOutDurationMs, 600, "Fade-out duration must be 600ms");
+  });
+
+  it("6. Fail-Safe Fallbacks: defines valid placeholder and ambient fallback routes", () => {
+    const config = getAlexandrinaKennethAudioConfig();
+    assert.equal(
+      config.placeholderSrc,
+      "/audio/alexandrina-kenneth/say-you-wont-let-go-placeholder.mp3"
+    );
+    assert.equal(config.ambientFallbackSrc, "/audio/bg-music-web.mp3");
+  });
+
+  it("7. Declared Authorization: confirms organizational authorization flag", () => {
+    const config = getAlexandrinaKennethAudioConfig();
+    assert.equal(config.commercialLicenseConfirmed, true);
+    assert.equal(config.isAuthorized, true);
+    assert.equal(config.licensingStatus, "authorized_commercial");
+  });
+
+  it("8. Physical local master file verification (when running with local assets)", () => {
     const mp3Path = path.resolve(
       process.cwd(),
       "public/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
@@ -49,57 +99,8 @@ describe("Alexandrina & Kenneth — Official Audio Activation & Licensing", () =
       const stats = fs.statSync(mp3Path);
       assert.ok(
         stats.size > 1_000_000,
-        `When present locally, authorized MP3 must be authentic (> 1MB), got ${stats.size} bytes`
+        `Local master audio must be an authentic recording (> 1MB), got ${stats.size} bytes`
       );
-    } else {
-      // In CI environments where commercial audio is excluded from public git
-      assert.ok(
-        config.authorizedSrc.length > 0,
-        "Authorized audio path must be present in config"
-      );
-    }
-  });
-
-  it("enforces comfortable 3-second progressive fade-in and volume", () => {
-    const config = getAlexandrinaKennethAudioConfig();
-
-    assert.equal(
-      config.targetVolume,
-      0.35,
-      "Target volume must be 0.35 (comfortable ceremonial soundscape)"
-    );
-    assert.equal(
-      config.fadeInDurationMs,
-      3000,
-      "Fade-in duration must be exactly 3000ms (~3 seconds progressive ramp)"
-    );
-    assert.equal(
-      config.fadeOutDurationMs,
-      600,
-      "Fade-out duration must be 600ms for responsive luxury pause"
-    );
-  });
-
-  it("dynamically supports custom URL override via NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL", () => {
-    const prevUrl = process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
-    try {
-      process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL =
-        "https://cdn.haxrsignature.com/audio/ceremonial-suite-authorized.mp3";
-
-      const config = getAlexandrinaKennethAudioConfig();
-      assert.equal(config.isAuthorized, true);
-      assert.equal(config.licensingStatus, "authorized_custom");
-      assert.equal(
-        config.authorizedSrc,
-        "https://cdn.haxrsignature.com/audio/ceremonial-suite-authorized.mp3"
-      );
-      assert.equal(config.title, "Música Cerimonial");
-    } finally {
-      if (prevUrl !== undefined) {
-        process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL = prevUrl;
-      } else {
-        delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
-      }
     }
   });
 });

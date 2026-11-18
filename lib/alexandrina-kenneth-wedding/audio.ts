@@ -35,10 +35,11 @@ export interface AlexandrinaKennethAudioConfig {
 }
 
 export function getAlexandrinaKennethAudioConfig(): AlexandrinaKennethAudioConfig {
-  const customUrl =
+  const rawUrl =
     typeof process !== "undefined" && process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL
       ? process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL.trim()
-      : null;
+      : "";
+  const customUrl = rawUrl.length > 0 ? rawUrl : null;
 
   // Authorisation confirmed by organisation decision
   const commercialLicenseConfirmed = true;
@@ -46,15 +47,14 @@ export function getAlexandrinaKennethAudioConfig(): AlexandrinaKennethAudioConfi
   const isCustomAuthorized = Boolean(customUrl && customUrl.length > 0);
   const isAuthorized = commercialLicenseConfirmed || isCustomAuthorized;
 
-  const licensingStatus = isCustomAuthorized
-    ? ("authorized_custom" as const)
-    : commercialLicenseConfirmed
-      ? ("authorized_commercial" as const)
-      : ("unauthorized_commercial" as const);
+  // Track identity is invariant to technical storage distribution (CDN, R2, or local static)
+  const licensingStatus = isAuthorized
+    ? ("authorized_commercial" as const)
+    : ("unauthorized_commercial" as const);
 
   return {
-    title: isCustomAuthorized ? "Música Cerimonial" : "Say You Won't Let Go",
-    artist: isCustomAuthorized ? "Edição Especial" : "James Arthur",
+    title: "Say You Won't Let Go",
+    artist: "James Arthur",
     commercialLicenseConfirmed,
     authorizedSrc: customUrl || "/audio/alexandrina-kenneth/say-you-wont-let-go.mp3",
     placeholderSrc: "/audio/alexandrina-kenneth/say-you-wont-let-go-placeholder.mp3",
