@@ -7,8 +7,8 @@
  * - Rights Owner / Publishing: Sony Music Entertainment / Sony Music Publishing
  *
  * AVAILABILITY & LIFECYCLE CONTRACT:
- * - `disabled`: Audio is intentionally silent / unconfigured (safe default for CI and unconfigured Production).
- *   No media requests are emitted; no 404s occur; Cover Gate opens seamlessly.
+ * - `disabled`: Audio can be intentionally disabled by future configuration.
+ *   The authorized static media asset is present in the deployment by default.
  * - `loading`: An authorized origin is configured; media asset is being buffered.
  * - `ready`: Media element buffered and ready to start synchronously on user gesture token.
  * - `playing`: Audio actively playing with 3.0s progressive exponential fade-in.
@@ -101,26 +101,12 @@ export function getAlexandrinaKennethAudioConfig(): AlexandrinaKennethAudioConfi
       : "";
   const customUrl = rawUrl.length > 0 ? rawUrl : null;
 
-  // Local development / engineering workstation override:
-  // Requires explicit opt-in via NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_ALLOW_LOCAL=1
-  const allowLocal =
-    typeof process !== "undefined" &&
-    process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_ALLOW_LOCAL === "1";
-
-  // Declaration of organizational intent for ceremonial use
+  // Owner-approved production asset, served using the existing Next.js /public/audio pattern.
+  // NEXT_PUBLIC_* override remains optional for controlled testing; never required in production.
   const commercialLicenseConfirmed = true;
-
-  // Determine authorized source: strictly explicit.
-  // When no external URL or local override is configured, authorizedSrc is null,
-  // entering the intentional silent mode without issuing 404 requests to unversioned paths.
-  let authorizedSrc: string | null = null;
-  if (customUrl) {
-    authorizedSrc = customUrl;
-  } else if (allowLocal) {
-    authorizedSrc = "/audio/alexandrina-kenneth/say-you-wont-let-go.mp3";
-  }
-
-  const hasConfiguredOrigin = authorizedSrc !== null;
+  const staticDefault = "/audio/alexandrina-kenneth/say-you-wont-let-go.mp3";
+  const authorizedSrc = customUrl || staticDefault;
+  const hasConfiguredOrigin = true;
 
   // Technical availability requires BOTH organizational intent AND a configured source
   const isAuthorized = hasConfiguredOrigin && commercialLicenseConfirmed;

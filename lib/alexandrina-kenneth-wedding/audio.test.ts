@@ -29,22 +29,19 @@ describe("Alexandrina & Kenneth — Audio Availability & State Machine Contract"
     }
   });
 
-  // 1. Origem ausente → disabled (Modo Silencioso Intencional)
-  it("1. Origem ausente → disabled: defaults to intentional silent mode without issuing network requests", () => {
+  // 1. Canonical static source, even when environment overrides are absent
+  it("1. Origem estática: defaults to the bundled master without an environment variable", () => {
     delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
     delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_ALLOW_LOCAL;
 
     const config = getAlexandrinaKennethAudioConfig();
-    assert.equal(config.hasConfiguredOrigin, false);
-    assert.equal(config.authorizedSrc, null, "Must NOT default to local unversioned MP3 path in unconfigured environments");
+    assert.equal(config.hasConfiguredOrigin, true);
+    assert.equal(config.authorizedSrc, "/audio/alexandrina-kenneth/say-you-wont-let-go.mp3");
     assert.equal(config.customTrackUrl, null);
-    assert.equal(config.initialState, "disabled", "Initial state must be 'disabled' when no origin is configured");
-    assert.equal(config.isAuthorized, false, "Must not claim readiness when no physical audio source is configured");
-    assert.equal(config.licensingStatus, "unauthorized_commercial");
-
-    // Reducer test: INIT with hasOrigin=false yields 'disabled'
-    const state = audioPlaybackReducer("disabled", { type: "INIT", hasOrigin: false });
-    assert.equal(state, "disabled");
+    assert.equal(config.initialState, "loading");
+    assert.equal(config.isAuthorized, true);
+    assert.equal(config.licensingStatus, "authorized_commercial");
+    assert.equal(audioPlaybackReducer("disabled", { type: "INIT", hasOrigin: true }), "loading");
   });
 
   // 2. Origem configurada → tentativa de carregamento (loading)
@@ -132,19 +129,19 @@ describe("Alexandrina & Kenneth — Audio Availability & State Machine Contract"
     assert.equal(s2, "ready");
   });
 
-  // 10. Origem ausente em Production → nenhum pedido à rota local inexistente
-  it("10. Origem ausente em Production → nenhum pedido à rota local inexistente: whitespace/empty env vars are trimmed to null", () => {
+  // 10. Empty environment override falls back to bundled production asset
+  it("10. Empty Production override: uses the canonical local static route", () => {
     process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL = "   ";
     delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_ALLOW_LOCAL;
 
     const config = getAlexandrinaKennethAudioConfig();
-    assert.equal(config.authorizedSrc, null, "Must NOT emit local MP3 route for empty/whitespace env");
-    assert.equal(config.hasConfiguredOrigin, false);
-    assert.equal(config.initialState, "disabled");
+    assert.equal(config.authorizedSrc, "/audio/alexandrina-kenneth/say-you-wont-let-go.mp3");
+    assert.equal(config.hasConfiguredOrigin, true);
+    assert.equal(config.initialState, "loading");
   });
 
-  // 11. Local development override explicitly opted-in
-  it("11. Local engineering workstation override: enables local master when explicitly opted-in", () => {
+  // 11. Local source remains canonical even with the legacy opt-in switch
+  it("11. Local engineering workstation uses the static master route", () => {
     delete process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_URL;
     process.env.NEXT_PUBLIC_ALEXANDRINA_KENNETH_AUDIO_ALLOW_LOCAL = "1";
 
@@ -166,19 +163,13 @@ describe("Alexandrina & Kenneth — Audio Availability & State Machine Contract"
   });
 
   // 13. Physical local master file cryptographic integrity verification
-  it("13. Physical local master file cryptographic integrity verification", (t) => {
+  it("13. Release master file SHA-256 and byte-size integrity verification", () => {
     const mp3Path = path.resolve(
       process.cwd(),
       "public/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
     );
 
-    if (!fs.existsSync(mp3Path)) {
-      t.skip(
-        "SKIPPED (NOT VERIFIED): Master audio file absent in CI/CD environment (untracked commercial asset). " +
-        "Cryptographic integrity can only be verified in environments where the physical asset is present."
-      );
-      return;
-    }
+    assert.ok(fs.existsSync(mp3Path), "Commercial master must be present in the release build for integrity verification");
 
     const fileBuffer = fs.readFileSync(mp3Path);
     const actualHash = crypto
