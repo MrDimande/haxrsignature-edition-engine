@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it, afterEach } from "node:test";
@@ -90,40 +91,47 @@ describe("Alexandrina & Kenneth — Audio Configuration & Origin Precedence", ()
     assert.equal(config.licensingStatus, "authorized_commercial");
   });
 
-  it("8. Physical local master file: verify when present, skip gracefully when absent (CI)", () => {
-    // INTENTIONAL CONDITIONAL TEST — read before modifying:
+  it("8. Physical local master file cryptographic integrity verification", (t) => {
+    // CONDITIONAL TEST WITH EXPLICIT CLASSIFICATION:
     //
     // The commercial master recording (say-you-wont-let-go.mp3) is excluded from Git
     // to avoid distributing copyrighted material in the public repository.
     // In CI/CD environments (Vercel Preview builds), the file will NOT be present.
     //
-    // When the file IS present (local engineering workstation with master asset):
-    //   → Verify exact byte-length matches the authenticated master (SHA-256 verified separately)
-    //
-    // When the file is ABSENT (CI environment):
-    //   → This test does NOT assert failure — absence is expected and correct in CI.
-    //   → Runtime availability MUST be verified via E2E/deployment tests, not unit tests.
-    //   → See: scratch/test_preview_audio_live.js for the E2E layer check.
-    //
-    // Classification: NOT_VERIFIED_IN_CI | VERIFIED_ON_WORKSTATION
+    // - When ABSENT (CI/CD): Explicitly SKIPPED with NOT VERIFIED classification.
+    // - When PRESENT (Workstation/Staging with asset): Bit-exact byte size AND SHA-256 hash verified.
     const mp3Path = path.resolve(
       process.cwd(),
       "public/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
     );
-    if (fs.existsSync(mp3Path)) {
-      const stats = fs.statSync(mp3Path);
-      assert.ok(
-        stats.size > 1_000_000,
-        `Local master audio must be an authentic recording (> 1MB), got ${stats.size} bytes`
+
+    if (!fs.existsSync(mp3Path)) {
+      t.skip(
+        "SKIPPED (NOT VERIFIED): Master audio file absent in CI/CD environment (untracked commercial asset). " +
+        "Cryptographic integrity can only be verified in environments where the physical asset is present."
       );
-      assert.equal(
-        stats.size,
-        3_431_168,
-        `Local master must match authenticated bit-exact size (3,431,168 bytes). ` +
-        `Actual: ${stats.size}. ` +
-        `If size differs, verify SHA-256: e010be1f2bda3a99898414089afccbd8a7869eb7d0fef7a20440c90aac88d547`
-      );
+      return;
     }
-    // No assertion when file absent — intentional. See comment above.
+
+    const fileBuffer = fs.readFileSync(mp3Path);
+    const actualHash = crypto
+      .createHash("sha256")
+      .update(fileBuffer)
+      .digest("hex");
+
+    const EXPECTED_HASH = "e010be1f2bda3a99898414089afccbd8a7869eb7d0fef7a20440c90aac88d547";
+    const EXPECTED_SIZE = 3_431_168;
+
+    assert.equal(
+      fileBuffer.length,
+      EXPECTED_SIZE,
+      `Local master must match authenticated bit-exact size (${EXPECTED_SIZE} bytes). Actual: ${fileBuffer.length}`
+    );
+
+    assert.equal(
+      actualHash,
+      EXPECTED_HASH,
+      `Local master recording SHA-256 hash must match authenticated master bit-for-bit. Expected: ${EXPECTED_HASH}, Actual: ${actualHash}`
+    );
   });
 });
