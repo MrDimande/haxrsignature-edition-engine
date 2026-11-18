@@ -45,6 +45,8 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isStartingRef = useRef(false);
   const autoStartAttemptedRef = useRef(false);
+  const retryCountRef = useRef(0);
+  const MAX_MANUAL_RETRIES = 3;
 
   const showFeedbackToast = useCallback((msg: string) => {
     if (toastTimeoutRef.current) {
@@ -94,7 +96,7 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
   );
 
   const startPlayback = useCallback(async (): Promise<boolean> => {
-    // A. Sem origem configurada -> modo silencioso intencional
+    // Mode Silencieux Intentionnel: no-op if disabled or unconfigured
     if (state === "disabled" || !config.authorizedSrc) {
       return false;
     }
@@ -102,7 +104,7 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     const audio = audioRef.current;
     if (!audio) return false;
 
-    // Idempotency & concurrency guard
+    // Idempotency & concurrency guard: prevent duplicate play calls and avoid restarting ongoing fade-in
     if ((!audio.paused && audio.currentTime > 0) || isStartingRef.current) {
       return true;
     }
@@ -144,7 +146,6 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
 
   const resumePlayback = useCallback(async (): Promise<boolean> => {
     if (state === "disabled" || !config.authorizedSrc) {
-      showFeedbackToast("Áudio cerimonial sob consulta");
       return false;
     }
 
@@ -170,18 +171,33 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     } finally {
       isStartingRef.current = false;
     }
-  }, [config.authorizedSrc, config.fadeInDurationMs, config.targetVolume, fadeTo, showFeedbackToast, state]);
+  }, [config.authorizedSrc, config.fadeInDurationMs, config.targetVolume, fadeTo, state]);
 
-  const togglePlayback = useCallback(() => {
+  const togglePlayback = useCallback(async () => {
     if (state === "disabled" || !config.authorizedSrc) {
-      showFeedbackToast("Áudio cerimonial sob consulta");
       return;
     }
 
     if (state === "error") {
-      showFeedbackToast("Tentando reiniciar áudio...");
+      if (retryCountRef.current >= MAX_MANUAL_RETRIES) {
+        showFeedbackToast("Áudio temporariamente indisponível");
+        return;
+      }
+      retryCountRef.current += 1;
+      showFeedbackToast("A restabelecer áudio cerimonial...");
+      clearFade();
       dispatch({ type: "RETRY" });
-      void startPlayback();
+
+      const audio = audioRef.current;
+      if (audio) {
+        try {
+          // Native reload re-initializes media pipeline and forces browser to re-evaluate media resource
+          audio.load();
+        } catch (loadErr) {
+          console.warn("[Alexandrina & Kenneth Audio] audio.load() error:", loadErr);
+        }
+      }
+      await startPlayback();
       return;
     }
 
@@ -190,7 +206,7 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     } else {
       void resumePlayback();
     }
-  }, [config.authorizedSrc, pausePlayback, resumePlayback, showFeedbackToast, startPlayback, state]);
+  }, [config.authorizedSrc, clearFade, pausePlayback, resumePlayback, showFeedbackToast, startPlayback, state]);
 
   // Imperative handle for parent (Cover Gate) to trigger audio immediately on user tap
   useImperativeHandle(
@@ -206,7 +222,7 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
         pausePlayback();
       },
       toggle: () => {
-        togglePlayback();
+        void togglePlayback();
       },
       isPlaying: () => state === "playing",
       getState: () => state,
@@ -232,78 +248,75 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
     };
   }, [clearFade]);
 
+  // SOLUÇÃO PREFERENCIAL: Quando o áudio está intencionalmente desactivado / sem origem configurada,
+  // ocultar integralmente o controlo e a tag de áudio do DOM.
+  // Preserva 100% da integridade visual e funcional, sem botões inoperacionais nem pedidos de rede.
+  if (state === "disabled" || !config.hasConfiguredOrigin || !config.authorizedSrc) {
+    return null;
+  }
+
+  const isError = state === "error";
+  const isLoading = state === "loading";
+  const isPlaying = state === "playing";
+
   return (
     <>
-      {/* Media element rendered ONLY when an authorized origin is configured */}
-      {config.authorizedSrc && (
-        <audio
-          ref={audioRef}
-          id="bgMusic"
-          loop
-          playsInline
-          preload="auto"
-          onCanPlay={() => dispatch({ type: "CAN_PLAY" })}
-          onPlay={() => dispatch({ type: "PLAYING" })}
-          onPause={() => dispatch({ type: "PAUSE" })}
-          onPlaying={() => {
-            dispatch({ type: "PLAYING" });
-            showFeedbackToast(`🎶 ${config.title} — ${config.artist}`);
-          }}
-          onError={(e) => {
-            console.warn("[Alexandrina & Kenneth Audio] Native audio error:", e);
-            clearFade();
-            dispatch({ type: "ERROR", error: e });
-          }}
-        >
-          <source src={config.authorizedSrc} type="audio/mpeg" />
-        </audio>
-      )}
+      <audio
+        ref={audioRef}
+        id="bgMusic"
+        loop
+        playsInline
+        preload="auto"
+        onCanPlay={() => dispatch({ type: "CAN_PLAY" })}
+        onPlay={() => dispatch({ type: "PLAYING" })}
+        onPause={() => dispatch({ type: "PAUSE" })}
+        onPlaying={() => {
+          dispatch({ type: "PLAYING" });
+          showFeedbackToast(`🎶 ${config.title} — ${config.artist}`);
+        }}
+        onError={(e) => {
+          console.warn("[Alexandrina & Kenneth Audio] Native audio error:", e);
+          clearFade();
+          dispatch({ type: "ERROR", error: e });
+        }}
+      >
+        <source src={config.authorizedSrc} type="audio/mpeg" />
+      </audio>
 
       {showToggle && (
         <button
           type="button"
-          className={`audio-toggle ${
-            state === "disabled"
-              ? "audio-toggle--disabled cursor-not-allowed opacity-60"
-              : state === "error"
-              ? "audio-toggle--error border-red-400/40 text-red-300"
-              : "cursor-pointer"
+          className={`audio-toggle cursor-pointer ${
+            isError
+              ? "audio-toggle--error border-[#d4af37]/40 text-[#d4af37]/75 hover:border-[#d4af37]"
+              : ""
           }`}
           id="audioToggle"
           onClick={togglePlayback}
           aria-label={
-            state === "disabled"
-              ? "Áudio cerimonial sob consulta"
-              : state === "error"
-              ? "Áudio cerimonial indisponível (clique para tentar novamente)"
-              : state === "loading"
+            isError
+              ? "Áudio cerimonial temporariamente indisponível. Toque para tentar novamente."
+              : isLoading
               ? "A carregar áudio cerimonial"
-              : state === "playing"
+              : isPlaying
               ? "Pausar música"
               : "Tocar música"
           }
-          aria-pressed={state === "playing"}
-          aria-disabled={state === "disabled"}
+          aria-pressed={isPlaying}
         >
-          {state === "disabled" ? (
+          {isError ? (
             <VolumeX
               className="audio-toggle__icon opacity-75"
               aria-hidden="true"
               size={20}
             />
-          ) : state === "error" ? (
-            <VolumeX
-              className="audio-toggle__icon text-red-300/80"
-              aria-hidden="true"
-              size={20}
-            />
-          ) : state === "loading" ? (
+          ) : isLoading ? (
             <Loader2
               className="audio-toggle__icon animate-spin"
               aria-hidden="true"
               size={20}
             />
-          ) : state === "playing" ? (
+          ) : isPlaying ? (
             <Pause
               className="audio-toggle__icon"
               aria-hidden="true"
@@ -317,13 +330,11 @@ export const AlexandrinaKennethAudioToggle = forwardRef<
             />
           )}
           <span className="audio-toggle__sr sr-only">
-            {state === "disabled"
-              ? "Áudio cerimonial sob consulta"
-              : state === "error"
-              ? "Áudio cerimonial indisponível"
-              : state === "loading"
+            {isError
+              ? "Áudio cerimonial indisponível (toque para tentar novamente)"
+              : isLoading
               ? "A carregar áudio"
-              : state === "playing"
+              : isPlaying
               ? "Música a tocar"
               : "Música pausada"}
           </span>
