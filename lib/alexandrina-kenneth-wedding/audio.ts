@@ -41,7 +41,20 @@ export function getAlexandrinaKennethAudioConfig(): AlexandrinaKennethAudioConfi
       : "";
   const customUrl = rawUrl.length > 0 ? rawUrl : null;
 
-  // Authorisation confirmed by organisation decision
+  // ORGANISATIONAL AUTHORISATION — Declaration vs Runtime Availability:
+  //
+  // `commercialLicenseConfirmed = true` reflects the ORGANISATIONAL DECISION only.
+  // It certifies that the organisation has authorised this track for ceremonial use.
+  // It does NOT guarantee that the audio resource is accessible at runtime.
+  //
+  // `isAuthorized = true` enables the audio element to be rendered and playback to begin.
+  // Runtime availability is determined SEPARATELY by the browser's HTMLAudioElement:
+  //   - HTTP 200/206 on the asset URL → playback proceeds normally
+  //   - HTTP 404 or network error → `onError` event fires in AlexandrinaKennethAudioToggle
+  //     → `setIsPlaying(false)` and `clearFade()` are called → component degrades gracefully
+  //
+  // The component is designed fail-safe: a 404 audio URL does NOT crash the experience.
+  // Confirm this by auditing the `onError` handler in AlexandrinaKennethAudioToggle.tsx.
   const commercialLicenseConfirmed = true;
 
   const isCustomAuthorized = Boolean(customUrl && customUrl.length > 0);

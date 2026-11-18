@@ -90,7 +90,22 @@ describe("Alexandrina & Kenneth — Audio Configuration & Origin Precedence", ()
     assert.equal(config.licensingStatus, "authorized_commercial");
   });
 
-  it("8. Physical local master file verification (when running with local assets)", () => {
+  it("8. Physical local master file: verify when present, skip gracefully when absent (CI)", () => {
+    // INTENTIONAL CONDITIONAL TEST — read before modifying:
+    //
+    // The commercial master recording (say-you-wont-let-go.mp3) is excluded from Git
+    // to avoid distributing copyrighted material in the public repository.
+    // In CI/CD environments (Vercel Preview builds), the file will NOT be present.
+    //
+    // When the file IS present (local engineering workstation with master asset):
+    //   → Verify exact byte-length matches the authenticated master (SHA-256 verified separately)
+    //
+    // When the file is ABSENT (CI environment):
+    //   → This test does NOT assert failure — absence is expected and correct in CI.
+    //   → Runtime availability MUST be verified via E2E/deployment tests, not unit tests.
+    //   → See: scratch/test_preview_audio_live.js for the E2E layer check.
+    //
+    // Classification: NOT_VERIFIED_IN_CI | VERIFIED_ON_WORKSTATION
     const mp3Path = path.resolve(
       process.cwd(),
       "public/audio/alexandrina-kenneth/say-you-wont-let-go.mp3"
@@ -101,6 +116,14 @@ describe("Alexandrina & Kenneth — Audio Configuration & Origin Precedence", ()
         stats.size > 1_000_000,
         `Local master audio must be an authentic recording (> 1MB), got ${stats.size} bytes`
       );
+      assert.equal(
+        stats.size,
+        3_431_168,
+        `Local master must match authenticated bit-exact size (3,431,168 bytes). ` +
+        `Actual: ${stats.size}. ` +
+        `If size differs, verify SHA-256: e010be1f2bda3a99898414089afccbd8a7869eb7d0fef7a20440c90aac88d547`
+      );
     }
+    // No assertion when file absent — intentional. See comment above.
   });
 });
