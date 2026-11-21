@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getPublicGifts } from "@lib/gifts";
 import { getAlexandrinaKennethPublicGifts } from "@lib/alexandrina-kenneth-wedding/gifts/inventory";
+import { AYLLA_GIFTS_CONFIG } from "@lib/aylla/gifts/config";
+import { AYLLA_GIFT_CATEGORIES, getBabyAyllaPublicGiftCatalog } from "@data/gifts/baby-aylla";
 import { resolveInvitationContext } from "@lib/context-resolver";
 
 export async function GET(request: Request) {
@@ -8,6 +10,30 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const rawSlug = searchParams.get("slug") || searchParams.get("registry") || "";
     const context = rawSlug ? resolveInvitationContext(rawSlug) : null;
+
+    // Phase A is intentionally read-only. This explicit branch prevents Aylla
+    // from inheriting another invitation's public catalogue while her family
+    // reviews the individual articles.
+    if (context?.giftsRegistryKey === AYLLA_GIFTS_CONFIG.registryKey) {
+      return NextResponse.json(
+        {
+          success: true,
+          registry: {
+            key: AYLLA_GIFTS_CONFIG.registryKey,
+            enabled: AYLLA_GIFTS_CONFIG.enabled,
+            reservationsEnabled: false,
+          },
+          categories: AYLLA_GIFT_CATEGORIES,
+          gifts: getBabyAyllaPublicGiftCatalog(),
+        },
+        {
+          status: 200,
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          },
+        }
+      );
+    }
 
     if (
       context?.giftsRegistryKey === "alexandrina-kenneth" ||
