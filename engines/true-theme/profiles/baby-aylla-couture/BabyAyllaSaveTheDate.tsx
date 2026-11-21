@@ -1,6 +1,7 @@
 "use client";
 
 import { BABY_AYLLA_EVENT } from "@lib/aylla/event-details";
+import { buildAyllaGoogleCalendarUrl, buildAyllaIcs } from "@lib/aylla/calendar";
 import { BabyAyllaCountdown } from "./BabyAyllaCountdown";
 import { CoutureBow, CoutureReveal, PearlTransition } from "./BabyAyllaCouture";
 import styles from "./BabyAyllaCelebration.module.css";
@@ -10,29 +11,10 @@ export function BabyAyllaSaveTheDate() {
   const startDayOffset = 5; // Friday (Jan 1, 2027)
 
 
-  const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-    "Baby Aylla · Édition Rose | Celebração de Aniversário"
-  )}&dates=20270123/20270124&details=${encodeURIComponent(
-    "Celebração de Aniversário da Baby Aylla · Édition Rose. Horário oficial será comunicado oportunamente."
-  )}&location=${encodeURIComponent("Vila do Mar Eventos, Costa do Sol, Maputo")}&ctz=Africa/Maputo`;
+  const googleCalendarUrl = buildAyllaGoogleCalendarUrl();
 
   const handleDownloadIcs = () => {
-    const icsContent = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//HAXR Signature//Baby Aylla Edition Rose//PT",
-      "BEGIN:VEVENT",
-      "UID:baby-aylla-20270123@edition.haxrsignature.com",
-      "DTSTAMP:20261118T200000Z",
-      "DTSTART;VALUE=DATE:20270123",
-      "DTEND;VALUE=DATE:20270124",
-      "SUMMARY:Baby Aylla · Édition Rose | Celebração de Aniversário",
-      "DESCRIPTION:Celebração de Aniversário da Baby Aylla · Édition Rose. Horário e detalhes logísticos serão anunciados oportunamente.",
-      "LOCATION:Vila do Mar Eventos\\, Costa do Sol\\, Maputo",
-      "STATUS:CONFIRMED",
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
+    const icsContent = buildAyllaIcs();
 
     const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
     const url = URL.createObjectURL(blob);

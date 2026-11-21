@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { getDaysUntilAylla } from "../aylla/calendar";
+import { buildAyllaGoogleCalendarUrl, buildAyllaIcs, getDaysUntilAylla } from "../aylla/calendar";
 
 describe("Aylla calendar-day countdown", () => {
   it("uses Maputo midnight rather than the viewer's time zone", () => {
@@ -20,5 +20,15 @@ describe("Aylla calendar-day countdown", () => {
   });
   it("does not silently accept an invalid clock", () => {
     assert.throws(() => getDaysUntilAylla(new Date(Number.NaN)), RangeError);
+  });
+
+  it("exports the canonical 11h00 Maputo start without inventing an end time", () => {
+    const ics = buildAyllaIcs();
+    assert.match(ics, /DTSTART;TZID=Africa\/Maputo:20270123T110000/);
+    assert.doesNotMatch(ics, /DTEND/);
+
+    const googleUrl = buildAyllaGoogleCalendarUrl();
+    assert.match(googleUrl, /dates=20270123T090000Z/);
+    assert.match(decodeURIComponent(googleUrl), /Início: 11h00/);
   });
 });

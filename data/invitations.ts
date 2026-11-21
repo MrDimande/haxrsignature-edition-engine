@@ -474,11 +474,11 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     metadata: {
       title: "Baby Aylla | Dior Collection Rosa · Convite Digital de Alta-Costura",
       date: "2027-01-23",
-      time: "Hora a confirmar",
+      time: "11h00",
       location: "Vila do Mar Eventos, Maputo, Moçambique",
       subtitle: "Um convite para viver um dia encantado.",
       description:
-        "Baby Aylla — Dior Collection Rosa · Aniversário Infantil. Sábado, 23 de Janeiro de 2027. Uma celebração envolta em amor e delicadeza.",
+        "Baby Aylla — Dior Collection Rosa · Aniversário Infantil. Sábado, 23 de Janeiro de 2027, às 11h00. Uma celebração envolta em amor e delicadeza.",
       eventDate: "2027-01-23",
       eventType: "Aniversário Infantil",
       dressCode: "Dior Collection Rosa · Tons Suaves e Tecidos Nobres",

@@ -100,8 +100,9 @@ export const BABY_AYLLA_EVENT: BabyAyllaEventDetails = {
   eventDayOfWeek: "Sábado",
   timezone: "Africa/Maputo",
   time: {
-    isConfirmed: false,
-    display: "Hora a confirmar",
+    isConfirmed: true,
+    display: "11h00",
+    startIso: "2027-01-23T11:00:00+02:00",
   },
   venue: {
     isConfirmed: true,

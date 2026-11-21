@@ -14,6 +14,7 @@ import {
 import { resolveActiveRsvpSlug } from "../rsvp/events";
 import { getRegistryTheme } from "../../theme/registry";
 import { BABY_AYLLA_EVENT } from "../aylla/event-details";
+import { resolveEditionCheckinUrl } from "../rsvp/checkin-url";
 
 describe("Baby Aylla — Architectural & Security Contract", () => {
   it("registers canonical slug 'babyaylla' in theme engine with draft status", () => {
@@ -24,7 +25,7 @@ describe("Baby Aylla — Architectural & Security Contract", () => {
     assert.equal(invitation.theme, "baby-aylla-couture");
     assert.equal(invitation.status, "draft");
     assert.equal(invitation.metadata.date, "2027-01-23");
-    assert.equal(invitation.metadata.time, "Hora a confirmar");
+    assert.equal(invitation.metadata.time, "11h00");
     assert.equal(invitation.metadata.location, "Vila do Mar Eventos, Maputo, Moçambique");
   });
 
@@ -97,10 +98,38 @@ describe("Baby Aylla — Architectural & Security Contract", () => {
       BABY_AYLLA_EVENT.concept,
       "Alta-Costura Infantil, Romantismo e Delicadeza Editorial"
     );
-    assert.equal(BABY_AYLLA_EVENT.time.isConfirmed, false);
+    assert.equal(BABY_AYLLA_EVENT.time.isConfirmed, true);
+    assert.equal(BABY_AYLLA_EVENT.time.display, "11h00");
     assert.equal(BABY_AYLLA_EVENT.venue.isConfirmed, true);
     assert.equal(BABY_AYLLA_EVENT.venue.name, "Vila do Mar Eventos");
     assert.equal(BABY_AYLLA_EVENT.rsvp.isConfigured, true);
     assert.equal(BABY_AYLLA_EVENT.rsvp.adminEnvVar, "EDITION_EVENT_AYLLA_ID");
+  });
+
+  it("builds QR check-in URLs only for the canonical Baby Aylla event identifier", () => {
+    const checkin = resolveEditionCheckinUrl(
+      "5d5d0a71340a4f58b4e0cb1ebc7a8123",
+      "a0f6b5a9-4d8c-4501-81b6-52929fa9da38",
+      { env: "production" }
+    );
+
+    assert.equal(checkin.ok, true);
+    if (checkin.ok) {
+      assert.match(
+        checkin.url,
+        /\/event\/a0f6b5a9-4d8c-4501-81b6-52929fa9da38\/checkin\//
+      );
+    }
+
+    assert.deepEqual(
+      resolveEditionCheckinUrl("short", "a0f6b5a9-4d8c-4501-81b6-52929fa9da38", {
+        env: "production",
+      }),
+      {
+        ok: false,
+        error: "invalid_token",
+        message: "Token de entrada inválido ou demasiado curto.",
+      }
+    );
   });
 });

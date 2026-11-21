@@ -9,9 +9,10 @@ describe("Baby Aylla — Event Details & Contract", () => {
     assert.equal(BABY_AYLLA_EVENT.timezone, "Africa/Maputo");
   });
 
-  it("marks confirmed venue and unconfirmed fields explicitly without inventing fake data", () => {
-    assert.equal(BABY_AYLLA_EVENT.time.isConfirmed, false);
-    assert.equal(BABY_AYLLA_EVENT.time.display, "Hora a confirmar");
+  it("uses the official 11h00 Maputo start and confirmed venue", () => {
+    assert.equal(BABY_AYLLA_EVENT.time.isConfirmed, true);
+    assert.equal(BABY_AYLLA_EVENT.time.display, "11h00");
+    assert.equal(BABY_AYLLA_EVENT.time.startIso, "2027-01-23T11:00:00+02:00");
     assert.equal(BABY_AYLLA_EVENT.venue.isConfirmed, true);
     assert.equal(BABY_AYLLA_EVENT.venue.name, "Vila do Mar Eventos");
     assert.equal(BABY_AYLLA_EVENT.dressCode.isConfirmed, false);

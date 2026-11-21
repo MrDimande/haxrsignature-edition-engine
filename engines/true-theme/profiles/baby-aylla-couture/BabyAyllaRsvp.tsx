@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { BABY_AYLLA_EVENT } from "@lib/aylla/event-details";
+import { resolveBabyAyllaRsvpState } from "@lib/aylla/rsvp-state";
 import { submitUniversalRsvp } from "@lib/rsvp/universal-client";
 import { useExperience } from "../../context";
 import { CoutureReveal } from "./BabyAyllaCouture";
@@ -18,14 +19,14 @@ export function BabyAyllaRsvp() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [error, setError] = useState("");
   const [ticket, setTicket] = useState<{ checkinUrl: string; partySize: number } | null>(null);
-  const rsvpIsOpen = BABY_AYLLA_EVENT.rsvp.isConfigured && config.status === "active";
-  // Draft previews can show the form for design review, but must never submit.
-  const isDraftPreview = BABY_AYLLA_EVENT.rsvp.isConfigured && config.status === "draft";
-  const showRsvpForm = rsvpIsOpen || isDraftPreview;
+  const rsvpState = resolveBabyAyllaRsvpState(
+    BABY_AYLLA_EVENT.rsvp.isConfigured,
+    config.status
+  );
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (status === "sending" || !rsvpIsOpen) return;
+    if (status === "sending" || !rsvpState.canSubmit) return;
     setStatus("sending");
     setError("");
     setTicket(null);
@@ -58,7 +59,7 @@ export function BabyAyllaRsvp() {
         <p className={`aylla-font-calligraphy ${styles.scriptLead}`}>Um lugar para ti.</p>
         <h2 id="aylla-presence-title" className={`aylla-font-serif ${styles.sectionTitle}`}>A tua presença faz parte<br />deste dia.</h2>
         <p className={`aylla-font-serif ${styles.sectionLead}`}>Será ainda mais especial celebrar contigo.</p>
-        {showRsvpForm ? (
+        {rsvpState.showForm ? (
           status === "success" ? (
             <div className={styles.rsvpSuccess} aria-live="polite">
               <p className={`aylla-font-serif ${styles.availabilityTitle}`}>
@@ -72,14 +73,14 @@ export function BabyAyllaRsvp() {
             </div>
           ) : (
             <>
-              {isDraftPreview ? (
+              {rsvpState.isDraftPreview ? (
                 <p className={styles.quietNote} role="status">Pré-visualização do formulário de confirmação. O envio permanece indisponível até à publicação do convite.</p>
               ) : null}
               <form className={styles.rsvpForm} onSubmit={(event) => void submit(event)}>
               <input className={styles.rsvpInput} required value={name} onChange={(event) => setName(event.target.value)} placeholder="Nome completo" autoComplete="name" />
               <div className={styles.rsvpGrid}>
-                <input className={styles.rsvpInput} type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email" autoComplete="email" />
-                <input className={styles.rsvpInput} type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Telefone" autoComplete="tel" />
+                <input className={styles.rsvpInput} type="email" required={rsvpState.canSubmit && !phone.trim()} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email" autoComplete="email" aria-label="Email" />
+                <input className={styles.rsvpInput} type="tel" required={rsvpState.canSubmit && !email.trim()} value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Telefone" autoComplete="tel" aria-label="Telefone" />
               </div>
               <div className={styles.rsvpGrid}>
                 <select className={styles.rsvpSelect} value={attending} onChange={(event) => setAttending(event.target.value as "yes" | "no")} aria-label="Presença">
@@ -94,8 +95,8 @@ export function BabyAyllaRsvp() {
                 ) : <span aria-hidden="true" />}
               </div>
               {error ? <p className={styles.rsvpError} role="alert">{error}</p> : null}
-              <button className={styles.rsvpSubmit} type="submit" disabled={!rsvpIsOpen || status === "sending"}>
-                {isDraftPreview ? "Confirmar presença" : status === "sending" ? "A registar…" : "Confirmar presença"}
+              <button className={styles.rsvpSubmit} type="submit" disabled={!rsvpState.canSubmit || status === "sending"}>
+                {rsvpState.isDraftPreview ? "Confirmar presença" : status === "sending" ? "A registar…" : "Confirmar presença"}
               </button>
               </form>
             </>

@@ -69,6 +69,7 @@ export function BabyAyllaDigitalPass({ fullName, partySize, checkinUrl }: BabyAy
         <p className={styles.passGuestRole}>Titular da celebração</p>
         <div className={styles.passDetails}>
           <span>{BABY_AYLLA_EVENT.eventDateFormatted}</span>
+          <span>{BABY_AYLLA_EVENT.time.display}</span>
           <span>{BABY_AYLLA_EVENT.venue.name}</span>
         </div>
         <p className={styles.passCapacity}>Entrada autorizada para {partySize} {partySize === 1 ? "pessoa" : "pessoas"}</p>
