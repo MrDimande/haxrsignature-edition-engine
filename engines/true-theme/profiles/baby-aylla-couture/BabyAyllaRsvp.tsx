@@ -19,10 +19,13 @@ export function BabyAyllaRsvp() {
   const [error, setError] = useState("");
   const [ticket, setTicket] = useState<{ checkinUrl: string; partySize: number } | null>(null);
   const rsvpIsOpen = BABY_AYLLA_EVENT.rsvp.isConfigured && config.status === "active";
+  // Draft previews can show the form for design review, but must never submit.
+  const isDraftPreview = BABY_AYLLA_EVENT.rsvp.isConfigured && config.status === "draft";
+  const showRsvpForm = rsvpIsOpen || isDraftPreview;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (status === "sending") return;
+    if (status === "sending" || !rsvpIsOpen) return;
     setStatus("sending");
     setError("");
     setTicket(null);
@@ -55,7 +58,7 @@ export function BabyAyllaRsvp() {
         <p className={`aylla-font-calligraphy ${styles.scriptLead}`}>Um lugar para ti.</p>
         <h2 id="aylla-presence-title" className={`aylla-font-serif ${styles.sectionTitle}`}>A tua presença faz parte<br />deste dia.</h2>
         <p className={`aylla-font-serif ${styles.sectionLead}`}>Será ainda mais especial celebrar contigo.</p>
-        {rsvpIsOpen ? (
+        {showRsvpForm ? (
           status === "success" ? (
             <div className={styles.rsvpSuccess} aria-live="polite">
               <p className={`aylla-font-serif ${styles.availabilityTitle}`}>
@@ -68,7 +71,11 @@ export function BabyAyllaRsvp() {
               ) : null}
             </div>
           ) : (
-            <form className={styles.rsvpForm} onSubmit={(event) => void submit(event)}>
+            <>
+              {isDraftPreview ? (
+                <p className={styles.quietNote} role="status">Pré-visualização do formulário de confirmação. O envio permanece indisponível até à publicação do convite.</p>
+              ) : null}
+              <form className={styles.rsvpForm} onSubmit={(event) => void submit(event)}>
               <input className={styles.rsvpInput} required value={name} onChange={(event) => setName(event.target.value)} placeholder="Nome completo" autoComplete="name" />
               <div className={styles.rsvpGrid}>
                 <input className={styles.rsvpInput} type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email" autoComplete="email" />
@@ -87,8 +94,11 @@ export function BabyAyllaRsvp() {
                 ) : <span aria-hidden="true" />}
               </div>
               {error ? <p className={styles.rsvpError} role="alert">{error}</p> : null}
-              <button className={styles.rsvpSubmit} type="submit" disabled={status === "sending"}>{status === "sending" ? "A registar…" : "Confirmar presença"}</button>
-            </form>
+              <button className={styles.rsvpSubmit} type="submit" disabled={!rsvpIsOpen || status === "sending"}>
+                {isDraftPreview ? "Confirmar presença" : status === "sending" ? "A registar…" : "Confirmar presença"}
+              </button>
+              </form>
+            </>
           )
         ) : (
           <div className={styles.availability}>
