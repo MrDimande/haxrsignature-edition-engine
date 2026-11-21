@@ -7,7 +7,8 @@ import {
   rsvpSlugNotAllowedResponse,
 } from "@lib/control-plane/rsvp-backend";
 import { getRsvpEmailConfig } from "@lib/rsvp/config";
-import { isEditionPersistenceConfigured } from "@lib/rsvp/events";
+import { getEditionEventBinding, isEditionPersistenceConfigured } from "@lib/rsvp/events";
+import { resolveEditionCheckinUrl } from "@lib/rsvp/checkin-url";
 import { logLocalRsvp } from "@lib/rsvp/logging";
 import { buildLocalRsvpSuccessBody } from "@lib/rsvp/local-response";
 import { isRsvpDatabaseConfigured, persistEditionRsvp } from "@lib/rsvp/persist";
@@ -176,6 +177,11 @@ export async function handleLocalRsvpPost(
     }
 
     const notificationSkipped = !notificationsEnabled || !emailConfig;
+    const eventBinding = getEditionEventBinding(slug);
+    const checkinResolution =
+      persistResult.status === "confirmed" && persistResult.qrToken && eventBinding
+        ? resolveEditionCheckinUrl(persistResult.qrToken, eventBinding.eventId)
+        : null;
 
     logStage(requestId, "complete", startedAt, 200, "success", {
       slug: submission.slug,
@@ -188,6 +194,7 @@ export async function handleLocalRsvpPost(
       notificationSkipped,
       guestId: persistResult.guestId,
       qrToken: persistResult.qrToken,
+      checkinUrl: checkinResolution?.ok ? checkinResolution.url : undefined,
       status: persistResult.status,
       created: persistResult.created,
       partySize: persistResult.partySize,

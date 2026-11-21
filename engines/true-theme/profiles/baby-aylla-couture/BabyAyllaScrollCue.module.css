@@ -1,0 +1,68 @@
+.continuation {
+  position: relative;
+  width: 100%;
+  margin-top: 42px;
+  padding-bottom: 28px;
+  display: flex;
+  justify-content: center;
+}
+
+.continuation::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 28px;
+  width: 1px;
+  background: #d4bfa1;
+}
+
+.cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.label { margin: 0 0 16px; color: #73544a; font-size: 13px; font-style: italic; }
+
+.thread {
+  position: relative;
+  width: 22px;
+  height: 81px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.thread::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: #d4bfa1;
+}
+
+.pearl {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border: 1px solid #d4bfa1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #fff, #fff8ec 45%, #c5ad93);
+}
+
+.ribbon {
+  position: absolute;
+  bottom: 0;
+  width: 15px;
+  height: 23px;
+  border-top: 1px solid #f5dcd0;
+  background: linear-gradient(90deg, #bb897b, #f0d4c5 35%, #d2a290 75%, #ae7c70);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+}
+
+@media (min-width: 1024px) { .continuation { margin-top: 36px; } }

@@ -8,6 +8,7 @@ export type LocalRsvpSuccessBody = {
   notificationSkipped: boolean;
   guestId?: string;
   qrToken?: string;
+  checkinUrl?: string;
   status?: "confirmed" | "declined";
   created?: boolean;
   partySize?: number;
@@ -18,6 +19,7 @@ export function buildLocalRsvpSuccessBody(options?: {
   notificationSkipped?: boolean;
   guestId?: string;
   qrToken?: string;
+  checkinUrl?: string;
   status?: "confirmed" | "declined";
   created?: boolean;
   partySize?: number;
@@ -30,6 +32,7 @@ export function buildLocalRsvpSuccessBody(options?: {
     notificationSkipped: Boolean(options?.notificationSkipped),
     ...(options?.guestId ? { guestId: options.guestId } : {}),
     ...(options?.qrToken ? { qrToken: options.qrToken } : {}),
+    ...(options?.checkinUrl ? { checkinUrl: options.checkinUrl } : {}),
     ...(options?.status ? { status: options.status } : {}),
     ...(options?.created !== undefined ? { created: options.created } : {}),
     ...(options?.partySize !== undefined ? { partySize: options.partySize } : {}),

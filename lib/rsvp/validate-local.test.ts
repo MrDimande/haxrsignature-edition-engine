@@ -251,6 +251,7 @@ describe("validateLocalRsvpPayload", () => {
     }
   });
 
+
   it("neidyejosewedding: rejeita mais de 2 pessoas com partySize legado", () => {
     const result = validateLocalRsvpPayload({
       slug: "neidyejosewedding",

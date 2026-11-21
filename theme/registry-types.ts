@@ -12,4 +12,5 @@ export type RegistryThemeKey =
   | "nian-night-of-the-web"
   | "queen-kailane-luz-da-graca"
   | "neidy-jose-vinculo"
-  | "alexandrina-kenneth-gold";
+  | "alexandrina-kenneth-gold"
+  | "baby-aylla-couture";

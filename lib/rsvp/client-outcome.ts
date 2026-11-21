@@ -7,6 +7,7 @@ export type RsvpApiPayload = {
   guestEmailSent?: boolean;
   guestId?: string;
   qrToken?: string;
+  checkinUrl?: string;
   status?: "confirmed" | "declined";
   created?: boolean;
   partySize?: number;
