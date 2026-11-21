@@ -31,7 +31,8 @@ export type RenderProfile =
   | "nian-night-of-the-web"
   | "queen-kailane-luz-da-graca"
   | "neidy-jose-o-vinculo-perfeito"
-  | "alexandrina-kenneth-wedding";
+  | "alexandrina-kenneth-wedding"
+  | "baby-aylla-couture";
 
 export type AudioExperienceType = "ambient" | "piano" | "ritual" | "silent";
 

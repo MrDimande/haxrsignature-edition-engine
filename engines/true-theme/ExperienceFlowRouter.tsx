@@ -52,5 +52,10 @@ export function ExperienceFlowRouter() {
     return null;
   }
 
+  /* Gate próprio BabyAyllaCoverGate — evita o StandardExperienceFlow */
+  if (theme.renderProfile === "baby-aylla-couture") {
+    return null;
+  }
+
   return <StandardExperienceFlow />;
 }

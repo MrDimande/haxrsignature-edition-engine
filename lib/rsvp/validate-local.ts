@@ -134,7 +134,7 @@ export function validateLocalRsvpPayload(body: unknown, options: { now?: Date } 
     return validationError("O número de pessoas deve ser entre 1 e 10.");
   }
 
-  if (resolvedSlug === "neidyejosewedding" && isAttending && parsedGuests > 2) {
+  if ((resolvedSlug === "neidyejosewedding" || resolvedSlug === "babyaylla") && isAttending && parsedGuests > 2) {
     return validationError("O convite permite no máximo 2 pessoas (o titular e 1 acompanhante).");
   }
 

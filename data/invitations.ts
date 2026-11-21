@@ -458,6 +458,40 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
       expectedRegistryKey: "alexandrina-kenneth-gold",
     },
   },
+  babyaylla: {
+    slug: "babyaylla",
+    aliases: [
+      "aylla",
+      "the-bow-collection",
+      "dior-collection-rosa",
+    ],
+    engine: "theme",
+    theme: "baby-aylla-couture",
+    experienceType: "ceremonial",
+    sourcePath: "/babyaylla",
+    legacyFolder: "babyaylla",
+    status: "draft",
+    metadata: {
+      title: "Baby Aylla | Dior Collection Rosa · Convite Digital de Alta-Costura",
+      date: "2027-01-23",
+      time: "Hora a confirmar",
+      location: "Vila do Mar Eventos, Maputo, Moçambique",
+      subtitle: "Um convite para viver um dia encantado.",
+      description:
+        "Baby Aylla — Dior Collection Rosa · Aniversário Infantil. Sábado, 23 de Janeiro de 2027. Uma celebração envolta em amor e delicadeza.",
+      eventDate: "2027-01-23",
+      eventType: "Aniversário Infantil",
+      dressCode: "Dior Collection Rosa · Tons Suaves e Tecidos Nobres",
+      ogImage: "/images/baby-aylla/og-image.jpg",
+    },
+    admin: {
+      clientName: "Baby Aylla",
+      eventTypeLabel: "Aniversário",
+      adminEventName: "Edition · Aniversário · Baby Aylla",
+      envVar: "EDITION_EVENT_AYLLA_ID",
+      expectedRegistryKey: "baby-aylla-couture",
+    },
+  },
 };
 
 /** @deprecated Use INVITATIONS */

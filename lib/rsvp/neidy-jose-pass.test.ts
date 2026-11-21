@@ -6,11 +6,31 @@ import { resolveRsvpClientOutcome } from "@lib/rsvp/client-outcome";
 
 import {
   resolveNeidyJoseCheckinUrl,
+  resolveEditionCheckinUrl,
   CANONICAL_CORE_PRODUCTION_BASE,
   NEIDY_JOSE_CANONICAL_EVENT_ID,
 } from "@lib/rsvp/checkin-url";
 
 describe("Neidy & José — Digital Pass & Token Security", () => {
+  it("resolveEditionCheckinUrl emite um passe para o evento exacto sem dados pessoais", () => {
+    const token = "b7a2d4f9e1c3856012345678abcdef01";
+    const eventId = "550e8400-e29b-41d4-a716-446655440000";
+    const res = resolveEditionCheckinUrl(token, eventId, { env: "production" });
+
+    assert.equal(res.ok, true);
+    if (res.ok) {
+      assert.equal(res.url, `${CANONICAL_CORE_PRODUCTION_BASE}/event/${eventId}/checkin/${token}`);
+      assert.ok(!res.url.includes("name="));
+      assert.ok(!res.url.includes("phone="));
+    }
+  });
+
+  it("resolveEditionCheckinUrl rejeita um identificador de evento inválido", () => {
+    const res = resolveEditionCheckinUrl("b7a2d4f9e1c3856012345678abcdef01", "evento-aylla", { env: "production" });
+    assert.equal(res.ok, false);
+    if (!res.ok) assert.equal(res.error, "invalid_event");
+  });
+
   it("buildNeidyJoseCheckinUrl encodes canonical event ID and token without PII in production", () => {
     const token = "b7a2d4f9e1c3856012345678abcdef01";
     const res = resolveNeidyJoseCheckinUrl(token, { env: "production" });
@@ -136,6 +156,7 @@ describe("Neidy & José — Digital Pass & Token Security", () => {
     const body = buildLocalRsvpSuccessBody({
       guestId: "550e8400-e29b-41d4-a716-446655440000",
       qrToken: token,
+      checkinUrl: `${CANONICAL_CORE_PRODUCTION_BASE}/event/550e8400-e29b-41d4-a716-446655440000/checkin/${token}`,
       status: "confirmed",
       created: true,
       partySize: 2,
@@ -145,6 +166,7 @@ describe("Neidy & José — Digital Pass & Token Security", () => {
     assert.equal(body.success, true);
     assert.equal(body.persisted, true);
     assert.equal(body.qrToken, token);
+    assert.match(body.checkinUrl ?? "", /\/event\/550e8400-e29b-41d4-a716-446655440000\/checkin\//);
     assert.equal(body.partySize, 2);
     assert.equal(body.plusOnes, 1);
     assert.equal(body.created, true);
