@@ -10,13 +10,19 @@ import {
   AYLLA_GIFT_CATEGORIES,
   AYLLA_GIFT_CANDIDATES,
   AYLLA_GIFT_CATALOG,
+  type BabyAyllaGiftCandidate,
   getBabyAyllaPublicGiftCatalog,
 } from "../../data/gifts/baby-aylla";
 import * as ayllaGiftData from "../../data/gifts/baby-aylla";
 import { evaluateBabyAyllaGiftEligibility } from "../aylla/gifts/eligibility";
 import { resolveBabyAyllaGiftPresentation } from "../aylla/gifts/presentation";
 
+const approvedCandidateState: BabyAyllaGiftCandidate["familyApproval"] = "approved";
+
 describe("Baby Aylla Gift Registry — Phase A safety contract", () => {
+  it("keeps the candidate approval contract ready for all family decisions", () => {
+    assert.equal(approvedCandidateState, "approved");
+  });
   it("keeps the registry disabled and structurally scoped to the canonical event", () => {
     assert.equal(AYLLA_GIFTS_CONFIG.slug, "babyaylla");
     assert.equal(AYLLA_GIFTS_CONFIG.registryKey, "baby-aylla-couture");

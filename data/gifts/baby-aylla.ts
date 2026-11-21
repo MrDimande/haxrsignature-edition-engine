@@ -31,7 +31,7 @@ export type BabyAyllaGiftCandidate = {
   readonly colorPreference: null;
   readonly specifications: null;
   readonly referenceImage: null;
-  readonly familyApproval: "pending";
+  readonly familyApproval: BabyAyllaFamilyApproval;
   readonly approvedByFamily: false;
   readonly enabled: false;
   readonly reviewFlags: readonly BabyAyllaCandidateReviewFlag[];
