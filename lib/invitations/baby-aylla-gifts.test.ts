@@ -47,7 +47,7 @@ describe("Baby Aylla Gift Registry — Phase A safety contract", () => {
     assert.equal(candidateCatalog?.length, 52);
   });
 
-  it("keeps all 52 candidates pending, unique and distributed across the official categories", () => {
+  it("keeps all 52 family-approved candidates inactive, unique and distributed across the official categories", () => {
     const expectedCounts = {
       "cantinho-dos-sonhos": 11,
       "guarda-roupa": 7,
@@ -68,7 +68,7 @@ describe("Baby Aylla Gift Registry — Phase A safety contract", () => {
       ),
       expectedCounts
     );
-    assert.equal(AYLLA_GIFT_CANDIDATES.every((gift) => gift.approvedByFamily === false), true);
+    assert.equal(AYLLA_GIFT_CANDIDATES.every((gift) => gift.approvedByFamily === true), true);
     assert.equal(AYLLA_GIFT_CANDIDATES.every((gift) => gift.enabled === false), true);
     assert.equal(AYLLA_GIFT_CANDIDATES.every((gift) => gift.familyApproval === "pending"), true);
     assert.equal(AYLLA_GIFT_CANDIDATES.every((gift) => gift.suggestedQuantity === null), true);
