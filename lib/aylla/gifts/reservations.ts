@@ -105,7 +105,10 @@ export function canTransitionAyllaGiftReservation(
 export type AyllaGiftReservationPlan =
   | { readonly ok: true; readonly kind: "idempotent"; readonly reservation: AyllaGiftReservationRecord }
   | { readonly ok: true; readonly kind: "new"; readonly remainingQuantity: number }
-  | { readonly ok: false; readonly reason: "insufficient_quantity" | "invalid_quantity" | "item_scope_mismatch" };
+  | {
+      readonly ok: false;
+      readonly reason: "insufficient_quantity" | "invalid_quantity" | "item_scope_mismatch" | "idempotency_conflict";
+    };
 
 /**
  * Pure counterpart of the future Neon transaction. It is used to prove the
@@ -134,7 +137,12 @@ export function planAyllaGiftReservation(input: {
       reservation.guestId === input.guestId &&
       reservation.idempotencyKey === input.idempotencyKey
   );
-  if (sameRequest) return { ok: true, kind: "idempotent", reservation: sameRequest };
+  if (sameRequest) {
+    if (sameRequest.giftId !== input.item.id || sameRequest.quantity !== input.requestedQuantity) {
+      return { ok: false, reason: "idempotency_conflict" };
+    }
+    return { ok: true, kind: "idempotent", reservation: sameRequest };
+  }
 
   const consumedQuantity = input.existingReservations
     .filter(

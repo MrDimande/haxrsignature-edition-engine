@@ -10,7 +10,7 @@ Preparação técnica local concluída. Convite, catálogo público e reservas p
 - Branch: `br-icy-butterfly-b4lw52nv` — `canary/baby-aylla-rsvp-qr-20261121`.
 - Estado observado: `ready`, não-default, expira `2026-11-28T18:00:00Z`.
 - Esquema: `public.events`, `public.guests`, `public.checkins`, `public.guest_audit_log`.
-- Papel observado: apenas `neondb_owner`; `edition_runtime` está ausente.
+- Papel observado: `edition_runtime` existe como fundação restritiva, sem login, herança, superpoderes ou privilégios directos nas tabelas/funções existentes.
 - Nenhuma escrita, migração, RSVP, reserva ou check-in foi executado.
 
 ## Protecções
@@ -27,7 +27,7 @@ Preparação técnica local concluída. Convite, catálogo público e reservas p
 
 ## Dependências bloqueadoras
 
-1. Provisionar e validar o papel mínimo `edition_runtime` no laboratório.
+1. Definir e validar a identidade de ligação do Edition que pode assumir ou invocar o papel mínimo `edition_runtime`; o papel actual não tem login nem permissões.
 2. Criar a migração forward-only no HAXR Core com RLS e grants para os papéis reais.
 3. Confirmar o emissor, cookie e expiração da sessão de identidade no servidor; RSVP não é autenticação.
 4. A família deve definir quantidades, tamanhos, cores, especificações, imagens e validações de segurança. Nada foi assumido.

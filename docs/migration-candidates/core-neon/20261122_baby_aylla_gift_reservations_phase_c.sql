@@ -2,7 +2,7 @@
 -- STATUS: CANDIDATE ONLY. Not an Edition migration and never production-ready.
 -- Intended canonical destination after review: HAXR Core / database/migrations/
 -- Verified lab: gentle-firefly-70094226 / br-icy-butterfly-b4lw52nv.
--- The lab has events and guests but no edition_runtime role.
+-- The lab has events and guests plus a restrictive NOLOGIN edition_runtime.
 -- This candidate ends in ROLLBACK so accidental execution is non-persistent.
 
 BEGIN;
@@ -81,9 +81,18 @@ BEGIN
   IF p_quantity IS NULL OR p_quantity < 1 THEN
     RAISE EXCEPTION 'invalid reservation quantity' USING ERRCODE = '22023';
   END IF;
+  -- Serialises every reuse of a key, even if a malicious retry changes item.
+  PERFORM pg_advisory_xact_lock(hashtextextended(
+    p_event_id::text || ':' || p_guest_id::text || ':' || p_idempotency_key::text, 0
+  ));
   SELECT * INTO v_existing FROM public.edition_gift_reservations_v2
    WHERE event_id = p_event_id AND guest_id = p_guest_id AND idempotency_key = p_idempotency_key;
-  IF FOUND THEN RETURN v_existing; END IF;
+  IF FOUND THEN
+    IF v_existing.item_id <> p_item_id OR v_existing.quantity <> p_quantity THEN
+      RAISE EXCEPTION 'idempotency key conflicts with the original request' USING ERRCODE = '22000';
+    END IF;
+    RETURN v_existing;
+  END IF;
   SELECT * INTO v_inventory FROM public.edition_gift_inventory
    WHERE event_id = p_event_id AND item_id = p_item_id FOR UPDATE;
   IF NOT FOUND OR NOT v_inventory.family_approved OR NOT v_inventory.enabled
@@ -108,6 +117,8 @@ BEGIN
   RETURN v_reservation;
 END;
 $$;
+
+REVOKE ALL ON FUNCTION public.reserve_baby_aylla_gift(uuid, text, uuid, integer, uuid) FROM PUBLIC;
 
 -- Before converting to a Core forward migration: enable RLS; grant execution
 -- only to the verified server runtime; configure existing Core admin authority;

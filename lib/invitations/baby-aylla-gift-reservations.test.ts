@@ -109,6 +109,32 @@ describe("Baby Aylla Gift Registry — Phase C reservation safeguards", () => {
     );
   });
 
+  it("rejects reuse of an idempotency key for a different reservation intent", () => {
+    const existing: AyllaGiftReservationRecord = {
+      id: "reservation-existing",
+      eventId: AYLLA_GIFTS_CONFIG.eventId,
+      giftId: readyItem.id,
+      guestId: eligibleGuest.id,
+      quantity: 1,
+      status: "reserved",
+      idempotencyKey: "same-request",
+      createdAt: "2026-11-22T00:00:00.000Z",
+      updatedAt: "2026-11-22T00:00:00.000Z",
+    };
+
+    assert.deepEqual(
+      planAyllaGiftReservation({
+        item: { ...readyItem, id: "dream-blankets" },
+        existingReservations: [existing],
+        guestId: eligibleGuest.id,
+        eventId: AYLLA_GIFTS_CONFIG.eventId,
+        requestedQuantity: 1,
+        idempotencyKey: "same-request",
+      }),
+      { ok: false, reason: "idempotency_conflict" }
+    );
+  });
+
   it("refuses a second reservation that would consume the final available unit", () => {
     const existing: AyllaGiftReservationRecord = {
       id: "reservation-existing",
