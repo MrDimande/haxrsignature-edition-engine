@@ -10,6 +10,7 @@
 ## 1. Modificações Necessárias no HAXR Core
 
 ### A. Registo do Evento Baby Aylla em `src/lib/edition/registry.ts`
+
 Acrescentar o binding do evento e aliases:
 
 ```typescript
@@ -28,14 +29,17 @@ babyaylla: {
 ```
 
 ### B. Migração PostgreSQL
+
 Copiar `docs/migration-candidates/core-neon/20261122_baby_aylla_gift_registry_phase_c3_forward.sql` para:
 `database/migrations/20261122120000_baby_aylla_gift_registry_phase_c3.sql`
 
 ### C. Módulos de Serviço e Rotas
+
 Copiar `lib/aylla/gifts/core-adapter/` para:
 `src/lib/edition/gifts/aylla/`
 
 Montar os endpoints da API App Router:
+
 - `src/app/api/v1/edition/gifts/aylla/challenge/route.ts`
 - `src/app/api/v1/edition/gifts/aylla/verify/route.ts`
 - `src/app/api/v1/edition/gifts/aylla/reserve/route.ts`
