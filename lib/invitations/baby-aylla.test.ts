@@ -15,6 +15,7 @@ import { resolveActiveRsvpSlug } from "../rsvp/events";
 import { getRegistryTheme } from "../../theme/registry";
 import { BABY_AYLLA_EVENT } from "../aylla/event-details";
 import { resolveEditionCheckinUrl } from "../rsvp/checkin-url";
+import { generateMetadata } from "../../app/[slug]/page";
 
 describe("Baby Aylla — Architectural & Security Contract", () => {
   it("registers canonical slug 'babyaylla' in theme engine with draft status", () => {
@@ -58,6 +59,24 @@ describe("Baby Aylla — Architectural & Security Contract", () => {
       false,
       "babyaylla must not appear in getActiveInvitations()"
     );
+  });
+
+  it("keeps the draft title private by default but renders its real metadata in explicit Preview", async () => {
+    const params = Promise.resolve({ slug: "babyaylla" });
+    const previousNodeEnv = process.env.NODE_ENV;
+    (process.env as Record<string, string | undefined>).NODE_ENV = "production";
+    try {
+      const privateMetadata = await generateMetadata({ params });
+      const previewMetadata = await generateMetadata({
+        params,
+        searchParams: Promise.resolve({ preview: "1" }),
+      });
+
+      assert.equal(privateMetadata.title, "Convite não encontrado");
+      assert.equal(previewMetadata.title, "Baby Aylla | Dior Collection Rosa · Convite Digital de Alta-Costura");
+    } finally {
+      (process.env as Record<string, string | undefined>).NODE_ENV = previousNodeEnv;
+    }
   });
 
   it("prevents RSVP persistence leakage for unreleased draft edition", () => {

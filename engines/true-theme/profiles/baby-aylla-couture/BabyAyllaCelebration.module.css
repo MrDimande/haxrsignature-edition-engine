@@ -81,6 +81,19 @@
 .paletteNote { max-width: 45ch; margin: 37px auto 0; text-align: center; color: #77584b; font-size: 15px; font-style: italic; line-height: 1.85; }
 
 .rsvpSection { background: #fbf8f5; }
+.giftsSection { background: linear-gradient(180deg, #fbf8f5, #f7eadf 50%, #fbf8f5); }
+.giftAtelier { width: min(100%, 760px); margin: 0 auto; padding: clamp(28px, 6vw, 54px); border: 1px solid #d8c3a5; background: linear-gradient(135deg, #fffdf8, #f9ebdd); box-shadow: 0 22px 34px -28px rgba(88,52,39,.32), inset 0 0 0 5px #fffaf1; text-align: center; }
+.giftOverline { margin: 0 0 23px; color: #9b735f; font-size: 10px; letter-spacing: .16em; }
+.giftTabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.giftTab, .giftTabActive { min-height: 38px; padding: 8px 12px; border: 1px solid #d7bea4; background: transparent; color: #76584d; font: inherit; font-size: 11px; line-height: 1.35; cursor: pointer; }
+.giftTabActive { border-color: #a16d60; background: #f0d9cb; color: #6b433c; }
+.giftTab:focus-visible, .giftTabActive:focus-visible { outline: 2px solid #71504b; outline-offset: 3px; }
+.giftCategoryCard { position: relative; margin-top: 26px; padding: 33px 20px 25px; border-block: 1px solid #d7bda066; }
+.giftPearl { display: grid; place-items: center; width: 38px; height: 38px; margin: 0 auto 13px; border: 1px solid #c5a17f; border-radius: 50%; color: #a8786b; font-family: var(--font-aylla-calligraphy, cursive); font-size: 27px; }
+.giftCategoryTitle { margin: 0; color: #744b43; font-size: clamp(24px, 4vw, 34px); line-height: 1.25; }
+.giftCategoryLead { max-width: 42ch; margin: 13px auto 0; color: #76584d; font-size: 15px; line-height: 1.7; }
+.giftPending { max-width: 48ch; margin: 19px auto 0; color: #8b6e60; font-size: 12px; font-style: italic; line-height: 1.75; }
+.giftEligibility { margin: 24px auto 0; color: #76584d; font-size: 12px; line-height: 1.7; }
 .replyCard { position: relative; width: min(100%, 680px); margin: auto; padding: 38px 22px 42px; border: 1px solid #dbcbb3; background: linear-gradient(135deg, #fffdf7, #fcf4e7); box-shadow: 0 18px 32px -27px rgba(88,52,39,.32); text-align: center; }
 .embossedA { display: block; width: 62px; height: 62px; margin: 0 auto 24px; border: 1px solid #c6ae8c66; border-radius: 50%; color: #cab69c; font-size: 47px; line-height: 62px; text-indent: -4px; text-shadow: 1px 1px 0 #fffef8, -1px -1px 0 #b29a7c55; }
 .replyCard .sectionTitle { font-size: clamp(27px, 4vw, 36px); }

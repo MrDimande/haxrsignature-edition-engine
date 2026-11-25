@@ -35,13 +35,16 @@ export function generateStaticParams() {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: InvitationPageProps): Promise<Metadata> {
   const { slug } = await params;
   const canonicalSlug = resolveSlug(slug);
   const invitation = canonicalSlug ? getInvitation(canonicalSlug) : null;
   const isDev = process.env.NODE_ENV !== "production";
+  const sp = searchParams ? await searchParams : undefined;
+  const allowDraft = isDev || sp?.preview === "1";
 
-  if (!invitation || (invitation.status !== "active" && !isDev)) {
+  if (!invitation || (invitation.status !== "active" && !allowDraft)) {
     return {
       title: "Convite não encontrado",
       robots: { index: false, follow: false },

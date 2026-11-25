@@ -24,6 +24,9 @@ const INVITATION_FEATURES: Record<string, Omit<InvitationContext, "slug">> = {
   alexandrinaekennethwedding: {
     giftsRegistryKey: "alexandrina-kenneth",
   },
+  babyaylla: {
+    giftsRegistryKey: "baby-aylla-couture",
+  },
 };
 
 export function resolveInvitationContext(rawSlug: string): InvitationContext | null {

@@ -7,6 +7,7 @@ import { resolveInvitationContext } from "@lib/context-resolver";
 import { validateGiftReservationPayload } from "@core/contracts/gifts.contract";
 import { publicMutationRateLimit } from "@lib/security/mutation-rate-limit";
 import { RATE_LIMITS, rateLimitResponse } from "@lib/security/rate-limit";
+import { AYLLA_GIFTS_CONFIG } from "@lib/aylla/gifts/config";
 
 export async function POST(request: Request) {
   try {
@@ -22,6 +23,18 @@ export async function POST(request: Request) {
     }
 
     const registryKey = context.giftsRegistryKey;
+    // Phase A has no authenticated reservation service. Reject before reading
+    // browser-supplied identity fields or executing any mutation path.
+    if (registryKey === AYLLA_GIFTS_CONFIG.registryKey) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: "GIFT_REGISTRY_CLOSED",
+          error: "A lista de presentes da Aylla ainda não está disponível.",
+        },
+        { status: 403, headers: { "Cache-Control": "no-store" } }
+      );
+    }
     const requiresPhone = registryKey === "jessica-samuel";
 
     const validation = validateGiftReservationPayload(body, { requiresPhone });

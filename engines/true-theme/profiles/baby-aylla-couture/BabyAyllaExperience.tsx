@@ -13,6 +13,7 @@ import { BabyAyllaStory } from "./BabyAyllaStory";
 import { BabyAyllaSaveTheDate } from "./BabyAyllaSaveTheDate";
 import { BabyAyllaDetails } from "./BabyAyllaDetails";
 import { BabyAyllaDressCode } from "./BabyAyllaDressCode";
+import { BabyAyllaGifts } from "./BabyAyllaGifts";
 import { BabyAyllaRsvp } from "./BabyAyllaRsvp";
 import { BabyAyllaFooter } from "./BabyAyllaFooter";
 
@@ -131,6 +132,9 @@ export function BabyAyllaExperience() {
 
         {/* Section 06: Dress Code */}
         <BabyAyllaDressCode />
+
+        {/* Section 07: Gift Registry — inspiration only until family activation */}
+        <BabyAyllaGifts />
 
         {/* Section 08: RSVP */}
         <BabyAyllaRsvp />
