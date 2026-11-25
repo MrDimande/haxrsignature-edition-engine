@@ -71,7 +71,7 @@ describe("Baby Aylla — Architectural & Security Contract", () => {
         publicMetadata.title,
         "Baby Aylla | Dior Collection Rosa · Convite Digital de Alta-Costura"
       );
-      assert.equal(publicMetadata.robots, undefined);
+      assert.deepEqual(publicMetadata.robots, { index: false, follow: false });
     } finally {
       (process.env as Record<string, string | undefined>).NODE_ENV = previousNodeEnv;
     }
