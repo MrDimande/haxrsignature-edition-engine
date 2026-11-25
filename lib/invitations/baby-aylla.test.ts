@@ -18,13 +18,13 @@ import { resolveEditionCheckinUrl } from "../rsvp/checkin-url";
 import { generateMetadata } from "../../app/[slug]/page";
 
 describe("Baby Aylla — Architectural & Security Contract", () => {
-  it("registers canonical slug 'babyaylla' in theme engine with draft status", () => {
+  it("registers canonical slug 'babyaylla' in theme engine with active status", () => {
     const invitation = getInvitation("babyaylla");
     assert.ok(invitation, "Invitation config for 'babyaylla' must exist");
     assert.equal(invitation.slug, "babyaylla");
     assert.equal(invitation.engine, "theme");
     assert.equal(invitation.theme, "baby-aylla-couture");
-    assert.equal(invitation.status, "draft");
+    assert.equal(invitation.status, "active");
     assert.equal(invitation.metadata.date, "2027-01-23");
     assert.equal(invitation.metadata.time, "11h00");
     assert.equal(invitation.metadata.location, "Vila do Mar Eventos, Maputo, Moçambique");
@@ -37,59 +37,49 @@ describe("Baby Aylla — Architectural & Security Contract", () => {
     assert.equal(resolveCanonicalInvitationSlug("BABYAYLLA"), "babyaylla");
   });
 
-  it("enforces fail-closed isolation: draft is excluded from active public allowlist", () => {
+  it("publishes canonical slug in active allowlist while keeping SEO indexing disabled and Gift Registry closed", () => {
     assert.equal(
       isActiveInvitationSlug("babyaylla"),
-      false,
-      "Draft invitation must not be marked active"
+      true,
+      "Active Release 1 invitation must be marked active"
     );
     assert.equal(
       resolveActiveInvitationSlug("babyaylla"),
-      null,
-      "resolveActiveInvitationSlug must return null for draft"
+      "babyaylla",
+      "resolveActiveInvitationSlug must return 'babyaylla' once active"
     );
     assert.equal(
       activeInvitationSlugs.includes("babyaylla"),
-      false,
-      "babyaylla must not appear in activeInvitationSlugs"
+      true,
+      "babyaylla must appear in activeInvitationSlugs"
     );
     const activeList = getActiveInvitations();
     assert.equal(
       activeList.some((inv) => inv.slug === "babyaylla"),
-      false,
-      "babyaylla must not appear in getActiveInvitations()"
+      true,
+      "babyaylla must appear in getActiveInvitations()"
     );
   });
 
-  it("keeps the draft title private by default but renders its real metadata in explicit Preview", async () => {
+  it("renders official invitation metadata when active without overriding root noindex privacy", async () => {
     const params = Promise.resolve({ slug: "babyaylla" });
     const previousNodeEnv = process.env.NODE_ENV;
     (process.env as Record<string, string | undefined>).NODE_ENV = "production";
     try {
-      const privateMetadata = await generateMetadata({ params });
-      const previewMetadata = await generateMetadata({
-        params,
-        searchParams: Promise.resolve({ preview: "1" }),
-      });
-
-      assert.equal(privateMetadata.title, "Convite não encontrado");
-      assert.equal(previewMetadata.title, "Baby Aylla | Dior Collection Rosa · Convite Digital de Alta-Costura");
+      const publicMetadata = await generateMetadata({ params });
+      assert.equal(
+        publicMetadata.title,
+        "Baby Aylla | Dior Collection Rosa · Convite Digital de Alta-Costura"
+      );
+      assert.equal(publicMetadata.robots, undefined);
     } finally {
       (process.env as Record<string, string | undefined>).NODE_ENV = previousNodeEnv;
     }
   });
 
-  it("prevents RSVP persistence leakage for unreleased draft edition", () => {
-    assert.equal(
-      resolveActiveRsvpSlug("babyaylla"),
-      null,
-      "resolveActiveRsvpSlug must return null for draft — fail-closed protection"
-    );
-    assert.equal(
-      resolveActiveRsvpSlug("aylla"),
-      null,
-      "resolveActiveRsvpSlug must return null for alias when draft"
-    );
+  it("allows canonical and alias RSVP resolution once active", () => {
+    assert.equal(resolveActiveRsvpSlug("babyaylla"), "babyaylla");
+    assert.equal(resolveActiveRsvpSlug("aylla"), "babyaylla");
   });
 
   it("registers 'baby-aylla-couture' theme with correct visual and audio tokens", () => {
