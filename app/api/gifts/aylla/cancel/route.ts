@@ -1,5 +1,11 @@
-import { NextResponse } from "next/server";
 import { callCoreGiftApi } from "@lib/aylla/gifts/core-adapter/client";
+import { humanizeAyllaError } from "@lib/aylla/gifts/error-copy";
+import { isAyllaEditionRegistryOperational } from "@lib/aylla/gifts/test-activation";
+import {
+  getOrCreateAyllaRequestId,
+  jsonWithAyllaRequestId,
+  logEditionAyllaTrace,
+} from "@lib/aylla/gifts/trace";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,12 +17,39 @@ function getSessionTokenFromRequest(request: Request): string | null {
 }
 
 export async function POST(request: Request) {
+  const startedAt = Date.now();
+  const requestId = getOrCreateAyllaRequestId(request);
+  logEditionAyllaTrace(requestId, "edition_route_enter", { route: "cancel" });
+
+  if (!isAyllaEditionRegistryOperational()) {
+    logEditionAyllaTrace(requestId, "edition_route_exit", {
+      route: "cancel",
+      status: 403,
+      outcome: "registry_closed",
+      durationMs: Date.now() - startedAt,
+    });
+    return jsonWithAyllaRequestId(
+      { success: false, outcome: "registry_closed", error: "A lista de presentes da Aylla ainda não está aberta." },
+      { status: 403 },
+      requestId
+    );
+  }
+
   const sessionToken = getSessionTokenFromRequest(request);
+  logEditionAyllaTrace(requestId, "edition_cookie_checked", {
+    route: "cancel",
+    hasCookie: Boolean(sessionToken),
+  });
 
   if (!sessionToken) {
-    return NextResponse.json(
-      { success: false, outcome: "verification_required", error: "Sessão de convidado necessária." },
-      { status: 401 }
+    return jsonWithAyllaRequestId(
+      {
+        success: false,
+        outcome: "verification_required",
+        error: humanizeAyllaError("session_expired"),
+      },
+      { status: 401 },
+      requestId
     );
   }
 
@@ -24,11 +57,11 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ success: false, error: "Payload inválido." }, { status: 400 });
+    return jsonWithAyllaRequestId({ success: false, error: "Payload inválido." }, { status: 400 }, requestId);
   }
 
   if (!body.reservationId) {
-    return NextResponse.json({ success: false, error: "reservationId obrigatório." }, { status: 400 });
+    return jsonWithAyllaRequestId({ success: false, error: "reservationId obrigatório." }, { status: 400 }, requestId);
   }
 
   const result = await callCoreGiftApi<{
@@ -38,14 +71,38 @@ export async function POST(request: Request) {
   }>({
     method: "POST",
     path: "/api/v1/edition/gifts/aylla/cancel",
+    requestId,
+    signal: request.signal,
     body: {
       sessionToken,
       reservationId: body.reservationId,
     },
   });
 
-  return NextResponse.json(
-    result.ok ? result.data : { success: false, outcome: result.code, error: result.error },
-    { status: result.status }
+  logEditionAyllaTrace(requestId, "edition_route_exit", {
+    route: "cancel",
+    status: result.status,
+    outcome: result.ok ? result.data.outcome : result.code,
+    durationMs: Date.now() - startedAt,
+  });
+
+  if (result.ok) {
+    return jsonWithAyllaRequestId(result.data, { status: result.status }, requestId);
+  }
+
+  const response = jsonWithAyllaRequestId(
+    {
+      success: false,
+      outcome: result.code,
+      error: humanizeAyllaError(result.code, result.error),
+    },
+    { status: result.status },
+    requestId
   );
+
+  if (result.status === 401 || result.code === "session_expired") {
+    response.cookies.delete("haxr_aylla_guest_session");
+  }
+
+  return response;
 }
