@@ -345,4 +345,48 @@ describe("Baby Aylla — Edition Gate D Couture UI & Proxy Integration", () => {
     assert.deepEqual(body.stagingTestItems, []);
     assert.equal(body.editorialItems.length, 52);
   });
+
+  it("exposes email-only OTP metadata cleanly, guides RSVP guests, and preserves QR pass & multichannel UI compatibility", async () => {
+    process.env.HAXR_AYLLA_GIFT_STAGING_TEST_ACTIVATION = "true";
+    process.env.HAXR_AYLLA_GIFT_SYNTHETIC_DELIVERY = "true";
+
+    globalThis.fetch = async (url) => {
+      const path = new URL(String(url)).pathname;
+      if (path === "/api/v1/edition/gifts/aylla/catalog") {
+        return new Response(
+          JSON.stringify({
+            success: true,
+            registryEnabled: true,
+            otpChannels: { email: true, phone: false },
+            items: [],
+            myReservations: [],
+          }),
+          { status: 200, headers: { "content-type": "application/json" } }
+        );
+      }
+      return new Response("{}", { status: 404 });
+    };
+
+    const res = await ayllaCatalogHandler(new Request("http://localhost:3000/api/gifts/aylla/catalog"));
+    assert.equal(res.status, 200);
+    const body = (await res.json()) as { otpChannels?: { email: boolean; phone: boolean } };
+    assert.deepEqual(body.otpChannels, { email: true, phone: false });
+
+    const giftsSource = readFileSync(
+      resolve(process.cwd(), "engines/true-theme/profiles/baby-aylla-couture/BabyAyllaGifts.tsx"),
+      "utf8"
+    );
+    assert.match(giftsSource, /isEmailOnlyOtp/);
+    assert.match(giftsSource, /E-mail confirmado no RSVP/);
+    assert.match(giftsSource, /isEmailOnlyOtp \? "email" : "text"/);
+
+    const rsvpSource = readFileSync(
+      resolve(process.cwd(), "engines/true-theme/profiles/baby-aylla-couture/BabyAyllaRsvp.tsx"),
+      "utf8"
+    );
+    assert.match(rsvpSource, /!phone\.trim\(\)/);
+    assert.match(rsvpSource, /!email\.trim\(\)/);
+    assert.match(rsvpSource, /BabyAyllaDigitalPass/);
+    assert.match(rsvpSource, /Lista de Presentes/);
+  });
 });

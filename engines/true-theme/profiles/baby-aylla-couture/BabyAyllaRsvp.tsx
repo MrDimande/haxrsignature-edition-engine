@@ -82,6 +82,9 @@ export function BabyAyllaRsvp() {
                 <input className={styles.rsvpInput} type="email" required={rsvpState.canSubmit && !phone.trim()} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email" autoComplete="email" aria-label="Email" />
                 <input className={styles.rsvpInput} type="tel" required={rsvpState.canSubmit && !email.trim()} value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Telefone" autoComplete="tel" aria-label="Telefone" />
               </div>
+              <p className={styles.quietNote}>
+                Indique o seu e-mail se pretender escolher um mimo na Lista de Presentes (o código de confirmação é enviado por e-mail).
+              </p>
               <div className={styles.rsvpGrid}>
                 <select className={styles.rsvpSelect} value={attending} onChange={(event) => setAttending(event.target.value as "yes" | "no")} aria-label="Presença">
                   <option value="yes">Confirmar presença</option>

@@ -84,6 +84,7 @@ export async function GET(request: Request) {
         success: true,
         registryEnabled: false,
         testActivation: false,
+        otpChannels: { email: true, phone: false },
         categories: BABY_AYLLA_EDITORIAL_CATEGORIES,
         editorialItems,
         inventoryItems: [],
@@ -107,6 +108,7 @@ export async function GET(request: Request) {
     callCoreGiftApi<{
       success: boolean;
       registryEnabled: boolean;
+      otpChannels?: { email: boolean; phone: boolean };
       items: CoreAvailabilityItem[];
       myReservations: CoreReservationSummary[];
     }>({
@@ -144,6 +146,7 @@ export async function GET(request: Request) {
         success: false,
         registryEnabled: true,
         testActivation,
+        otpChannels: { email: true, phone: false },
         categories: BABY_AYLLA_EDITORIAL_CATEGORIES,
         editorialItems,
         inventoryItems: [],
@@ -202,6 +205,7 @@ export async function GET(request: Request) {
       success: true,
       registryEnabled: Boolean(catalogResult.data.registryEnabled),
       testActivation,
+      otpChannels: catalogResult.data.otpChannels ?? { email: true, phone: false },
       categories: BABY_AYLLA_EDITORIAL_CATEGORIES,
       editorialItems,
       inventoryItems: coreItems.filter((item) => editorialIds.has(item.itemId)),

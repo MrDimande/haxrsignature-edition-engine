@@ -67,6 +67,10 @@ type CatalogPayload = {
   success: boolean;
   registryEnabled: boolean;
   testActivation: boolean;
+  otpChannels?: {
+    email: boolean;
+    phone: boolean;
+  };
   inventoryItems: AvailabilityItem[];
   stagingTestItems: StagingTestItem[];
   myReservations: MyReservation[];
@@ -118,6 +122,10 @@ export function BabyAyllaGifts() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const [registryEnabled, setRegistryEnabled] = useState(false);
+  const [otpChannels, setOtpChannels] = useState<{ email: boolean; phone: boolean }>({
+    email: true,
+    phone: false,
+  });
   const [inventoryItems, setInventoryItems] = useState<AvailabilityItem[]>([]);
   const [stagingTestItems, setStagingTestItems] = useState<StagingTestItem[]>([]);
   const [myReservations, setMyReservations] = useState<MyReservation[]>([]);
@@ -157,6 +165,12 @@ export function BabyAyllaGifts() {
       const data = (await response.json()) as CatalogPayload;
 
       setRegistryEnabled(Boolean(data.registryEnabled));
+      if (data.otpChannels) {
+        setOtpChannels({
+          email: Boolean(data.otpChannels.email),
+          phone: Boolean(data.otpChannels.phone),
+        });
+      }
       setInventoryItems(Array.isArray(data.inventoryItems) ? data.inventoryItems : []);
       setStagingTestItems(Array.isArray(data.stagingTestItems) ? data.stagingTestItems : []);
       setMyReservations(Array.isArray(data.myReservations) ? data.myReservations : []);
@@ -282,11 +296,18 @@ export function BabyAyllaGifts() {
     });
   }
 
+  const isEmailOnlyOtp = !otpChannels.phone;
+
   async function handleRequestOtp(event: React.FormEvent) {
     event.preventDefault();
     setModalError(null);
     const trimmed = contactInput.trim();
-    if (trimmed.length < 4) {
+    if (isEmailOnlyOtp) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+        setModalError("Por favor, indique o endereço de e-mail usado na sua confirmação de presença (RSVP).");
+        return;
+      }
+    } else if (trimmed.length < 4) {
       setModalError("Por favor, indique o telemóvel ou e-mail usado na sua confirmação de presença.");
       return;
     }
@@ -324,7 +345,11 @@ export function BabyAyllaGifts() {
     setModalError(null);
     const normalized = otpInput.trim();
     if (!normalized) {
-      setModalError("Introduza o código numérico enviado para o seu contacto.");
+      setModalError(
+        isEmailOnlyOtp
+          ? "Introduza o código numérico de 6 dígitos enviado para o seu e-mail."
+          : "Introduza o código numérico enviado para o seu contacto."
+      );
       return;
     }
 
@@ -610,7 +635,9 @@ export function BabyAyllaGifts() {
                     Acesso exclusivo para convidados confirmados
                   </span>
                   <p className={ui.guestSubcopy}>
-                    Confirme o contacto do seu RSVP para reservar presentes e acompanhar as suas escolhas.
+                    {isEmailOnlyOtp
+                      ? "Confirme o e-mail do seu RSVP para reservar presentes e acompanhar as suas escolhas."
+                      : "Confirme o contacto do seu RSVP para reservar presentes e acompanhar as suas escolhas."}
                   </p>
                 </>
               )
@@ -909,7 +936,9 @@ export function BabyAyllaGifts() {
                   Confirmar Convite
                 </h3>
                 <p className={ui.modalBodyCopy}>
-                  Para proteger a lista da Aylla, confirme o telemóvel ou endereço de e-mail usado na sua confirmação de presença (RSVP).
+                  {isEmailOnlyOtp
+                    ? "Para proteger a lista da Aylla, confirme o endereço de e-mail usado na sua confirmação de presença (RSVP)."
+                    : "Para proteger a lista da Aylla, confirme o telemóvel ou endereço de e-mail usado na sua confirmação de presença (RSVP)."}
                 </p>
 
                 {(modalState.reason || modalError) && (
@@ -921,21 +950,23 @@ export function BabyAyllaGifts() {
 
                 <div className={ui.fieldGroup}>
                   <label htmlFor="aylla-guest-contact" className={ui.fieldLabel}>
-                    Contacto confirmado no RSVP
+                    {isEmailOnlyOtp ? "E-mail confirmado no RSVP" : "Contacto confirmado no RSVP"}
                   </label>
                   <input
                     id="aylla-guest-contact"
-                    type="text"
+                    type={isEmailOnlyOtp ? "email" : "text"}
                     className={ui.fieldInput}
-                    autoComplete="tel"
-                    placeholder="+258 84 000 0001 ou e-mail"
+                    autoComplete={isEmailOnlyOtp ? "email" : "tel"}
+                    placeholder={isEmailOnlyOtp ? "nome@exemplo.com" : "+258 84 000 0001 ou e-mail"}
                     value={contactInput}
                     onChange={(event) => setContactInput(event.target.value)}
                     disabled={modalBusy}
                     required
                   />
                   <p className={ui.fieldHelp}>
-                    Enviaremos um código numérico de uso único. Não partilhamos o seu contacto.
+                    {isEmailOnlyOtp
+                      ? "Enviaremos um código numérico de uso único para o seu e-mail. Se confirmou a presença apenas por telefone, contacte a família."
+                      : "Enviaremos um código numérico de uso único. Não partilhamos o seu contacto."}
                   </p>
                 </div>
 
@@ -961,7 +992,9 @@ export function BabyAyllaGifts() {
                   Introduza o Código
                 </h3>
                 <p className={ui.modalBodyCopy}>
-                  Se o contacto indicado corresponder a um convite confirmado para a celebração da Aylla, enviámos um código numérico de 6 dígitos.
+                  {isEmailOnlyOtp
+                    ? "Se o e-mail indicado corresponder a um convite confirmado para a celebração da Aylla, enviámos um código numérico de 6 dígitos."
+                    : "Se o contacto indicado corresponder a um convite confirmado para a celebração da Aylla, enviámos um código numérico de 6 dígitos."}
                 </p>
 
                 {modalError && (
