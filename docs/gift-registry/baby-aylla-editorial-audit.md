@@ -2,9 +2,8 @@
 
 ## Estado editorial
 
-Foram organizados 52 artigos candidatos em sete categorias. Todos estão em
-`familyApproval: pending`, `approvedByFamily: false` e `enabled: false`.
-Nenhum item está no catálogo público ou pode ser reservado.
+Foram organizados 52 artigos candidatos em sete categorias. No código de galeria editorial (`data/gifts/baby-aylla.ts`), os 52 temas exibidos na pré-visualização estética estão em `familyApproval: pending`, `approvedByFamily: true` (inclusão visual na galeria de inspiração), `suggestedQuantity: null`, `approvedQuantity: null` e `enabled: false`. No inventário operacional em base de dados (`public.edition_gift_inventory`), todos os 52 itens permanecem com `family_approved = false`, `enabled = false`, `approved_quantity = NULL`, `specifications_complete = false` e `child_safety_validated = false` até aprovação familiar formal.
+Nenhum item está activado operacionalmente ou pode ser reservado em produção.
 
 ## Pontos que exigem decisão da família
 

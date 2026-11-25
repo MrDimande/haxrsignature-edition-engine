@@ -32,7 +32,7 @@ export type BabyAyllaGiftCandidate = {
   readonly specifications: null;
   readonly referenceImage: null;
   readonly familyApproval: BabyAyllaFamilyApproval;
-  readonly approvedByFamily: false;
+  readonly approvedByFamily: boolean;
   readonly enabled: false;
   readonly reviewFlags: readonly BabyAyllaCandidateReviewFlag[];
 };
@@ -50,7 +50,7 @@ export const AYLLA_GIFT_CATEGORIES: readonly BabyAyllaGiftCategory[] = [
 const pending = {
   suggestedQuantity: null, approvedQuantity: null, size: null, colorPreference: null,
   specifications: null, referenceImage: null, familyApproval: "pending",
-  approvedByFamily: false, enabled: false,
+  approvedByFamily: true, enabled: false,
 } as const;
 
 const candidate = (
