@@ -39,8 +39,9 @@ export async function generateMetadata({
   const { slug } = await params;
   const canonicalSlug = resolveSlug(slug);
   const invitation = canonicalSlug ? getInvitation(canonicalSlug) : null;
+  const isDev = process.env.NODE_ENV !== "production";
 
-  if (!invitation || invitation.status !== "active") {
+  if (!invitation || (invitation.status !== "active" && !isDev)) {
     return {
       title: "Convite não encontrado",
       robots: { index: false, follow: false },
@@ -57,6 +58,7 @@ export async function generateMetadata({
 
   return {
     ...base,
+    robots: invitation.status === "active" ? base.robots : { index: false, follow: false },
     openGraph: {
       ...base.openGraph,
       images: [
@@ -112,7 +114,11 @@ export default async function InvitationPage({
   }
 
   const invitation = getInvitation(canonicalSlug);
-  if (!invitation || invitation.status !== "active") {
+  const sp = searchParams ? await searchParams : undefined;
+  const isDev = process.env.NODE_ENV !== "production";
+  const allowDraft = isDev || sp?.preview === "1";
+
+  if (!invitation || (invitation.status !== "active" && !allowDraft)) {
     notFound();
   }
 

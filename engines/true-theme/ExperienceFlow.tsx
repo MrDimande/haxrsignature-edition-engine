@@ -264,6 +264,7 @@ export function AudioToggle() {
   const isStan = theme.renderProfile === "stan-real-madrid";
   const isNian = theme.renderProfile === "nian-night-of-the-web";
   const isAlexandrina = theme.renderProfile === "alexandrina-kenneth-wedding";
+  const isBabyAylla = theme.renderProfile === "baby-aylla-couture";
   const useBrandToggle = isRose || isWedding;
   const hasAudioSrc =
     typeof theme.audio.src === "string" && theme.audio.src.trim().length > 0;
@@ -273,6 +274,7 @@ export function AudioToggle() {
     isStan ||
     isNian ||
     isAlexandrina ||
+    isBabyAylla ||
     !introComplete ||
     theme.audio.type === "silent" ||
     !hasAudioSrc

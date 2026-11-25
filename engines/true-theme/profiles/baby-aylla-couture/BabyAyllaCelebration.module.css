@@ -1,0 +1,206 @@
+.section {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  padding: 86px 28px 88px;
+  color: #4b332f;
+  background: #fbf8f5;
+  scroll-margin-top: 20px;
+}
+
+.section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 35px;
+  background: linear-gradient(#cbb797, transparent);
+}
+
+.sectionHeader { max-width: 620px; margin: 0 auto 42px; text-align: center; }
+.sectionTitle { margin: 0; font-size: clamp(30px, 4.7vw, 43px); font-weight: 400; line-height: 1.3; text-wrap: balance; }
+.scriptLead { margin: 0 0 14px; color: #95685b; font-size: clamp(29px, 5vw, 38px); font-weight: 400; line-height: 1.35; }
+.sectionLead { margin: 20px auto 0; max-width: 35ch; font-size: 17px; line-height: 1.75; color: #76584d; text-wrap: balance; }
+.smallItalic { margin: 0 0 12px; color: #876854; font-size: 14px; font-style: italic; line-height: 1.7; }
+.smallLabel { margin: 0 0 8px; font-size: 12px; line-height: 1.6; color: #77594d; }
+.quietNote { margin: 10px 0 0; color: #765b50; font-size: 12px; line-height: 1.8; }
+
+.dateSection { padding-top: 48px; background: linear-gradient(#fbf8f5, #f8f0e6 55%, #fbf8f5); }
+.dateSection::before { height: 25px; }
+.calendarSheet {
+  position: relative;
+  width: min(100%, 560px);
+  margin: auto;
+  padding: 36px 22px 24px;
+  border: 1px solid #dbccb4;
+  background: linear-gradient(135deg, #fffdf7, #faf1e2);
+  box-shadow: 0 22px 34px -27px rgba(88,52,39,.32), inset 0 0 0 4px #fffaf0;
+}
+
+.calendarSheet::before { content: ""; position: absolute; top: 10px; bottom: 10px; left: 10px; width: 1px; background: #c9ae8a66; }
+.bookmark { position: absolute; top: -11px; right: 28px; width: 23px; height: 76px; background: linear-gradient(90deg, #b88676, #edc9b4 42%, #c3937d); border-inline: 1px solid #f9e2cd; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 83%, 0 100%); }
+.dateDisplay { display: flex; justify-content: center; align-items: center; gap: 15px; }
+.dateDay { font-size: clamp(98px, 16vw, 132px); line-height: 1.1; font-weight: 400; color: #87564f; }
+.dateMonth { display: block; font-size: clamp(22px, 5vw, 29px); text-transform: capitalize; }
+.dateYear { display: block; margin-top: 4px; color: #8c6b56; font-size: 20px; }
+.weekday { margin: 6px 0 24px; text-align: center; font-size: 15px; font-style: italic; color: #876854; }
+.calendar { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; font-size: 12px; color: #6a5146; }
+.calendar th { padding: 10px 0 14px; font-size: 11px; font-weight: 500; }
+.calendar td { height: 39px; padding: 0; }
+.calendar td span { position: relative; display: inline-grid; place-items: center; min-width: 29px; height: 32px; }
+.selectedDay { color: #76463c; font-weight: 600; }
+.selectedDay::before { content: ""; position: absolute; inset: 0 -2px; border: 1.6px solid #ad7867; border-radius: 48% 52% 43% 57%; transform: rotate(-13deg); }
+.selectedDay::after { content: ""; position: absolute; inset: 2px -1px -2px 1px; border: 1px solid #b78b7977; border-radius: 53% 47% 56% 44%; transform: rotate(9deg); }
+.countdown { margin: 24px 0 0; text-align: center; color: #87564f; font-size: 14px; line-height: 1.7; font-style: italic; }
+.calendarActions { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px 28px; margin-top: 21px; padding-top: 15px; border-top: 1px solid #d4bea066; }
+.textAction { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 8px 2px; border: 0; background: transparent; color: #67463a; font-family: inherit; font-size: 12px; text-decoration: underline; text-underline-offset: 5px; cursor: pointer; }
+.textAction:hover { color: #9c6657; }
+.textAction:focus-visible { outline: 2px solid #71504b; outline-offset: 4px; }
+
+.encounterSection { background: radial-gradient(ellipse at 15% 50%, #f1ddd033, transparent 65%), #fbf8f5; }
+.placeCard { position: relative; width: min(100%, 940px); margin: auto; padding: 48px 26px 34px; border-block: 1px solid #d1b998; background: linear-gradient(120deg, #fffaf0, #f8eee0 64%, #fffaf1); box-shadow: 0 18px 34px -28px rgba(88,52,39,.3); }
+.cardRibbon { position: absolute; top: 23px; left: -12px; width: 83px; height: 18px; transform: rotate(-24deg); border-block: 1px solid #f5dfc8; background: linear-gradient(#b88878, #e9c3ab 40%, #c99b82); box-shadow: 0 2px 3px rgba(88,52,39,.12); }
+.placeName { text-align: center; }
+.venueName { max-width: 12ch; margin: 0 auto; font-size: clamp(34px, 6vw, 48px); font-weight: 400; line-height: 1.2; text-wrap: balance; }
+.placeSignature { margin: 16px 0 0; color: #a17b65; font-size: 36px; }
+.placePractical { margin-top: 28px; padding-top: 24px; border-top: 1px solid #d4bea077; text-align: center; }
+.address { max-width: 27ch; margin: auto; font-size: 19px; font-style: normal; line-height: 1.6; }
+.timeNote { margin: 24px 0 13px; }
+.timeValue { margin: 0; color: #87564f; font-size: 23px; font-style: italic; }
+
+.atelierSection { background: linear-gradient(#fbf8f5, #f5e9de77 50%, #fbf8f5); }
+.fabricCollection { position: relative; display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 30px 12px; width: min(100%, 760px); margin: 54px auto 0; }
+.fabricCollection::before { content: ""; position: absolute; top: 0; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, #cfb597, transparent); }
+.fabricSample { position: relative; width: clamp(76px, 22vw, 100px); margin: 0; text-align: center; }
+.fabricSample::before { content: ""; position: absolute; z-index: 1; top: -3px; left: calc(50% - 3px); width: 6px; height: 6px; border: 1px solid #d4bfa1; border-radius: 50%; background: radial-gradient(circle at 30% 25%, white, #f5e8d6 65%, #c0a688); }
+.fabric { position: relative; isolation: isolate; width: min(100%, 82px); height: var(--fabric-length); margin: 0 auto; transform: rotate(var(--fabric-angle)); border: 1px solid rgba(139,109,83,.14); background: var(--fabric-color); clip-path: polygon(0 0, 100% 0, 100% 98%, 92% 100%, 84% 98%, 76% 100%, 68% 98%, 60% 100%, 52% 98%, 44% 100%, 36% 98%, 28% 100%, 20% 98%, 12% 100%, 0 98%); }
+.fabric::before { content: ""; position: absolute; inset: 0; background: url('/images/baby-aylla/silk-drape-bg.webp') center / cover; mix-blend-mode: luminosity; opacity: .58; }
+.fabric::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(101,72,54,.13), transparent 25%, rgba(255,255,255,.28) 42%, transparent 64%, rgba(101,72,54,.1)); }
+.fabricName { margin-top: 18px; color: #77584b; font-size: 14px; line-height: 1.5; }
+.paletteNote { max-width: 45ch; margin: 37px auto 0; text-align: center; color: #77584b; font-size: 15px; font-style: italic; line-height: 1.85; }
+
+.rsvpSection { background: #fbf8f5; }
+.replyCard { position: relative; width: min(100%, 680px); margin: auto; padding: 38px 22px 42px; border: 1px solid #dbcbb3; background: linear-gradient(135deg, #fffdf7, #fcf4e7); box-shadow: 0 18px 32px -27px rgba(88,52,39,.32); text-align: center; }
+.embossedA { display: block; width: 62px; height: 62px; margin: 0 auto 24px; border: 1px solid #c6ae8c66; border-radius: 50%; color: #cab69c; font-size: 47px; line-height: 62px; text-indent: -4px; text-shadow: 1px 1px 0 #fffef8, -1px -1px 0 #b29a7c55; }
+.replyCard .sectionTitle { font-size: clamp(27px, 4vw, 36px); }
+.availability { max-width: 37ch; margin: 30px auto 0; padding-top: 25px; border-top: 1px solid #d1b99866; }
+.availabilityTitle { margin: 0; font-size: 17px; line-height: 1.7; color: #76584d; }
+.rsvpForm { display: grid; gap: 18px; margin-top: 30px; text-align: left; }
+.rsvpInput, .rsvpSelect { width: 100%; min-height: 48px; padding: 12px 0; border: 0; border-bottom: 1px solid #d4bea0; border-radius: 0; color: #4b332f; background: transparent; font: inherit; }
+.rsvpInput:focus-visible, .rsvpSelect:focus-visible { outline: 2px solid #95685b; outline-offset: 4px; }
+.rsvpGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.rsvpSubmit, .passDownload { display: inline-flex; justify-content: center; align-items: center; gap: 9px; min-height: 48px; padding: 13px 22px; border: 1px solid #9c6b60; background: linear-gradient(135deg, #a66d63, #d69b92); color: #fffaf5; font: inherit; font-size: 12px; letter-spacing: .08em; cursor: pointer; }
+.rsvpSubmit:disabled, .passDownload:disabled { cursor: wait; opacity: .65; }
+.rsvpError { margin: 0; color: #9f3838; font-size: 13px; line-height: 1.6; }
+.rsvpSuccess { margin-top: 30px; text-align: center; }
+.passWrap { display: grid; justify-items: center; gap: 16px; margin-top: 26px; }
+.digitalPass { position: relative; overflow: hidden; width: min(100%, 390px); padding: 30px 25px 25px; border: 1px solid #d7bda9; background: linear-gradient(145deg, #fffdfa 0%, #f5dfd4 100%); box-shadow: 0 20px 36px -26px rgba(88,52,39,.42), inset 0 0 0 5px #fffaf1; }
+.digitalPass::before { content: ""; position: absolute; inset: 10px; border: 1px solid #caa78d66; pointer-events: none; }
+.passBow { position: relative; display: grid; place-items: center; width: 39px; height: 39px; margin: 0 auto 12px; border: 1px solid #c39a82; border-radius: 50%; color: #ad766b; font-family: var(--font-aylla-calligraphy, cursive); font-size: 29px; }
+.passLabel, .passGuestRole, .passSignature { position: relative; display: flex; justify-content: center; align-items: center; gap: 6px; margin: 0; color: #886252; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+.passName { position: relative; margin: 0; color: #7e4e48; font-size: 46px; line-height: 1; }
+.passRule { position: relative; width: 76px; height: 1px; margin: 10px auto 16px; background: linear-gradient(90deg, transparent, #be937d, transparent); }
+.passGuest { position: relative; margin: 0; color: #4b332f; font-family: Georgia, serif; font-size: 23px; line-height: 1.25; }
+.passGuestRole { margin-top: 5px; }
+.passDetails { position: relative; display: grid; gap: 4px; margin: 18px 0 13px; padding: 12px 0; border-block: 1px solid #cfae9766; color: #735147; font-size: 12px; line-height: 1.55; }
+.passCapacity { position: relative; margin: 0; color: #87584f; font-size: 12px; font-style: italic; }
+.passQr { position: relative; display: grid; place-items: center; width: 178px; height: 178px; margin: 20px auto 14px; padding: 9px; background: #fff; box-shadow: 0 6px 16px rgba(88,52,39,.14); }
+.passQr img { width: 100%; height: 100%; object-fit: contain; }
+.passQr span { color: #76584d; font-size: 11px; text-align: center; }
+.passScanNote { position: relative; margin: 0 auto; max-width: 31ch; color: #76584d; font-size: 11px; line-height: 1.65; }
+.passSignature { margin-top: 16px; color: #a27d6b; font-size: 8px; }
+.passDownload { border-radius: 999px; font-size: 11px; }
+
+.farewell { padding-top: 94px; padding-bottom: 42px; text-align: center; background: #f5e7df; }
+.farewellSilk { position: absolute; z-index: -1; inset: 0; pointer-events: none; background: url('/images/baby-aylla/silk-drape-bg.webp') center / cover; }
+.farewellSilk::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(255,248,239,.95), rgba(255,246,236,.73) 55%, rgba(251,239,230,.5)); }
+.finalPearl { display: block; width: 9px; height: 9px; margin: 0 auto 32px; border: 1px solid #cab08e; border-radius: 50%; background: radial-gradient(circle at 30% 25%, #fff, #fff5e4 55%, #c7aa89); }
+.farewellMessage { max-width: 34ch; margin: 26px auto 30px; color: #76584d; font-size: 19px; line-height: 1.8; }
+.familySignature { margin: 5px auto 0; color: #87564f; font-size: clamp(32px, 6vw, 48px); line-height: 1.4; }
+.atelierSignature { display: flex; flex-direction: column; align-items: center; margin: 66px auto 0; padding-top: 26px; width: min(100%, 240px); border-top: 1px solid #c9ae8a55; color: #775e50; }
+.brandLogo { width: 25px; height: 36px; object-fit: contain; opacity: .75; }
+.atelierSignature p { margin: 12px 0 8px; font-size: 11px; letter-spacing: .1em; }
+.atelierSignature small { font-size: 10px; }
+
+@media (min-width: 640px) {
+  .section { padding-inline: 40px; }
+  .calendarSheet { padding: 44px 45px 28px; }
+  .calendar td { height: 43px; }
+  .calendar { font-size: 13px; }
+  .replyCard { padding: 48px 54px; }
+}
+
+@media (min-width: 900px) {
+  .section { padding-top: 102px; padding-bottom: 102px; }
+  .dateSection { padding-top: 48px; }
+  .placeCard { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; padding: 64px 50px; }
+  .placePractical { margin: 0; padding: 0 0 0 44px; border-top: 0; border-left: 1px solid #d4bea077; text-align: left; }
+  .address { margin: 0; }
+  .fabricCollection { gap: 28px; }
+  .fabricSample { width: 110px; }
+  .fabric { width: 95px; }
+  .farewell { padding-bottom: 42px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fabric { transform: none; }
+}
+
+/* Couture finishing: one bow on the date, a pearl bridge, one family seal. */
+.dateSection .sectionHeader { margin-bottom: 100px; }
+.dateSection { padding-bottom: 0; }
+.calendarSheet { padding-top: 65px; transform-origin: 50% 15%; }
+.calendarSheet::after { content: ""; position: absolute; pointer-events: none; inset: 8px; border: 1px dashed #c5a18c55; }
+.bookmark { top: -12px; right: 23px; height: 117px; width: 20px; background: linear-gradient(90deg, #bc8c85, #edc7c0 45%, #c09188); }
+.coutureBow { position: relative; display: block; pointer-events: none; transform-origin: 50% 30%; }
+.calendarBow { position: absolute; z-index: 1; top: -75px; left: calc(50% - 90px); width: 180px; height: 125px; }
+.coutureBowImage { object-fit: contain; filter: drop-shadow(0 7px 5px #8a584827); }
+.pearlTransition { width: min(100%, 340px); margin: 34px auto 0; height: 102px; pointer-events: none; }
+.pearlStrand { width: 100%; height: 100%; overflow: visible; }
+.encounterSection::before { display: none; }
+.encounterSection { padding-top: 52px; }
+.placeCard { border: 1px solid #d3bda2; border-radius: 48% 48% 0 0 / 22px 22px 0 0; padding-top: 66px; }
+.placeCard::after { content: ""; position: absolute; pointer-events: none; inset: 8px; border: 1px solid #d8c3a55c; border-radius: inherit; }
+.coutureMedallion { position: absolute; z-index: 1; top: -38px; left: calc(50% - 32px); width: 64px; height: 76px; pointer-events: none; }
+.medallionRibbon { position: absolute; top: 7px; left: 20px; width: 24px; height: 70px; border-inline: 1px solid #edc6bd; background: linear-gradient(90deg, #b7847c, #edc7c0 45%, #c08e83); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%); transform: rotate(-8deg); }
+.medallionSeal { position: relative; display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid #b9a17d; border-radius: 50%; background: radial-gradient(ellipse at 35% 25%, #fffdf7, #f1e3cd 65%, #d2bba0); box-shadow: inset 0 0 0 4px #fff9eb, inset 0 0 0 5px #d5bfa1, 0 4px 8px #76584d1a; color: #b39176; text-shadow: 1px 1px #fffaf0, -1px -1px #b7a18566; font-size: 45px; padding: 1px 6px 0 0; }
+.encounterSection .sectionHeader { margin-bottom: 76px; }
+.fabric { transform-origin: 50% 0; }
+.fabric::after { inset: 5px 6px 9px; border-inline: 1px dashed #fff7e688; }
+.farewellComposition { max-width: 660px; margin: auto; }
+.farewellBow { width: 140px; height: 110px; margin: -24px auto 24px; }
+.familySignature { color: #98625c; }
+@media (min-width: 640px) {
+  .calendarSheet { padding-top: 65px; }
+  .calendarBow { width: 204px; height: 140px; top: -85px; left: calc(50% - 102px); }
+}
+@media (min-width: 900px) {
+  .dateSection { padding-bottom: 0; }
+  .encounterSection { padding-top: 52px; }
+  .placeCard { padding-top: 70px; }
+  .pearlTransition { height: 118px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .section [data-couture-reveal], .coutureBow { transform: none !important; }
+  .pearlStrand [data-pearl-thread] { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section [data-couture-reveal="signature"] { opacity: 1 !important; }
+}
+
+/* Sound is a small pearl control; the family farewell remains the closing scene. */
+.audioDock { position: fixed; z-index: 60; right: max(18px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); display: flex; align-items: flex-end; gap: 12px; max-width: calc(100vw - 36px); }
+.audioButton { flex: 0 0 46px; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border: 1px solid #b9a17d; border-radius: 50%; background: radial-gradient(ellipse at 30% 20%, #fffdf8, #f4e7d5 70%, #d5bea0); box-shadow: inset 0 0 0 3px #fffaf0, 0 4px 12px #76584d22; color: #76534a; cursor: pointer; touch-action: manipulation; }
+.audioButton:focus-visible { outline: 2px solid #71504b; outline-offset: 4px; }
+.audioButton:disabled { cursor: wait; opacity: .7; }
+.audioNotice { margin: 0; max-width: 230px; padding: 12px 14px; border: 1px solid #d3bda2; background: #fffaf0; color: #67463a; font-size: 12px; line-height: 1.7; box-shadow: 0 4px 12px #76584d14; }
+.atelierSignature { width: min(100%, 300px); margin-top: 58px; }
+.brandLogo { width: 240px; max-width: 100%; height: 92px; object-fit: cover; opacity: .86; mix-blend-mode: multiply; }
+.atelierSignature .brandTagline { margin: 8px 0 0; font-size: 19px; line-height: 1.5; letter-spacing: 0; }
+.atelierSignature .brandIntention { margin: 7px 0 22px; color: #95685b; font-size: 27px; line-height: 1.4; letter-spacing: 0; }
+.musicCredit { width: min(100%, 380px); margin: 30px auto 0; padding: 24px 0 16px; border-top: 1px solid #c9ae8a55; color: #775e50; }
+.musicCredit p { margin: 5px 0; font-size: 11px; line-height: 1.8; }
+.musicCredit .musicTitle { margin-top: 8px; font-size: 19px; }
+.farewell { padding-bottom: 84px; }

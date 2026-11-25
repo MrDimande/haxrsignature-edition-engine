@@ -25,6 +25,7 @@ export type CheckinUrlResolution =
       error:
         | "missing_token"
         | "invalid_token"
+        | "invalid_event"
         | "preview_target_unconfigured"
         | "preview_cannot_target_production"
         | "invalid_target_url";
@@ -102,8 +103,9 @@ export function isProductionHostOrAlias(hostname: string): boolean {
   return false;
 }
 
-export function resolveNeidyJoseCheckinUrl(
+export function resolveEditionCheckinUrl(
   qrToken: string,
+  eventId: string,
   options?: ResolveCheckinUrlOptions
 ): CheckinUrlResolution {
   if (!qrToken || typeof qrToken !== "string") {
@@ -123,9 +125,18 @@ export function resolveNeidyJoseCheckinUrl(
     };
   }
 
+  const cleanEventId = eventId?.trim();
+  if (!cleanEventId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleanEventId)) {
+    return {
+      ok: false,
+      error: "invalid_event",
+      message: "Evento de entrada inválido ou indisponível.",
+    };
+  }
+
   const environment = detectEnvironment(options);
   const safeToken = encodeURIComponent(cleanToken);
-  const path = `/event/${NEIDY_JOSE_CANONICAL_EVENT_ID}/checkin/${safeToken}`;
+  const path = `/event/${encodeURIComponent(cleanEventId)}/checkin/${safeToken}`;
 
   if (environment === "production") {
     return {
@@ -201,4 +212,11 @@ export function resolveNeidyJoseCheckinUrl(
     environment: "development",
     targetBase: devBase.replace(/\/$/, ""),
   };
+}
+
+export function resolveNeidyJoseCheckinUrl(
+  qrToken: string,
+  options?: ResolveCheckinUrlOptions
+): CheckinUrlResolution {
+  return resolveEditionCheckinUrl(qrToken, NEIDY_JOSE_CANONICAL_EVENT_ID, options);
 }

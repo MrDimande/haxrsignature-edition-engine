@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* ==========================================================================
+   BABY AYLLA — DIOR COLLECTION ROSA | DIGITAL HAUTE COUTURE STYLES
+   Maison de Luxe Palette: Powder Pink, Blush Silk, Pale Champagne Gold, Soft Ivory
+   ========================================================================== */
+
+.baby-aylla-root {
+  --aylla-dior-rose: #C87A6E;
+  --aylla-blush-accent: #D4958A;
+  --aylla-powder-pink: #ECCBC0;
+  --aylla-baby-pink: #F4D8CD;
+  --aylla-nude-rose: #DFC0B7;
+  --aylla-champagne: #F5EFEB;
+  --aylla-ivory: #FBF8F5;
+  --aylla-creme: #FAF3EE;
+  --aylla-deep: #4A3B39;
+  --aylla-subtle: #7A6662;
+  --aylla-gold: #DFBA73;
+  --aylla-gold-light: #F7E7B4;
+  --aylla-gold-pale: #E5D2B3;
+
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+  color: var(--aylla-deep);
+  background-color: var(--aylla-ivory);
+  overflow-x: clip;
+}
+
+.aylla-font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.aylla-font-calligraphy {
+  font-family: 'Great Vibes', cursive;
+}
+
+.aylla-font-sans {
+  font-family: 'Montserrat', system-ui, sans-serif;
+}
+
+/* --- Dior Silk Shimmer Effect --- */
+@keyframes diorSilkShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.aylla-shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #C87A6E 0%,
+    #ECCBC0 50%,
+    #C87A6E 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: diorSilkShimmer 7s linear infinite;
+}
+
+.aylla-gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    #B38728 0%,
+    #F7E7B4 25%,
+    #DFBA73 50%,
+    #FAF3EE 75%,
+    #B38728 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: diorSilkShimmer 8s linear infinite;
+}
+
+/* --- Floating Stardust & Rose Petal Ambient --- */
+@keyframes ayllaFloatParticle {
+  0% {
+    transform: translateY(0) scale(0.8) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.6;
+  }
+  75% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-110px) scale(1.1) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+.aylla-particle {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(223, 186, 115, 0.35) 50%, transparent 100%);
+  filter: drop-shadow(0 0 5px rgba(223, 186, 115, 0.25));
+  animation: ayllaFloatParticle ease-in-out infinite;
+}
+
+/* --- Pearl Luminescence --- */
+@keyframes pearlGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 20px rgba(223, 186, 115, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(255, 255, 255, 1), 0 0 28px rgba(223, 186, 115, 0.35);
+  }
+}
+
+.aylla-pearl-glow {
+  animation: pearlGlow 4s ease-in-out infinite;
+}
+
+/* --- Dior Haute Couture CTA Button --- */
+.aylla-cta-btn {
+  background: linear-gradient(135deg, #C87A6E 0%, #A85A4E 100%);
+  box-shadow: 0 10px 25px -5px rgba(200, 122, 110, 0.32), 0 0 0 1px rgba(247, 231, 180, 0.4) inset;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aylla-cta-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: linear-gradient(135deg, #D4958A 0%, #B86B60 100%);
+  box-shadow: 0 16px 32px -6px rgba(200, 122, 110, 0.45), 0 0 0 1.5px rgba(247, 231, 180, 0.6) inset;
+}
+
+.aylla-cta-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* --- Stationery Luxury Cards --- */
+.aylla-stationery-card {
+  background: linear-gradient(180deg, #FCF9F6 0%, #FBF8F5 50%, #FAF3EE 100%);
+  border: 1px solid rgba(223, 186, 115, 0.35);
+  box-shadow: 0 16px 40px -12px rgba(74, 59, 57, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+}
+
+/* --- Subtle Filigree Border --- */
+.aylla-filigree-border {
+  position: relative;
+  border: 1px solid rgba(223, 186, 115, 0.45);
+}
+
+.aylla-filigree-border::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(223, 186, 115, 0.2);
+  border-radius: inherit;
+  pointer-events: none;
+}
