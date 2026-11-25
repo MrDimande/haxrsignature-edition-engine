@@ -470,7 +470,7 @@ export const INVITATIONS: Record<string, InvitationConfig> = {
     experienceType: "ceremonial",
     sourcePath: "/babyaylla",
     legacyFolder: "babyaylla",
-    status: "draft",
+    status: "active",
     metadata: {
       title: "Baby Aylla | Dior Collection Rosa · Convite Digital de Alta-Costura",
       date: "2027-01-23",

@@ -61,7 +61,10 @@ export async function generateMetadata({
 
   return {
     ...base,
-    robots: invitation.status === "active" ? base.robots : { index: false, follow: false },
+    robots:
+      invitation.status === "active"
+        ? (base.robots ?? { index: false, follow: false })
+        : { index: false, follow: false },
     openGraph: {
       ...base.openGraph,
       images: [
