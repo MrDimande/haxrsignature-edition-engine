@@ -5,15 +5,20 @@ import { POST as verifyHandler } from "../../app/api/gifts/aylla/verify/route";
 import { GET as sessionGetHandler, DELETE as sessionDeleteHandler } from "../../app/api/gifts/aylla/session/route";
 import { POST as reserveHandler } from "../../app/api/gifts/aylla/reserve/route";
 import { POST as cancelHandler } from "../../app/api/gifts/aylla/cancel/route";
+import { POST as rsvpPostHandler } from "../../app/api/rsvp/route";
 
-const TEST_SECRET = "integration-proxy-secret-test-2026";
+const TEST_SECRET: string = "integration-proxy-secret-test-2026";
+const TEST_GLOBAL_SECRET: string = "global-rsvp-secret-should-not-pass";
 let mockCoreServerResponses: Map<string, { status: number; body: unknown }> = new Map();
 const originalFetch = globalThis.fetch;
 
 describe("Baby Aylla — Edition ↔ Core Full End-to-End Integration (Phase C.3.1.1)", () => {
   beforeEach(() => {
-    process.env.HAXR_EDITION_PROXY_SECRET = TEST_SECRET;
+    process.env.HAXR_AYLLA_GIFT_PROXY_SECRET = TEST_SECRET;
+    process.env.HAXR_EDITION_PROXY_SECRET = TEST_GLOBAL_SECRET;
     process.env.HAXR_CORE_API_BASE_URL = "http://core.haxrsignature.local";
+    process.env.HAXR_AYLLA_GIFT_STAGING_TEST_ACTIVATION = "true";
+    process.env.HAXR_AYLLA_GIFT_SYNTHETIC_DELIVERY = "true";
     mockCoreServerResponses.clear();
 
     // Mock fetch to simulate Core upstream responses faithfully
@@ -23,8 +28,13 @@ describe("Baby Aylla — Edition ↔ Core Full End-to-End Integration (Phase C.3
       const authHeader = (init?.headers as Record<string, string>)?.["authorization"] || "";
       const proxyHeader = (init?.headers as Record<string, string>)?.["x-haxr-edition-proxy"] || "";
 
-      // Verify proxy secret is always forwarded properly
-      if (!proxyHeader || proxyHeader !== TEST_SECRET) {
+      // Verify dedicated Gift Registry proxy secret is always forwarded exclusively
+      if (
+        !proxyHeader ||
+        proxyHeader !== TEST_SECRET ||
+        authHeader !== `Bearer ${TEST_SECRET}` ||
+        proxyHeader === TEST_GLOBAL_SECRET
+      ) {
         return new Response(JSON.stringify({ success: false, error: "Não autorizado." }), {
           status: 401,
           headers: { "content-type": "application/json" },
@@ -47,8 +57,13 @@ describe("Baby Aylla — Edition ↔ Core Full End-to-End Integration (Phase C.3
   });
 
   afterEach(() => {
+    delete process.env.HAXR_AYLLA_GIFT_PROXY_SECRET;
     delete process.env.HAXR_EDITION_PROXY_SECRET;
     delete process.env.HAXR_CORE_API_BASE_URL;
+    delete process.env.HAXR_AYLLA_GIFT_STAGING_TEST_ACTIVATION;
+    delete process.env.HAXR_AYLLA_GIFT_SYNTHETIC_DELIVERY;
+    delete process.env.HAXR_API_BACKEND;
+    delete process.env.VERCEL_ENV;
     globalThis.fetch = originalFetch;
   });
 
@@ -194,6 +209,9 @@ describe("Baby Aylla — Edition ↔ Core Full End-to-End Integration (Phase C.3
   });
 
   it("8. Reserve route: fail-closed blocks any reservation while catalog is disabled", async () => {
+    delete process.env.HAXR_AYLLA_GIFT_STAGING_TEST_ACTIVATION;
+    delete process.env.HAXR_AYLLA_GIFT_SYNTHETIC_DELIVERY;
+
     const req = new Request("http://localhost:3000/api/gifts/aylla/reserve", {
       method: "POST",
       headers: {
@@ -214,8 +232,13 @@ describe("Baby Aylla — Edition ↔ Core Full End-to-End Integration (Phase C.3
     assert.equal(json.outcome, "registry_closed");
   });
 
-  it("9. Fails closed with 503 if HAXR_EDITION_PROXY_SECRET is missing from Edition", async () => {
-    delete process.env.HAXR_EDITION_PROXY_SECRET;
+  it("9. Fails closed with 503 if HAXR_AYLLA_GIFT_PROXY_SECRET is missing from Edition even when HAXR_EDITION_PROXY_SECRET exists", async () => {
+    delete process.env.HAXR_AYLLA_GIFT_PROXY_SECRET;
+    let fetchCalled = false;
+    globalThis.fetch = async () => {
+      fetchCalled = true;
+      return new Response("{}", { status: 200 });
+    };
 
     const req = new Request("http://localhost:3000/api/gifts/aylla/challenge", {
       method: "POST",
@@ -224,6 +247,7 @@ describe("Baby Aylla — Edition ↔ Core Full End-to-End Integration (Phase C.3
     });
 
     const res = await challengeHandler(req);
+    assert.equal(fetchCalled, false);
     assert.equal(res.status, 503);
     const json = await res.json();
     assert.equal(json.success, false);
@@ -246,5 +270,52 @@ describe("Baby Aylla — Edition ↔ Core Full End-to-End Integration (Phase C.3
     const json = await res.json();
     assert.equal(json.success, false);
     assert.equal(json.code, "CORE_NETWORK_ERROR");
+  });
+
+  it("11. Preserves HAXR_API_BACKEND=local for /api/rsvp and never logs secrets", async () => {
+    process.env.HAXR_API_BACKEND = "local";
+    const loggedLines: string[] = [];
+    const originalConsoleInfo = console.info;
+    console.info = (...args: unknown[]) => {
+      loggedLines.push(args.map(String).join(" "));
+    };
+
+    try {
+      let fetchCalled = false;
+      globalThis.fetch = async () => {
+        fetchCalled = true;
+        return new Response("{}", { status: 200 });
+      };
+
+      const rsvpRes = await rsvpPostHandler(
+        new Request("http://localhost:3000/api/rsvp", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ name: "", slug: "babyaylla" }),
+        })
+      );
+      assert.equal(fetchCalled, false);
+      assert.equal(rsvpRes.status, 400);
+
+      // Trigger session lookup to verify proxy logs never expose either secret
+      mockCoreServerResponses.set("POST /api/v1/edition/gifts/aylla/session", {
+        status: 401,
+        body: { success: false, reason: "session_expired" },
+      });
+      await sessionGetHandler(
+        new Request("http://localhost:3000/api/gifts/aylla/session", {
+          method: "GET",
+          headers: {
+            cookie: "haxr_aylla_guest_session=00000000-0000-0000-0000-000000000000.probe",
+          },
+        })
+      );
+
+      const combinedLogs = loggedLines.join("\n");
+      assert.equal(combinedLogs.includes(TEST_SECRET), false);
+      assert.equal(combinedLogs.includes(TEST_GLOBAL_SECRET), false);
+    } finally {
+      console.info = originalConsoleInfo;
+    }
   });
 });
