@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     requestId
   );
 
-  if (result.status === 401 || result.code === "session_expired") {
+  if (result.status === 401 || result.code === "session_expired" || result.code === "access_denied") {
     response.cookies.delete("haxr_aylla_guest_session");
   }
 
