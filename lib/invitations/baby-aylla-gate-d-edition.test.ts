@@ -20,6 +20,7 @@ import {
   resolveAyllaGiftEventId,
 } from "../../lib/aylla/gifts/config";
 import {
+  isAyllaEditionRealDeliveryStagingEnabled,
   isAyllaEditionRegistryOperational,
   isAyllaEditionTestActivationEnabled,
 } from "../../lib/aylla/gifts/test-activation";
@@ -29,6 +30,7 @@ const trackedEnvKeys = [
   "HAXR_CORE_API_BASE_URL",
   "HAXR_EDITION_PROXY_SECRET",
   "HAXR_AYLLA_GIFT_STAGING_TEST_ACTIVATION",
+  "HAXR_AYLLA_GIFT_STAGING_REAL_DELIVERY",
   "HAXR_AYLLA_GIFT_SYNTHETIC_DELIVERY",
   "VERCEL_ENV",
   "NEXT_PUBLIC_VERCEL_ENV",
@@ -388,5 +390,18 @@ describe("Baby Aylla — Edition Gate D Couture UI & Proxy Integration", () => {
     assert.match(rsvpSource, /!email\.trim\(\)/);
     assert.match(rsvpSource, /BabyAyllaDigitalPass/);
     assert.match(rsvpSource, /Lista de Presentes/);
+  });
+
+  it("supports isolated real-delivery staging gate outside Production without synthetic flags", () => {
+    process.env.HAXR_AYLLA_GIFT_STAGING_TEST_ACTIVATION = "true";
+    process.env.HAXR_AYLLA_GIFT_STAGING_REAL_DELIVERY = "true";
+
+    assert.equal(isAyllaEditionTestActivationEnabled(), false);
+    assert.equal(isAyllaEditionRealDeliveryStagingEnabled(), true);
+    assert.equal(isAyllaEditionRegistryOperational(), true);
+
+    process.env.VERCEL_ENV = "production";
+    assert.equal(isAyllaEditionRealDeliveryStagingEnabled(), false);
+    assert.equal(isAyllaEditionRegistryOperational(), false);
   });
 });

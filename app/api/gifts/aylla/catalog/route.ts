@@ -5,6 +5,7 @@ import {
 } from "@lib/aylla/gifts/editorial-gallery";
 import { humanizeAyllaError } from "@lib/aylla/gifts/error-copy";
 import {
+  isAyllaEditionRealDeliveryStagingEnabled,
   isAyllaEditionRegistryOperational,
   isAyllaEditionTestActivationEnabled,
 } from "@lib/aylla/gifts/test-activation";
@@ -75,6 +76,7 @@ export async function GET(request: Request) {
   const editorialItems = getBabyAyllaEditorialGalleryItems();
   const operational = isAyllaEditionRegistryOperational();
   const testActivation = isAyllaEditionTestActivationEnabled();
+  const realDeliveryStaging = isAyllaEditionRealDeliveryStagingEnabled();
 
   logEditionAyllaTrace(requestId, "edition_route_enter", { route: "catalog", operational });
 
@@ -164,7 +166,7 @@ export async function GET(request: Request) {
   const coreItems = catalogResult.data.items ?? [];
   const editorialIds = new Set(editorialItems.map((item) => item.id));
 
-  const stagingTestItems = testActivation
+  const stagingTestItems = (testActivation || realDeliveryStaging)
     ? coreItems
         .filter((item) => !editorialIds.has(item.itemId) && item.itemId in SYNTHETIC_TEST_ITEM_META)
         .map((item) => {
