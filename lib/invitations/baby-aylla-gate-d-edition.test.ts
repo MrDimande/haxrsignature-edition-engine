@@ -28,6 +28,7 @@ import {
 const originalFetch = globalThis.fetch;
 const trackedEnvKeys = [
   "HAXR_CORE_API_BASE_URL",
+  "HAXR_AYLLA_GIFT_PROXY_SECRET",
   "HAXR_EDITION_PROXY_SECRET",
   "HAXR_AYLLA_GIFT_STAGING_TEST_ACTIVATION",
   "HAXR_AYLLA_GIFT_STAGING_REAL_DELIVERY",
@@ -40,7 +41,8 @@ const trackedEnvKeys = [
 describe("Baby Aylla — Edition Gate D Couture UI & Proxy Integration", () => {
   beforeEach(() => {
     process.env.HAXR_CORE_API_BASE_URL = "https://core.internal.haxrsignature.test";
-    process.env.HAXR_EDITION_PROXY_SECRET = "test-edition-proxy-secret";
+    process.env.HAXR_AYLLA_GIFT_PROXY_SECRET = "test-aylla-gift-proxy-secret";
+    process.env.HAXR_EDITION_PROXY_SECRET = "test-global-rsvp-only-secret";
   });
 
   afterEach(() => {
@@ -314,6 +316,47 @@ describe("Baby Aylla — Edition Gate D Couture UI & Proxy Integration", () => {
     );
     assert.match(componentSource, /kind:\s*"confirmed"[\s\S]{0,300}void fetchCatalog\(\)/);
     assert.doesNotMatch(componentSource, /await fetchCatalog\(\);\s*setStatusMessage\(`O mimo/);
+  });
+
+  it("uses HAXR_AYLLA_GIFT_PROXY_SECRET exclusively without fallback to HAXR_EDITION_PROXY_SECRET", async () => {
+    process.env.VERCEL_ENV = "production";
+    let fetchCalled = false;
+
+    globalThis.fetch = async (_url, init) => {
+      fetchCalled = true;
+      const headers = new Headers(init?.headers);
+      assert.equal(headers.get("authorization"), "Bearer test-aylla-gift-proxy-secret");
+      assert.equal(headers.get("x-haxr-edition-proxy"), "test-aylla-gift-proxy-secret");
+      assert.notEqual(headers.get("x-haxr-edition-proxy"), process.env.HAXR_EDITION_PROXY_SECRET);
+      return new Response(
+        JSON.stringify({ success: true, registryEnabled: false, items: [], myReservations: [] }),
+        { status: 200, headers: { "content-type": "application/json" } }
+      );
+    };
+
+    const okRes = await callCoreGiftApi({
+      method: "POST",
+      path: "/api/v1/edition/gifts/aylla/catalog",
+      requestId: "corr-gate-d-dedicated-secret",
+      body: { sessionToken: null },
+    });
+    assert.equal(okRes.ok, true);
+    assert.equal(fetchCalled, true);
+
+    // Removing HAXR_AYLLA_GIFT_PROXY_SECRET must fail closed even though HAXR_EDITION_PROXY_SECRET is present
+    delete process.env.HAXR_AYLLA_GIFT_PROXY_SECRET;
+    fetchCalled = false;
+
+    const missingRes = await callCoreGiftApi({
+      method: "POST",
+      path: "/api/v1/edition/gifts/aylla/catalog",
+      requestId: "corr-gate-d-missing-dedicated-secret",
+      body: { sessionToken: null },
+    });
+    assert.equal(fetchCalled, false);
+    assert.equal(missingRes.ok, false);
+    assert.equal(missingRes.status, 503);
+    assert.equal(missingRes.code, "PROXY_SECRET_MISSING");
   });
 
   it("parameterizes canonical Baby Aylla event UUID safely and blocks canary/synthetic leakage in production", async () => {

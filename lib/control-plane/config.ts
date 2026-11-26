@@ -41,6 +41,10 @@ export function getEditionProxySecret(): string | undefined {
   return process.env.HAXR_EDITION_PROXY_SECRET?.trim() || undefined;
 }
 
+export function getAyllaGiftProxySecret(): string | undefined {
+  return process.env.HAXR_AYLLA_GIFT_PROXY_SECRET?.trim() || undefined;
+}
+
 export function getProxyTimeoutMs(): number {
   const parsed = Number(process.env.HAXR_PROXY_TIMEOUT_MS);
   if (!Number.isFinite(parsed) || parsed < 5_000) {

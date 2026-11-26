@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import {
+  getAyllaGiftProxySecret,
   getCoreApiBaseUrl,
-  getEditionProxySecret,
   getEditionSiteUrl,
   getProxyTimeoutMs,
 } from "@lib/control-plane/config";
@@ -55,13 +55,13 @@ function raceWithDeadline<T>(
 
 /**
  * Server-to-server proxy client from Edition to Core for Baby Aylla gift operations.
- * Fails closed if HAXR_EDITION_PROXY_SECRET is not configured.
+ * Fails closed if HAXR_AYLLA_GIFT_PROXY_SECRET is not configured.
  */
 export async function callCoreGiftApi<T = unknown>(
   options: CoreFetchOptions
 ): Promise<CoreFetchResult<T>> {
   const requestId = options.requestId || randomUUID();
-  const secret = getEditionProxySecret();
+  const secret = getAyllaGiftProxySecret();
   if (!secret) {
     logEditionAyllaTrace(requestId, "edition_proxy_secret_missing", { path: options.path });
     return {
