@@ -95,7 +95,7 @@ export function BabyAyllaRsvp() {
                     <option value="1">1 pessoa</option>
                     <option value="2">2 pessoas</option>
                   </select>
-                ) : <span aria-hidden="true" />}
+                ) : <span className={styles.rsvpSpacer} aria-hidden="true" />}
               </div>
               {error ? <p className={styles.rsvpError} role="alert">{error}</p> : null}
               <button className={styles.rsvpSubmit} type="submit" disabled={!rsvpState.canSubmit || status === "sending"}>

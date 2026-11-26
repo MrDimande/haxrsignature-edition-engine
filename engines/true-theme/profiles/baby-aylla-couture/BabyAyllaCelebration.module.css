@@ -100,9 +100,14 @@
 .availability { max-width: 37ch; margin: 30px auto 0; padding-top: 25px; border-top: 1px solid #d1b99866; }
 .availabilityTitle { margin: 0; font-size: 17px; line-height: 1.7; color: #76584d; }
 .rsvpForm { display: grid; gap: 18px; margin-top: 30px; text-align: left; }
-.rsvpInput, .rsvpSelect { width: 100%; min-height: 48px; padding: 12px 0; border: 0; border-bottom: 1px solid #d4bea0; border-radius: 0; color: #4b332f; background: transparent; font: inherit; }
+.rsvpInput, .rsvpSelect { width: 100%; min-width: 0; max-width: 100%; min-height: 48px; padding: 12px 0; border: 0; border-bottom: 1px solid #d4bea0; border-radius: 0; color: #4b332f; background: transparent; font: inherit; }
 .rsvpInput:focus-visible, .rsvpSelect:focus-visible { outline: 2px solid #95685b; outline-offset: 4px; }
-.rsvpGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.rsvpGrid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.rsvpSpacer { display: none; }
+@media (max-width: 359px) {
+  .rsvpSection { padding-inline: 16px; }
+  .replyCard { padding-inline: 18px; }
+}
 .rsvpSubmit, .passDownload { display: inline-flex; justify-content: center; align-items: center; gap: 9px; min-height: 48px; padding: 13px 22px; border: 1px solid #9c6b60; background: linear-gradient(135deg, #a66d63, #d69b92); color: #fffaf5; font: inherit; font-size: 12px; letter-spacing: .08em; cursor: pointer; }
 .rsvpSubmit:disabled, .passDownload:disabled { cursor: wait; opacity: .65; }
 .rsvpError { margin: 0; color: #9f3838; font-size: 13px; line-height: 1.6; }
@@ -142,6 +147,8 @@
   .calendar td { height: 43px; }
   .calendar { font-size: 13px; }
   .replyCard { padding: 48px 54px; }
+  .rsvpGrid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rsvpSpacer { display: block; }
 }
 
 @media (min-width: 900px) {

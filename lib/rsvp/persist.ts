@@ -30,16 +30,25 @@ type ExistingEditionGuestIdentity = {
   name_normalized: string | null;
   email: string | null;
   phone: string | null;
+  archived_at?: string | null;
+  deleted_at?: string | null;
+  is_incorrect?: boolean | null;
 };
 
 export function resolveExistingRsvpIdentityKey(
   candidates: ExistingEditionGuestIdentity[],
   submission: Pick<RsvpSubmission, "name" | "email" | "phone">
 ): string {
+  const activeCandidates = candidates.filter(
+    (candidate) =>
+      !candidate.archived_at &&
+      !candidate.deleted_at &&
+      !candidate.is_incorrect
+  );
   const email = normalizeRsvpEmail(submission.email);
   const phone = normalizeRsvpPhone(submission.phone);
 
-  const contactMatch = candidates.find((candidate) => {
+  const contactMatch = activeCandidates.find((candidate) => {
     if (email && normalizeRsvpEmail(candidate.email) === email) return true;
     if (phone && normalizeRsvpPhone(candidate.phone) === phone) return true;
     return false;
@@ -52,7 +61,7 @@ export function resolveExistingRsvpIdentityKey(
   // Name fallback is safe only when no contact was supplied.
   if (!email && !phone) {
     const normalizedName = normalizeGuestName(submission.name);
-    const nameMatch = candidates.find(
+    const nameMatch = activeCandidates.find(
       (candidate) =>
         candidate.name_normalized === normalizedName ||
         candidate.name_normalized === `name:${normalizedName}`
@@ -107,7 +116,13 @@ export async function persistEditionRsvp(
     try {
       const pool = getNeonPool();
       const { rows: existingGuests } = await pool.query(
-        `SELECT name_normalized, email, phone FROM guests WHERE event_id = $1 AND guest_source = 'edition_rsvp'`,
+        `SELECT name_normalized, email, phone
+         FROM guests
+         WHERE event_id = $1
+           AND guest_source = 'edition_rsvp'
+           AND archived_at IS NULL
+           AND deleted_at IS NULL
+           AND is_incorrect = false`,
         [binding.eventId]
       );
 
@@ -189,7 +204,10 @@ export async function persistEditionRsvp(
     .from("guests")
     .select("name_normalized,email,phone")
     .eq("event_id", binding.eventId)
-    .eq("guest_source", "edition_rsvp");
+    .eq("guest_source", "edition_rsvp")
+    .is("archived_at", null)
+    .is("deleted_at", null)
+    .eq("is_incorrect", false);
 
   if (lookupError) {
     console.error("[RSVP] Identity lookup failed:", lookupError.message);

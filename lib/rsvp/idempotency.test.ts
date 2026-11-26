@@ -154,4 +154,34 @@ describe("idempotency contract", () => {
     const contact = normalizeRsvpEmail("same@example.invalid");
     assert.notEqual(`${eventA}:${contact}`, `${eventB}:${contact}`);
   });
+
+  it("ignora convidados arquivados, eliminados ou incorrectos ao resolver identidade RSVP", () => {
+    const key = resolveExistingRsvpIdentityKey(
+      [
+        {
+          name_normalized: "name:legado-arquivado",
+          email: "convidada@example.invalid",
+          phone: null,
+          archived_at: "2026-11-25T20:00:00Z",
+        },
+        {
+          name_normalized: "name:legado-apagado",
+          email: "convidada@example.invalid",
+          phone: null,
+          deleted_at: "2026-11-25T20:00:00Z",
+        },
+        {
+          name_normalized: "name:legado-incorrecto",
+          email: "convidada@example.invalid",
+          phone: null,
+          is_incorrect: true,
+        },
+      ],
+      {
+        name: "Convidada Nova",
+        email: "convidada@example.invalid",
+      }
+    );
+    assert.equal(key, "email:convidada@example.invalid");
+  });
 });
